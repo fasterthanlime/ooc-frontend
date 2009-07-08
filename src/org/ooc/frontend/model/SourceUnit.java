@@ -1,26 +1,23 @@
 package org.ooc.frontend.model;
 
-import org.ubi.FileLocation;
 
 public class SourceUnit extends Node {
 
-	private FileLocation location;
-	private NodeList<Declaration> body;
+	private NodeList<Node> body;
+	private String fileName;
 	
-	public SourceUnit(FileLocation location) {
+	public SourceUnit(String fileName) {
 		
-		this.location = location;
-		body = new NodeList<Declaration>();
+		this.fileName = fileName;
+		body = new NodeList<Node>();
 		
 	}
-	
-	public FileLocation getLocation() {
-		
-		return location;
-		
+
+	public String getFileName() {
+		return fileName;
 	}
 	
-	public NodeList<Declaration> getBody() {
+	public NodeList<Node> getBody() {
 		
 		return body;
 		

@@ -1,8 +1,8 @@
 package org.ooc.frontend.model;
 
-public class IntLiteral extends Literal {
+public class NumberLiteral extends Literal {
 
-	static enum Format {
+	public static enum Format {
 		DEC,
 		OCT,
 		HEX,
@@ -11,7 +11,7 @@ public class IntLiteral extends Literal {
 	int value;
 	Format format;
 	
-	public IntLiteral(int value, Format format) {
+	public NumberLiteral(int value, Format format) {
 		
 		this.value = value;
 		this.format = format;

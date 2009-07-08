@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import org.ooc.backend.Generator;
 import org.ooc.backend.TabbedWriter;
-import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -21,7 +20,7 @@ public class OocGenerator implements Generator {
 	@Override
 	public void generate(File outPath, SourceUnit unit) throws IOException {
 
-		String fileName = unit.getLocation().getFileName();
+		String fileName = unit.getFileName();
 		FileWriter w = new FileWriter(new File(outPath, fileName + ".gen"));
 		sourceUnit(unit, new TabbedWriter(w));
 		w.close();
@@ -30,7 +29,7 @@ public class OocGenerator implements Generator {
 
 	private void sourceUnit(SourceUnit unit, TabbedWriter w) throws IOException {
 
-		Iterator<Declaration> nodes = unit.getBody().iterator();
+		Iterator<Node> nodes = unit.getBody().iterator();
 		while(nodes.hasNext()) {
 			node(nodes.next(), w);
 		}

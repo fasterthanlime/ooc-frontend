@@ -1,6 +1,6 @@
 package org.ooc.frontend.model;
 
-public abstract class TypedNode extends Node {
+public interface Typed {
 
 	public abstract Type getType();
 	

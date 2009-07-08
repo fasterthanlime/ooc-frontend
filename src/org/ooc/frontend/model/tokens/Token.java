@@ -33,8 +33,12 @@ public class Token {
 		WHILE_KW,
 		DO_KW,
 		SWITCH_KW,
+		CASE_KW,
 		
 		VERSION_KW, // version keyword
+		
+		CTYPE_KW,
+		TYPEDEF_KW,
 		
 		RETURN_KW,
 		
