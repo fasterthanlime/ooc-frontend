@@ -8,8 +8,8 @@ public class NumberLiteral extends Literal {
 		HEX,
 	}
 	
-	int value;
-	Format format;
+	private int value;
+	private Format format;
 	
 	public NumberLiteral(int value, Format format) {
 		
@@ -23,6 +23,14 @@ public class NumberLiteral extends Literal {
 	
 		return new Type("Int");
 		
+	}
+	
+	public int getValue() {
+		return value;
+	}
+	
+	public Format getFormat() {
+		return format;
 	}
 	
 }

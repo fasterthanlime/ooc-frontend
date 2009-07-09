@@ -1,5 +1,5 @@
 package org.ooc.frontend.model;
 
-public class Declaration extends Statement {
+public abstract class Declaration extends Expression {
 
 }

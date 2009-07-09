@@ -127,8 +127,8 @@ public class TokenParser {
 				reader.read();
 				// TODO: optimize. readStringLiteral actually stores it into a String, but we don't care
 				reader.readStringLiteral();
-				tokens.add(new Token(location.getIndex(),
-						reader.mark() - location.getIndex(),
+				tokens.add(new Token(location.getIndex() + 1,
+						reader.mark() - location.getIndex() - 2,
 						TokenType.STRING_LIT));
 				continue;
 			}

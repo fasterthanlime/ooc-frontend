@@ -22,20 +22,33 @@ public class CommandLine {
 	
 	public CommandLine(String[] fileNames) {
 	
+		OocGenerator generator = new OocGenerator();
+		WhitelessComparator comparator = new WhitelessComparator();
+		
 		for(String fileName: fileNames) {
 		
-			System.out.println("Processing "+fileName);
+			System.out.printf("%s...\t", fileName);
+			File file = new File(fileName);
 			
 			try {
 				long t1 = System.currentTimeMillis();
-				SourceUnit unit = new Parser().parse(new File(fileName));
+				SourceUnit unit = new Parser().parse(file);
 				long t2 = System.currentTimeMillis();
-				System.out.printf("Parsing took %d ms\n", Long.valueOf(t2 - t1));
+				System.out.printf("Parsing...%d ms\t", Long.valueOf(t2 - t1));
 				
 				t1 = System.currentTimeMillis();
-				new OocGenerator().generate(new File("."), unit);
+				generator.generate(new File("."), unit);
 				t2 = System.currentTimeMillis();
-				System.out.printf("Generating ooc took %d ms\n", Long.valueOf(t2 - t1));
+				System.out.printf("Generating...%d ms\t", Long.valueOf(t2 - t1));
+				
+				t1 = System.currentTimeMillis();
+				boolean same = comparator.compare(file, new File(file.getPath() + ".gen"));
+				t2 = System.currentTimeMillis();
+				if(same) {
+					System.out.printf("Comparing... %d ms\tSame!\n", Long.valueOf(t2 - t1));
+				} else {
+					System.out.printf("Comparing... %d ms\tSLUT ALERT!\n", Long.valueOf(t2 - t1));
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);

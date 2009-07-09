@@ -32,6 +32,10 @@ public class ListReader<T> {
 		return list.get(index - 1);
 	}
 	
+	public T prev(int offset) {
+		return list.get(index - offset);
+	}
+	
 	public int mark() {
 		mark = index;
 		return mark;
