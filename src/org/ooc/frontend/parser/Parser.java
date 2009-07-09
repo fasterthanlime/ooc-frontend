@@ -3,12 +3,13 @@ package org.ooc.frontend.parser;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.ooc.errors.CompilationFailedError;
 import org.ooc.frontend.model.Access;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.CharLiteral;
+import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
@@ -16,7 +17,6 @@ import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Literal;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.NumberLiteral;
 import org.ooc.frontend.model.SourceUnit;
@@ -32,6 +32,7 @@ import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.SourceReader;
+import org.ubi.SyntaxError;
 
 public class Parser {
 
@@ -48,7 +49,7 @@ public class Parser {
 		
 	}
 	
-	public SourceUnit sourceUnit(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private SourceUnit sourceUnit(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 		
 		SourceUnit unit = new SourceUnit(sourceReader.getLocation().getFileName());
 		
@@ -60,11 +61,11 @@ public class Parser {
 				continue;
 			}
 			
-			if(include(sourceReader, reader, unit.getBody())) {
+			if(include(sourceReader, reader, unit.getIncludes())) {
 				continue;
 			}
 			
-			throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected declaration in source unit");
+			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start + reader.prev().length), "Expected declaration in source unit");
 			
 		}
 		
@@ -74,7 +75,7 @@ public class Parser {
 	
 	
 
-	private boolean include(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Node> body) throws EOFException, CompilationFailedError {
+	private boolean include(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
 
 		if(reader.peek().type != TokenType.INCLUDE_KW) {
 			return false;
@@ -87,11 +88,11 @@ public class Parser {
 		
 			Token t = reader.read();
 			if(t.type == TokenType.SEMICOL) {
-				body.add(new Include(sb.toString()));
+				includes.add(new Include(sb.toString()));
 				break;
 			}
 			if(t.type == TokenType.COMMA) {
-				body.add(new Include(sb.toString()));
+				includes.add(new Include(sb.toString()));
 				sb.setLength(0);
 			} else if(t.type == TokenType.NAME) {
 				sb.append(sourceReader.getSlice(t.start, t.length));
@@ -215,6 +216,11 @@ public class Parser {
 			return funcDecl;
 		}
 		
+		ClassDecl classDecl = classDecl(sourceReader, reader);
+		if(classDecl != null) {
+			return classDecl;
+		}
+		
 		reader.reset(mark);
 		return null;
 		
@@ -236,12 +242,63 @@ public class Parser {
 					reader.skip();
 					Expression expr = expression(sourceReader, reader);
 					if(expr == null) {
-						throw new CompilationFailedError(sourceReader.getLocation(t2.start), "Expecting expression as an initializer to a variable declaration.");
+						throw new CompilationFailedError(sourceReader.getLocation(t2.start), "Expected expression as an initializer to a variable declaration.");
 					}
 					return new VariableDeclAssigned(type, sourceReader.getSlice(t.start, t.length), expr);
 				}
 				return new VariableDecl(type, sourceReader.getSlice(t.start, t.length));
 			}
+		}
+		
+		reader.reset(mark);
+		return null;
+		
+	}
+	
+	private ClassDecl classDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+
+		int mark = reader.mark();
+		
+		if(reader.read().type == TokenType.CLASS_KW) {
+			
+			Token t = reader.read();
+			if(t.type != TokenType.NAME) {
+				throw new CompilationFailedError(sourceReader.getLocation(t.start),
+						"Expected class name after the class keyword.");
+			}
+			
+			Token t2 = reader.read();
+			if(t2.type != TokenType.OPEN_BRACK) {
+				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
+						"Expected opening bracket to begin class declaration.");
+			}
+			
+			ClassDecl classDecl = new ClassDecl(sourceReader.getSlice(t.start, t.length));
+			
+			while(reader.peek().type != TokenType.OPEN_BRACK) {
+			
+				VariableDecl varDecl = variableDecl(sourceReader, reader);
+				if(varDecl != null) {
+					if(reader.read().type != TokenType.SEMICOL) {
+						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+							"Expected semi-colon after variable declaration in class declaration");
+					}
+					classDecl.getVariables().add(varDecl);
+					continue;
+				}
+				
+				FunctionDecl funcDecl = functionDecl(sourceReader,reader);
+				if(funcDecl != null) {
+					classDecl.getFunctions().add(funcDecl);
+					continue;
+				}
+				
+				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+						"Expected variable declaration or function declaration in a class declaration");
+			
+			}
+			reader.skip();
+			
 		}
 		
 		reader.reset(mark);
@@ -410,7 +467,7 @@ public class Parser {
 		
 	}
 
-	private Literal literal(SourceReader sourceReader, ListReader<Token> reader) {
+	private Literal literal(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -418,8 +475,24 @@ public class Parser {
 		if(t.type == TokenType.STRING_LIT) {
 			return new StringLiteral(sourceReader.getSlice(t.start, t.length));
 		}
+		if(t.type == TokenType.CHAR_LIT) {
+			try {
+				return new CharLiteral(SourceReader.parseCharLiteral(sourceReader.getSlice(t.start, t.length)));
+			} catch (SyntaxError e) {
+				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Malformed char literal");
+			}
+		}
 		if(t.type == TokenType.DEC_NUMBER) {
-			return new NumberLiteral(Integer.parseInt(sourceReader.getSlice(t.start, t.length)), Format.DEC);
+			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length)), Format.DEC);
+		}
+		if(t.type == TokenType.HEX_NUMBER) {
+			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 16), Format.HEX);
+		}
+		if(t.type == TokenType.OCT_NUMBER) {
+			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 8), Format.OCT);
+		}
+		if(t.type == TokenType.BIN_NUMBER) {
+			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 2), Format.BIN);
 		}
 		
 		reader.reset(mark);

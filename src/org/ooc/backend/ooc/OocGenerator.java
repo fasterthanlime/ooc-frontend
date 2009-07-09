@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.ooc.backend.Generator;
 import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -51,14 +52,16 @@ public class OocGenerator implements Generator {
 			functionDecl((FunctionDecl) node, w);
 		} else if(node instanceof FunctionCall) {
 			functionCall((FunctionCall) node, w);
-		} else if(node instanceof StringLiteral) {
-			stringLiteral((StringLiteral) node, w);
 		} else if(node instanceof VariableAccess) {
 			variableAccess((VariableAccess) node, w);
 		} else if(node instanceof VariableDecl) {
 			variableDecl((VariableDecl) node, w);
 		} else if(node instanceof Assignment) {
 			assignment((Assignment) node, w);
+		} else if(node instanceof StringLiteral) {
+			stringLiteral((StringLiteral) node, w);
+		} else if(node instanceof CharLiteral) {
+			charLiteral((CharLiteral) node, w);
 		} else if(node instanceof NumberLiteral) {
 			numberLiteral((NumberLiteral) node, w);
 		} else {
@@ -71,11 +74,16 @@ public class OocGenerator implements Generator {
 
 		switch(node.getFormat()) {
 			case DEC: 
-				w.append(Integer.toString(node.getValue())); break;
+				w.append(Long.toString(node.getValue())); break;
 			case HEX: 
-				w.append(Integer.toHexString(node.getValue())); break;
-			case OCT: 
-				w.append(Integer.toOctalString(node.getValue())); break;
+				w.append("0x");
+				w.append(Long.toHexString(node.getValue())); break;
+			case OCT:
+				w.append("0c");
+				w.append(Long.toOctalString(node.getValue())); break;
+			case BIN: 
+				w.append("0b");
+				w.append(Long.toBinaryString(node.getValue())); break;
 		}
 		
 	}
@@ -180,6 +188,14 @@ public class OocGenerator implements Generator {
 		w.append('"');
 		w.append(SourceReader.spelled(node.getValue()));
 		w.append('"');
+		
+	}
+	
+	private void charLiteral(CharLiteral node, TabbedWriter w) throws IOException {
+		
+		w.append('\'');
+		w.append(SourceReader.spelled(node.getValue()));
+		w.append('\'');
 		
 	}
 

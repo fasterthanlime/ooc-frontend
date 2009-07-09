@@ -137,8 +137,8 @@ public class TokenParser {
 				reader.read();
 				try {
 					reader.readCharLiteral();
-					tokens.add(new Token(location.getIndex(), 
-							reader.mark() - location.getIndex(),
+					tokens.add(new Token(location.getIndex() + 1, 
+							reader.mark() - location.getIndex() - 2,
 							TokenType.CHAR_LIT));
 					continue;
 				} catch(SyntaxError e) {
@@ -235,6 +235,36 @@ public class TokenParser {
 				}
 				tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.REFERENCE));
 				continue;
+			}
+			
+			if(c == '0') {
+				reader.read();
+				char c2 = reader.peek();
+				if(c2 == 'x') {
+					reader.read();
+					String lit = reader.readMany("0123456789abcdefABCDEF", "_", true);
+					if(lit.isEmpty()) {
+						throw new CompilationFailedError(location, "Empty hexadecimal number literal");
+					}
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.HEX_NUMBER));
+					continue;
+				} else if(c2 == 'c') {
+					reader.read();
+					String lit = reader.readMany("01234567", "_", true);
+					if(lit.isEmpty()) {
+						throw new CompilationFailedError(location, "Empty octal number literal");
+					}
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.OCT_NUMBER));
+					continue;
+				} else if(c2 == 'b') {
+					reader.read();
+					String lit = reader.readMany("01", "_", true);
+					if(lit.isEmpty()) {
+						throw new CompilationFailedError(location, "Empty binary number literal");
+					}
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.BIN_NUMBER));
+					continue;
+				}
 			}
 			
 			if(Character.isDigit(c)) {

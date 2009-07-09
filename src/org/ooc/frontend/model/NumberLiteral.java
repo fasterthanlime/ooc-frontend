@@ -6,12 +6,13 @@ public class NumberLiteral extends Literal {
 		DEC,
 		OCT,
 		HEX,
+		BIN,
 	}
 	
-	private int value;
+	private long value;
 	private Format format;
 	
-	public NumberLiteral(int value, Format format) {
+	public NumberLiteral(long value, Format format) {
 		
 		this.value = value;
 		this.format = format;
@@ -25,7 +26,7 @@ public class NumberLiteral extends Literal {
 		
 	}
 	
-	public int getValue() {
+	public long getValue() {
 		return value;
 	}
 	

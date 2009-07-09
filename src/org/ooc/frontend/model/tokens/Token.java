@@ -82,7 +82,8 @@ public class Token {
 		
 		DEC_NUMBER, // 234
 		HEX_NUMBER, // 0xdeadbeef007
-		OCT_NUMBER,
+		OCT_NUMBER, // 0c777
+		BIN_NUMBER, // 0b1011
 		
 		OPEN_PAREN, // (
 		CLOS_PAREN, // )

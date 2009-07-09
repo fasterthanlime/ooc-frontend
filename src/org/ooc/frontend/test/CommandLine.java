@@ -31,23 +31,23 @@ public class CommandLine {
 			File file = new File(fileName);
 			
 			try {
-				long t1 = System.currentTimeMillis();
+				long t1 = System.nanoTime();
 				SourceUnit unit = new Parser().parse(file);
-				long t2 = System.currentTimeMillis();
-				System.out.printf("Parsing...%d ms\t", Long.valueOf(t2 - t1));
+				long t2 = System.nanoTime();
+				System.out.printf("Parsing...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
-				t1 = System.currentTimeMillis();
+				t1 = System.nanoTime();
 				generator.generate(new File("."), unit);
-				t2 = System.currentTimeMillis();
-				System.out.printf("Generating...%d ms\t", Long.valueOf(t2 - t1));
+				t2 = System.nanoTime();
+				System.out.printf("Generating...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
-				t1 = System.currentTimeMillis();
+				t1 = System.nanoTime();
 				boolean same = comparator.compare(file, new File(file.getPath() + ".gen"));
-				t2 = System.currentTimeMillis();
+				t2 = System.nanoTime();
 				if(same) {
-					System.out.printf("Comparing... %d ms\tSame!\n", Long.valueOf(t2 - t1));
+					System.out.printf("Comparing... %.2f ms\tSame!\n", Float.valueOf((t2 - t1) / 1000000.0f));
 				} else {
-					System.out.printf("Comparing... %d ms\tSLUT ALERT!\n", Long.valueOf(t2 - t1));
+					System.out.printf("Comparing... %.2f ms\tSLUT ALERT!\n", Float.valueOf((t2 - t1) / 1000000.0f));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
