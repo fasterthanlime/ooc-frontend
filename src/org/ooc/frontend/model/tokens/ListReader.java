@@ -29,6 +29,9 @@ public class ListReader<T> {
 	}
 	
 	public T prev() {
+		if(index < 1) {
+			return list.get(index);
+		}
 		return list.get(index - 1);
 	}
 	

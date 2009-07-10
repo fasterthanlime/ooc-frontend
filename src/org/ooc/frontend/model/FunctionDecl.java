@@ -8,14 +8,14 @@ public class FunctionDecl extends Declaration {
 	private String name;
 	private final NodeList<Line> body;
 	private Type returnType;
-	private List<VariableDecl> arguments;
+	private List<Argument> arguments;
 	
 	public FunctionDecl(String name) {
 		
 		this.name = name;
 		this.body = new NodeList<Line>();
 		this.returnType = null;
-		this.arguments = new ArrayList<VariableDecl>();
+		this.arguments = new ArrayList<Argument>();
 		
 	}
 	
@@ -39,7 +39,7 @@ public class FunctionDecl extends Declaration {
 		this.returnType = returnType;
 	}
 	
-	public List<VariableDecl> getArguments() {
+	public List<Argument> getArguments() {
 		return arguments;
 	}
 	

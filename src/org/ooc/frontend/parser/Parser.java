@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.ooc.errors.CompilationFailedError;
 import org.ooc.frontend.model.Access;
+import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
@@ -15,10 +16,17 @@ import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Include;
+import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Literal;
+import org.ooc.frontend.model.MemberAccess;
+import org.ooc.frontend.model.MemberArgument;
+import org.ooc.frontend.model.MemberAssignArgument;
+import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.RegularArgument;
+import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Statement;
 import org.ooc.frontend.model.StringLiteral;
@@ -65,7 +73,8 @@ public class Parser {
 				continue;
 			}
 			
-			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start + reader.prev().length), "Expected declaration in source unit");
+			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start + reader.prev().length),
+					"Expected declaration or include in source unit");
 			
 		}
 		
@@ -131,6 +140,16 @@ public class Parser {
 		
 		//System.out.println("Parsing statement, trying function call");
 		
+		Expression expression = expression(sourceReader, reader);
+		if(expression != null) {
+			return expression;
+		}
+		
+		Instantiation inst = instantiation(sourceReader, reader);
+		if(inst != null) {
+			return inst;
+		}
+		
 		FunctionCall call = functionCall(sourceReader, reader);
 		if(call != null) {
 			return call;
@@ -148,6 +167,53 @@ public class Parser {
 		Declaration decl = declaration(sourceReader, reader);
 		if(decl != null) {
 			return decl;
+		}
+		
+		Return ret = returnStatement(sourceReader, reader);
+		if(ret != null) {
+			return ret;
+		}
+		
+		reader.reset(mark);
+		return null;
+		
+	}
+
+	private Instantiation instantiation(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+
+		int mark = reader.mark();
+		
+		if(reader.read().type == TokenType.NEW_KW) {
+			System.out.println("Got 'new' keyword");
+			FunctionCall functionCall = functionCall(sourceReader, reader);
+			if(functionCall == null) {
+				Token t = reader.peek();
+				if(t.type == TokenType.NAME) {
+					reader.skip();
+					return new Instantiation(sourceReader.getSlice(t.start, t.length));
+				}
+				return new Instantiation();
+			}
+			return new Instantiation(functionCall);
+		}
+		
+		reader.reset(mark);
+		return null;
+		
+	}
+
+	private Return returnStatement(SourceReader sourceReader,
+			ListReader<Token> reader) throws IOException {
+
+		int mark = reader.mark();
+		
+		if(reader.read().type == TokenType.RETURN_KW) {
+			Expression expr = expression(sourceReader, reader);
+			if(expr == null) {
+				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+						"Expecting expression after keyword");
+			}
+			return new Return(expr);
 		}
 		
 		reader.reset(mark);
@@ -275,7 +341,7 @@ public class Parser {
 			
 			ClassDecl classDecl = new ClassDecl(sourceReader.getSlice(t.start, t.length));
 			
-			while(reader.peek().type != TokenType.OPEN_BRACK) {
+			while(reader.peek().type != TokenType.CLOS_BRACK) {
 			
 				VariableDecl varDecl = variableDecl(sourceReader, reader);
 				if(varDecl != null) {
@@ -299,6 +365,8 @@ public class Parser {
 			}
 			reader.skip();
 			
+			return classDecl;
+			
 		}
 		
 		reader.reset(mark);
@@ -313,7 +381,7 @@ public class Parser {
 		if(reader.read().type == TokenType.FUNC_KW) {
 
 			Token name = reader.read();
-			if(name.type != TokenType.NAME) {
+			if(name.type != TokenType.NAME && name.type != TokenType.NEW_KW) {
 				throw new CompilationFailedError(sourceReader.getLocation(name.start), "Expected function name after 'func' keyword");
 			}
 			
@@ -333,7 +401,7 @@ public class Parser {
 							throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected comma between arguments of a function definition");
 						}
 					} else {
-						VariableDecl arg = variableDecl(sourceReader, reader);
+						Argument arg = argument(sourceReader, reader);
 						if(arg == null) {
 							throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected variable declaration as an argument of a function definition");
 						}
@@ -344,7 +412,19 @@ public class Parser {
 				}
 			}
 			
-			if(reader.read().type != TokenType.OPEN_BRACK) {
+			Token t = reader.read();
+			if(t.type == TokenType.ARROW) {
+				Type returnType = type(sourceReader, reader);
+				if(returnType == null) {
+					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected return type after arrow");
+				}
+				functionDecl.setReturnType(returnType);
+				t = reader.read();
+			}
+			if(t.type == TokenType.SEMICOL) {
+				return functionDecl;
+			}
+			if(t.type != TokenType.OPEN_BRACK) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
 			}
 		
@@ -354,7 +434,7 @@ public class Parser {
 				if(line == null) {
 					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected statement in function body.");
 				}
-				functionDecl.getBody().nodes.add(line);
+				functionDecl.getBody().add(line);
 			
 			}
 			reader.skip();
@@ -368,6 +448,38 @@ public class Parser {
 		
 	}
 	
+	private Argument argument(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+
+		int mark = reader.mark();
+		
+		Type type = type(sourceReader, reader);
+		if(type != null) {
+			Token t = reader.peek();
+			if(t.type == TokenType.NAME) {
+				reader.skip();
+				return new RegularArgument(type, sourceReader.getSlice(t.start, t.length));
+			}
+		}
+		reader.reset(mark);
+		
+		Token t = reader.read();
+		if(t.type == TokenType.ASSIGN) {
+			Token t2 = reader.read();
+			if(t2.type != TokenType.NAME) {
+				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
+						"Expecting member variable name in member-assign-argument");
+			}
+			return new MemberAssignArgument(sourceReader.getSlice(t2.start, t2.length));
+		}
+		
+		if(t.type != TokenType.NAME) {
+			throw new CompilationFailedError(sourceReader.getLocation(t.start),
+			"Expecting member variable name in member-assign-argument");
+		}
+		return new MemberArgument(sourceReader.getSlice(t.start, t.length));
+		
+	}
+
 	private Assignment assignment(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
@@ -405,13 +517,13 @@ public class Parser {
 		return null;
 		
 	}
-	
+
 	private VariableAccess variableAccess(SourceReader sourceReader, ListReader<Token> reader) {
 		
 		int mark = reader.mark();
 		
 		Token t = reader.peek();
-		if(t.type == TokenType.NAME) {
+		if(t.type == TokenType.NAME || t.type == TokenType.THIS_KW) {
 			reader.skip();
 			return new VariableAccess(sourceReader.getSlice(t.start, t.length));
 		}
@@ -435,6 +547,41 @@ public class Parser {
 	
 	private Expression expression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 		
+		Expression expr = flatExpression(sourceReader, reader);
+		if(expr == null) {
+			return null;
+		}
+		
+		int count = 1;
+		
+		while(true) {
+			
+			System.out.println("Got #" + (count++) + " expression "+expr.getClass().getSimpleName());
+			
+			if(reader.peek().type == TokenType.DOT) {
+				System.out.println("Its a dot =)");
+				reader.skip();
+				FunctionCall call = functionCall(sourceReader, reader);
+				if(call != null) {
+					expr = new MemberCall(expr, call);
+					continue;
+				}
+				
+				VariableAccess varAccess = variableAccess(sourceReader, reader);
+				if(varAccess != null) {
+					expr = new MemberAccess(expr, varAccess);
+					continue;
+				}
+			}
+			
+			return expr;
+			
+		}
+		
+	}
+	
+	private Expression flatExpression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+		
 		int mark = reader.mark();
 		
 		Literal literal = literal(sourceReader, reader);
@@ -450,6 +597,11 @@ public class Parser {
 		Declaration declaration = declaration(sourceReader, reader);
 		if(declaration != null) {
 			return declaration;
+		}
+		
+		Instantiation instantiation = instantiation(sourceReader, reader);
+		if(instantiation != null) {
+			return instantiation;
 		}
 		
 		FunctionCall funcCall = functionCall(sourceReader, reader);

@@ -10,6 +10,7 @@ public class ClassDecl extends Declaration {
 	
 	public ClassDecl(String name) {
 		this.name = name;
+		this.superName = "";
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
 	}

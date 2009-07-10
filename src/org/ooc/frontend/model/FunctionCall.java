@@ -1,27 +1,25 @@
 package org.ooc.frontend.model;
 
-public class FunctionCall extends Expression {
+public class FunctionCall extends Access {
 
-	private String name;
-	private final NodeList<Expression> arguments;
+	protected String name;
+	protected final NodeList<Expression> arguments;
 	
 	public FunctionCall(String name) {
-		
 		this.name = name;
 		this.arguments = new NodeList<Expression>();
-		
 	}
 	
 	public String getName() {
-		
 		return name;
-		
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public NodeList<Expression> getArguments() {
-		
 		return arguments;
-		
 	}
 
 	@Override
