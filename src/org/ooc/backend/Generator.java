@@ -5,8 +5,16 @@ import java.io.IOException;
 
 import org.ooc.frontend.model.SourceUnit;
 
-public interface Generator {
+public abstract class Generator {
 
-	public void generate(File outPath, SourceUnit unit) throws IOException;
+	protected SourceUnit unit;
+
+	public Generator(File outPath, SourceUnit unit) {
+		
+		this.unit = unit;
+		
+	}
+	
+	public abstract void generate() throws IOException;
 	
 }

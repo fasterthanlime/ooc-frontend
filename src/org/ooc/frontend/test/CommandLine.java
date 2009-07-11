@@ -22,12 +22,16 @@ public class CommandLine {
 	
 	public CommandLine(String[] fileNames) {
 	
-		OocGenerator generator = new OocGenerator();
 		WhitelessComparator comparator = new WhitelessComparator();
+		
+		long tt1 = System.nanoTime();
 		
 		for(String fileName: fileNames) {
 		
-			System.out.printf("%s...\t", fileName);
+			String tabbedTitle = (fileName
+					+ "                                                                                                       ")
+					.substring(0, 45);			
+			System.out.printf(tabbedTitle);
 			File file = new File(fileName);
 			
 			try {
@@ -37,7 +41,7 @@ public class CommandLine {
 				System.out.printf("Parsing...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
 				t1 = System.nanoTime();
-				generator.generate(new File("."), unit);
+				new OocGenerator(new File("."), unit).generate();
 				t2 = System.nanoTime();
 				System.out.printf("Generating...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
@@ -56,7 +60,10 @@ public class CommandLine {
 			
 		}
 		
-		System.out.println("Everything went fine =)");	
+		long tt2 = System.nanoTime();
+		
+		System.out.printf("Everything went fine =) Total time: %.2f ms for %d files\n",
+				Float.valueOf((tt2 - tt1) / 1000000.0f), Integer.valueOf(fileNames.length));	
 		
 	}
 

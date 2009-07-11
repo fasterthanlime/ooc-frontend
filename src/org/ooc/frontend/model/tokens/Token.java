@@ -42,14 +42,20 @@ public class Token {
 		
 		RETURN_KW,
 		
+		TRUE,
+		FALSE,
+		NULL,
+		
 		SL_COMMENT, // single-line comment
 		ML_COMMENT, // multi-line comment
+		OOCDOC, // oodoc comment
 		
 		REFERENCE, // @functionName
 		NAME, // mostly a Java identifier
 		
 		COMMA, // ,
 		DOT, // .
+		DOUBLE_DOT, // ..
 		ARROW, // ->
 		COL, // :
 		SEMICOL, // ;
@@ -76,6 +82,12 @@ public class Token {
 		LTE, // <=
 		ASSIGN, // =
 		EQUALS, // ==
+		
+		L_AND, // && (logical and)
+		L_OR, // || (logical or)
+		
+		B_AND, // & (binary and)
+		B_OR, // | (binary or)
 		
 		CHAR_LIT, // 'c'
 		STRING_LIT, // "blah\n"

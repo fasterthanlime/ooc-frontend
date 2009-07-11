@@ -21,6 +21,10 @@ public class TokenParser {
 		while(reader.hasNext()) {
 			
 			reader.skipWhitespace();
+			if(!reader.hasNext()) {
+				break;
+			}
+			
 			//int mark = reader.mark();
 			FileLocation location = reader.getLocation();
 			
@@ -64,7 +68,13 @@ public class TokenParser {
 			
 			if(c == '.') {
 				reader.read();
-				tokens.add(new Token(location.getIndex(), 1, TokenType.DOT));
+				char c2 = reader.peek();
+				if(c2 == '.') {
+					reader.read();
+					tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_DOT));
+				} else {
+					tokens.add(new Token(location.getIndex(), 1, TokenType.DOT));
+				}
 				continue;
 			}
 			
@@ -112,6 +122,30 @@ public class TokenParser {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.NOT_EQ));
 				} else {
 					tokens.add(new Token(location.getIndex(), 1, TokenType.EXCL));
+				}
+				continue;
+			}
+			
+			if(c == '&') {
+				reader.read();
+				char c2 = reader.peek();
+				if(c2 == '&') {
+					reader.read();
+					tokens.add(new Token(location.getIndex(), 2, TokenType.L_AND));
+				} else {
+					tokens.add(new Token(location.getIndex(), 1, TokenType.B_AND));
+				}
+				continue;
+			}
+			
+			if(c == '|') {
+				reader.read();
+				char c2 = reader.peek();
+				if(c2 == '|') {
+					reader.read();
+					tokens.add(new Token(location.getIndex(), 2, TokenType.L_OR));
+				} else {
+					tokens.add(new Token(location.getIndex(), 1, TokenType.B_OR));
 				}
 				continue;
 			}
@@ -196,8 +230,14 @@ public class TokenParser {
 					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.SL_COMMENT));
 				} else if(c2 == '*') {
 					reader.read();
+					char c3 = reader.peek();
+					TokenType type = TokenType.ML_COMMENT;
+					if(c3 == '*') {
+						reader.read();
+						type = TokenType.OOCDOC;
+					}
 					reader.readUntil(new String[] {"*/"}, true);
-					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.ML_COMMENT));
+					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), type));
 				} else {
 					tokens.add(new Token(location.getIndex(), 1, TokenType.SLASH));
 				}
@@ -327,6 +367,12 @@ public class TokenParser {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.RETURN_KW));
 				} else if(name.equals("version")) {
 					tokens.add(new Token(location.getIndex(), 7, TokenType.VERSION_KW));
+				} else if(name.equals("true")) {
+					tokens.add(new Token(location.getIndex(), 4, TokenType.TRUE));
+				} else if(name.equals("false")) {
+					tokens.add(new Token(location.getIndex(), 5, TokenType.FALSE));
+				} else if(name.equals("null")) {
+					tokens.add(new Token(location.getIndex(), 4, TokenType.NULL));
 				} else {
 					tokens.add(new Token(location.getIndex(), name.length(), TokenType.NAME));
 				}

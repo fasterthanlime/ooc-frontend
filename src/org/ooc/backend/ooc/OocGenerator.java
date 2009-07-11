@@ -11,7 +11,10 @@ import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.Expression;
+import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Include;
@@ -23,6 +26,8 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.Parenthesis;
+import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SourceUnit;
@@ -33,31 +38,38 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ubi.SourceReader;
 
-public class OocGenerator implements Generator {
+public class OocGenerator extends Generator {
 
+	private TabbedWriter w;
+	private FileWriter fw;
+	
+	public OocGenerator(File outPath, SourceUnit unit) throws IOException {
+		super(outPath, unit);
+		this.fw = new FileWriter(new File(outPath, unit.getFileName() + ".gen"));
+		this.w = new TabbedWriter(fw);
+	}
+	
 	@Override
-	public void generate(File outPath, SourceUnit unit) throws IOException {
+	public void generate() throws IOException {
 
-		String fileName = unit.getFileName();
-		FileWriter w = new FileWriter(new File(outPath, fileName + ".gen"));
-		sourceUnit(unit, new TabbedWriter(w));
-		w.close();
+		sourceUnit(unit);
+		fw.close();
 		
 	}
 
-	private void sourceUnit(SourceUnit unit, TabbedWriter w) throws IOException {
+	private void sourceUnit(SourceUnit unit) throws IOException {
 
 		for(Include include: unit.getIncludes()) {
-			include(include, w);
+			include(include);
 		}
 		
 		for(Node node: unit.getBody()) {
-			node(node, w);
+			node(node);
 		}
 		
 	}
 	
-	private void include(Include include, TabbedWriter w) throws IOException {
+	private void include(Include include) throws IOException {
 
 		w.append("include ");
 		w.append(include.getInclude());
@@ -66,45 +78,117 @@ public class OocGenerator implements Generator {
 		
 	}
 
-	private void node(Node node, TabbedWriter w) throws IOException {
+	private void node(Node node) throws IOException {
 		
 		if(node instanceof Line) {
-			line((Line) node, w);
+			line((Line) node);
 		} else if(node instanceof ClassDecl) {
-			classDecl((ClassDecl) node, w);
+			classDecl((ClassDecl) node);
 		} else if(node instanceof FunctionDecl) {
-			functionDecl((FunctionDecl) node, w);
+			functionDecl((FunctionDecl) node);
 		} else if(node instanceof FunctionCall) {
-			functionCall((FunctionCall) node, w);
+			functionCall((FunctionCall) node);
 		} else if(node instanceof VariableAccess) {
-			variableAccess((VariableAccess) node, w);
+			variableAccess((VariableAccess) node);
 		} else if(node instanceof VariableDecl) {
-			variableDecl((VariableDecl) node, w);
+			variableDecl((VariableDecl) node);
 		} else if(node instanceof Assignment) {
-			assignment((Assignment) node, w);
+			assignment((Assignment) node);
 		} else if(node instanceof StringLiteral) {
-			stringLiteral((StringLiteral) node, w);
+			stringLiteral((StringLiteral) node);
 		} else if(node instanceof CharLiteral) {
-			charLiteral((CharLiteral) node, w);
+			charLiteral((CharLiteral) node);
 		} else if(node instanceof NumberLiteral) {
-			numberLiteral((NumberLiteral) node, w);
+			numberLiteral((NumberLiteral) node);
+		} else if(node instanceof RangeLiteral) {
+			rangeLiteral((RangeLiteral) node);
+		} else if(node instanceof Foreach) {
+			foreach((Foreach) node);
 		} else if(node instanceof Return) {
-			returnStatement((Return) node, w);
+			returnStatement((Return) node);
+		} else if(node instanceof Parenthesis) {
+			parenthesis((Parenthesis) node);
+		} else if(node instanceof Comment) {
+			comment((Comment) node);
 		} else {
 			throw new Error("Don't know how to write node of type "+node.getClass().getSimpleName());
 		}
 		
 	}
 
-	private void returnStatement(Return node, TabbedWriter w) throws IOException {
-
-		w.append("return ");
-		node(node.getExpression(), w);
+	private void comment(Comment node) throws IOException {
+		
+		w.append(node.getContent());
+		w.newLine();
 		
 	}
 
-	private void classDecl(ClassDecl node, TabbedWriter w) throws IOException {
+	private void parenthesis(Parenthesis node) throws IOException {
+		
+		w.append('(');
+		node(node.getExpression());
+		w.append(')');
+		
+	}
 
+	private void rangeLiteral(RangeLiteral node) throws IOException {
+
+		node(node.getLower());
+		w.append("..");
+		node(node.getUpper());
+		
+		
+	}
+
+	private void foreach(Foreach node) throws IOException {
+		
+		w.newLine();
+		w.append("for (");
+		variableDecl(node.getVariable());
+		w.append(": ");
+		node(node.getCollection());
+		w.append(") ");
+		
+		if(node.getBody().size() == 1) {
+			w.tab();
+			node(node.getBody().get(0));
+			w.untab();
+			return;
+		}
+		
+		w.append('{');
+		w.tab();
+		w.newLine();
+		w.newLine();
+		
+		for(Line line: node.getBody()) {
+			node(line);
+		}
+		
+		w.untab();
+		w.newLine();
+		w.append('}');
+		w.newLine();
+		w.newLine();
+		
+	}
+
+	private void returnStatement(Return node) throws IOException {
+
+		w.append("return ");
+		node(node.getExpression());
+		
+	}
+
+	private void classDecl(ClassDecl node) throws IOException {
+
+		w.newLine();
+		if(node.getComment() != null) {
+			node(node.getComment());
+		}
+		if(node.isAbstract()) {
+			w.append("abstract ");
+		}
 		w.append("class ");
 		w.append(node.getName());
 		if(!node.getSuperName().isEmpty()) {
@@ -125,13 +209,13 @@ public class OocGenerator implements Generator {
 		w.newLine();
 		
 		for(VariableDecl variable: node.getVariables()) {
-			variableDecl(variable, w);
+			variableDecl(variable);
 			w.append(';');
 			w.newLine();
 		}
 		
 		for(FunctionDecl function: node.getFunctions()) {
-			functionDecl(function, w);
+			functionDecl(function);
 			w.newLine();
 		}
 		
@@ -139,11 +223,10 @@ public class OocGenerator implements Generator {
 		w.newLine();
 		w.append('}');
 		w.newLine();
-		w.newLine();
 		
 	}
 
-	private void numberLiteral(NumberLiteral node, TabbedWriter w) throws IOException {
+	private void numberLiteral(NumberLiteral node) throws IOException {
 
 		switch(node.getFormat()) {
 			case DEC: 
@@ -161,39 +244,42 @@ public class OocGenerator implements Generator {
 		
 	}
 
-	private void assignment(Assignment node, TabbedWriter w) throws IOException {
+	private void assignment(Assignment node) throws IOException {
 
-		node(node.getLvalue(), w);
+		node(node.getLvalue());
 		w.append(" = ");
-		node(node.getRvalue(), w);
+		node(node.getRvalue());
 		
 	}
 
-	private void variableDecl(VariableDecl node, TabbedWriter w) throws IOException {
+	private void variableDecl(VariableDecl node) throws IOException {
 
-		type(node.getType(), w);
+		type(node.getType());
 		w.append(' ');
 		w.append(node.getName());
 		
 		if(node instanceof VariableDeclAssigned) {
 			VariableDeclAssigned vdass = (VariableDeclAssigned) node;
 			w.append(" = ");
-			node(vdass.getExpression(), w);
+			node(vdass.getExpression());
 		}
 		
 	}
 	
-	private void type(Type node, TabbedWriter w) throws IOException {
+	private void type(Type node) throws IOException {
 		
 		w.append(node.getName());
+		for(int i = 0; i < node.getPointerLevel(); i++) {
+			w.append("*");
+		}
 		
 	}
 
-	private void variableAccess(VariableAccess node, TabbedWriter w) throws IOException {
+	private void variableAccess(VariableAccess node) throws IOException {
 
 		if(node instanceof MemberAccess) {
 			MemberAccess mAccess = (MemberAccess) node;
-			node(mAccess.getExpression(), w);
+			node(mAccess.getExpression());
 			w.append('.');
 		}
 		
@@ -201,16 +287,22 @@ public class OocGenerator implements Generator {
 		
 	}
 
-	private void line(Line node, TabbedWriter w) throws IOException {
+	private void line(Line node) throws IOException {
 
 		w.newLine();
-		node(node.getStatement(), w);
-		w.append(';');		
+		node(node.getStatement());
+		if(!(node.getStatement() instanceof ControlStatement)) {
+			w.append(';');
+		}
 		
 	}
 
-	private void functionDecl(FunctionDecl node, TabbedWriter w) throws IOException {
+	private void functionDecl(FunctionDecl node) throws IOException {
 		
+		w.newLine();
+		if(node.isAbstract()) {
+			w.append("abstract ");
+		}
 		w.append("func ");
 		w.append(node.getName());
 		
@@ -221,7 +313,7 @@ public class OocGenerator implements Generator {
 				Argument arg = iter.next();
 				if(arg instanceof RegularArgument) {
 					RegularArgument regArg = (RegularArgument) arg;
-					type(regArg.getType(), w);
+					type(regArg.getType());
 					w.append(' ');
 					w.append(regArg.getName());
 				} else if(arg instanceof MemberAssignArgument) {
@@ -239,41 +331,41 @@ public class OocGenerator implements Generator {
 		
 		if(node.getReturnType() != null) {
 			w.append(" -> ");
-			type(node.getReturnType(), w);
+			type(node.getReturnType());
 		}
 		
 		if(node.getBody().isEmpty()) {
 		
 			w.append(';');
-			w.newLine();
-			w.newLine();
+			//w.newLine();
+			//w.newLine();
 			
 		} else {
 			
 			w.append(" {");
 			w.tab();
-			w.newLine();
+			//w.newLine();
 			
 			for(Node child: node.getBody()) {
-				node(child, w);
+				node(child);
 			}
 			
 			w.untab();
-			w.newLine();
+			//w.newLine();
 			w.newLine();
 			w.append("}");
-			w.newLine();
-			w.newLine();
+			//w.newLine();
+			//w.newLine();
 		
 		}
 		
 	}
 	
-	private void functionCall(FunctionCall node, TabbedWriter w) throws IOException {
+	private void functionCall(FunctionCall node) throws IOException {
 		
 		if(node instanceof MemberCall) {
 			MemberCall mfCall = (MemberCall) node;
-			node(mfCall.getExpression(), w);
+			node(mfCall.getExpression());
 			w.append('.');
 		}
 		
@@ -295,7 +387,7 @@ public class OocGenerator implements Generator {
 			if(!isFirst) {
 				w.append(", ");
 			}
-			node(arg, w);
+			node(arg);
 			isFirst = false;
 		}
 		
@@ -303,7 +395,7 @@ public class OocGenerator implements Generator {
 		
 	}
 	
-	private void stringLiteral(StringLiteral node, TabbedWriter w) throws IOException {
+	private void stringLiteral(StringLiteral node) throws IOException {
 
 		w.append('"');
 		w.append(SourceReader.spelled(node.getValue()));
@@ -311,7 +403,7 @@ public class OocGenerator implements Generator {
 		
 	}
 	
-	private void charLiteral(CharLiteral node, TabbedWriter w) throws IOException {
+	private void charLiteral(CharLiteral node) throws IOException {
 		
 		w.append('\'');
 		w.append(SourceReader.spelled(node.getValue()));
