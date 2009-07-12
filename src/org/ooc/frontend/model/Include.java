@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
 import org.ooc.frontend.Visitor;
 
 public class Include extends Node {
@@ -10,16 +12,16 @@ public class Include extends Node {
 		this.include = include;
 	}
 	
-	public String getInclude() {
+	public String getPath() {
 		return include;
 	}
 	
 	@Override
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) {}
+	public void acceptChildren(Visitor visitor) throws IOException {}
 	
 }

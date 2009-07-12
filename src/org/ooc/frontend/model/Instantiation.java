@@ -1,5 +1,9 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
+import org.ooc.frontend.Visitor;
+
 public class Instantiation extends FunctionCall {
 
 	public Instantiation(FunctionCall call) {
@@ -13,6 +17,11 @@ public class Instantiation extends FunctionCall {
 	
 	public Instantiation() {
 		super("");
+	}
+	
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
 	}
 	
 }

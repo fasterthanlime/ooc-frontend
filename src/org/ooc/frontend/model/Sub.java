@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
 import org.ooc.frontend.Visitor;
 
 
@@ -10,7 +12,7 @@ public class Sub extends BinaryOperation {
 	}
 	
 	@Override
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
 

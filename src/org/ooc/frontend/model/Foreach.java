@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
 import org.ooc.frontend.Visitor;
 
 public class Foreach extends ControlStatement {
@@ -29,12 +31,12 @@ public class Foreach extends ControlStatement {
 	}
 	
 	@Override
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) {
+	public void acceptChildren(Visitor visitor) throws IOException {
 		variable.accept(visitor);
 		collection.accept(visitor);
 	}

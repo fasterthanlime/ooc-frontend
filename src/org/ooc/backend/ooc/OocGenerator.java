@@ -72,7 +72,7 @@ public class OocGenerator extends Generator {
 	private void include(Include include) throws IOException {
 
 		w.append("include ");
-		w.append(include.getInclude());
+		w.append(include.getPath());
 		w.append(';');
 		w.newLine();
 		

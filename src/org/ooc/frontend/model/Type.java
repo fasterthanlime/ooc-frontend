@@ -1,6 +1,10 @@
 package org.ooc.frontend.model;
 
-public class Type {
+import java.io.IOException;
+
+import org.ooc.frontend.Visitor;
+
+public class Type implements Visitable {
 
 	private String name;
 	private int pointerLevel;
@@ -29,5 +33,13 @@ public class Type {
 	public int getPointerLevel() {
 		return pointerLevel;
 	}
+
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
+	}
+
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {}
 	
 }

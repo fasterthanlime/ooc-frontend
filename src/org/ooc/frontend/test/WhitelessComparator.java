@@ -45,6 +45,9 @@ public class WhitelessComparator {
 					break;
 				}
 			}
+			if(wr1.read() != -1 || wr2.read() != -1) {
+				same = false; // Not the same length
+			}
 			
 		} catch(EOFException e) {
 			// Huh. Finished yet? Great.

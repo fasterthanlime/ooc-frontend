@@ -1,5 +1,9 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
+import org.ooc.frontend.Visitor;
+
 public class MemberCall extends FunctionCall {
 
 	private Expression expression;
@@ -26,6 +30,11 @@ public class MemberCall extends FunctionCall {
 	@Override
 	public Type getType() {
 		throw new UnsupportedOperationException(this.getClass()+" can't figure out return type just yet.");
+	}
+	
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
 	}
 	
 }

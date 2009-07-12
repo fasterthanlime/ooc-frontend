@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
 import org.ooc.frontend.Visitor;
 
 public class VariableAccess extends Access {
@@ -21,11 +23,11 @@ public class VariableAccess extends Access {
 	}
 	
 	@Override
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) {}
+	public void acceptChildren(Visitor visitor) throws IOException {}
 
 }

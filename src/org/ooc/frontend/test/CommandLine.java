@@ -3,7 +3,7 @@ package org.ooc.frontend.test;
 import java.io.File;
 import java.io.IOException;
 
-import org.ooc.backend.ooc.OocGenerator;
+import org.ooc.backend.ooc.OocGeneratorVisitor;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.parser.Parser;
 
@@ -41,7 +41,8 @@ public class CommandLine {
 				System.out.printf("Parsing...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
 				t1 = System.nanoTime();
-				new OocGenerator(new File("."), unit).generate();
+				//new OocGenerator(new File("."), unit).generate();
+				new OocGeneratorVisitor(new File("."), unit).generate();
 				t2 = System.nanoTime();
 				System.out.printf("Generating...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
