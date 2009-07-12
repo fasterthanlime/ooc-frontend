@@ -31,6 +31,7 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
+import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NumberLiteral;
 import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Parenthesis;
@@ -47,6 +48,7 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.NumberLiteral.Format;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
@@ -636,23 +638,33 @@ public class Parser {
 		
 		boolean isAbstract = false;
 		
-		while(reader.peek().type != TokenType.FUNC_KW) {
-			Token t = reader.read();
-			if(t.type == TokenType.ABSTRACT_KW) {
-				isAbstract = true;
-			} else {
-				reader.reset(mark);
-				return null;
+		FunctionDeclType declType = FunctionDeclType.FUNC;
+		if(reader.peek().type == TokenType.IMPL_KW) {
+			reader.skip();
+			declType = FunctionDeclType.IMPL;
+		} else if(reader.peek().type == TokenType.OVER_KW) {
+			reader.skip();
+			declType = FunctionDeclType.OVER;
+		} else {
+			while(reader.peek().type != TokenType.FUNC_KW) {
+				Token t = reader.read();
+				if(t.type == TokenType.ABSTRACT_KW) {
+					isAbstract = true;
+				} else {
+					reader.reset(mark);
+					return null;
+				}
 			}
+			reader.skip(); // the 'func' keyword
 		}
-		reader.skip(); // the 'func' keyword
 		
 		Token name = reader.read();
 		if(name.type != TokenType.NAME && name.type != TokenType.NEW_KW) {
 			throw new CompilationFailedError(sourceReader.getLocation(name.start), "Expected function name after 'func' keyword");
 		}
 		
-		FunctionDecl functionDecl = new FunctionDecl(sourceReader.getSlice(name.start, name.length), isAbstract);
+		FunctionDecl functionDecl = new FunctionDecl(declType,
+				sourceReader.getSlice(name.start, name.length), isAbstract);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == TokenType.OPEN_PAREN) {
@@ -817,6 +829,19 @@ public class Parser {
 	}
 	
 	private Expression expression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+		
+		int mark = reader.mark();
+		
+		if(reader.peek().type == TokenType.EXCL) {
+			reader.skip();
+			Expression inner = expression(sourceReader, reader);
+			if(inner == null) {
+				reader.reset(mark);
+				return null;
+			}
+			System.out.println("Got NOT of a "+inner.getClass().getSimpleName());
+			return new Not(inner);
+		}
 		
 		Expression expr = flatExpression(sourceReader, reader);
 		if(expr == null) {

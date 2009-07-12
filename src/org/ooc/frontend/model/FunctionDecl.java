@@ -5,17 +5,25 @@ import java.util.List;
 
 public class FunctionDecl extends Declaration {
 
+	public static enum FunctionDeclType {
+		FUNC,
+		IMPL,
+		OVER,
+	}
+	
 	private OocDocComment comment;
 	
 	private boolean isAbstract;
-	
+
+	private FunctionDeclType declType;
 	private String name;
 	private final NodeList<Line> body;
 	private Type returnType;
 	private List<Argument> arguments;
 	
-	public FunctionDecl(String name, boolean isAbstract) {
+	public FunctionDecl(FunctionDeclType declType, String name, boolean isAbstract) {
 		
+		this.declType = declType;
 		this.name = name;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>();
@@ -30,6 +38,14 @@ public class FunctionDecl extends Declaration {
 	
 	public OocDocComment getComment() {
 		return comment;
+	}
+	
+	public FunctionDeclType getDeclType() {
+		return declType;
+	}
+	
+	public void setDeclType(FunctionDeclType declType) {
+		this.declType = declType;
 	}
 	
 	public String getName() {
