@@ -1,7 +1,5 @@
-package org.ooc.frontend.parser;
+package org.ooc.frontend.model;
 
-import org.ooc.frontend.model.BinaryOperation;
-import org.ooc.frontend.model.Expression;
 
 public class Sub extends BinaryOperation {
 

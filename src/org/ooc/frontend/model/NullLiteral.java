@@ -1,7 +1,5 @@
-package org.ooc.frontend.parser;
+package org.ooc.frontend.model;
 
-import org.ooc.frontend.model.Literal;
-import org.ooc.frontend.model.Type;
 
 public class NullLiteral extends Literal {
 
