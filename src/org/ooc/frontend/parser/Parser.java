@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.ooc.errors.CompilationFailedError;
 import org.ooc.frontend.model.Access;
+import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
@@ -920,6 +921,28 @@ public class Parser {
 				}
 				expr = new Assignment((Access) expr, rvalue);
 				continue;
+				
+			}
+			
+			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
+					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH) {
+				
+				reader.skip();
+				Expression rvalue = expression(sourceReader, reader);
+				if(rvalue == null) {
+					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+						"Expected rvalue after binary operator");
+				}
+				switch(t.type) {
+					case PLUS:  expr = new Add(expr, rvalue); break;
+					case STAR:  expr = new Mul(expr, rvalue); break;
+					case MINUS: expr = new Sub(expr, rvalue); break;
+					case SLASH: expr = new Div(expr, rvalue); break;
+					default: throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+							"Unknown binary operation yet");
+				}
+				continue;
+				
 				
 			}
 			

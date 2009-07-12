@@ -1,5 +1,9 @@
 package org.ooc.frontend.model;
 
+/**
+ * Binary in the sense that it has a left and a right operand (e.g. binary op,
+ * as opposed to unary op or ternary op)
+ */
 public abstract class BinaryOperation extends Expression {
 
 	private Expression left;
@@ -24,6 +28,12 @@ public abstract class BinaryOperation extends Expression {
 	
 	public void setRight(Expression right) {
 		this.right = right;
+	}
+	
+	@Override
+	public Type getType() {
+		// FIXME probably not right (haha)
+		return getLeft().getType();
 	}
 	
 }
