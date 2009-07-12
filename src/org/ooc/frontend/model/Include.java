@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class Include extends Node {
 
 	private String include;
@@ -11,5 +13,13 @@ public class Include extends Node {
 	public String getInclude() {
 		return include;
 	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 	
 }

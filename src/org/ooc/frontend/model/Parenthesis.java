@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class Parenthesis extends Expression {
 
 	Expression expression;
@@ -21,4 +23,14 @@ public class Parenthesis extends Expression {
 		return expression.getType();
 	}
 
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		expression.accept(visitor);
+	}
+	
 }

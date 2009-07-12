@@ -1,6 +1,6 @@
 package org.ooc.frontend.model;
 
-public class Conditional extends ControlStatement {
+public abstract class Conditional extends ControlStatement {
 
 	private Expression condition;
 

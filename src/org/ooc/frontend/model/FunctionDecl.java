@@ -3,6 +3,8 @@ package org.ooc.frontend.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ooc.frontend.Visitor;
+
 public class FunctionDecl extends Declaration {
 
 	public static enum FunctionDeclType {
@@ -83,6 +85,18 @@ public class FunctionDecl extends Declaration {
 	@Override
 	public Type getType() {
 		return new Type("Func");
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		for(Argument argument: arguments) {
+			argument.accept(visitor);
+		}
 	}
 	
 }

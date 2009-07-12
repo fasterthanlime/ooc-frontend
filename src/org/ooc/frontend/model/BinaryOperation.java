@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 /**
  * Binary in the sense that it has a left and a right operand (e.g. binary op,
  * as opposed to unary op or ternary op)
@@ -34,6 +36,12 @@ public abstract class BinaryOperation extends Expression {
 	public Type getType() {
 		// FIXME probably not right (haha)
 		return getLeft().getType();
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		left.accept(visitor);
+		right.accept(visitor);
 	}
 	
 }

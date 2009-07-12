@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class ClassDecl extends Declaration {
 
 	private boolean isAbstract;
@@ -62,6 +64,23 @@ public class ClassDecl extends Declaration {
 	@Override
 	public Type getType() {
 		return new Type("class");
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		
+		for (VariableDecl variable : variables) {
+			variable.accept(visitor);
+		}
+		for (FunctionDecl function: functions) {
+			function.accept(visitor);
+		}
+		
 	}
 	
 }

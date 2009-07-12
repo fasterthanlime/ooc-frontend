@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class NumberLiteral extends Literal {
 
 	public static enum Format {
@@ -21,9 +23,7 @@ public class NumberLiteral extends Literal {
 	
 	@Override
 	public Type getType() {
-	
 		return new Type("Int");
-		
 	}
 	
 	public long getValue() {
@@ -33,5 +33,13 @@ public class NumberLiteral extends Literal {
 	public Format getFormat() {
 		return format;
 	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 	
 }

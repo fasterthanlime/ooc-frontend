@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class FunctionCall extends Access {
 
 	protected String name;
@@ -24,9 +26,19 @@ public class FunctionCall extends Access {
 
 	@Override
 	public Type getType() {
-
 		throw new Error("FunctionCall not yet resolves the type");
-		
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		for(Expression expression: arguments) {
+			expression.accept(visitor);
+		}
 	}
 	
 }

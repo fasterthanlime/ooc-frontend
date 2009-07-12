@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 
 public class BoolLiteral extends Literal {
 
@@ -21,5 +23,13 @@ public class BoolLiteral extends Literal {
 	public Type getType() {
 		return new Type("Bool");
 	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 
 }

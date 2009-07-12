@@ -33,7 +33,6 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mul;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
@@ -53,6 +52,7 @@ import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
+import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.NumberLiteral.Format;
@@ -111,7 +111,7 @@ public class Parser {
 		
 	}
 	
-	private Node comment(SourceReader sourceReader, ListReader<Token> reader) {
+	private Visitable comment(SourceReader sourceReader, ListReader<Token> reader) {
 		
 		Token t = reader.peek();
 		

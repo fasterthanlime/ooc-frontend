@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class RegularArgument extends Argument {
 
 	private Type type;
@@ -16,5 +18,13 @@ public class RegularArgument extends Argument {
 	public void setType(Type type) {
 		this.type = type;
 	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 	
 }

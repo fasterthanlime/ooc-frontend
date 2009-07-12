@@ -1,28 +1,26 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 
 public class SourceUnit extends Node {
 
 	private String fileName;
-	private NodeList<Node> body;
 	private NodeList<Include> includes;
 	private NodeList<Import> imports;
+	private NodeList<Node> body;
 	
 	public SourceUnit(String fileName) {
 		
 		this.fileName = fileName;
-		this.body = new NodeList<Node>();
 		this.includes = new NodeList<Include>();
 		this.imports = new NodeList<Import>();
+		this.body = new NodeList<Node>();
 		
 	}
 
 	public String getFileName() {
 		return fileName;
-	}
-	
-	public NodeList<Node> getBody() {
-		return body;
 	}
 	
 	public NodeList<Include> getIncludes() {
@@ -31,6 +29,30 @@ public class SourceUnit extends Node {
 	
 	public NodeList<Import> getImports() {
 		return imports;
+	}
+	
+	public NodeList<Node> getBody() {
+		return body;
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		
+		for(Include include: includes) {
+			include.accept(visitor);
+		}
+		for(Import importStatement: imports) {
+			importStatement.accept(visitor);
+		}
+		for(Visitable node: body) {
+			node.accept(visitor);
+		}
+		
 	}
 	
 }

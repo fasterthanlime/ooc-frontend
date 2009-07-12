@@ -1,6 +1,6 @@
 package org.ooc.frontend.model;
 
-public class ControlStatement extends Statement {
+public abstract class ControlStatement extends Statement {
 
 	private NodeList<Line> body;
 	

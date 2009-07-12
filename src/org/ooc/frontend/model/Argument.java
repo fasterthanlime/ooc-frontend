@@ -1,6 +1,6 @@
 package org.ooc.frontend.model;
 
-public abstract class Argument {
+public abstract class Argument extends Node {
 
 	private String name;
 

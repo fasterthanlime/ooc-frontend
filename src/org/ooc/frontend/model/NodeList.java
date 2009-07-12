@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class NodeList<T extends Node> extends Node implements Iterable<T> {
+public class NodeList<T extends Node> implements Iterable<T> {
 	
 	private final List<T> nodes;
 	

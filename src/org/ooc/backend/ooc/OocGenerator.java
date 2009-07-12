@@ -24,7 +24,6 @@ import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NumberLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
@@ -36,6 +35,7 @@ import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
+import org.ooc.frontend.model.Visitable;
 import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator {
@@ -63,7 +63,7 @@ public class OocGenerator extends Generator {
 			include(include);
 		}
 		
-		for(Node node: unit.getBody()) {
+		for(Visitable node: unit.getBody()) {
 			node(node);
 		}
 		
@@ -78,7 +78,7 @@ public class OocGenerator extends Generator {
 		
 	}
 
-	private void node(Node node) throws IOException {
+	private void node(Visitable node) throws IOException {
 		
 		if(node instanceof Line) {
 			line((Line) node);
@@ -346,7 +346,7 @@ public class OocGenerator extends Generator {
 			w.tab();
 			//w.newLine();
 			
-			for(Node child: node.getBody()) {
+			for(Visitable child: node.getBody()) {
 				node(child);
 			}
 			

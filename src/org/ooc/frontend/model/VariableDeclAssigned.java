@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class VariableDeclAssigned extends VariableDecl {
 
 	private Expression expression;
@@ -14,4 +16,15 @@ public class VariableDeclAssigned extends VariableDecl {
 		return expression;
 	}
 	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		expression.accept(visitor);
+	}
+	
 }
+

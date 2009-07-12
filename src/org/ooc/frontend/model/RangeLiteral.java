@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class RangeLiteral extends Literal {
 
 	private Expression lower;
@@ -30,5 +32,13 @@ public class RangeLiteral extends Literal {
 	public Type getType() {
 		return new Type("Range");
 	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 
 }

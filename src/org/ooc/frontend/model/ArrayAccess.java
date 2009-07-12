@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class ArrayAccess extends Access {
 
 	private Expression variable;
@@ -29,6 +31,17 @@ public class ArrayAccess extends Access {
 	@Override
 	public Type getType() {
 		throw new UnsupportedOperationException("ArrayAccess doesn't resolve types just yet ;)");
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		variable.accept(visitor);
+		index.accept(visitor);
 	}
 	
 }

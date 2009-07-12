@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class Assignment extends Expression {
 
 	private Access lvalue;
@@ -20,9 +22,18 @@ public class Assignment extends Expression {
 
 	@Override
 	public Type getType() {
-		
 		return lvalue.getType();
-		
+	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {
+		lvalue.accept(visitor);
+		rvalue.accept(visitor);
 	}
 	
 }

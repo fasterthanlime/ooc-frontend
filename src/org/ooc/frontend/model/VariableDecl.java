@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.Visitor;
+
 public class VariableDecl extends Declaration {
 
 	private boolean isConst;
@@ -46,5 +48,13 @@ public class VariableDecl extends Declaration {
 	public void setStatic(boolean isStatic) {
 		this.isStatic = isStatic;
 	}
+	
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) {}
 	
 }
