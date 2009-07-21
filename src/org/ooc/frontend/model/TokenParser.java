@@ -71,7 +71,13 @@ public class TokenParser {
 				char c2 = reader.peek();
 				if(c2 == '.') {
 					reader.read();
-					tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_DOT));
+					char c3 = reader.peek();
+					if(c3 == '.') {
+						reader.read();
+						tokens.add(new Token(location.getIndex(), 3, TokenType.TRIPLE_DOT));
+					} else {
+						tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_DOT));
+					}
 				} else {
 					tokens.add(new Token(location.getIndex(), 1, TokenType.DOT));
 				}
@@ -373,6 +379,8 @@ public class TokenParser {
 					tokens.add(new Token(location.getIndex(), 5, TokenType.FALSE));
 				} else if(name.equals("null")) {
 					tokens.add(new Token(location.getIndex(), 4, TokenType.NULL));
+				} else if(name.equals("extern")) {
+					tokens.add(new Token(location.getIndex(), 6, TokenType.EXTERN_KW));
 				} else {
 					tokens.add(new Token(location.getIndex(), name.length(), TokenType.NAME));
 				}

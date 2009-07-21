@@ -33,6 +33,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
@@ -87,5 +88,7 @@ public interface Visitor {
 	public void visit(MemberAssignArgument memberArgument) throws IOException;
 
 	public void visit(Type type) throws IOException;
+
+	public void visit(VarArg varArg) throws IOException;
 	
 }

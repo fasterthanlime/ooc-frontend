@@ -49,6 +49,7 @@ import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.TokenParser;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
@@ -440,6 +441,7 @@ public class Parser {
 		FunctionCall call = new FunctionCall(sourceReader.getSlice(name.start, name.length));
 		
 		if(!exprList(sourceReader, reader, call.getArguments())) {
+			
 			reader.reset(mark);
 			return null; // not a function call
 		}
@@ -732,6 +734,11 @@ public class Parser {
 	private Argument argument(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
+		
+		if(reader.peek().type == TokenType.TRIPLE_DOT) {
+			reader.skip();
+			return new VarArg();
+		}
 		
 		Type type = type(sourceReader, reader);
 		if(type != null) {

@@ -18,7 +18,8 @@ public class Token {
 		STATIC_KW, // static keyword
 		
 		INCLUDE_KW, // include keyword
-		IMPORT_KW, // include keyword
+		IMPORT_KW, // import keyword
+		EXTERN_KW, // extern keyword
 		
 		BREAK_KW, // break keyword
 		CONTINUE_KW, // continue keyword
@@ -56,6 +57,7 @@ public class Token {
 		COMMA, // ,
 		DOT, // .
 		DOUBLE_DOT, // ..
+		TRIPLE_DOT, // ...
 		ARROW, // ->
 		COL, // :
 		SEMICOL, // ;
