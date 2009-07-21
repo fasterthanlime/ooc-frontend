@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.ooc.errors.CompilationFailedError;
 import org.ooc.frontend.model.Access;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.Argument;
@@ -60,6 +59,7 @@ import org.ooc.frontend.model.NumberLiteral.Format;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.Token.TokenType;
+import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
 

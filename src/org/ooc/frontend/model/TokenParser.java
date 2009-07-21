@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.ooc.errors.CompilationFailedError;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.Token.TokenType;
+import org.ubi.CompilationFailedError;
 import org.ubi.FileLocation;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
