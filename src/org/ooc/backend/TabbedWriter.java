@@ -1,6 +1,7 @@
 package org.ooc.backend;
 
 import java.io.IOException;
+import java.io.Writer;
 
 public class TabbedWriter {
 
@@ -10,6 +11,18 @@ public class TabbedWriter {
 	public TabbedWriter(Appendable appendable) {
 
 		this.appendable = appendable;
+		
+	}
+	
+	public void close() throws IOException {
+		
+		if(appendable instanceof Writer) {
+			((Writer) appendable).close();
+		} else {
+			// well, do nothing, probably trying
+			// to close a StringBuilder, which is
+			// nonsense.
+		}
 		
 	}
 	

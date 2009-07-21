@@ -52,19 +52,17 @@ import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator implements Visitor {
 
-	private FileWriter fw;
 	private TabbedWriter w;
 
 	public OocGenerator(File outPath, SourceUnit unit) throws IOException {
 		super(outPath, unit);
-		this.fw = new FileWriter(new File(outPath, unit.getFileName() + ".gen"));
-		this.w = new TabbedWriter(fw);
+		this.w = new TabbedWriter(new FileWriter(new File(outPath, unit.getFileName() + ".gen")));
 	}
 	
 	@Override
 	public void generate() throws IOException {
 		unit.accept(this);
-		fw.close();
+		w.close();
 	}
 	
 	@Override
