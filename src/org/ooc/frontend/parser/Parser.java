@@ -46,7 +46,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Statement;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
-import org.ooc.frontend.model.TokenParser;
+import org.ooc.frontend.model.Tokenizer;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
@@ -72,7 +72,7 @@ public class Parser {
 	public SourceUnit parse(File file) throws IOException {
 
 		SourceReader sourceReader = SourceReader.getReaderFromFile(file);
-		List<Token> tokens = new TokenParser().parse(sourceReader);
+		List<Token> tokens = new Tokenizer().parse(sourceReader);
 		SourceUnit unit = sourceUnit(sourceReader, new ListReader<Token>(tokens));
 		return unit;
 		

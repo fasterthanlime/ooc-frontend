@@ -12,7 +12,7 @@ import org.ubi.FileLocation;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
 
-public class TokenParser {
+public class Tokenizer {
 
 	public List<Token> parse(SourceReader reader) throws IOException {
 		
@@ -404,7 +404,7 @@ public class TokenParser {
 		}
 		
 		SourceReader reader = SourceReader.getReaderFromPath(args[0]);
-		List<Token> tokens = new TokenParser().parse(reader);
+		List<Token> tokens = new Tokenizer().parse(reader);
 		Iterator<Token> iter = tokens.iterator();
 		while(iter.hasNext()) {
 			Token t = iter.next();

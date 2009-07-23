@@ -12,6 +12,7 @@ public class FunctionDecl extends Declaration {
 		FUNC,
 		IMPL,
 		OVER,
+		EXT,
 	}
 	
 	private OocDocComment comment;
@@ -30,7 +31,7 @@ public class FunctionDecl extends Declaration {
 		this.name = name;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>();
-		this.returnType = null;
+		this.returnType = new Type("void");
 		this.arguments = new ArrayList<Argument>();
 		
 	}
