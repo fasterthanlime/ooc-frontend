@@ -79,12 +79,20 @@ public class CGenerator extends Generator implements Visitor {
 		hw.append(" header file, generated with ooc */");
 		hw.newLine();
 		
+		for(Include include: sourceUnit.getIncludes()) {
+			hw.append("#include <");
+			hw.append(include.getPath());
+			hw.append(".h>");
+			hw.newLine();
+		}
+		
+		hw.newLine();
+		
 		cw.append("/* ");
 		cw.append(unit.getName());
 		cw.append(" source file, generated with ooc */");
 		cw.newLine();
 		
-		cw.newLine();
 		cw.append("#include \"");
 		cw.append(unit.getSimpleName());
 		cw.append(".h\"");

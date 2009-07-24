@@ -5,6 +5,6 @@ extern func printf(String, ...);
 
 func main {
 
-	printf("Hello, world !");
+	printf("Hello, world !\n");
 
 }
