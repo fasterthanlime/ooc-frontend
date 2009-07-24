@@ -122,39 +122,39 @@ public class Parser {
 	
 	public SourceUnit parse(File file) throws IOException {
 
-		SourceReader sourceReader = SourceReader.getReaderFromFile(file);
-		List<Token> tokens = new Tokenizer().parse(sourceReader);
-		SourceUnit unit = sourceUnit(sourceReader, new ListReader<Token>(tokens));
+		SourceReader sReader = SourceReader.getReaderFromFile(file);
+		List<Token> tokens = new Tokenizer().parse(sReader);
+		SourceUnit unit = sourceUnit(sReader, new ListReader<Token>(tokens));
 		return unit;
 		
 	}
 	
-	private SourceUnit sourceUnit(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private SourceUnit sourceUnit(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
-		SourceUnit unit = new SourceUnit(sourceReader.getLocation().getFileName());
+		SourceUnit unit = new SourceUnit(sReader.getLocation().getFileName());
 		
 		while(reader.hasNext()) {
 			
-			Declaration declaration = declaration(sourceReader, reader);
+			Declaration declaration = declaration(sReader, reader);
 			if(declaration != null) {
 				unit.getBody().add(declaration);
 				continue;
 			}
 			
-			if(include(sourceReader, reader, unit.getIncludes())) {
+			if(include(sReader, reader, unit.getIncludes())) {
 				continue;
 			}
 			
-			if(importStatement(sourceReader, reader, unit.getImports())) {
+			if(importStatement(sReader, reader, unit.getImports())) {
 				continue;
 			}
 			
-			if(comment(sourceReader, reader) != null) {
+			if(comment(sReader, reader) != null) {
 				// TODO store comments somewhere..
 				continue;
 			}
 			
-			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start + reader.prev().length),
+			throw new CompilationFailedError(sReader.getLocation(reader.prev().start + reader.prev().length),
 					"Expected declaration, include, or import in source unit");
 			
 		}
@@ -163,13 +163,13 @@ public class Parser {
 		
 	}
 	
-	private Visitable comment(SourceReader sourceReader, ListReader<Token> reader) {
+	private Visitable comment(SourceReader sReader, ListReader<Token> reader) {
 		
 		Token t = reader.peek();
 		
 		if(t.type == SL_COMMENT) {
 			reader.skip();
-			return new SingleLineComment(sourceReader.getSlice(t.start, t.length));
+			return new SingleLineComment(t.get(sReader));
 		}
 
 		if(t.type == ML_COMMENT) {
@@ -181,7 +181,7 @@ public class Parser {
 		
 	}
 
-	private boolean include(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
+	private boolean include(SourceReader sReader,	ListReader<Token> reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
 
 		if(reader.peek().type != INCLUDE_KW) {
 			return false;
@@ -201,11 +201,11 @@ public class Parser {
 				includes.add(new Include(sb.toString()));
 				sb.setLength(0);
 			} else if(t.type == NAME) {
-				sb.append(sourceReader.getSlice(t.start, t.length));
+				sb.append(t.get(sReader));
 			} else if(t.type == SLASH) {
 				sb.append('/');
 			} else {
-				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Unexpected token "+t.type);
+				throw new CompilationFailedError(sReader.getLocation(t.start), "Unexpected token "+t.type);
 			}
 			
 		}
@@ -214,7 +214,7 @@ public class Parser {
 		
 	}
 	
-	private boolean importStatement(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Import> imports) throws EOFException, CompilationFailedError {
+	private boolean importStatement(SourceReader sReader,	ListReader<Token> reader, NodeList<Import> imports) throws EOFException, CompilationFailedError {
 
 		if(reader.peek().type != IMPORT_KW) {
 			return false;
@@ -234,11 +234,11 @@ public class Parser {
 				imports.add(new Import(sb.toString()));
 				sb.setLength(0);
 			} else if(t.type == NAME) {
-				sb.append(sourceReader.getSlice(t.start, t.length));
+				sb.append(t.get(sReader));
 			} else if(t.type == DOT) {
 				sb.append('.');
 			} else {
-				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Unexpected token "+t.type);
+				throw new CompilationFailedError(sReader.getLocation(t.start), "Unexpected token "+t.type);
 			}
 			
 		}
@@ -247,20 +247,20 @@ public class Parser {
 		
 	}
 
-	private Line line(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Line line(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		if(reader.peek().type == SL_COMMENT) {
 			Token t = reader.read();
-			return new SingleLineComment(sourceReader.getSlice(t.start, t.length));
+			return new SingleLineComment(t.get(sReader));
 		}
 		
-		Statement statement = statement(sourceReader, reader);
+		Statement statement = statement(sReader, reader);
 		if(statement != null) {
 			// control statements (if, else, for, version, etc.) don't need a semicolon
 			if(!(statement instanceof ControlStatement) && reader.read().type != SEMICOL) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.prev(2).start),
+				throw new CompilationFailedError(sReader.getLocation(reader.prev(2).start),
 						"Missing semi-colon at the end of a line (got a "+reader.prev(2).type+" instead)");
 			}
 			return new Line(statement);
@@ -271,52 +271,52 @@ public class Parser {
 		
 	}
 
-	private Statement statement(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Statement statement(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		//System.out.println("Parsing statement, trying function call");
 		
-		Foreach foreach = foreach(sourceReader, reader);
+		Foreach foreach = foreach(sReader, reader);
 		if(foreach != null) {
 			return foreach;
 		}
 		
-		Conditional conditional = conditional(sourceReader, reader);
+		Conditional conditional = conditional(sReader, reader);
 		if(conditional != null) {
 			return conditional;
 		}
 		
-		Return ret = returnStatement(sourceReader, reader);
+		Return ret = returnStatement(sReader, reader);
 		if(ret != null) {
 			return ret;
 		}
 		
-		Expression expression = expression(sourceReader, reader);
+		Expression expression = expression(sReader, reader);
 		if(expression != null) {
 			return expression;
 		}
 		
-		Instantiation inst = instantiation(sourceReader, reader);
+		Instantiation inst = instantiation(sReader, reader);
 		if(inst != null) {
 			return inst;
 		}
 		
-		FunctionCall call = functionCall(sourceReader, reader);
+		FunctionCall call = functionCall(sReader, reader);
 		if(call != null) {
 			return call;
 		}
 		
 		//System.out.println("Parsing statement, trying assignment");
 		
-		Assignment ass = assignment(sourceReader, reader);
+		Assignment ass = assignment(sReader, reader);
 		if(ass != null) {
 			return ass;
 		}
 		
 		//System.out.println("Parsing statement, trying declaration");
 		
-		Declaration decl = declaration(sourceReader, reader);
+		Declaration decl = declaration(sReader, reader);
 		if(decl != null) {
 			return decl;
 		}
@@ -327,7 +327,7 @@ public class Parser {
 	}
 	
 	private Conditional conditional(
-			SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+			SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -337,9 +337,9 @@ public class Parser {
 			return null;
 		}
 		
-		Expression condition = expression(sourceReader, reader);
+		Expression condition = expression(sReader, reader);
 		if(condition == null) {
-			throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+			throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Expected expression as while condition");
 		}
 		
@@ -352,12 +352,12 @@ public class Parser {
 			reader.reset(mark);
 			return null;
 		}
-		fillControlStatement(sourceReader, reader, statement);
+		fillControlStatement(sReader, reader, statement);
 		return statement;
 		
 	}
 	
-	private Foreach foreach(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Foreach foreach(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -368,7 +368,7 @@ public class Parser {
 				hasParen = true;
 			}
 			
-			VariableDecl variable = variableDecl(sourceReader, reader);
+			VariableDecl variable = variableDecl(sReader, reader);
 			if(variable == null) {
 				return null;
 			}
@@ -378,19 +378,19 @@ public class Parser {
 			}
 			
 			//System.out.println("Attempting to parse collection expression in foreach");
-			Expression collection = expression(sourceReader, reader);
+			Expression collection = expression(sReader, reader);
 			if(collection == null) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected expression after colon in a foreach");
 			}
 			
 			if(hasParen && reader.read().type != CLOS_PAREN) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 				"Expected closing parenthesis at the end of a parenthesized foreach");
 			}
 			
 			Foreach foreach = new Foreach(variable, collection);
-			fillControlStatement(sourceReader, reader, foreach);
+			fillControlStatement(sReader, reader, foreach);
 			return foreach;
 			
 		}
@@ -400,7 +400,7 @@ public class Parser {
 		
 	}
 
-	private void fillControlStatement(SourceReader sourceReader,
+	private void fillControlStatement(SourceReader sReader,
 			ListReader<Token> reader, ControlStatement controlStatement)
 			throws EOFException, IOException, CompilationFailedError {
 		
@@ -413,13 +413,13 @@ public class Parser {
 		if(hasBrack) {
 			
 			//System.out.println("Parsing a bracketed "+controlStatement.getClass().getSimpleName()
-					//+" at "+sourceReader.getLocation(reader.peek().start));
+					//+" at "+sReader.getLocation(reader.peek().start));
 			//System.out.println("Current token is a "+reader.peek().type);
 			
 			while(reader.peek().type != CLOS_BRACK) {
-				Line line = line(sourceReader, reader);
+				Line line = line(sReader, reader);
 				if(line == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Expected line inside of "+controlStatement.getClass().getSimpleName());
 				}
 				controlStatement.getBody().add(line);
@@ -428,9 +428,9 @@ public class Parser {
 			
 		} else {
 			
-			Line only = line(sourceReader, reader);
+			Line only = line(sReader, reader);
 			if(only == null) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 				"Expected line inside of bracket-less "+controlStatement.getClass().getSimpleName());
 			}
 			controlStatement.getBody().add(only);
@@ -438,7 +438,7 @@ public class Parser {
 		}
 	}
 
-	private Instantiation instantiation(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Instantiation instantiation(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -446,12 +446,12 @@ public class Parser {
 			Token t = reader.peek();
 			if(t.type == NAME) {
 				reader.skip();
-				Instantiation inst = new Instantiation(sourceReader.getSlice(t.start, t.length));
-				exprList(sourceReader, reader, inst.getArguments()); // we don't care whether we have args or not
+				Instantiation inst = new Instantiation(t.get(sReader));
+				exprList(sReader, reader, inst.getArguments()); // we don't care whether we have args or not
 				return inst;
 			}
 			Instantiation inst = new Instantiation();
-			exprList(sourceReader, reader, inst.getArguments()); // we don't care whether we have args or not
+			exprList(sReader, reader, inst.getArguments()); // we don't care whether we have args or not
 			return inst;
 		}
 		
@@ -460,15 +460,15 @@ public class Parser {
 		
 	}
 
-	private Return returnStatement(SourceReader sourceReader,
+	private Return returnStatement(SourceReader sReader,
 			ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		if(reader.read().type == RETURN_KW) {
-			Expression expr = expression(sourceReader, reader);
+			Expression expr = expression(sReader, reader);
 			if(expr == null) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expecting expression after keyword");
 			}
 			return new Return(expr);
@@ -479,7 +479,7 @@ public class Parser {
 		
 	}
 
-	private FunctionCall functionCall(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private FunctionCall functionCall(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -489,9 +489,9 @@ public class Parser {
 			return null;
 		}
 		
-		FunctionCall call = new FunctionCall(sourceReader.getSlice(name.start, name.length));
+		FunctionCall call = new FunctionCall(name.get(sReader));
 		
-		if(!exprList(sourceReader, reader, call.getArguments())) {
+		if(!exprList(sReader, reader, call.getArguments())) {
 			
 			reader.reset(mark);
 			return null; // not a function call
@@ -503,7 +503,7 @@ public class Parser {
 		
 	}
 
-	private boolean exprList(SourceReader sourceReader, ListReader<Token> reader, NodeList<Expression> list) throws IOException {
+	private boolean exprList(SourceReader sReader, ListReader<Token> reader, NodeList<Expression> list) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -521,12 +521,12 @@ public class Parser {
 			}
 			if(comma) {
 				if(reader.read().type != COMMA) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected comma between arguments of a function call");
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected comma between arguments of a function call");
 				}
 			} else {
-				Expression expr = expression(sourceReader, reader);
+				Expression expr = expression(sReader, reader);
 				if(expr == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected expression as argument of function call");
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start), "Expected expression as argument of function call");
 				}
 				list.add(expr);
 			}
@@ -538,30 +538,30 @@ public class Parser {
 		
 	}
 	
-	private Declaration declaration(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Declaration declaration(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		//System.out.println("Parsing declaration, trying variable declaration");
 		
-		VariableDecl varDecl = variableDecl(sourceReader, reader);
+		VariableDecl varDecl = variableDecl(sReader, reader);
 		if(varDecl != null) {
 			return varDecl;
 		}
 		
 		//System.out.println("Parsing declaration, trying function declaration");
 		
-		FunctionDecl funcDecl = functionDecl(sourceReader, reader);
+		FunctionDecl funcDecl = functionDecl(sReader, reader);
 		if(funcDecl != null) {
 			return funcDecl;
 		}
 		
-		ClassDecl classDecl = classDecl(sourceReader, reader);
+		ClassDecl classDecl = classDecl(sReader, reader);
 		if(classDecl != null) {
 			return classDecl;
 		}
 		
-		CoverDecl coverDecl = coverDecl(sourceReader, reader);
+		CoverDecl coverDecl = coverDecl(sReader, reader);
 		if(coverDecl != null) {
 			return coverDecl;
 		}
@@ -571,7 +571,7 @@ public class Parser {
 		
 	}
 	
-	private VariableDecl variableDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private VariableDecl variableDecl(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -593,7 +593,7 @@ public class Parser {
 			}
 		}
 		
-		Type type = type(sourceReader, reader);
+		Type type = type(sReader, reader);
 		if(type != null) {
 			Token t = reader.peek();
 			if(t.type == NAME) {
@@ -601,13 +601,14 @@ public class Parser {
 				Token t2 = reader.peek();
 				if(t2.type == ASSIGN) {
 					reader.skip();
-					Expression expr = expression(sourceReader, reader);
+					Expression expr = expression(sReader, reader);
 					if(expr == null) {
-						throw new CompilationFailedError(sourceReader.getLocation(t2.start), "Expected expression as an initializer to a variable declaration.");
+						throw new CompilationFailedError(sReader.getLocation(t2.start),
+								"Expected expression as an initializer to a variable declaration.");
 					}
-					return new VariableDeclAssigned(type, sourceReader.getSlice(t.start, t.length), expr, isConst, isStatic);
+					return new VariableDeclAssigned(type, t.get(sReader), expr, isConst, isStatic);
 				}
-				return new VariableDecl(type, sourceReader.getSlice(t.start, t.length), isConst, isStatic);
+				return new VariableDecl(type, t.get(sReader), isConst, isStatic);
 			}
 		}
 		
@@ -616,69 +617,76 @@ public class Parser {
 		
 	}
 	
-	private CoverDecl coverDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private CoverDecl coverDecl(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
 		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
-			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
+			comment = new OocDocComment(t.get(sReader));
 		}
 		
 		if(reader.read().type == COVER_KW) {
 			
 			Token t = reader.read();
 			if(t.type != NAME) {
-				throw new CompilationFailedError(sourceReader.getLocation(t.start),
-						"Expected class name after the class keyword.");
+				throw new CompilationFailedError(sReader.getLocation(t.start),
+						"Expected cover name after the cover keyword.");
 			}
 			
 			Type fromType = null;
 			if(reader.peek().type == FROM_KW) {
 				reader.skip();
-				fromType = type(sourceReader, reader);
+				fromType = type(sReader, reader);
 				if(fromType == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
-					"Expected class name after the class keyword.");
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					"Expected cover's base type name after the from keyword.");
 				}
 			}
+			
+			CoverDecl coverDecl = new CoverDecl(t.get(sReader), fromType);
+			if(comment != null) coverDecl.setComment(comment);
 			
 			Token t2 = reader.read();
 			if(t2.type != OPEN_BRACK) {
-				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
-						"Expected opening bracket to begin class declaration.");
+				if(t2.type == SEMICOL) {
+					return coverDecl; // empty cover, acts like a typedef
+				}
+				throw new CompilationFailedError(sReader.getLocation(t2.start),
+						"Expected opening bracket to begin cover declaration.");
 			}
-			
-			ClassDecl classDecl = new ClassDecl(sourceReader.getSlice(t.start, t.length), isAbstract);
-			classDecl.setSuperName(superName);
-			if(comment != null) classDecl.setComment(comment);
 			
 			while(reader.peek().type != CLOS_BRACK) {
 			
-				VariableDecl varDecl = variableDecl(sourceReader, reader);
+				VariableDecl varDecl = variableDecl(sReader, reader);
 				if(varDecl != null) {
 					if(reader.read().type != SEMICOL) {
-						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
-					classDecl.getVariables().add(varDecl);
+					if(fromType != null) {
+						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"You can't add member variables to a Cover which already has a base type (in this case, "
+								+fromType.getName()+")");
+					}
+					coverDecl.getVariables().add(varDecl);
 					continue;
 				}
 				
-				FunctionDecl funcDecl = functionDecl(sourceReader,reader);
+				FunctionDecl funcDecl = functionDecl(sReader,reader);
 				if(funcDecl != null) {
-					classDecl.getFunctions().add(funcDecl);
+					coverDecl.getFunctions().add(funcDecl);
 					continue;
 				}
 				
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected variable declaration or function declaration in a class declaration");
 			
 			}
 			reader.skip();
 			
-			return classDecl;
+			return coverDecl;
 			
 		}
 		
@@ -687,14 +695,14 @@ public class Parser {
 		
 	}
 	
-	private ClassDecl classDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private ClassDecl classDecl(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
 		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
-			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
+			comment = new OocDocComment(t.get(sReader));
 		}
 		
 		boolean isAbstract = reader.peek().type == ABSTRACT_KW;
@@ -706,7 +714,7 @@ public class Parser {
 			
 			Token t = reader.read();
 			if(t.type != NAME) {
-				throw new CompilationFailedError(sourceReader.getLocation(t.start),
+				throw new CompilationFailedError(sReader.getLocation(t.start),
 						"Expected class name after the class keyword.");
 			}
 			
@@ -714,39 +722,43 @@ public class Parser {
 			if(reader.peek().type == FROM_KW) {
 				reader.skip();
 				Token tSuper = reader.read();
-				superName = sourceReader.getSlice(tSuper.start, tSuper.length);
+				if(tSuper.type != NAME) {
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					"Expected super-class name after the from keyword.");
+				}
+				superName = tSuper.get(sReader);
 				
 			}
 			
 			Token t2 = reader.read();
 			if(t2.type != OPEN_BRACK) {
-				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
+				throw new CompilationFailedError(sReader.getLocation(t2.start),
 						"Expected opening bracket to begin class declaration.");
 			}
 			
-			ClassDecl classDecl = new ClassDecl(sourceReader.getSlice(t.start, t.length), isAbstract);
+			ClassDecl classDecl = new ClassDecl(t.get(sReader), isAbstract);
 			classDecl.setSuperName(superName);
 			if(comment != null) classDecl.setComment(comment);
 			
 			while(reader.peek().type != CLOS_BRACK) {
 			
-				VariableDecl varDecl = variableDecl(sourceReader, reader);
+				VariableDecl varDecl = variableDecl(sReader, reader);
 				if(varDecl != null) {
 					if(reader.read().type != SEMICOL) {
-						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
 					classDecl.getVariables().add(varDecl);
 					continue;
 				}
 				
-				FunctionDecl funcDecl = functionDecl(sourceReader,reader);
+				FunctionDecl funcDecl = functionDecl(sReader,reader);
 				if(funcDecl != null) {
 					classDecl.getFunctions().add(funcDecl);
 					continue;
 				}
 				
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected variable declaration or function declaration in a class declaration");
 			
 			}
@@ -761,14 +773,14 @@ public class Parser {
 		
 	}
 	
-	private FunctionDecl functionDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private FunctionDecl functionDecl(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
 		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
-			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
+			comment = new OocDocComment(t.get(sReader));
 		}
 		
 		boolean isAbstract = false;
@@ -801,11 +813,11 @@ public class Parser {
 		
 		Token name = reader.read();
 		if(name.type != NAME && name.type != NEW_KW) {
-			throw new CompilationFailedError(sourceReader.getLocation(name.start), "Expected function name after 'func' keyword");
+			throw new CompilationFailedError(sReader.getLocation(name.start), "Expected function name after 'func' keyword");
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(declType,
-				sourceReader.getSlice(name.start, name.length), isAbstract);
+				name.get(sReader), isAbstract);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == OPEN_PAREN) {
@@ -819,25 +831,25 @@ public class Parser {
 				}
 				if(comma) {
 					if(reader.read().type != COMMA) {
-						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 								"Expected comma between arguments of a function definition");
 					}
 				} else {
 					if(declType == FunctionDeclType.FUNC) {
-						Argument arg = argument(sourceReader, reader);
+						Argument arg = argument(sReader, reader);
 						if(arg == null) {
-							throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+							throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 									"Expected variable declaration as an argument of a function definition");
 						}
 						functionDecl.getArguments().add(arg);
 					} else {
-						Type type = type(sourceReader, reader);
+						Type type = type(sReader, reader);
 						if(type == null) {
 							if(reader.peek().type == TRIPLE_DOT) {
 								reader.skip();
 								functionDecl.getArguments().add(new VarArg());
 							} else {
-								throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+								throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 									"Expected type as an argument of an extern function definition");
 							}
 						} else {
@@ -852,9 +864,9 @@ public class Parser {
 		
 		Token t = reader.read();
 		if(t.type == ARROW) {
-			Type returnType = type(sourceReader, reader);
+			Type returnType = type(sReader, reader);
 			if(returnType == null) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected return type after arrow");
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start), "Expected return type after arrow");
 			}
 			functionDecl.setReturnType(returnType);
 			t = reader.read();
@@ -863,14 +875,14 @@ public class Parser {
 			return functionDecl;
 		}
 		if(t.type != OPEN_BRACK) {
-			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
+			throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
 		}
 	
 		while(reader.peek().type != CLOS_BRACK) {
 		
-			Line line = line(sourceReader, reader);
+			Line line = line(sReader, reader);
 			if(line == null) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected statement in function body.");
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start), "Expected statement in function body.");
 			}
 			functionDecl.getBody().add(line);
 		
@@ -885,7 +897,7 @@ public class Parser {
 		
 	}
 	
-	private Argument argument(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Argument argument(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -894,12 +906,12 @@ public class Parser {
 			return new VarArg();
 		}
 		
-		Type type = type(sourceReader, reader);
+		Type type = type(sReader, reader);
 		if(type != null) {
 			Token t = reader.peek();
 			if(t.type == NAME) {
 				reader.skip();
-				return new RegularArgument(type, sourceReader.getSlice(t.start, t.length));
+				return new RegularArgument(type, t.get(sReader));
 			}
 		}
 		reader.reset(mark);
@@ -908,33 +920,33 @@ public class Parser {
 		if(t.type == ASSIGN) {
 			Token t2 = reader.read();
 			if(t2.type != NAME) {
-				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
+				throw new CompilationFailedError(sReader.getLocation(t2.start),
 						"Expecting member variable name in member-assign-argument");
 			}
-			return new MemberAssignArgument(sourceReader.getSlice(t2.start, t2.length));
+			return new MemberAssignArgument(t2.get(sReader));
 		}
 		
 		if(t.type != NAME) {
-			throw new CompilationFailedError(sourceReader.getLocation(t.start),
+			throw new CompilationFailedError(sReader.getLocation(t.start),
 			"Expecting member variable name in member-assign-argument");
 		}
-		return new MemberArgument(sourceReader.getSlice(t.start, t.length));
+		return new MemberArgument(t.get(sReader));
 		
 	}
 
-	private Assignment assignment(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Assignment assignment(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 
 		//System.out.println("Parsing an assignment");
 		
-		Access lvalue = access(sourceReader, reader);
+		Access lvalue = access(sReader, reader);
 		//System.out.println("Got lvalue "+lvalue);
 		if(lvalue != null) {
 			Token t = reader.peek();
 			if(t.type == ASSIGN) {
 				reader.skip();
-				Expression rvalue = expression(sourceReader, reader);
+				Expression rvalue = expression(sReader, reader);
 				if(rvalue != null) {
 					return new Assignment(lvalue, rvalue);
 				}
@@ -947,12 +959,12 @@ public class Parser {
 		
 	}
 	
-	private Access access(SourceReader sourceReader, ListReader<Token> reader) {
+	private Access access(SourceReader sReader, ListReader<Token> reader) {
 		
 		int mark = reader.mark();
 		
 		//System.out.println("Attempting to read varAccess");
-		VariableAccess varAcc = variableAccess(sourceReader, reader);
+		VariableAccess varAcc = variableAccess(sReader, reader);
 		if(varAcc != null) {
 			return varAcc;
 		}
@@ -962,7 +974,7 @@ public class Parser {
 		
 	}
 
-	private VariableAccess variableAccess(SourceReader sourceReader, ListReader<Token> reader) {
+	private VariableAccess variableAccess(SourceReader sReader, ListReader<Token> reader) {
 		
 		int mark = reader.mark();
 		
@@ -970,7 +982,7 @@ public class Parser {
 		//System.out.println("Got token "+t.type);
 		if(t.type == NAME || t.type == THIS_KW) {
 			reader.skip();
-			return new VariableAccess(sourceReader.getSlice(t.start, t.length));
+			return new VariableAccess(t.get(sReader));
 		}
 		
 		reader.reset(mark);
@@ -978,7 +990,7 @@ public class Parser {
 		
 	}
 	
-	private Type type(SourceReader sourceReader, ListReader<Token> reader) {
+	private Type type(SourceReader sReader, ListReader<Token> reader) {
 		
 		Token t = reader.peek();
 		if(t.type == NAME) {
@@ -988,20 +1000,20 @@ public class Parser {
 				reader.skip();
 				pointerLevel++;
 			}
-			return new Type(sourceReader.getSlice(t.start, t.length), pointerLevel);
+			return new Type(t.get(sReader), pointerLevel);
 		}
 		
 		return null;
 		
 	}
 	
-	private Expression expression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Expression expression(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 		
 		if(reader.peek().type == EXCL) {
 			reader.skip();
-			Expression inner = expression(sourceReader, reader);
+			Expression inner = expression(sReader, reader);
 			if(inner == null) {
 				reader.reset(mark);
 				return null;
@@ -1010,7 +1022,7 @@ public class Parser {
 			return new Not(inner);
 		}
 		
-		Expression expr = flatExpression(sourceReader, reader);
+		Expression expr = flatExpression(sReader, reader);
 		if(expr == null) {
 			//System.out.println("Null flat expression");
 			return null;
@@ -1026,13 +1038,13 @@ public class Parser {
 			if(t.type == DOT) {
 				
 				reader.skip();
-				FunctionCall call = functionCall(sourceReader, reader);
+				FunctionCall call = functionCall(sReader, reader);
 				if(call != null) {
 					expr = new MemberCall(expr, call);
 					continue;
 				}
 				
-				VariableAccess varAccess = variableAccess(sourceReader, reader);
+				VariableAccess varAccess = variableAccess(sReader, reader);
 				if(varAccess != null) {
 					expr = new MemberAccess(expr, varAccess);
 					continue;
@@ -1043,9 +1055,9 @@ public class Parser {
 			if(t.type == DOUBLE_DOT) {
 				
 				reader.skip();
-				Expression upper = expression(sourceReader, reader);
+				Expression upper = expression(sReader, reader);
 				if(upper == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 							"Expected expression for the upper part of a range literal");
 				}
 				// this is so beautiful it makes me wanna cry
@@ -1056,15 +1068,15 @@ public class Parser {
 			if(t.type == OPEN_SQUAR) {
 
 				reader.skip();
-				Expression index = expression(sourceReader, reader);
+				Expression index = expression(sReader, reader);
 				if(index == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected expression for the index of an array access");
 				}
 				//System.out.println("Got expression which is really a "+index.getClass().getSimpleName());
 				//System.out.println("Next is a "+reader.peek().type);
 				if(reader.read().type != CLOS_SQUAR) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 						"Expected closing bracket to end array access, got "+reader.prev().type+" instead.");
 				}
 				//System.out.println("Did arrayAccess just fine, next is a "+reader.peek().type);
@@ -1076,13 +1088,13 @@ public class Parser {
 			if(t.type == ASSIGN) {
 				
 				reader.skip();
-				Expression rvalue = expression(sourceReader, reader);
+				Expression rvalue = expression(sReader, reader);
 				if(rvalue == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected rvalue for assignment");
 				}
 				if(!(expr instanceof Access)) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Trying to assign something which is not an access (ie. not a lvalue)");
 				}
 				expr = new Assignment((Access) expr, rvalue);
@@ -1094,9 +1106,9 @@ public class Parser {
 					|| t.type == MINUS || t.type == SLASH) {
 				
 				reader.skip();
-				Expression rvalue = expression(sourceReader, reader);
+				Expression rvalue = expression(sReader, reader);
 				if(rvalue == null) {
-					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected rvalue after binary operator");
 				}
 				switch(t.type) {
@@ -1104,7 +1116,7 @@ public class Parser {
 					case STAR:  expr = new Mul(expr, rvalue); break;
 					case MINUS: expr = new Sub(expr, rvalue); break;
 					case SLASH: expr = new Div(expr, rvalue); break;
-					default: throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
 				continue;
@@ -1118,7 +1130,7 @@ public class Parser {
 		
 	}
 	
-	private Expression flatExpression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Expression flatExpression(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -1133,14 +1145,14 @@ public class Parser {
 		Expression expression;
 		
 		if(parenNumber > 0) {
-			expression = expression(sourceReader, reader);
+			expression = expression(sReader, reader);
 		} else {
-			expression = flatUnparenExpression(sourceReader, reader);
+			expression = flatUnparenExpression(sReader, reader);
 		}
 		
 		if(expression == null) {
 			if(parenNumber > 0) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Expected expression into parenthesis");
 			}
 			reader.reset(mark);
@@ -1149,7 +1161,7 @@ public class Parser {
 		
 		while(parenNumber > 0) {
 			if(reader.read().type != CLOS_PAREN) {
-				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Missing closing parenthesis.");
 			}
 			expression = new Parenthesis(expression);
@@ -1160,44 +1172,44 @@ public class Parser {
 		
 	}
 	
-	private Expression flatUnparenExpression(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Expression flatUnparenExpression(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
 		int mark = reader.mark();
 		
 		//System.out.println("Parsing flatUnparenExpression");
 		
 		//System.out.println("Attempting to parse literal for flatUnparenExpression (next is "+reader.peek().type+")");
-		Literal literal = literal(sourceReader, reader);
+		Literal literal = literal(sReader, reader);
 		if(literal != null) {
 			return literal;
 		}
 		
 		//System.out.println("Attempting to parse assignment for flatUnparenExpression (next is "+reader.peek().type+")");
-		Assignment ass = assignment(sourceReader, reader);
+		Assignment ass = assignment(sReader, reader);
 		if(ass != null) {
 			return ass;
 		}
 		
 		//System.out.println("Attempting to parse declaration for flatUnparenExpression (next is "+reader.peek().type+")");
-		Declaration declaration = declaration(sourceReader, reader);
+		Declaration declaration = declaration(sReader, reader);
 		if(declaration != null) {
 			return declaration;
 		}
 		
 		//System.out.println("Attempting to parse instantiation for flatUnparenExpression (next is "+reader.peek().type+")");
-		Instantiation instantiation = instantiation(sourceReader, reader);
+		Instantiation instantiation = instantiation(sReader, reader);
 		if(instantiation != null) {
 			return instantiation;
 		}
 		
 		//System.out.println("Attempting to parse funcCall for flatUnparenExpression (next is "+reader.peek().type+")");
-		FunctionCall funcCall = functionCall(sourceReader, reader);
+		FunctionCall funcCall = functionCall(sReader, reader);
 		if(funcCall != null) {
 			return funcCall;
 		}
 		
 		//System.out.println("Attempting to parse access for flatUnparenExpression (next is "+reader.peek().type+")");
-		Access access = access(sourceReader, reader);
+		Access access = access(sReader, reader);
 		if(access != null) {
 			return access;
 		}
@@ -1207,32 +1219,32 @@ public class Parser {
 		
 	}
 
-	private Literal literal(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private Literal literal(SourceReader sReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		Token t = reader.read();
 		if(t.type == STRING_LIT) {
-			return new StringLiteral(sourceReader.getSlice(t.start, t.length));
+			return new StringLiteral(t.get(sReader));
 		}
 		if(t.type == CHAR_LIT) {
 			try {
-				return new CharLiteral(SourceReader.parseCharLiteral(sourceReader.getSlice(t.start, t.length)));
+				return new CharLiteral(SourceReader.parseCharLiteral(t.get(sReader)));
 			} catch (SyntaxError e) {
-				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Malformed char literal");
+				throw new CompilationFailedError(sReader.getLocation(t.start), "Malformed char literal");
 			}
 		}
 		if(t.type == DEC_NUMBER) {
-			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length)), Format.DEC);
+			return new NumberLiteral(Long.parseLong(t.get(sReader)), Format.DEC);
 		}
 		if(t.type == HEX_NUMBER) {
-			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 16), Format.HEX);
+			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 16), Format.HEX);
 		}
 		if(t.type == OCT_NUMBER) {
-			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 8), Format.OCT);
+			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 8), Format.OCT);
 		}
 		if(t.type == BIN_NUMBER) {
-			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 2), Format.BIN);
+			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 2), Format.BIN);
 		}
 		if(t.type == TRUE) {
 			return new BoolLiteral(true);

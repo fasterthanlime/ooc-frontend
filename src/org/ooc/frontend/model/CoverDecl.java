@@ -13,6 +13,11 @@ public class CoverDecl extends Declaration {
 	private NodeList<VariableDecl> variables;
 	private NodeList<FunctionDecl> functions;
 	
+	public CoverDecl(String name, Type type) {
+		this.name = name;
+		this.type = type;
+	}
+
 	/**
 	 * @return the name
 	 */
@@ -45,6 +50,14 @@ public class CoverDecl extends Declaration {
 	
 	public void setComment(OocDocComment comment) {
 		this.comment = comment;
+	}
+	
+	public NodeList<VariableDecl> getVariables() {
+		return variables;
+	}
+	
+	public NodeList<FunctionDecl> getFunctions() {
+		return functions;
 	}
 
 	@Override

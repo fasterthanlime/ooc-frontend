@@ -1,5 +1,7 @@
 package org.ooc.frontend.model.tokens;
 
+import org.ubi.SourceReader;
+
 
 public class Token {
 	
@@ -124,6 +126,10 @@ public class Token {
 	@Override
 	public String toString() {
 		return type.toString();
+	}
+	
+	public String get(SourceReader sReader) {
+		return sReader.getSlice(start, length);
 	}
 	
 }
