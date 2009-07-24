@@ -16,6 +16,7 @@ import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
 import org.ooc.frontend.model.ControlStatement;
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.Foreach;
@@ -46,6 +47,8 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
+import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
 
 public class CGenerator extends Generator implements Visitor {
@@ -76,9 +79,9 @@ public class CGenerator extends Generator implements Visitor {
 		hw.append(" header file, generated with ooc */");
 		hw.newLine();
 		
-		hw.append("/* ");
-		hw.append(unit.getName());
-		hw.append(" source file, generated with ooc */");
+		cw.append("/* ");
+		cw.append(unit.getName());
+		cw.append(" source file, generated with ooc */");
 		cw.newLine();
 		
 		cw.newLine();
@@ -195,11 +198,9 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(StringLiteral stringLiteral) throws IOException {
-
 		current.append('"');
 		current.append(SourceReader.spelled(stringLiteral.getValue()));
 		current.append('"');
-		
 	}
 
 	@Override
@@ -289,29 +290,33 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(FunctionDecl functionDecl) throws IOException {
 		
-		hw.newLine();
-		hw.append("/* Function "+unit.getName()+"."+functionDecl.getName()+" */");
-		hw.newLine();
+		if(functionDecl.getDeclType() != FunctionDeclType.EXTERN && !functionDecl.isAbstract()) {
 		
-		current = hw;
-		writeFuncPrototype(functionDecl);
-		hw.append(';');
+			hw.newLine();
+			hw.append("/* Function "+unit.getName()+"."+functionDecl.getName()+" */");
+			hw.newLine();
+			
+			current = hw;
+			writeFuncPrototype(functionDecl);
+			hw.append(';');
 		
-		current = cw;
-		writeFuncPrototype(functionDecl);
-		cw.append(" {");
-		cw.tab();
-		cw.newLine();
-		
-		for(Line line: functionDecl.getBody()) {
-			line.accept(this);
+			current = cw;
+			writeFuncPrototype(functionDecl);
+			cw.append(" {");
+			cw.tab();
+			cw.newLine();
+			
+			for(Line line: functionDecl.getBody()) {
+				line.accept(this);
+			}
+			
+			cw.untab();
+			cw.newLine();
+			cw.newLine();
+			cw.append("}");
+			cw.newLine();
+			
 		}
-		
-		cw.untab();
-		cw.newLine();
-		cw.newLine();
-		cw.append("}");
-		cw.newLine();
 		
 	}
 
@@ -342,6 +347,11 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(ClassDecl classDecl) throws IOException {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void visit(TypeArgument typeArgument) throws IOException {
+		typeArgument.getType().accept(this);
 	}
 
 	@Override
@@ -380,6 +390,13 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(VarArg varArg) throws IOException {
+		
+		current.append("...");
+		
+	}
+
+	@Override
+	public void visit(CoverDecl cover) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}

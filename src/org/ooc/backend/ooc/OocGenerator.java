@@ -17,6 +17,7 @@ import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
 import org.ooc.frontend.model.ControlStatement;
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.Foreach;
@@ -48,6 +49,7 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator implements Visitor {
@@ -417,6 +419,11 @@ public class OocGenerator extends Generator implements Visitor {
 		w.newLine();
 		
 	}
+	
+	@Override
+	public void visit(TypeArgument typeArgument) throws IOException {
+		typeArgument.getType().accept(this);
+	}
 
 	@Override
 	public void visit(RegularArgument arg) throws IOException {
@@ -447,6 +454,12 @@ public class OocGenerator extends Generator implements Visitor {
 		for(int i = 0; i < type.getPointerLevel(); i++) {
 			w.append('*');
 		}
+	}
+
+	@Override
+	public void visit(CoverDecl cover) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

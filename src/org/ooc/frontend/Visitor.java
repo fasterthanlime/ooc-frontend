@@ -9,6 +9,7 @@ import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
@@ -38,6 +39,7 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.parser.TypeArgument;
 
 public interface Visitor {
 
@@ -83,6 +85,7 @@ public interface Visitor {
 	public void visit(FunctionDecl functionDecl) throws IOException;
 	public void visit(ClassDecl classDecl) throws IOException;
 
+	public void visit(TypeArgument typeArgument) throws IOException;
 	public void visit(RegularArgument regularArgument) throws IOException;
 	public void visit(MemberArgument memberArgument) throws IOException;
 	public void visit(MemberAssignArgument memberArgument) throws IOException;
@@ -90,5 +93,7 @@ public interface Visitor {
 	public void visit(Type type) throws IOException;
 
 	public void visit(VarArg varArg) throws IOException;
+
+	public void visit(CoverDecl cover) throws IOException;
 	
 }

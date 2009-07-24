@@ -8,10 +8,12 @@ public class FunctionCall extends Access {
 
 	protected String name;
 	protected final NodeList<Expression> arguments;
+	protected FunctionDecl impl;
 	
 	public FunctionCall(String name) {
 		this.name = name;
 		this.arguments = new NodeList<Expression>();
+		this.impl = null;
 	}
 	
 	public String getName() {

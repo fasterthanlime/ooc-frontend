@@ -1,5 +1,56 @@
 package org.ooc.frontend.parser;
 
+ import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
+import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CHAR_LIT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CLASS_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_BRACK;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_PAREN;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_SQUAR;
+import static org.ooc.frontend.model.tokens.Token.TokenType.COL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.COMMA;
+import static org.ooc.frontend.model.tokens.Token.TokenType.CONST_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.COVER_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.DEC_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.DOT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.DOUBLE_DOT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.EXCL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.EXTERN_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.FALSE;
+import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.IMPORT_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.INCLUDE_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.MINUS;
+import static org.ooc.frontend.model.tokens.Token.TokenType.ML_COMMENT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
+import static org.ooc.frontend.model.tokens.Token.TokenType.NEW_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.NULL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OCT_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OOCDOC;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_BRACK;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_SQUAR;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OVER_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.PLUS;
+import static org.ooc.frontend.model.tokens.Token.TokenType.RETURN_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.SEMICOL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.SLASH;
+import static org.ooc.frontend.model.tokens.Token.TokenType.SL_COMMENT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
+import static org.ooc.frontend.model.tokens.Token.TokenType.STATIC_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.STRING_LIT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.TRUE;
+import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +66,7 @@ import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Conditional;
 import org.ooc.frontend.model.ControlStatement;
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
@@ -58,7 +110,6 @@ import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.NumberLiteral.Format;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
-import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
@@ -116,12 +167,12 @@ public class Parser {
 		
 		Token t = reader.peek();
 		
-		if(t.type == TokenType.SL_COMMENT) {
+		if(t.type == SL_COMMENT) {
 			reader.skip();
 			return new SingleLineComment(sourceReader.getSlice(t.start, t.length));
 		}
 
-		if(t.type == TokenType.ML_COMMENT) {
+		if(t.type == ML_COMMENT) {
 			reader.skip();
 			
 		}
@@ -132,7 +183,7 @@ public class Parser {
 
 	private boolean include(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
 
-		if(reader.peek().type != TokenType.INCLUDE_KW) {
+		if(reader.peek().type != INCLUDE_KW) {
 			return false;
 		}
 		reader.skip();
@@ -142,16 +193,16 @@ public class Parser {
 		while(true) {
 		
 			Token t = reader.read();
-			if(t.type == TokenType.SEMICOL) {
+			if(t.type == SEMICOL) {
 				includes.add(new Include(sb.toString()));
 				break;
 			}
-			if(t.type == TokenType.COMMA) {
+			if(t.type == COMMA) {
 				includes.add(new Include(sb.toString()));
 				sb.setLength(0);
-			} else if(t.type == TokenType.NAME) {
+			} else if(t.type == NAME) {
 				sb.append(sourceReader.getSlice(t.start, t.length));
-			} else if(t.type == TokenType.SLASH) {
+			} else if(t.type == SLASH) {
 				sb.append('/');
 			} else {
 				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Unexpected token "+t.type);
@@ -165,7 +216,7 @@ public class Parser {
 	
 	private boolean importStatement(SourceReader sourceReader,	ListReader<Token> reader, NodeList<Import> imports) throws EOFException, CompilationFailedError {
 
-		if(reader.peek().type != TokenType.IMPORT_KW) {
+		if(reader.peek().type != IMPORT_KW) {
 			return false;
 		}
 		reader.skip();
@@ -175,16 +226,16 @@ public class Parser {
 		while(true) {
 		
 			Token t = reader.read();
-			if(t.type == TokenType.SEMICOL) {
+			if(t.type == SEMICOL) {
 				imports.add(new Import(sb.toString()));
 				break;
 			}
-			if(t.type == TokenType.COMMA) {
+			if(t.type == COMMA) {
 				imports.add(new Import(sb.toString()));
 				sb.setLength(0);
-			} else if(t.type == TokenType.NAME) {
+			} else if(t.type == NAME) {
 				sb.append(sourceReader.getSlice(t.start, t.length));
-			} else if(t.type == TokenType.DOT) {
+			} else if(t.type == DOT) {
 				sb.append('.');
 			} else {
 				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Unexpected token "+t.type);
@@ -200,7 +251,7 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.SL_COMMENT) {
+		if(reader.peek().type == SL_COMMENT) {
 			Token t = reader.read();
 			return new SingleLineComment(sourceReader.getSlice(t.start, t.length));
 		}
@@ -208,7 +259,7 @@ public class Parser {
 		Statement statement = statement(sourceReader, reader);
 		if(statement != null) {
 			// control statements (if, else, for, version, etc.) don't need a semicolon
-			if(!(statement instanceof ControlStatement) && reader.read().type != TokenType.SEMICOL) {
+			if(!(statement instanceof ControlStatement) && reader.read().type != SEMICOL) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.prev(2).start),
 						"Missing semi-colon at the end of a line (got a "+reader.prev(2).type+" instead)");
 			}
@@ -281,7 +332,7 @@ public class Parser {
 		int mark = reader.mark();
 		
 		Token token = reader.read();
-		if(token.type != TokenType.WHILE_KW && token.type != TokenType.IF_KW) {
+		if(token.type != WHILE_KW && token.type != IF_KW) {
 			reader.reset(mark);
 			return null;
 		}
@@ -293,9 +344,9 @@ public class Parser {
 		}
 		
 		Conditional statement;
-		if(token.type == TokenType.WHILE_KW) {
+		if(token.type == WHILE_KW) {
 			statement = new While(condition);
-		} else if(token.type == TokenType.IF_KW) {
+		} else if(token.type == IF_KW) {
 			statement = new If(condition);
 		} else {
 			reader.reset(mark);
@@ -310,9 +361,9 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type == TokenType.FOR_KW) {
+		if(reader.read().type == FOR_KW) {
 			boolean hasParen = false;
-			if(reader.peek().type == TokenType.OPEN_PAREN) {
+			if(reader.peek().type == OPEN_PAREN) {
 				reader.skip();
 				hasParen = true;
 			}
@@ -322,7 +373,7 @@ public class Parser {
 				return null;
 			}
 			
-			if(reader.read().type != TokenType.COL) {
+			if(reader.read().type != COL) {
 				return null;
 			}
 			
@@ -333,7 +384,7 @@ public class Parser {
 						"Expected expression after colon in a foreach");
 			}
 			
-			if(hasParen && reader.read().type != TokenType.CLOS_PAREN) {
+			if(hasParen && reader.read().type != CLOS_PAREN) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
 				"Expected closing parenthesis at the end of a parenthesized foreach");
 			}
@@ -354,7 +405,7 @@ public class Parser {
 			throws EOFException, IOException, CompilationFailedError {
 		
 		boolean hasBrack = false;
-		if(reader.peek().type == TokenType.OPEN_BRACK) {
+		if(reader.peek().type == OPEN_BRACK) {
 			reader.skip();
 			hasBrack = true;
 		}
@@ -365,7 +416,7 @@ public class Parser {
 					//+" at "+sourceReader.getLocation(reader.peek().start));
 			//System.out.println("Current token is a "+reader.peek().type);
 			
-			while(reader.peek().type != TokenType.CLOS_BRACK) {
+			while(reader.peek().type != CLOS_BRACK) {
 				Line line = line(sourceReader, reader);
 				if(line == null) {
 					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
@@ -391,9 +442,9 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type == TokenType.NEW_KW) {
+		if(reader.read().type == NEW_KW) {
 			Token t = reader.peek();
-			if(t.type == TokenType.NAME) {
+			if(t.type == NAME) {
 				reader.skip();
 				Instantiation inst = new Instantiation(sourceReader.getSlice(t.start, t.length));
 				exprList(sourceReader, reader, inst.getArguments()); // we don't care whether we have args or not
@@ -414,7 +465,7 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type == TokenType.RETURN_KW) {
+		if(reader.read().type == RETURN_KW) {
 			Expression expr = expression(sourceReader, reader);
 			if(expr == null) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
@@ -433,7 +484,7 @@ public class Parser {
 		int mark = reader.mark();
 		
 		Token name = reader.read();
-		if(name.type != TokenType.NAME) {
+		if(name.type != NAME) {
 			reader.reset(mark);
 			return null;
 		}
@@ -456,7 +507,7 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type != TokenType.OPEN_PAREN) {
+		if(reader.read().type != OPEN_PAREN) {
 			reader.reset(mark);
 			return false;
 		}
@@ -464,12 +515,12 @@ public class Parser {
 		boolean comma = false;
 		while(true) {
 			
-			if(reader.peek().type == TokenType.CLOS_PAREN) {
+			if(reader.peek().type == CLOS_PAREN) {
 				reader.skip(); // skip the ')'
 				break;
 			}
 			if(comma) {
-				if(reader.read().type != TokenType.COMMA) {
+				if(reader.read().type != COMMA) {
 					throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected comma between arguments of a function call");
 				}
 			} else {
@@ -510,6 +561,11 @@ public class Parser {
 			return classDecl;
 		}
 		
+		CoverDecl coverDecl = coverDecl(sourceReader, reader);
+		if(coverDecl != null) {
+			return coverDecl;
+		}
+		
 		reader.reset(mark);
 		return null;
 		
@@ -526,10 +582,10 @@ public class Parser {
 		
 		while(true) {
 			Token t = reader.peek();
-			if(t.type == TokenType.CONST_KW) {
+			if(t.type == CONST_KW) {
 				isConst = true;
 				reader.skip();
-			} else if(t.type == TokenType.STATIC_KW) {
+			} else if(t.type == STATIC_KW) {
 				isStatic = true;
 				reader.skip();
 			} else {
@@ -540,10 +596,10 @@ public class Parser {
 		Type type = type(sourceReader, reader);
 		if(type != null) {
 			Token t = reader.peek();
-			if(t.type == TokenType.NAME) {
+			if(t.type == NAME) {
 				reader.skip();
 				Token t2 = reader.peek();
-				if(t2.type == TokenType.ASSIGN) {
+				if(t2.type == ASSIGN) {
 					reader.skip();
 					Expression expr = expression(sourceReader, reader);
 					if(expr == null) {
@@ -560,39 +616,36 @@ public class Parser {
 		
 	}
 	
-	private ClassDecl classDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+	private CoverDecl coverDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
-		if(reader.peek().type == TokenType.OOCDOC) {
+		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
 			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
 		}
 		
-		boolean isAbstract = reader.peek().type == TokenType.ABSTRACT_KW;
-		if(isAbstract) {
-			reader.skip();
-		}
-		
-		if(reader.read().type == TokenType.CLASS_KW) {
+		if(reader.read().type == COVER_KW) {
 			
 			Token t = reader.read();
-			if(t.type != TokenType.NAME) {
+			if(t.type != NAME) {
 				throw new CompilationFailedError(sourceReader.getLocation(t.start),
 						"Expected class name after the class keyword.");
 			}
 			
-			String superName = "";
-			if(reader.peek().type == TokenType.FROM_KW) {
+			Type fromType = null;
+			if(reader.peek().type == FROM_KW) {
 				reader.skip();
-				Token tSuper = reader.read();
-				superName = sourceReader.getSlice(tSuper.start, tSuper.length);
-				
+				fromType = type(sourceReader, reader);
+				if(fromType == null) {
+					throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+					"Expected class name after the class keyword.");
+				}
 			}
 			
 			Token t2 = reader.read();
-			if(t2.type != TokenType.OPEN_BRACK) {
+			if(t2.type != OPEN_BRACK) {
 				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
 						"Expected opening bracket to begin class declaration.");
 			}
@@ -601,11 +654,85 @@ public class Parser {
 			classDecl.setSuperName(superName);
 			if(comment != null) classDecl.setComment(comment);
 			
-			while(reader.peek().type != TokenType.CLOS_BRACK) {
+			while(reader.peek().type != CLOS_BRACK) {
 			
 				VariableDecl varDecl = variableDecl(sourceReader, reader);
 				if(varDecl != null) {
-					if(reader.read().type != TokenType.SEMICOL) {
+					if(reader.read().type != SEMICOL) {
+						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+							"Expected semi-colon after variable declaration in class declaration");
+					}
+					classDecl.getVariables().add(varDecl);
+					continue;
+				}
+				
+				FunctionDecl funcDecl = functionDecl(sourceReader,reader);
+				if(funcDecl != null) {
+					classDecl.getFunctions().add(funcDecl);
+					continue;
+				}
+				
+				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+						"Expected variable declaration or function declaration in a class declaration");
+			
+			}
+			reader.skip();
+			
+			return classDecl;
+			
+		}
+		
+		reader.reset(mark);
+		return null;
+		
+	}
+	
+	private ClassDecl classDecl(SourceReader sourceReader, ListReader<Token> reader) throws IOException {
+
+		int mark = reader.mark();
+		
+		OocDocComment comment = null;
+		if(reader.peek().type == OOCDOC) {
+			Token t = reader.read();
+			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
+		}
+		
+		boolean isAbstract = reader.peek().type == ABSTRACT_KW;
+		if(isAbstract) {
+			reader.skip();
+		}
+		
+		if(reader.read().type == CLASS_KW) {
+			
+			Token t = reader.read();
+			if(t.type != NAME) {
+				throw new CompilationFailedError(sourceReader.getLocation(t.start),
+						"Expected class name after the class keyword.");
+			}
+			
+			String superName = "";
+			if(reader.peek().type == FROM_KW) {
+				reader.skip();
+				Token tSuper = reader.read();
+				superName = sourceReader.getSlice(tSuper.start, tSuper.length);
+				
+			}
+			
+			Token t2 = reader.read();
+			if(t2.type != OPEN_BRACK) {
+				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
+						"Expected opening bracket to begin class declaration.");
+			}
+			
+			ClassDecl classDecl = new ClassDecl(sourceReader.getSlice(t.start, t.length), isAbstract);
+			classDecl.setSuperName(superName);
+			if(comment != null) classDecl.setComment(comment);
+			
+			while(reader.peek().type != CLOS_BRACK) {
+			
+				VariableDecl varDecl = variableDecl(sourceReader, reader);
+				if(varDecl != null) {
+					if(reader.read().type != SEMICOL) {
 						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
@@ -639,7 +766,7 @@ public class Parser {
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
-		if(reader.peek().type == TokenType.OOCDOC) {
+		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
 			comment = new OocDocComment(sourceReader.getSlice(t.start, t.length));
 		}
@@ -647,16 +774,22 @@ public class Parser {
 		boolean isAbstract = false;
 		
 		FunctionDeclType declType = FunctionDeclType.FUNC;
-		if(reader.peek().type == TokenType.IMPL_KW) {
+		if(reader.peek().type == IMPL_KW) {
 			reader.skip();
 			declType = FunctionDeclType.IMPL;
-		} else if(reader.peek().type == TokenType.OVER_KW) {
+		} else if(reader.peek().type == OVER_KW) {
 			reader.skip();
 			declType = FunctionDeclType.OVER;
+		} else if(reader.peek().type == EXTERN_KW) {
+			reader.skip();
+			declType = FunctionDeclType.EXTERN;
+			if(reader.read().type != FUNC_KW) {
+				
+			}
 		} else {
-			while(reader.peek().type != TokenType.FUNC_KW) {
+			while(reader.peek().type != FUNC_KW) {
 				Token t = reader.read();
-				if(t.type == TokenType.ABSTRACT_KW) {
+				if(t.type == ABSTRACT_KW) {
 					isAbstract = true;
 				} else {
 					reader.reset(mark);
@@ -667,7 +800,7 @@ public class Parser {
 		}
 		
 		Token name = reader.read();
-		if(name.type != TokenType.NAME && name.type != TokenType.NEW_KW) {
+		if(name.type != NAME && name.type != NEW_KW) {
 			throw new CompilationFailedError(sourceReader.getLocation(name.start), "Expected function name after 'func' keyword");
 		}
 		
@@ -675,25 +808,42 @@ public class Parser {
 				sourceReader.getSlice(name.start, name.length), isAbstract);
 		if(comment != null) functionDecl.setComment(comment);
 		
-		if(reader.peek().type == TokenType.OPEN_PAREN) {
+		if(reader.peek().type == OPEN_PAREN) {
 			reader.skip();
 			boolean comma = false;
 			while(true) {
 				
-				if(reader.peek().type == TokenType.CLOS_PAREN) {
+				if(reader.peek().type == CLOS_PAREN) {
 					reader.skip(); // skip the ')'
 					break;
 				}
 				if(comma) {
-					if(reader.read().type != TokenType.COMMA) {
-						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected comma between arguments of a function definition");
+					if(reader.read().type != COMMA) {
+						throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
+								"Expected comma between arguments of a function definition");
 					}
 				} else {
-					Argument arg = argument(sourceReader, reader);
-					if(arg == null) {
-						throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected variable declaration as an argument of a function definition");
+					if(declType == FunctionDeclType.FUNC) {
+						Argument arg = argument(sourceReader, reader);
+						if(arg == null) {
+							throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+									"Expected variable declaration as an argument of a function definition");
+						}
+						functionDecl.getArguments().add(arg);
+					} else {
+						Type type = type(sourceReader, reader);
+						if(type == null) {
+							if(reader.peek().type == TRIPLE_DOT) {
+								reader.skip();
+								functionDecl.getArguments().add(new VarArg());
+							} else {
+								throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
+									"Expected type as an argument of an extern function definition");
+							}
+						} else {
+							functionDecl.getArguments().add(new TypeArgument(type));
+						}
 					}
-					functionDecl.getArguments().add(arg);
 				}
 				comma = !comma;
 				
@@ -701,7 +851,7 @@ public class Parser {
 		}
 		
 		Token t = reader.read();
-		if(t.type == TokenType.ARROW) {
+		if(t.type == ARROW) {
 			Type returnType = type(sourceReader, reader);
 			if(returnType == null) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start), "Expected return type after arrow");
@@ -709,14 +859,14 @@ public class Parser {
 			functionDecl.setReturnType(returnType);
 			t = reader.read();
 		}
-		if(t.type == TokenType.SEMICOL) {
+		if(t.type == SEMICOL) {
 			return functionDecl;
 		}
-		if(t.type != TokenType.OPEN_BRACK) {
+		if(t.type != OPEN_BRACK) {
 			throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
 		}
 	
-		while(reader.peek().type != TokenType.CLOS_BRACK) {
+		while(reader.peek().type != CLOS_BRACK) {
 		
 			Line line = line(sourceReader, reader);
 			if(line == null) {
@@ -727,6 +877,10 @@ public class Parser {
 		}
 		reader.skip();
 		
+		if(functionDecl.getName().equals("main")) {
+			functionDecl.setReturnType(new Type("int"));
+		}
+		
 		return functionDecl;
 		
 	}
@@ -735,7 +889,7 @@ public class Parser {
 
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.TRIPLE_DOT) {
+		if(reader.peek().type == TRIPLE_DOT) {
 			reader.skip();
 			return new VarArg();
 		}
@@ -743,7 +897,7 @@ public class Parser {
 		Type type = type(sourceReader, reader);
 		if(type != null) {
 			Token t = reader.peek();
-			if(t.type == TokenType.NAME) {
+			if(t.type == NAME) {
 				reader.skip();
 				return new RegularArgument(type, sourceReader.getSlice(t.start, t.length));
 			}
@@ -751,16 +905,16 @@ public class Parser {
 		reader.reset(mark);
 		
 		Token t = reader.read();
-		if(t.type == TokenType.ASSIGN) {
+		if(t.type == ASSIGN) {
 			Token t2 = reader.read();
-			if(t2.type != TokenType.NAME) {
+			if(t2.type != NAME) {
 				throw new CompilationFailedError(sourceReader.getLocation(t2.start),
 						"Expecting member variable name in member-assign-argument");
 			}
 			return new MemberAssignArgument(sourceReader.getSlice(t2.start, t2.length));
 		}
 		
-		if(t.type != TokenType.NAME) {
+		if(t.type != NAME) {
 			throw new CompilationFailedError(sourceReader.getLocation(t.start),
 			"Expecting member variable name in member-assign-argument");
 		}
@@ -778,7 +932,7 @@ public class Parser {
 		//System.out.println("Got lvalue "+lvalue);
 		if(lvalue != null) {
 			Token t = reader.peek();
-			if(t.type == TokenType.ASSIGN) {
+			if(t.type == ASSIGN) {
 				reader.skip();
 				Expression rvalue = expression(sourceReader, reader);
 				if(rvalue != null) {
@@ -814,7 +968,7 @@ public class Parser {
 		
 		Token t = reader.peek();
 		//System.out.println("Got token "+t.type);
-		if(t.type == TokenType.NAME || t.type == TokenType.THIS_KW) {
+		if(t.type == NAME || t.type == THIS_KW) {
 			reader.skip();
 			return new VariableAccess(sourceReader.getSlice(t.start, t.length));
 		}
@@ -827,10 +981,10 @@ public class Parser {
 	private Type type(SourceReader sourceReader, ListReader<Token> reader) {
 		
 		Token t = reader.peek();
-		if(t.type == TokenType.NAME) {
+		if(t.type == NAME) {
 			reader.skip();
 			int pointerLevel = 0;
-			while(reader.peek().type == TokenType.STAR) {
+			while(reader.peek().type == STAR) {
 				reader.skip();
 				pointerLevel++;
 			}
@@ -845,7 +999,7 @@ public class Parser {
 		
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.EXCL) {
+		if(reader.peek().type == EXCL) {
 			reader.skip();
 			Expression inner = expression(sourceReader, reader);
 			if(inner == null) {
@@ -869,7 +1023,7 @@ public class Parser {
 			//System.out.println("Got #" + (count++) + " expression "+expr.getClass().getSimpleName());
 			
 			Token t = reader.peek();
-			if(t.type == TokenType.DOT) {
+			if(t.type == DOT) {
 				
 				reader.skip();
 				FunctionCall call = functionCall(sourceReader, reader);
@@ -886,7 +1040,7 @@ public class Parser {
 				
 			}
 			
-			if(t.type == TokenType.DOUBLE_DOT) {
+			if(t.type == DOUBLE_DOT) {
 				
 				reader.skip();
 				Expression upper = expression(sourceReader, reader);
@@ -899,7 +1053,7 @@ public class Parser {
 				
 			}
 			
-			if(t.type == TokenType.OPEN_SQUAR) {
+			if(t.type == OPEN_SQUAR) {
 
 				reader.skip();
 				Expression index = expression(sourceReader, reader);
@@ -909,7 +1063,7 @@ public class Parser {
 				}
 				//System.out.println("Got expression which is really a "+index.getClass().getSimpleName());
 				//System.out.println("Next is a "+reader.peek().type);
-				if(reader.read().type != TokenType.CLOS_SQUAR) {
+				if(reader.read().type != CLOS_SQUAR) {
 					throw new CompilationFailedError(sourceReader.getLocation(reader.prev().start),
 						"Expected closing bracket to end array access, got "+reader.prev().type+" instead.");
 				}
@@ -919,7 +1073,7 @@ public class Parser {
 				
 			}
 			
-			if(t.type == TokenType.ASSIGN) {
+			if(t.type == ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = expression(sourceReader, reader);
@@ -936,8 +1090,8 @@ public class Parser {
 				
 			}
 			
-			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
-					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH) {
+			if(t.type == PLUS || t.type == STAR
+					|| t.type == MINUS || t.type == SLASH) {
 				
 				reader.skip();
 				Expression rvalue = expression(sourceReader, reader);
@@ -970,7 +1124,7 @@ public class Parser {
 		
 		int parenNumber = 0;
 		Token t = reader.peek();
-		while(t.type == TokenType.OPEN_PAREN) {
+		while(t.type == OPEN_PAREN) {
 			reader.skip();
 			parenNumber++;
 			t = reader.peek();
@@ -994,7 +1148,7 @@ public class Parser {
 		}
 		
 		while(parenNumber > 0) {
-			if(reader.read().type != TokenType.CLOS_PAREN) {
+			if(reader.read().type != CLOS_PAREN) {
 				throw new CompilationFailedError(sourceReader.getLocation(reader.peek().start),
 					"Missing closing parenthesis.");
 			}
@@ -1058,35 +1212,35 @@ public class Parser {
 		int mark = reader.mark();
 		
 		Token t = reader.read();
-		if(t.type == TokenType.STRING_LIT) {
+		if(t.type == STRING_LIT) {
 			return new StringLiteral(sourceReader.getSlice(t.start, t.length));
 		}
-		if(t.type == TokenType.CHAR_LIT) {
+		if(t.type == CHAR_LIT) {
 			try {
 				return new CharLiteral(SourceReader.parseCharLiteral(sourceReader.getSlice(t.start, t.length)));
 			} catch (SyntaxError e) {
 				throw new CompilationFailedError(sourceReader.getLocation(t.start), "Malformed char literal");
 			}
 		}
-		if(t.type == TokenType.DEC_NUMBER) {
+		if(t.type == DEC_NUMBER) {
 			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length)), Format.DEC);
 		}
-		if(t.type == TokenType.HEX_NUMBER) {
+		if(t.type == HEX_NUMBER) {
 			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 16), Format.HEX);
 		}
-		if(t.type == TokenType.OCT_NUMBER) {
+		if(t.type == OCT_NUMBER) {
 			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 8), Format.OCT);
 		}
-		if(t.type == TokenType.BIN_NUMBER) {
+		if(t.type == BIN_NUMBER) {
 			return new NumberLiteral(Long.parseLong(sourceReader.getSlice(t.start, t.length).toUpperCase(), 2), Format.BIN);
 		}
-		if(t.type == TokenType.TRUE) {
+		if(t.type == TRUE) {
 			return new BoolLiteral(true);
 		}
-		if(t.type == TokenType.FALSE) {
+		if(t.type == FALSE) {
 			return new BoolLiteral(false);
 		}
-		if(t.type == TokenType.NULL) {
+		if(t.type == NULL) {
 			return new NullLiteral();
 		}
 		

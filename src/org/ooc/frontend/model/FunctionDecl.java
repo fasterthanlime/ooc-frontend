@@ -12,7 +12,7 @@ public class FunctionDecl extends Declaration {
 		FUNC,
 		IMPL,
 		OVER,
-		EXT,
+		EXTERN,
 	}
 	
 	private OocDocComment comment;
