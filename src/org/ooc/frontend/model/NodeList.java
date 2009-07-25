@@ -1,10 +1,13 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class NodeList<T extends Node> implements Iterable<T> {
+import org.ooc.frontend.Visitor;
+
+public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
 	private final List<T> nodes;
 	
@@ -48,6 +51,23 @@ public class NodeList<T extends Node> implements Iterable<T> {
 	@Override
 	public Iterator<T> iterator() {
 		return nodes.iterator();
+	}
+
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
+	}
+
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		for(T node : nodes) {
+			node.accept(visitor);
+		}
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return nodes.isEmpty();
 	}
 
 }

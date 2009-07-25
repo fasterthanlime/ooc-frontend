@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
@@ -23,6 +24,8 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
 import org.ooc.frontend.model.NumberLiteral;
@@ -84,6 +87,7 @@ public interface Visitor {
 	public void visit(VariableDeclAssigned variableDeclAssigned) throws IOException;
 	public void visit(FunctionDecl functionDecl) throws IOException;
 	public void visit(ClassDecl classDecl) throws IOException;
+	public void visit(CoverDecl cover) throws IOException;
 
 	public void visit(TypeArgument typeArgument) throws IOException;
 	public void visit(RegularArgument regularArgument) throws IOException;
@@ -93,7 +97,9 @@ public interface Visitor {
 	public void visit(Type type) throws IOException;
 
 	public void visit(VarArg varArg) throws IOException;
+	
+	public void visit(NodeList<? extends Node> list) throws IOException;
 
-	public void visit(CoverDecl cover) throws IOException;
+	public void visit(Block block) throws IOException;
 	
 }

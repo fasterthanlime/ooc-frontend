@@ -11,6 +11,7 @@ import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
@@ -31,6 +32,8 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
 import org.ooc.frontend.model.NumberLiteral;
@@ -74,30 +77,32 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(SourceUnit sourceUnit) throws IOException {
 		
-		hw.append("/* ");
-		hw.append(unit.getName());
-		hw.append(" header file, generated with ooc */");
-		hw.newLine();
+		current = hw;
+		current.append("/* ");
+		current.append(unit.getName());
+		current.append(" header file, generated with ooc */");
+		current.newLine();
 		
 		for(Include include: sourceUnit.getIncludes()) {
-			hw.append("#include <");
-			hw.append(include.getPath());
-			hw.append(".h>");
-			hw.newLine();
+			current.append("#include <");
+			current.append(include.getPath());
+			current.append(".h>");
+			current.newLine();
 		}
 		
-		hw.newLine();
+		current.newLine();
 		
-		cw.append("/* ");
-		cw.append(unit.getName());
-		cw.append(" source file, generated with ooc */");
-		cw.newLine();
+		current = cw;
+		current.append("/* ");
+		current.append(unit.getName());
+		current.append(" source file, generated with ooc */");
+		current.newLine();
 		
-		cw.append("#include \"");
-		cw.append(unit.getSimpleName());
-		cw.append(".h\"");
-		cw.newLine();
-		cw.newLine();
+		current.append("#include \"");
+		current.append(unit.getSimpleName());
+		current.append(".h\"");
+		current.newLine();
+		current.newLine();
 		
 		sourceUnit.acceptChildren(this);
 		
@@ -369,6 +374,8 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(CoverDecl cover) throws IOException {
 
+		current = hw;
+		
 		Type fromType = cover.getFromType();
 		if(fromType == null) {
 			throw new UnsupportedOperationException("Doesn't support compound covers yet.");
@@ -426,6 +433,23 @@ public class CGenerator extends Generator implements Visitor {
 		
 		current.append("...");
 		
+	}
+	
+	@Override
+	public void visit(NodeList<? extends Node> list) throws IOException {
+		list.acceptChildren(this);
+	}
+	
+	@Override
+	public void visit(Block block) throws IOException {
+		current.append('{');
+		current.tab();
+		current.newLine();
+		block.acceptChildren(this);
+		current.untab();
+		current.newLine();
+		current.append('}');
+		current.newLine();
 	}
 
 }

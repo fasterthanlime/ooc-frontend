@@ -12,6 +12,7 @@ import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
@@ -32,6 +33,8 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
 import org.ooc.frontend.model.NumberLiteral;
@@ -421,6 +424,12 @@ public class OocGenerator extends Generator implements Visitor {
 	}
 	
 	@Override
+	public void visit(CoverDecl cover) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public void visit(TypeArgument typeArgument) throws IOException {
 		typeArgument.getType().accept(this);
 	}
@@ -457,10 +466,20 @@ public class OocGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(CoverDecl cover) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void visit(NodeList<? extends Node> list) throws IOException {
+		list.acceptChildren(this);
 	}
 
+	@Override
+	public void visit(Block block) throws IOException {
+		w.append('{');
+		w.tab();
+		w.newLine();
+		block.acceptChildren(this);
+		w.untab();
+		w.newLine();
+		w.append('}');
+		w.newLine();
+	}
 	
 }

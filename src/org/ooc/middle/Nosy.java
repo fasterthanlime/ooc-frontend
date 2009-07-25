@@ -7,6 +7,7 @@ import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
@@ -26,6 +27,7 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
 import org.ooc.frontend.model.NumberLiteral;
@@ -264,6 +266,16 @@ public class Nosy<T extends Node> implements Visitor {
 	@Override
 	public void visit(CoverDecl cover) throws IOException {
 		visit((Node) cover);		
+	}
+
+	@Override
+	public void visit(NodeList<? extends Node> list) throws IOException {
+		visit((Node) list);
+	}
+	
+	@Override
+	public void visit(Block block) throws IOException {
+		visit((Node) block);
 	}
 	
 }
