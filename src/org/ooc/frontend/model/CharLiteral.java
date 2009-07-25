@@ -31,6 +31,11 @@ public class CharLiteral extends Literal {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return false;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
 
 }

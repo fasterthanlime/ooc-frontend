@@ -15,7 +15,4 @@ public class If extends Conditional {
 		visitor.visit(this);
 	}
 	
-	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
-	
 }

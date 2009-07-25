@@ -95,9 +95,18 @@ public class FunctionDecl extends Declaration {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		for(Argument argument: arguments) {
 			argument.accept(visitor);
+		}
+		returnType.accept(visitor);
+		for(Line line: body) {
+			line.accept(visitor);
 		}
 	}
 	

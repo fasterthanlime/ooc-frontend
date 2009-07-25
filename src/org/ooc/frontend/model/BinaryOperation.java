@@ -41,6 +41,11 @@ public abstract class BinaryOperation extends Expression {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		left.accept(visitor);
 		right.accept(visitor);

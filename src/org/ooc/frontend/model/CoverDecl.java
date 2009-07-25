@@ -16,6 +16,8 @@ public class CoverDecl extends Declaration {
 	public CoverDecl(String name, Type type) {
 		this.name = name;
 		this.type = type;
+		this.variables = new NodeList<VariableDecl>();
+		this.functions = new NodeList<FunctionDecl>();
 	}
 
 	/**
@@ -63,6 +65,11 @@ public class CoverDecl extends Declaration {
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
+	}
+	
+	@Override
+	public boolean hasChildren() {
+		return true;
 	}
 
 	@Override

@@ -41,6 +41,11 @@ public class ArrayAccess extends Access {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variable.accept(visitor);
 		index.accept(visitor);

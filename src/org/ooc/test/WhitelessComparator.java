@@ -1,4 +1,4 @@
-package org.ooc.frontend.test;
+package org.ooc.test;
 
 import java.io.EOFException;
 import java.io.File;

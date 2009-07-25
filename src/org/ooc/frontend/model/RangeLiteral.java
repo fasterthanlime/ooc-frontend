@@ -41,6 +41,14 @@ public class RangeLiteral extends Literal {
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		lower.accept(visitor);
+		upper.accept(visitor);
+	}
 
 }

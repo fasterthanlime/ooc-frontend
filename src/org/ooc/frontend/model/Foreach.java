@@ -36,9 +36,17 @@ public class Foreach extends ControlStatement {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variable.accept(visitor);
 		collection.accept(visitor);
+		for(Line line: body) {
+			line.accept(visitor);
+		}
 	}
 	
 }

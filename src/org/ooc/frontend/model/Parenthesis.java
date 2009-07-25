@@ -31,6 +31,11 @@ public class Parenthesis extends Expression {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		expression.accept(visitor);
 	}

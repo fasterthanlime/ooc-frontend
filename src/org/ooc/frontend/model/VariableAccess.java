@@ -28,6 +28,11 @@ public class VariableAccess extends Access {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
 
 }

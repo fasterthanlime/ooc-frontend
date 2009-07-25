@@ -14,8 +14,5 @@ public class While extends Conditional {
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
-	
-	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
 
 }

@@ -22,6 +22,11 @@ public class Line extends Node {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		statement.accept(visitor);
 	}

@@ -1,0 +1,269 @@
+package org.ooc.middle;
+
+import java.io.IOException;
+import java.util.Stack;
+
+import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.Add;
+import org.ooc.frontend.model.ArrayAccess;
+import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BoolLiteral;
+import org.ooc.frontend.model.CharLiteral;
+import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.CoverDecl;
+import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.Foreach;
+import org.ooc.frontend.model.FunctionCall;
+import org.ooc.frontend.model.FunctionDecl;
+import org.ooc.frontend.model.If;
+import org.ooc.frontend.model.Import;
+import org.ooc.frontend.model.Include;
+import org.ooc.frontend.model.Instantiation;
+import org.ooc.frontend.model.Line;
+import org.ooc.frontend.model.MemberArgument;
+import org.ooc.frontend.model.MemberAssignArgument;
+import org.ooc.frontend.model.MemberCall;
+import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.Not;
+import org.ooc.frontend.model.NullLiteral;
+import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.Parenthesis;
+import org.ooc.frontend.model.RangeLiteral;
+import org.ooc.frontend.model.RegularArgument;
+import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.StringLiteral;
+import org.ooc.frontend.model.Sub;
+import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.VarArg;
+import org.ooc.frontend.model.VariableAccess;
+import org.ooc.frontend.model.VariableDecl;
+import org.ooc.frontend.model.VariableDeclAssigned;
+import org.ooc.frontend.model.While;
+import org.ooc.frontend.parser.TypeArgument;
+
+public class Nosy<T extends Node> implements Visitor {
+
+	public static interface Opportunist<T> {
+		public void take(T node);
+	}
+	
+	public final Stack<Node> stack;
+	private Class<T> clazz;
+	private Opportunist<T> oppo;
+	
+	public Nosy(Class<T> clazz, Opportunist<T> oppo) {
+		this.stack = new Stack<Node>();
+		this.clazz = clazz;
+		this.oppo = oppo;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void visit(Node node) throws IOException {
+		
+		if(clazz.isInstance(node)) {
+			oppo.take((T) node);
+		}
+
+		if(node.hasChildren()) {
+			stack.push(node);
+			node.acceptChildren(this);
+			stack.pop();
+		}
+		
+	}
+	
+	@Override
+	public void visit(SourceUnit sourceUnit) throws IOException {
+		visit((Node) sourceUnit);
+	}
+
+	@Override
+	public void visit(Add add) throws IOException {
+		visit((Node) add);
+	}
+
+	@Override
+	public void visit(Mul mul) throws IOException {
+		visit((Node) mul);
+	}
+
+	@Override
+	public void visit(Sub sub) throws IOException {
+		visit((Node) sub);		
+	}
+
+	@Override
+	public void visit(Div div) throws IOException {
+		visit((Node) div);
+	}
+
+	@Override
+	public void visit(Not not) throws IOException {
+		visit((Node) not);		
+	}
+
+	@Override
+	public void visit(Comment comment) throws IOException {
+		visit((Node) comment);		
+	}
+
+	@Override
+	public void visit(FunctionCall functionCall) throws IOException {
+		visit((Node) functionCall);	
+	}
+
+	@Override
+	public void visit(MemberCall memberCall) throws IOException {
+		visit((Node) memberCall);	
+	}
+
+	@Override
+	public void visit(Instantiation inst) throws IOException {
+		visit((Node) inst);	
+	}
+
+	@Override
+	public void visit(Parenthesis parenthesis) throws IOException {
+		visit((Node) parenthesis);	
+	}
+
+	@Override
+	public void visit(Assignment assignment) throws IOException {
+		visit((Node) assignment);		
+	}
+
+	@Override
+	public void visit(Return return1) throws IOException {
+		visit((Node) return1);		
+	}
+
+	@Override
+	public void visit(NullLiteral nullLiteral) throws IOException {
+		visit((Node) nullLiteral);		
+	}
+
+	@Override
+	public void visit(NumberLiteral numberLiteral) throws IOException {
+		visit((Node) numberLiteral);
+	}
+
+	@Override
+	public void visit(StringLiteral stringLiteral) throws IOException {
+		visit((Node) stringLiteral);
+	}
+
+	@Override
+	public void visit(RangeLiteral rangeLiteral) throws IOException {
+		visit((Node) rangeLiteral);		
+	}
+
+	@Override
+	public void visit(BoolLiteral boolLiteral) throws IOException {
+		visit((Node) boolLiteral);		
+	}
+
+	@Override
+	public void visit(CharLiteral charLiteral) throws IOException {
+		visit((Node) charLiteral);		
+	}
+
+	@Override
+	public void visit(Line line) throws IOException {
+		visit((Node) line);		
+	}
+
+	@Override
+	public void visit(Include include) throws IOException {
+		visit((Node) include);
+	}
+
+	@Override
+	public void visit(Import import1) throws IOException {
+		visit((Node) import1);		
+	}
+
+	@Override
+	public void visit(If if1) throws IOException {
+		visit((Node) if1);		
+	}
+
+	@Override
+	public void visit(While while1) throws IOException {
+		visit((Node) while1);		
+	}
+
+	@Override
+	public void visit(Foreach foreach) throws IOException {
+		visit((Node) foreach);		
+	}
+
+	@Override
+	public void visit(VariableAccess variableAccess) throws IOException {
+		visit((Node) variableAccess);
+	}
+
+	@Override
+	public void visit(ArrayAccess arrayAccess) throws IOException {
+		visit((Node) arrayAccess);
+	}
+
+	@Override
+	public void visit(VariableDecl variableDecl) throws IOException {
+		visit((Node) variableDecl);	
+	}
+
+	@Override
+	public void visit(VariableDeclAssigned variableDeclAssigned)
+			throws IOException {
+		visit((Node) variableDeclAssigned);
+	}
+
+	@Override
+	public void visit(FunctionDecl functionDecl) throws IOException {
+		visit((Node) functionDecl);	
+	}
+
+	@Override
+	public void visit(ClassDecl classDecl) throws IOException {
+		visit((Node) classDecl);		
+	}
+
+	@Override
+	public void visit(TypeArgument typeArgument) throws IOException {
+		visit((Node) typeArgument);	
+	}
+
+	@Override
+	public void visit(RegularArgument regularArgument) throws IOException {
+		visit((Node) regularArgument);		
+	}
+
+	@Override
+	public void visit(MemberArgument memberArgument) throws IOException {
+		visit((Node) memberArgument);	
+	}
+
+	@Override
+	public void visit(MemberAssignArgument memberArgument) throws IOException {
+		visit((Node) memberArgument);		
+	}
+
+	@Override
+	public void visit(Type type) throws IOException {
+		visit((Node) type);		
+	}
+
+	@Override
+	public void visit(VarArg varArg) throws IOException {
+		visit((Node) varArg);		
+	}
+
+	@Override
+	public void visit(CoverDecl cover) throws IOException {
+		visit((Node) cover);		
+	}
+	
+}

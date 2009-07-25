@@ -2,7 +2,7 @@ package org.ooc.frontend.model;
 
 public abstract class ControlStatement extends Statement {
 
-	private NodeList<Line> body;
+	protected NodeList<Line> body;
 	
 	public ControlStatement() {
 		this.body = new NodeList<Line>();

@@ -23,8 +23,15 @@ public class TypeArgument extends Argument {
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
+	
+	@Override
+	public boolean hasChildren() {
+		return true;
+	}
 
 	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
+	public void acceptChildren(Visitor visitor) throws IOException {
+		type.accept(visitor);
+	}
 
 }

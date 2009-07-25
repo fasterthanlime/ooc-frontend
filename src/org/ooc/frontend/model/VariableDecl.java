@@ -57,6 +57,13 @@ public class VariableDecl extends Declaration {
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
+	public boolean hasChildren() {
+		return true;
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		type.accept(visitor);
+	}
 	
 }

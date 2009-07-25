@@ -22,6 +22,11 @@ public class Include extends Node {
 	}
 	
 	@Override
+	public boolean hasChildren() {
+		return false;
+	}
+	
+	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
 	
 }

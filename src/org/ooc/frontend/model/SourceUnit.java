@@ -60,6 +60,11 @@ public class SourceUnit extends Node {
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
+	
+	@Override
+	public boolean hasChildren() {
+		return true;
+	}
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {

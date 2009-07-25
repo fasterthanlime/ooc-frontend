@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class Type implements Visitable {
+public class Type extends Node {
 
 	private String name;
 	private int pointerLevel;
@@ -37,6 +37,11 @@ public class Type implements Visitable {
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
+	}
+	
+	@Override
+	public boolean hasChildren() {
+		return false;
 	}
 
 	@Override

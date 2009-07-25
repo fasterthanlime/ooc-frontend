@@ -1,4 +1,4 @@
-package org.ooc.frontend.test;
+package org.ooc.test;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,15 +7,11 @@ import org.ooc.backend.cdirty.CGenerator;
 import org.ooc.backend.ooc.OocGenerator;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.parser.Parser;
+import org.ooc.middle.Tinkerer;
 
 public class CommandLine {
 
 	public static void main(String[] argv) {
-	
-		if(argv.length < 1) {
-			System.out.println("Usage: oof [OPTIONS] file.ooc\nOptions:\n\t-c: generates C instead of regenerating ooc");
-			System.exit(0);
-		}
 		
 		new CommandLine(argv);
 	
@@ -52,6 +48,11 @@ public class CommandLine {
 				System.out.printf("Parsing...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
 				
 				t1 = System.nanoTime();
+				new Tinkerer().process(unit);
+				t2 = System.nanoTime();
+				System.out.printf("Resolving...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
+				
+				t1 = System.nanoTime();
 				if(outputC) {
 					new CGenerator(outPath, unit).generate();
 				} else {
@@ -81,9 +82,13 @@ public class CommandLine {
 		}
 		
 		long tt2 = System.nanoTime();
-		
-		System.out.printf("Everything went fine =) Total time: %.2f ms for %d files\n",
-				Float.valueOf((tt2 - tt1) / 1000000.0f), Integer.valueOf(count));	
+
+		if(count == 0) {
+			System.out.println("Usage: oof [OPTIONS] file.ooc\nOptions:\n\t-c: generates C instead of regenerating ooc");
+		} else {		
+			System.out.printf("Everything went fine =) Total time: %.2f ms for %d files\n",
+				Float.valueOf((tt2 - tt1) / 1000000.0f), Integer.valueOf(count));
+		}
 		
 	}
 
