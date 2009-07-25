@@ -4,19 +4,15 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class Return extends Statement {
-	
+public class Mod extends BinaryOperation {
+
+	public Mod(Expression left, Expression right) {
+		super(left, right);
+	}
+
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
 	
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-	
-	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
-
 }

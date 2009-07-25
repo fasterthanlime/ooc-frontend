@@ -25,6 +25,7 @@ import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
+import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
@@ -35,6 +36,7 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
@@ -144,7 +146,7 @@ public class Nosy<T> implements Visitor {
 	}
 
 	@Override
-	public void visit(Return return1) throws IOException {
+	public void visit(ValuedReturn return1) throws IOException {
 		visit((Node) return1);		
 	}
 
@@ -282,6 +284,16 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Block block) throws IOException {
 		visit((Node) block);
+	}
+
+	@Override
+	public void visit(Mod mod) throws IOException {
+		visit((Node) mod);
+	}
+
+	@Override
+	public void visit(Return return1) throws IOException {
+		visit((Node) return1);
 	}
 	
 }

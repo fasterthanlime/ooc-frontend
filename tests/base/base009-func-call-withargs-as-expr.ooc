@@ -1,5 +1,12 @@
+include stdlib, stdio, time;
+extern func printf(String, ...);
+extern func srand(Int);
+extern func rand -> Int;
+extern func time(time_t);
+
 func main {
 
-	printf("The answer is %d\n", random(25));
+	srand(time(null));
+	printf("The answer is %d\n", rand());
 
 }

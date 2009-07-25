@@ -31,6 +31,7 @@ import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
+import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
@@ -41,6 +42,7 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
@@ -110,32 +112,43 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Add add) throws IOException {
-		// TODO Auto-generated method stub
-		
+		add.getLeft().accept(this);
+		current.append(" + ");
+		add.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Mul mul) throws IOException {
-		// TODO Auto-generated method stub
-		
+		mul.getLeft().accept(this);
+		current.append(" * ");
+		mul.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Sub sub) throws IOException {
-		// TODO Auto-generated method stub
-		
+		sub.getLeft().accept(this);
+		current.append(" - ");
+		sub.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Div div) throws IOException {
-		// TODO Auto-generated method stub
-		
+		div.getLeft().accept(this);
+		current.append(" / ");
+		div.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(Not not) throws IOException {
-		// TODO Auto-generated method stub
-		
+		current.append('!');
+		not.getExpression().accept(this);		
+	}
+	
+	@Override
+	public void visit(Mod mod) throws IOException {
+		mod.getLeft().accept(this);
+		current.append(" % ");
+		mod.getRight().accept(this);
 	}
 
 	@Override
@@ -195,9 +208,14 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
+	public void visit(ValuedReturn return1) throws IOException {
+		current.append("return ");
+		return1.getExpression().accept(this);
+	}
+	
+	@Override
 	public void visit(Return return1) throws IOException {
-		// TODO Auto-generated method stub
-		
+		current.append("return");
 	}
 
 	@Override

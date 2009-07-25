@@ -23,6 +23,7 @@ import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
+import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
@@ -37,6 +38,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
@@ -53,6 +55,7 @@ public interface Visitor {
 	public void visit(Sub sub) throws IOException;
 	public void visit(Div div) throws IOException;
 	public void visit(Not not) throws IOException;
+	public void visit(Mod mod) throws IOException;
 	
 	public void visit(Comment comment) throws IOException;
 
@@ -62,6 +65,7 @@ public interface Visitor {
 	
 	public void visit(Parenthesis parenthesis) throws IOException;
 	public void visit(Assignment assignment) throws IOException;
+	public void visit(ValuedReturn return1) throws IOException;
 	public void visit(Return return1) throws IOException;
 	
 	public void visit(NullLiteral nullLiteral) throws IOException;

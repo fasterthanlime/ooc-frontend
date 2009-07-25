@@ -38,6 +38,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_BRACK;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_SQUAR;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OVER_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.PERCENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.PLUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.RETURN_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.SEMICOL;
@@ -83,6 +84,7 @@ import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
+import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -92,7 +94,7 @@ import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
-import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Statement;
@@ -287,7 +289,7 @@ public class Parser {
 			return conditional;
 		}
 		
-		Return ret = returnStatement(sReader, reader);
+		ValuedReturn ret = returnStatement(sReader, reader);
 		if(ret != null) {
 			return ret;
 		}
@@ -460,7 +462,7 @@ public class Parser {
 		
 	}
 
-	private Return returnStatement(SourceReader sReader,
+	private ValuedReturn returnStatement(SourceReader sReader,
 			ListReader<Token> reader) throws IOException {
 
 		int mark = reader.mark();
@@ -471,7 +473,7 @@ public class Parser {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expecting expression after keyword");
 			}
-			return new Return(expr);
+			return new ValuedReturn(expr);
 		}
 		
 		reader.reset(mark);
@@ -1103,7 +1105,7 @@ public class Parser {
 			}
 			
 			if(t.type == PLUS || t.type == STAR
-					|| t.type == MINUS || t.type == SLASH) {
+					|| t.type == MINUS || t.type == SLASH || t.type == PERCENT) {
 				
 				reader.skip();
 				Expression rvalue = expression(sReader, reader);
@@ -1116,6 +1118,7 @@ public class Parser {
 					case STAR:  expr = new Mul(expr, rvalue); break;
 					case MINUS: expr = new Sub(expr, rvalue); break;
 					case SLASH: expr = new Div(expr, rvalue); break;
+					case PERCENT: expr = new Mod(expr, rvalue); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
