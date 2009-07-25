@@ -69,8 +69,12 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void unwrap(Stack<Node> hierarchy) {
+	public boolean unwrap(Stack<Node> hierarchy) {
 
+		if(hierarchy.peek() instanceof Line) {
+			return false;
+		}
+		
 		int listIndex = find(NodeList.class, hierarchy);
 		if(listIndex == -1) {
 			throw new Error("Couldn't find list in which to replace VariableDecl expression. Stack = "+hierarchy);
@@ -90,6 +94,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		NodeList<Line> body = (NodeList<Line>) hierarchy.get(bodyIndex);
 		body.addBefore(line, new Line(this));
+		
+		return true;
 		
 	}
 	

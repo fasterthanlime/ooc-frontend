@@ -48,8 +48,11 @@ import org.ooc.frontend.parser.TypeArgument;
 
 public class Nosy<T> implements Visitor {
 
+	/**
+	 * @return false if you want to stop, true if you wanna continue.
+	 */
 	public static interface Opportunist<T> {
-		public void take(T node, Stack<Node> stack);
+		public boolean take(T node, Stack<Node> stack);
 	}
 	
 	public final Stack<Node> stack;
@@ -67,7 +70,9 @@ public class Nosy<T> implements Visitor {
 		//System.out.println("Nosy visiting a "+node.getClass().getSimpleName());
 		
 		if(clazz.isInstance(node)) {
-			oppo.take(clazz.cast(node), stack);
+			if(!oppo.take(clazz.cast(node), stack)) {
+				return; // aborted. (D-Nied. Denied).
+			}
 		}
 
 		if(node.hasChildren()) {

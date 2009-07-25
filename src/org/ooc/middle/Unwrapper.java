@@ -10,20 +10,44 @@ import org.ooc.middle.Nosy.Opportunist;
 
 public class Unwrapper implements Hobgoblin {
 
+	private static final int MAX = 1024;
+	boolean running;
+	
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 
 		System.out.println("Here's the unwrapper...");
 		
-		new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
+		Nosy<MustBeUnwrapped> nosy = new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
 
 			@Override
-			public void take(MustBeUnwrapped node, Stack<Node> stack) {
+			public boolean take(MustBeUnwrapped node, Stack<Node> stack) {
+				
 				System.out.println("Trying to unwrap a "+node.getClass().getSimpleName());
-				node.unwrap(stack);
+				if(node.unwrap(stack)) {
+					running = true;
+					System.out.println(node.getClass().getSimpleName()+" was dirty! Turning round");
+					return false;
+				}
+				
+				System.out.println(node.getClass().getSimpleName()+" was okay =)");
+				return true;
+				
 			}
 			
-		}).visit(unit);
+		});
+		
+		int count = 0;
+		running = true;
+		while(running) {
+			if(count > MAX) {
+				throw new Error("Going round in circles! More than "+MAX+" runs, abandoning...");
+			}
+			System.out.println("Unwrapper, round "+count+"...");
+			running = false;
+			nosy.visit(unit); // changes running to true if there was damage
+			count++;
+		}
 		
 	}
 

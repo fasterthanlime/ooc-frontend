@@ -24,6 +24,6 @@ import java.util.Stack;
  */
 public interface MustBeUnwrapped {
 	
-	public void unwrap(Stack<Node> hierarchy);
+	public boolean unwrap(Stack<Node> hierarchy);
 	
 }

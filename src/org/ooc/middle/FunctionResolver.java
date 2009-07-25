@@ -24,9 +24,10 @@ public class FunctionResolver implements Hobgoblin {
 		new Nosy<FunctionDecl>(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
 			@Override
-			public void take(FunctionDecl node, Stack<Node> stack) {
+			public boolean take(FunctionDecl node, Stack<Node> stack) {
 				System.out.println("Found function declaration "+node.getName());
 				funcs.add(node.getName(), node);
+				return true;
 			}
 			
 		}).visit(unit);
@@ -35,7 +36,7 @@ public class FunctionResolver implements Hobgoblin {
 		new Nosy<FunctionCall>(FunctionCall.class, new Opportunist<FunctionCall>() {
 			
 			@Override
-			public void take(FunctionCall node, Stack<Node> stack) {
+			public boolean take(FunctionCall node, Stack<Node> stack) {
 				System.out.println("Call to "+node.getName());
 				for(FunctionDecl decl: funcs.get(node.getName())) {
 					
@@ -61,6 +62,8 @@ public class FunctionResolver implements Hobgoblin {
 					throw new CompilationFailedError(null, "No implementation found for function "
 						+node.getName()+"(), did you forget to import it?");
 				}
+				
+				return true;
 			}
 			
 		}).visit(unit);
