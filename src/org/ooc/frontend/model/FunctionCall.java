@@ -53,9 +53,7 @@ public class FunctionCall extends Access {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		for(Expression expression: arguments) {
-			expression.accept(visitor);
-		}
+		arguments.accept(visitor);
 	}
 	
 }

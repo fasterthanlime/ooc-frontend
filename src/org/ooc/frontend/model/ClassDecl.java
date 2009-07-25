@@ -80,14 +80,8 @@ public class ClassDecl extends Declaration {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		
-		for (VariableDecl variable : variables) {
-			variable.accept(visitor);
-		}
-		for (FunctionDecl function: functions) {
-			function.accept(visitor);
-		}
-		
+		variables.accept(visitor);
+		functions.accept(visitor);
 	}
 	
 }

@@ -19,6 +19,7 @@ public class Tinkerer implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 
+		new Unwrapper().process(unit);
 		new FunctionResolver().process(unit);
 		new CaseEnforcer().process(unit);
 		

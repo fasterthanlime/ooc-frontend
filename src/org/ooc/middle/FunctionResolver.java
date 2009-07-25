@@ -1,11 +1,13 @@
 package org.ooc.middle;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Stack;
 
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.middle.Nosy.Opportunist;
@@ -22,7 +24,7 @@ public class FunctionResolver implements Hobgoblin {
 		new Nosy<FunctionDecl>(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
 			@Override
-			public void take(FunctionDecl node) {
+			public void take(FunctionDecl node, Stack<Node> stack) {
 				System.out.println("Found function declaration "+node.getName());
 				funcs.add(node.getName(), node);
 			}
@@ -33,7 +35,7 @@ public class FunctionResolver implements Hobgoblin {
 		new Nosy<FunctionCall>(FunctionCall.class, new Opportunist<FunctionCall>() {
 			
 			@Override
-			public void take(FunctionCall node) {
+			public void take(FunctionCall node, Stack<Node> stack) {
 				System.out.println("Call to "+node.getName());
 				for(FunctionDecl decl: funcs.get(node.getName())) {
 					
@@ -44,7 +46,7 @@ public class FunctionResolver implements Hobgoblin {
 						break;
 					}
 					
-					List<Argument> args = decl.getArguments();
+					NodeList<Argument> args = decl.getArguments();
 					if(args.get(args.size() - 1) instanceof VarArg && args.size() - 1 <= node.getArguments().size()) {
 						System.out.println("Found impl! (varargs)");
 						node.setImpl(decl);

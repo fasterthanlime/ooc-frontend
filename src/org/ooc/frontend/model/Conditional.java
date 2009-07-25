@@ -24,9 +24,7 @@ public abstract class Conditional extends ControlStatement {
 	@Override
 	public final void acceptChildren(Visitor visitor) throws IOException {
 		condition.accept(visitor);
-		for(Line line: body) {
-			line.accept(visitor);
-		}
+		body.accept(visitor);
 	}
 	
 	@Override

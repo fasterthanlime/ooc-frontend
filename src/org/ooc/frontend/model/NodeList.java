@@ -60,14 +60,40 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		for(T node : nodes) {
-			node.accept(visitor);
+		int i = 0;
+		while(i < nodes.size()) {
+			nodes.get(i++).accept(visitor);
 		}
 	}
 
 	@Override
 	public boolean hasChildren() {
-		return nodes.isEmpty();
+		return !nodes.isEmpty();
+	}
+	
+	public int indexOf(T lostSheep) {
+		return nodes.indexOf(lostSheep);
+	}
+
+	public T replace(T oldie, T kiddo) {
+		int index = nodes.indexOf(oldie);
+		if(index == -1) {
+			throw new ArrayIndexOutOfBoundsException("Trying to replace a "
+					+oldie.getClass().getName()+" with a "+kiddo.getClass().getSimpleName()+
+					" in a "+this.getClass().getSimpleName()+", but couldn't find node to replace.");
+		}
+		nodes.set(index, kiddo);
+		return oldie;
+	}
+
+	public void addBefore(Line ref, T kiddo) {
+		int index = nodes.indexOf(ref);
+		if(index == -1) {
+			throw new ArrayIndexOutOfBoundsException("Trying to add a "
+					+kiddo.getClass().getName()+" before a "+ref.getClass().getSimpleName()+
+					" in a "+this.getClass().getSimpleName()+", but couldn't find reference node.");
+		}
+		nodes.add(index, kiddo);
 	}
 
 }

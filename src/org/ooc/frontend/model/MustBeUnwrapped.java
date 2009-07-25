@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import java.util.Stack;
+
 /**
  * I like to use interfaces as "tags" we can apply to classes.
  * This one specifies that a node is a valid ooc statement, but must be
@@ -21,7 +23,7 @@ package org.ooc.frontend.model;
  * @author Amos Wenger
  */
 public interface MustBeUnwrapped {
-
-	public void unwrap();
+	
+	public void unwrap(Stack<Node> hierarchy);
 	
 }

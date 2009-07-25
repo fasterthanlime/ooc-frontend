@@ -68,17 +68,9 @@ public class SourceUnit extends Node {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		
-		for(Include include: includes) {
-			include.accept(visitor);
-		}
-		for(Import importStatement: imports) {
-			importStatement.accept(visitor);
-		}
-		for(Visitable node: body) {
-			node.accept(visitor);
-		}
-		
+		includes.accept(visitor);
+		imports.accept(visitor);
+		body.accept(visitor);
 	}
 	
 }

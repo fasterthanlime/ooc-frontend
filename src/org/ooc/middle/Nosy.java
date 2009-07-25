@@ -46,10 +46,10 @@ import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.parser.TypeArgument;
 
-public class Nosy<T extends Node> implements Visitor {
+public class Nosy<T> implements Visitor {
 
 	public static interface Opportunist<T> {
-		public void take(T node);
+		public void take(T node, Stack<Node> stack);
 	}
 	
 	public final Stack<Node> stack;
@@ -62,11 +62,12 @@ public class Nosy<T extends Node> implements Visitor {
 		this.oppo = oppo;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void visit(Node node) throws IOException {
 		
+		//System.out.println("Nosy visiting a "+node.getClass().getSimpleName());
+		
 		if(clazz.isInstance(node)) {
-			oppo.take((T) node);
+			oppo.take(clazz.cast(node), stack);
 		}
 
 		if(node.hasChildren()) {

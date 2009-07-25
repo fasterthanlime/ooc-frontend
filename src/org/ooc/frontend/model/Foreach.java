@@ -44,9 +44,7 @@ public class Foreach extends ControlStatement {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variable.accept(visitor);
 		collection.accept(visitor);
-		for(Line line: body) {
-			line.accept(visitor);
-		}
+		body.accept(visitor);
 	}
 	
 }

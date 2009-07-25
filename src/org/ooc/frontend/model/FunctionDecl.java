@@ -1,8 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.ooc.frontend.Visitor;
 
@@ -23,7 +21,7 @@ public class FunctionDecl extends Declaration {
 	private String name;
 	private final NodeList<Line> body;
 	private Type returnType;
-	private List<Argument> arguments;
+	private final NodeList<Argument> arguments;
 	
 	public FunctionDecl(FunctionDeclType declType, String name, boolean isAbstract) {
 		
@@ -32,7 +30,7 @@ public class FunctionDecl extends Declaration {
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>();
 		this.returnType = new Type("void");
-		this.arguments = new ArrayList<Argument>();
+		this.arguments = new NodeList<Argument>();
 		
 	}
 	
@@ -80,7 +78,7 @@ public class FunctionDecl extends Declaration {
 		this.returnType = returnType;
 	}
 	
-	public List<Argument> getArguments() {
+	public NodeList<Argument> getArguments() {
 		return arguments;
 	}
 	
@@ -101,13 +99,9 @@ public class FunctionDecl extends Declaration {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		for(Argument argument: arguments) {
-			argument.accept(visitor);
-		}
+		arguments.accept(visitor);
 		returnType.accept(visitor);
-		for(Line line: body) {
-			line.accept(visitor);
-		}
+		body.accept(visitor);
 	}
 	
 }
