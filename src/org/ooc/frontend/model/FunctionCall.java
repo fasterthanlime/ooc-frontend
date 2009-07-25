@@ -16,6 +16,14 @@ public class FunctionCall extends Access {
 		this.impl = null;
 	}
 	
+	public void setImpl(FunctionDecl impl) {
+		this.impl = impl;
+	}
+	
+	public FunctionDecl getImpl() {
+		return impl;
+	}
+	
 	public String getName() {
 		return name;
 	}

@@ -182,7 +182,10 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
-		// TODO Auto-generated method stub
+
+		assignment.getLvalue().accept(this);
+		current.append(" = ");
+		assignment.getRvalue().accept(this);
 		
 	}
 
@@ -200,8 +203,8 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(NumberLiteral numberLiteral) throws IOException {
-		// TODO Auto-generated method stub
-		
+
+		current.append(String.valueOf(numberLiteral.getValue()));
 	}
 
 	@Override
@@ -272,7 +275,8 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
-		// TODO Auto-generated method stub
+
+		current.append(variableAccess.getVariable());
 		
 	}
 
@@ -284,15 +288,20 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(VariableDecl variableDecl) throws IOException {
-		// TODO Auto-generated method stub
+
+		variableDecl.getType().accept(this);
+		current.append(' ');
+		current.append(variableDecl.getName());
 		
 	}
 
 	@Override
 	public void visit(VariableDeclAssigned variableDeclAssigned)
 			throws IOException {
-		// TODO Auto-generated method stub
 		
+		visit((VariableDecl) variableDeclAssigned);
+		current.append(" = ");
+		variableDeclAssigned.getExpression().accept(this);
 	}
 
 	@Override
@@ -358,6 +367,22 @@ public class CGenerator extends Generator implements Visitor {
 	}
 	
 	@Override
+	public void visit(CoverDecl cover) throws IOException {
+
+		Type fromType = cover.getFromType();
+		if(fromType == null) {
+			throw new UnsupportedOperationException("Doesn't support compound covers yet.");
+		}
+		current.append("typedef ");
+		fromType.accept(this);
+		current.append(' ');
+		current.append(cover.getName());
+		current.append(';');
+		current.newLine();
+		
+	}
+	
+	@Override
 	public void visit(TypeArgument typeArgument) throws IOException {
 		typeArgument.getType().accept(this);
 	}
@@ -400,12 +425,6 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(VarArg varArg) throws IOException {
 		
 		current.append("...");
-		
-	}
-
-	@Override
-	public void visit(CoverDecl cover) throws IOException {
-		// TODO Auto-generated method stub
 		
 	}
 

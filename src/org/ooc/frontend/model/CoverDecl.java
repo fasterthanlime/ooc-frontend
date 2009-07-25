@@ -7,15 +7,15 @@ import org.ooc.frontend.Visitor;
 public class CoverDecl extends Declaration {
 
 	private OocDocComment comment;
-	private Type type;
+	private Type fromType;
 	private String name;
 	
 	private NodeList<VariableDecl> variables;
 	private NodeList<FunctionDecl> functions;
 	
-	public CoverDecl(String name, Type type) {
+	public CoverDecl(String name, Type fromType) {
 		this.name = name;
-		this.type = type;
+		this.fromType = fromType;
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
 	}
@@ -34,16 +34,16 @@ public class CoverDecl extends Declaration {
 		this.name = name;
 	}
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(Type type) {
-		this.type = type;
-	}
-
 	@Override
 	public Type getType() {
-		return type;
+		if(fromType == null) {
+			return new Type(name);
+		}
+		return fromType;
+	}
+	
+	public Type getFromType() {
+		return fromType;
 	}
 	
 	public OocDocComment getComment() {

@@ -1,3 +1,7 @@
+include stdio;
+extern func printf(String, ...);
+cover Int from int;
+
 func main {
 
 	Int i = 42;
