@@ -202,8 +202,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(NullLiteral nullLiteral) throws IOException {
-		// TODO Auto-generated method stub
-		
+		current.append("NULL");
 	}
 
 	@Override

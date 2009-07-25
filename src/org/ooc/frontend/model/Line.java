@@ -9,6 +9,9 @@ public class Line extends Node {
 	private Statement statement;
 
 	public Line(Statement statement) {
+		if(statement == null) {
+			throw new Error("Who's giving me a null statement? Heck.");
+		}
 		this.statement = statement;
 	}
 	

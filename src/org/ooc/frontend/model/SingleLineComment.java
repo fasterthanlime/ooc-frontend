@@ -1,11 +1,12 @@
 package org.ooc.frontend.model;
 
+
 public class SingleLineComment extends Line {
 
 	private String content;
 	
 	public SingleLineComment(String content) {
-		super(null);
+		super(new NoOp());
 		this.content = content;
 	}
 	

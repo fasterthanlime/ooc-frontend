@@ -86,7 +86,8 @@ public class CommandLine {
 		if(count == 0) {
 			System.out.println("Usage: oof [OPTIONS] file.ooc\nOptions:\n\t-c: generates C instead of regenerating ooc");
 		} else {		
-			System.out.printf("Everything went fine =) Total time: %.2f ms for %d files\n",
+			System.out.printf("Everything went fine =) Total time: %.2f ms for %d "+
+					(count > 1 ? "files" : "file")+"\n",
 				Float.valueOf((tt2 - tt1) / 1000000.0f), Integer.valueOf(count));
 		}
 		
