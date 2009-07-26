@@ -54,7 +54,7 @@ public class Nosy<T> implements Visitor {
 	 * @return false if you want to stop, true if you wanna continue.
 	 */
 	public static interface Opportunist<T> {
-		public boolean take(T node, Stack<Node> stack);
+		public boolean take(T node, Stack<Node> stack) throws IOException;
 	}
 	
 	public final Stack<Node> stack;

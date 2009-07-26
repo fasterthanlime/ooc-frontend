@@ -7,11 +7,13 @@ import org.ooc.frontend.Visitor;
 public class FunctionCall extends Access {
 
 	protected String name;
+	protected String suffix;
 	protected final NodeList<Expression> arguments;
 	protected FunctionDecl impl;
 	
-	public FunctionCall(String name) {
+	public FunctionCall(String name, String suffix) {
 		this.name = name;
+		this.suffix = suffix;
 		this.arguments = new NodeList<Expression>();
 		this.impl = null;
 	}
@@ -32,13 +34,25 @@ public class FunctionCall extends Access {
 		this.name = name;
 	}
 	
+	public String getSuffix() {
+		return suffix;
+	}
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+	
 	public NodeList<Expression> getArguments() {
 		return arguments;
 	}
 
 	@Override
 	public Type getType() {
-		throw new Error("FunctionCall not yet resolves the type");
+		if(impl != null) {
+			return impl.getReturnType();
+		}
+		return null;
+		//throw new Error("FunctionCall not yet resolves the type, unfortunately ;)");
 	}
 	
 	@Override

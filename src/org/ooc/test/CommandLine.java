@@ -45,7 +45,7 @@ public class CommandLine {
 				long t1 = System.nanoTime();
 				SourceUnit unit = new Parser().parse(file);
 				long t2 = System.nanoTime();
-				System.out.printf("Parsing...%.2f ms\t", Float.valueOf((t2 - t1) / 1000000.0f));
+				System.out.printf("Parsing...%.2f ms\n", Float.valueOf((t2 - t1) / 1000000.0f));
 				
 				t1 = System.nanoTime();
 				new Tinkerer().process(unit);

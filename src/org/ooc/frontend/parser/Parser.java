@@ -1,6 +1,6 @@
 package org.ooc.frontend.parser;
 
- import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
 import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_NUMBER;
@@ -22,6 +22,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.FALSE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.HASH;
 import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_NUMBER;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
@@ -94,7 +95,6 @@ import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
-import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Statement;
@@ -102,6 +102,7 @@ import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Tokenizer;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
@@ -445,10 +446,11 @@ public class Parser {
 		int mark = reader.mark();
 		
 		if(reader.read().type == NEW_KW) {
-			Token t = reader.peek();
-			if(t.type == NAME) {
+			Token tName = reader.peek();
+			if(tName.type == NAME) {
 				reader.skip();
-				Instantiation inst = new Instantiation(t.get(sReader));
+				String name = tName.get(sReader);
+				Instantiation inst = new Instantiation(name, ""); // TODO add '#' parsing.
 				exprList(sReader, reader, inst.getArguments()); // we don't care whether we have args or not
 				return inst;
 			}
@@ -485,16 +487,27 @@ public class Parser {
 		
 		int mark = reader.mark();
 		
-		Token name = reader.read();
-		if(name.type != NAME) {
+		Token tName = reader.read();
+		if(tName.type != NAME) {
 			reader.reset(mark);
 			return null;
 		}
+		String name = tName.get(sReader);
 		
-		FunctionCall call = new FunctionCall(name.get(sReader));
+		String suffix = "";
+		if(reader.peek().type == HASH) {
+			reader.skip();
+			Token tSuff = reader.read();
+			if(tSuff.type != NAME) {
+				throw new CompilationFailedError(sReader.getLocation(tSuff.start),
+				"Expecting suffix after 'functionname#' !");
+			}
+			suffix = tSuff.get(sReader);
+		}
+
+		FunctionCall call = new FunctionCall(name, suffix);
 		
 		if(!exprList(sReader, reader, call.getArguments())) {
-			
 			reader.reset(mark);
 			return null; // not a function call
 		}
@@ -813,13 +826,26 @@ public class Parser {
 			reader.skip(); // the 'func' keyword
 		}
 		
-		Token name = reader.read();
-		if(name.type != NAME && name.type != NEW_KW) {
-			throw new CompilationFailedError(sReader.getLocation(name.start), "Expected function name after 'func' keyword");
+		Token tName = reader.read();
+		if(tName.type != NAME && tName.type != NEW_KW) {
+			throw new CompilationFailedError(sReader.getLocation(tName.start),
+					"Expected function name after 'func' keyword");
+		}
+		String name = tName.get(sReader);
+		
+		String suffix = "";
+		if(reader.peek().type == HASH) {
+			reader.skip();
+			Token tSuffix = reader.read();
+			if(tSuffix.type != NAME) {
+				throw new CompilationFailedError(sReader.getLocation(tSuffix.start),
+					"Expected suffix after function name and '#'");
+			}
+			suffix = tSuffix.get(sReader);
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(declType,
-				name.get(sReader), isAbstract);
+				name, suffix, isAbstract);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == OPEN_PAREN) {

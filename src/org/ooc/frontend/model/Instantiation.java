@@ -7,16 +7,16 @@ import org.ooc.frontend.Visitor;
 public class Instantiation extends FunctionCall {
 
 	public Instantiation(FunctionCall call) {
-		super(call.getName());
+		super(call.name, call.suffix);
 		arguments.setAll(call.arguments);
 	}
 
-	public Instantiation(String name) {
-		super(name);
+	public Instantiation(String name, String suffix) {
+		super(name, suffix);
 	}
 	
 	public Instantiation() {
-		super("");
+		super("", "");
 	}
 	
 	@Override

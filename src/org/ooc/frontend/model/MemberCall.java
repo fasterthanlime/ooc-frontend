@@ -8,13 +8,13 @@ public class MemberCall extends FunctionCall {
 
 	private Expression expression;
 
-	public MemberCall(Expression expression, String name) {
-		super(name);
+	public MemberCall(Expression expression, String name, String suffix) {
+		super(name, suffix);
 		this.expression = expression;
 	}
 	
 	public MemberCall(Expression expression, FunctionCall call) {
-		super(call.getName());
+		super(call.name, call.suffix);
 		this.expression = expression;
 		
 	}

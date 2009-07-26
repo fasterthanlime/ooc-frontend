@@ -55,7 +55,9 @@ public class Token {
 		
 		REFERENCE, // @functionName
 		NAME, // mostly a Java identifier
-		
+
+		AT, // @
+		HASH, // #
 		COMMA, // ,
 		DOT, // .
 		DOUBLE_DOT, // ..

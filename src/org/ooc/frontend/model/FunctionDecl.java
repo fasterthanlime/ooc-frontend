@@ -19,14 +19,16 @@ public class FunctionDecl extends Declaration {
 
 	private FunctionDeclType declType;
 	private String name;
+	private String suffix;
 	private final NodeList<Line> body;
 	private Type returnType;
 	private final NodeList<Argument> arguments;
 	
-	public FunctionDecl(FunctionDeclType declType, String name, boolean isAbstract) {
+	public FunctionDecl(FunctionDeclType declType, String name, String suffix, boolean isAbstract) {
 		
 		this.declType = declType;
 		this.name = name;
+		this.suffix = suffix;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>();
 		this.returnType = new Type("void");
@@ -56,6 +58,14 @@ public class FunctionDecl extends Declaration {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getSuffix() {
+		return suffix;
+	}
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
 	}
 	
 	public boolean isAbstract() {
@@ -102,6 +112,10 @@ public class FunctionDecl extends Declaration {
 		arguments.accept(visitor);
 		returnType.accept(visitor);
 		body.accept(visitor);
+	}
+
+	public boolean isConstructor() {
+		return name.equals("new");
 	}
 	
 }

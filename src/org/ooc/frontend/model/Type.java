@@ -46,5 +46,9 @@ public class Type extends Node {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
+
+	public boolean isVoid() {
+		return (name.equals("void") || name.equals("Void")) && (getPointerLevel() == 0);
+	}
 	
 }

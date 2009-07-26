@@ -1,3 +1,9 @@
+include stdio;
+cover Int from int;
+cover Char from char;
+cover String from char*;
+extern func printf(String, ...);
+
 func main {
 
 	Int a = 42;

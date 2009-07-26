@@ -162,6 +162,18 @@ public class Tokenizer {
 				continue;
 			}
 			
+			if(c == '#') {
+				reader.read();
+				tokens.add(new Token(location.getIndex(), 1, TokenType.HASH));
+				continue;
+			}
+			
+			if(c == '@') {
+				reader.read();
+				tokens.add(new Token(location.getIndex(), 1, TokenType.AT));
+				continue;
+			}
+			
 			
 			if(c == '"') {
 				reader.read();

@@ -226,7 +226,19 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(NumberLiteral numberLiteral) throws IOException {
 
-		current.append(String.valueOf(numberLiteral.getValue()));
+		switch(numberLiteral.getFormat()) {
+			case HEX:
+			case BIN: // C has no binary literals, write it has hex
+				current.append("0x");
+				current.append(Long.toHexString(numberLiteral.getValue()));
+				break;
+			case OCT:
+				current.append('0');
+				current.append(Long.toOctalString(numberLiteral.getValue()));
+				break;
+			default:
+				current.append(String.valueOf(numberLiteral.getValue()));
+		}
 	}
 
 	@Override
@@ -250,8 +262,9 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(CharLiteral charLiteral) throws IOException {
-		// TODO Auto-generated method stub
-		
+		current.append('\'');
+		current.append(SourceReader.spelled(charLiteral.getValue()));
+		current.append('\'');		
 	}
 
 	@Override

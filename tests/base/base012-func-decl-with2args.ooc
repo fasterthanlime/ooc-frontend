@@ -1,3 +1,7 @@
+include stdio;
+extern func printf(String, ...);
+cover String from char*;
+
 func main {
 
 	say("Alan", "Heya world");
