@@ -317,7 +317,7 @@ public class OocGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(VariableAccess access) throws IOException {
-		w.append(access.getVariable());
+		w.append(access.getName());
 	}
 
 	@Override

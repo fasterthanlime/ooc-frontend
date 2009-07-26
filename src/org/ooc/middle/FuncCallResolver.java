@@ -48,17 +48,20 @@ public class FuncCallResolver implements Hobgoblin {
 					MemberCall member = (MemberCall) node;
 					System.out.println(member.getExpression().getType().getName()+"."+node.getName());
 					
+					findMemberImpl(unit, member, member.getExpression().getType().getName(),
+							member.getName(), member.getSuffix());
+					
 				} else if(node instanceof Instantiation) {
 					
 					System.out.println("Instantiation call!");
 					Instantiation inst = (Instantiation) node;
 					System.out.println("new "+inst.getName());
 					
-					findConstructor(unit, inst);
+					findMemberImpl(unit, inst, inst.getName(), "new", inst.getSuffix());
 					
 				} else {
 					
-					findRegularFunc(funcs, node);
+					findImpl(funcs, node);
 					
 				}
 				
@@ -74,16 +77,15 @@ public class FuncCallResolver implements Hobgoblin {
 		
 	}
 	
-	void findConstructor(SourceUnit unit, final Instantiation inst) throws IOException {
+	void findMemberImpl(SourceUnit unit, final FunctionCall call, final String className,
+			final String name, final String suffix) throws IOException {
 
 		new Nosy<ClassDecl>(ClassDecl.class, new Opportunist<ClassDecl>() {
 			@Override
 			public boolean take(ClassDecl node, Stack<Node> stack) throws IOException {
 				
-				if(node.getName().equals(inst.getName())) {
-					final String name = "new";
-					final String suffix = inst.getSuffix();
-					findImpl(inst, node, name, suffix);
+				if(node.getName().equals(className)) {
+					findImpl(call, node, name, suffix);
 					// FIXME check if really found it.
 					return false; // we've found the holy grail.
 				}
@@ -95,7 +97,7 @@ public class FuncCallResolver implements Hobgoblin {
 		
 	}
 	
-	void findImpl(final Instantiation call,
+	void findImpl(final FunctionCall call,
 			ClassDecl root, final String name,
 			final String suffix) throws IOException {
 		new Nosy<FunctionDecl>(FunctionDecl.class, new Opportunist<FunctionDecl>() {
@@ -112,10 +114,10 @@ public class FuncCallResolver implements Hobgoblin {
 							&& node.getArguments().size() - 1 <= call.getArguments().size()) {
 						System.out.println("Found impl (vararg)");
 						call.setImpl(node);
-					}
-					
-					System.out.println("Mismatch: decl args = "+call.getArguments().size()
+					} else {
+						System.out.println("Mismatch: decl args = "+call.getArguments().size()
 							+", call args = "+node.getArguments().size());
+					}
 				}
 				
 				return false;
@@ -125,7 +127,7 @@ public class FuncCallResolver implements Hobgoblin {
 		}).visit(root);
 	}
 
-	void findRegularFunc(final MultiMap<String, FunctionDecl> funcs, FunctionCall node) {
+	void findImpl(final MultiMap<String, FunctionDecl> funcs, FunctionCall node) {
 		
 		for(FunctionDecl decl: funcs.get(node.getName())) {
 			

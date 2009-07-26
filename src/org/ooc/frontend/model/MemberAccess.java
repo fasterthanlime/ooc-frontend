@@ -10,7 +10,7 @@ public class MemberAccess extends VariableAccess {
 	}
 	
 	public MemberAccess(Expression expression, VariableAccess variableAccess) {
-		super(variableAccess.getVariable());
+		super(variableAccess.getName());
 		this.expression = expression;
 	}
 

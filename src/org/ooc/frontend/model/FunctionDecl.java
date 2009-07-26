@@ -18,7 +18,6 @@ public class FunctionDecl extends Declaration {
 	private boolean isAbstract;
 
 	private FunctionDeclType declType;
-	private String name;
 	private String suffix;
 	private final NodeList<Line> body;
 	private Type returnType;
@@ -26,8 +25,8 @@ public class FunctionDecl extends Declaration {
 	
 	public FunctionDecl(FunctionDeclType declType, String name, String suffix, boolean isAbstract) {
 		
+		super(name);
 		this.declType = declType;
-		this.name = name;
 		this.suffix = suffix;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>();
@@ -50,14 +49,6 @@ public class FunctionDecl extends Declaration {
 	
 	public void setDeclType(FunctionDeclType declType) {
 		this.declType = declType;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public String getSuffix() {

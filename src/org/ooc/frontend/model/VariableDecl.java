@@ -9,15 +9,13 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 	private boolean isConst;
 	private boolean isStatic;
-	
 	private Type type;
-	private String name;
 	
 	public VariableDecl(Type type, String name, boolean isConst, boolean isStatic) {
+		super(name);
 		this.isConst = isConst;
 		this.isStatic = isStatic;
 		this.type = type;
-		this.name = name;
 	}
 	
 	public Type getType() {
@@ -26,14 +24,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	public void setType(Type type) {
 		this.type = type;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public boolean isConst() {
@@ -71,6 +61,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 
+		// TODO wrap the two lines into a new Block
+		
 		if(hierarchy.peek() instanceof Line) {
 			return false;
 		}

@@ -8,30 +8,15 @@ public class CoverDecl extends Declaration {
 
 	private OocDocComment comment;
 	private Type fromType;
-	private String name;
 	
 	private NodeList<VariableDecl> variables;
 	private NodeList<FunctionDecl> functions;
 	
 	public CoverDecl(String name, Type fromType) {
-		this.name = name;
+		super(name);
 		this.fromType = fromType;
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@Override

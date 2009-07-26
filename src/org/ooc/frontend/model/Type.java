@@ -46,6 +46,22 @@ public class Type extends Node {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
+	
+	@Override
+	public String toString() {
+		
+		if(pointerLevel == 0) {
+			return name;
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(name);
+		for(int i = 0; i < pointerLevel; i++) {
+			sb.append('*');
+		}
+		return sb.toString();
+		
+	}
 
 	public boolean isVoid() {
 		return (name.equals("void") || name.equals("Void")) && (getPointerLevel() == 0);

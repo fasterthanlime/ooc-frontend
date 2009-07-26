@@ -311,7 +311,7 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
 
-		current.append(variableAccess.getVariable());
+		current.append(variableAccess.getName());
 		
 	}
 

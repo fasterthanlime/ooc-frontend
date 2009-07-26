@@ -37,4 +37,15 @@ public class MemberCall extends FunctionCall {
 		visitor.visit(this);
 	}
 	
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		expression.accept(visitor);
+		super.acceptChildren(visitor);
+	}
+	
+	@Override
+	public boolean hasChildren() {
+		return true;
+	}
+	
 }

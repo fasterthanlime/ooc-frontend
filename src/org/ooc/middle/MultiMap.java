@@ -84,4 +84,9 @@ public class MultiMap<K, V> {
 		
 	}
 	
+	@Override
+	public String toString() {
+		return map.toString();
+	}
+	
 }

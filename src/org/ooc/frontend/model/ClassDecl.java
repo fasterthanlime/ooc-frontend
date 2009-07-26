@@ -9,14 +9,13 @@ public class ClassDecl extends Declaration {
 	private boolean isAbstract;
 	
 	private OocDocComment comment;
-	private String name;
 	private String superName;
 
 	private NodeList<VariableDecl> variables;
 	private NodeList<FunctionDecl> functions;
 	
 	public ClassDecl(String name, boolean isAbstract) {
-		this.name = name;
+		super(name);
 		this.isAbstract = isAbstract;
 		this.superName = "";
 		this.variables = new NodeList<VariableDecl>();
@@ -29,14 +28,6 @@ public class ClassDecl extends Declaration {
 	
 	public void setComment(OocDocComment comment) {
 		this.comment = comment;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public String getSuperName() {
