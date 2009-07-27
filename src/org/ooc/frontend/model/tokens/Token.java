@@ -17,6 +17,7 @@ public class Token {
 		NEW_KW, // new keyword
 		
 		CONST_KW, // const keyword
+		FINAL_KW, // final keyword
 		STATIC_KW, // static keyword
 		
 		INCLUDE_KW, // include keyword

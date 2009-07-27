@@ -7,6 +7,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.middle.Nosy.Opportunist;
 
@@ -30,7 +31,9 @@ public class DefaultConstructorGiver implements Hobgoblin {
 				}
 				
 				if(!hasNew) {
-					node.getFunctions().add(new FunctionDecl(FunctionDeclType.FUNC, "new", "", false));
+					FunctionDecl con = new FunctionDecl(FunctionDeclType.FUNC, "new", "", false, true, false, false);
+					con.setReturnType(new Type(node.getName()));
+					node.getFunctions().add(con);
 					System.out.println("Added default constructor to class "+node.getName());
 				}
 				

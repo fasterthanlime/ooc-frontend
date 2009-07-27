@@ -10,12 +10,14 @@ public class FunctionDecl extends Declaration {
 		FUNC,
 		IMPL,
 		OVER,
-		EXTERN,
 	}
 	
 	private OocDocComment comment;
 	
+	private boolean isFinal;
+	private boolean isStatic;
 	private boolean isAbstract;
+	private boolean isExtern;
 
 	private FunctionDeclType declType;
 	private String suffix;
@@ -23,12 +25,16 @@ public class FunctionDecl extends Declaration {
 	private Type returnType;
 	private final NodeList<Argument> arguments;
 	
-	public FunctionDecl(FunctionDeclType declType, String name, String suffix, boolean isAbstract) {
+	public FunctionDecl(FunctionDeclType declType, String name, String suffix,
+			boolean isFinal, boolean isStatic, boolean isAbstract, boolean isExtern) {
 		
 		super(name);
 		this.declType = declType;
 		this.suffix = suffix;
+		this.isFinal = isFinal;
+		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
+		this.isExtern = isExtern;
 		this.body = new NodeList<Line>();
 		this.returnType = new Type("void");
 		this.arguments = new NodeList<Argument>();
@@ -65,6 +71,30 @@ public class FunctionDecl extends Declaration {
 	
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+	}
+	
+	public boolean isStatic() {
+		return isStatic;
+	}
+	
+	public void setStatic(boolean isStatic) {
+		this.isStatic = isStatic;
+	}
+	
+	public boolean isFinal() {
+		return isFinal;
+	}
+	
+	public void setFinal(boolean isFinal) {
+		this.isFinal = isFinal;
+	}
+	
+	public boolean isExtern() {
+		return isExtern;
+	}
+	
+	public void setExtern(boolean isExtern) {
+		this.isExtern = isExtern;
 	}
 	
 	public NodeList<Line> getBody() {

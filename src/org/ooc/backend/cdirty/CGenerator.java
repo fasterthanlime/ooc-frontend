@@ -3,6 +3,7 @@ package org.ooc.backend.cdirty;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.ooc.backend.Generator;
 import org.ooc.backend.TabbedWriter;
@@ -42,17 +43,16 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
-import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
 
@@ -85,6 +85,17 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(" header file, generated with ooc */");
 		current.newLine();
 		
+		String hName = "__" + sourceUnit.getName().toUpperCase().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
+		current.append("#ifndef ");
+		current.append(hName);
+		current.newLine();
+		current.append("#define ");
+		current.append(hName);
+		current.newLine();
+		current.newLine();
+		
+		current.append("#include \"mangoobject.h\"");
+		current.newLine();
 		for(Include include: sourceUnit.getIncludes()) {
 			current.append("#include <");
 			current.append(include.getPath());
@@ -107,6 +118,14 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 		
 		sourceUnit.acceptChildren(this);
+		
+		current = hw;
+		current.newLine();
+		current.newLine();
+		current.append("#endif // ");
+		current.append(hName);
+		current.newLine();
+		current.newLine();
 		
 	}
 
@@ -342,7 +361,7 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(FunctionDecl functionDecl) throws IOException {
 		
-		if(functionDecl.getDeclType() != FunctionDeclType.EXTERN && !functionDecl.isAbstract()) {
+		if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
 		
 			hw.newLine();
 			hw.append("/* Function "+unit.getName()+"."+functionDecl.getName()+" */");
@@ -397,7 +416,170 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(ClassDecl classDecl) throws IOException {
-		// TODO Auto-generated method stub
+		
+		current = hw;
+		
+		current.append("typedef struct _");
+		current.append(classDecl.getName());
+		current.append(" ");
+		current.append(classDecl.getName());
+		current.append(";");
+		current.newLine();
+		
+		current.append("typedef struct _");
+		current.append(classDecl.getName());
+		current.append("Class ");
+		current.append(classDecl.getName());
+		current.append("Class;");
+		current.newLine();
+		
+		current.newLine();
+		current.append("struct _");
+		current.append(classDecl.getName());
+		current.append(" {");
+		current.tab();
+		current.newLine();
+		
+		if(classDecl.getSuperName().isEmpty()) {
+			// FIXME oooh hardcoded MangoObject, that is baad.
+			current.append("MangoObject super;");
+		} else {
+			current.append(classDecl.getSuperName());
+			current.append(" super;");
+		}
+		
+		current.untab();
+		current.newLine();
+		current.append("};");
+		current.newLine();
+		current.newLine();
+		
+		current.newLine();
+		current.append("struct _");
+		current.append(classDecl.getName());
+		current.append("Class {");
+		current.tab();
+		current.newLine();
+		
+		if(classDecl.getSuperName().isEmpty()) {
+			// FIXME oooh hardcoded MangoClass, that is baad.
+			current.append("MangoClass super;");
+		} else {
+			current.append(classDecl.getSuperName());
+			current.append("Class super;");
+		}
+		
+		/* Now write all virtual functions prototypes */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+	
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			decl.getReturnType().accept(this);
+			current.append(" (*");
+			current.append(decl.getName());
+			current.append(")(");
+			Iterator<Argument> iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				arg.accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
+			current.append(");");
+			
+		}
+		
+		current.untab();
+		current.newLine();
+		current.append("};");
+		current.newLine();
+		current.newLine();
+		
+		/* Now write the function to get the type */
+		current.newLine();
+		current.append("MangoClass *");
+		current.append(classDecl.getName());
+		current.append("_class();");
+		current.newLine();
+		
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			current.newLine();
+			decl.getReturnType().accept(this);
+			current.append(' ');
+			current.append(classDecl.getName());
+			current.append('_');
+			current.append(decl.getName());
+			current.append('(');
+			if(!decl.isStatic()) {
+				current.append("const ");
+				current.append(classDecl.getName());
+				current.append(" *this");
+				if(!decl.getArguments().isEmpty()) current.append(", ");
+			}
+			Iterator<Argument> iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				arg.accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
+			current.append(");");
+			
+		}
+		
+		current.newLine();
+		
+		/* Now implementations */
+		current = cw;
+		current.newLine();
+		
+		// FIXME bad, bad, bad hardcoded.
+		current.append("const MangoClass *");
+		current.append(classDecl.getName());
+		current.append("_getClass() {");
+		current.tab();
+		current.newLine();
+		current.newLine();
+		
+		current.append("static const ");
+		current.append(classDecl.getName());
+		current.append("Class class = {");
+		current.tab();
+		current.newLine();
+		
+		/* size of class */
+		current.append("sizeof(");
+		current.append(classDecl.getName());
+		current.append("),");
+		current.newLine();
+		
+		/* name of class */
+		current.append('"');
+		current.append(classDecl.getName());
+		current.append("\",");
+		current.newLine();
+		
+		/* ctor, dtor, copy */
+		current.append(classDecl.getName());
+		current.append("_ctor,");
+		current.newLine();
+		current.append(classDecl.getName());
+		current.append("_dtor,");
+		current.newLine();
+		current.append(classDecl.getName());
+		current.append("_copy,");
+		current.newLine();
+		
+		current.untab();
+		current.newLine();
+		current.append("};");
+		current.newLine();
+		
+		current.untab();
+		current.newLine();
+		current.append('}');
+		current.newLine();
+		current.newLine();
 		
 	}
 	

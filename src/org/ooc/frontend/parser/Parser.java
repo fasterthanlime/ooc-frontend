@@ -19,6 +19,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.DOUBLE_DOT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.EXCL;
 import static org.ooc.frontend.model.tokens.Token.TokenType.EXTERN_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FALSE;
+import static org.ooc.frontend.model.tokens.Token.TokenType.FINAL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
@@ -799,31 +800,48 @@ public class Parser {
 		}
 		
 		boolean isAbstract = false;
+		boolean isStatic = false;
+		boolean isFinal = false;
+		boolean isExtern = false;
 		
 		FunctionDeclType declType = FunctionDeclType.FUNC;
-		if(reader.peek().type == IMPL_KW) {
+		
+		Token kw = reader.peek();
+		while(kw.type == ABSTRACT_KW
+		   || kw.type == STATIC_KW
+		   || kw.type == FINAL_KW
+		   || kw.type == IMPL_KW
+		   || kw.type == OVER_KW
+		   || kw.type == EXTERN_KW) {
+			
 			reader.skip();
-			declType = FunctionDeclType.IMPL;
-		} else if(reader.peek().type == OVER_KW) {
-			reader.skip();
-			declType = FunctionDeclType.OVER;
-		} else if(reader.peek().type == EXTERN_KW) {
-			reader.skip();
-			declType = FunctionDeclType.EXTERN;
-			if(reader.read().type != FUNC_KW) {
-				
-			}
-		} else {
-			while(reader.peek().type != FUNC_KW) {
-				Token t = reader.read();
-				if(t.type == ABSTRACT_KW) {
-					isAbstract = true;
-				} else {
-					reader.reset(mark);
-					return null;
+			
+			switch(kw.type) {
+			case ABSTRACT_KW: isAbstract = true; break;
+			case STATIC_KW: isStatic = true; break;
+			case FINAL_KW: isFinal = true; break;
+			case EXTERN_KW: isExtern = true; break;
+			case IMPL_KW: 
+				if(declType != FunctionDeclType.FUNC) {
+					throw new CompilationFailedError(sReader.getLocation(kw.start),
+							"multiple qualifiers for a function, impl and "+declType);
 				}
+				declType = FunctionDeclType.IMPL; break;
+			case OVER_KW: 
+				if(declType != FunctionDeclType.FUNC) {
+					throw new CompilationFailedError(sReader.getLocation(kw.start),
+							"multiple qualifiers for a function, over and "+declType);
+				}
+				declType = FunctionDeclType.OVER; break;
+			default: // eclipse, cool down.
 			}
-			reader.skip(); // the 'func' keyword
+			
+			kw = reader.peek();
+		}
+		
+		if(declType == FunctionDeclType.FUNC && reader.read().type != FUNC_KW) {
+			reader.reset(mark);
+			return null;
 		}
 		
 		Token tName = reader.read();
@@ -845,7 +863,7 @@ public class Parser {
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(declType,
-				name, suffix, isAbstract);
+				name, suffix, isFinal, isStatic, isAbstract, isExtern);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == OPEN_PAREN) {

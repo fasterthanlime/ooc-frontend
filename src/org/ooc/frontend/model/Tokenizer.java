@@ -353,6 +353,8 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 3, TokenType.NEW_KW));
 				} else if(name.equals("const")) {
 					tokens.add(new Token(location.getIndex(), 5, TokenType.CONST_KW));
+				} else if(name.equals("final")) {
+					tokens.add(new Token(location.getIndex(), 5, TokenType.FINAL_KW));
 				} else if(name.equals("static")) {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.STATIC_KW));
 				} else if(name.equals("include")) {
