@@ -8,6 +8,7 @@ public class Type extends Node {
 
 	private String name;
 	private int pointerLevel;
+	private Declaration ref;
 	
 	public Type(String name) {
 		this(name, 0);
@@ -32,6 +33,14 @@ public class Type extends Node {
 
 	public int getPointerLevel() {
 		return pointerLevel;
+	}
+	
+	public Declaration getRef() {
+		return ref;
+	}
+	
+	public void setRef(Declaration ref) {
+		this.ref = ref;
 	}
 
 	@Override

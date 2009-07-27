@@ -23,6 +23,8 @@ public class Tinkerer implements Hobgoblin {
 		new VoidReturnCrusher().process(unit);
 		new DefaultConstructorGiver().process(unit);
 		new Unwrapper().process(unit);
+		
+		new TypeResolver().process(unit);
 		new VarAccessResolver().process(unit);
 		new FuncCallResolver().process(unit);
 		

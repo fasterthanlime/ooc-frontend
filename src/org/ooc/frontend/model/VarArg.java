@@ -7,7 +7,8 @@ import org.ooc.frontend.Visitor;
 public class VarArg extends Argument {
 
 	public VarArg() {
-		super("...");
+		// TODO add special trickery to properly handle "any type"
+		super(new Type(""), "...");
 	}
 
 	@Override

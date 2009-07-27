@@ -55,6 +55,7 @@ import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.BuiltinType;
 import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator implements Visitor {
@@ -494,6 +495,11 @@ public class OocGenerator extends Generator implements Visitor {
 		w.newLine();
 		w.append('}');
 		w.newLine();
+	}
+
+	@Override
+	public void visit(BuiltinType builtinType) throws IOException {
+		// nothing to do.
 	}
 	
 }

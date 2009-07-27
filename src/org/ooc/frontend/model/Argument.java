@@ -1,19 +1,9 @@
 package org.ooc.frontend.model;
 
-public abstract class Argument extends Node {
+public abstract class Argument extends VariableDecl {
 
-	private String name;
-
-	public Argument(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
+	public Argument(Type type, String name) {
+		super(type, name, false, false);
 	}
 	
 }

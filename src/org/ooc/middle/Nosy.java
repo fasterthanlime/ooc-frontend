@@ -295,5 +295,10 @@ public class Nosy<T> implements Visitor {
 	public void visit(Return return1) throws IOException {
 		visit((Node) return1);
 	}
+
+	@Override
+	public void visit(BuiltinType builtinType) throws IOException {
+		visit((Node) builtinType);
+	}
 	
 }

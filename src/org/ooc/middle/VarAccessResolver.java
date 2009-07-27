@@ -15,6 +15,8 @@ public class VarAccessResolver implements Hobgoblin {
 
 	@Override
 	public void process(SourceUnit unit) throws IOException {
+		
+		System.out.println(">>> Running VarAccessResolver");
 
 		final MultiMap<Node, Declaration> decls = new MultiMap<Node, Declaration>();
 		
@@ -44,6 +46,8 @@ public class VarAccessResolver implements Hobgoblin {
 			@Override
 			public boolean take(VariableAccess node, Stack<Node> stack) throws IOException {
 				
+				if(node.getRef() != null) return true; // already resolved
+				
 				System.out.println("# Should resolve access to "+node.getName()+", stack = "+stack);
 				
 				int index = stack.size();
@@ -51,17 +55,21 @@ public class VarAccessResolver implements Hobgoblin {
 					
 					index = Node.find(NodeList.class, stack, index - 1);
 					if(index == -1) {
-						throw new Error("Couldn't resolve variable access "+node.getName());
+						break stacksearch;
 					}
 					
 					for(Declaration decl: decls.get(stack.get(index))) {
 						System.out.println("Looking through declaration "+decl.getName()+" of type "+decl.getType());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
+							break stacksearch;
 						}
-						break stacksearch;
 					}
 					
+				}
+				
+				if(node.getRef() == null) {
+					throw new Error("Couldn't resolve variable access "+node.getName());
 				}
 				
 				return true;

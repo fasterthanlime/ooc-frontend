@@ -1,4 +1,5 @@
 include stdlib, stdio, time;
+cover Int from int;
 extern func printf(String, ...);
 extern func srand(Int);
 extern func rand -> Int;

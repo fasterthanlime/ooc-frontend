@@ -7,7 +7,8 @@ import org.ooc.frontend.Visitor;
 public class MemberArgument extends Argument {
 
 	public MemberArgument(String name) {
-		super(name);
+		// TODO add special trickery to resolve the type
+		super(new Type(""), name);
 	}
 	
 	@Override

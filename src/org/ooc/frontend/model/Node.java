@@ -10,7 +10,7 @@ public abstract class Node implements Visitable {
 	
 	@Override
 	public String toString() {
-		return getClass().getName();
+		return getClass().getSimpleName();
 	}
 	
 	public Token getStartToken() {

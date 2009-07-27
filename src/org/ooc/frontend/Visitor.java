@@ -45,6 +45,7 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.BuiltinType;
 
 public interface Visitor {
 
@@ -99,6 +100,7 @@ public interface Visitor {
 	public void visit(MemberAssignArgument memberArgument) throws IOException;
 
 	public void visit(Type type) throws IOException;
+	public void visit(BuiltinType builtinType) throws IOException;
 
 	public void visit(VarArg varArg) throws IOException;
 	

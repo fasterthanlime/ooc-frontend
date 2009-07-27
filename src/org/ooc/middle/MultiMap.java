@@ -30,16 +30,19 @@ public class MultiMap<K, V> {
 		
 		Object o = map.get(key);
 		if(o == null) {
+			System.out.println("Null, adding");
 			map.put(key, value);
 		} else {
 			if(o instanceof List<?>) {
+				System.out.println("Already a list, adding");
 				List<V> list = (List<V>) o;
 				list.add(value);
 			} else {
+				System.out.println("Replacing with a list and adding boths");
 				List<V> list = new ArrayList<V>();
 				list.add((V) o);
 				list.add(value);
-				map.put(key, value);
+				map.put(key, list);
 			}
 		}
 		

@@ -63,9 +63,9 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 		// TODO wrap the two lines into a new Block
 		
-		if(hierarchy.peek() instanceof Line) {
+		if(hierarchy.peek() instanceof Line
+		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl)
 			return false;
-		}
 		
 		int listIndex = find(NodeList.class, hierarchy);
 		if(listIndex == -1) {

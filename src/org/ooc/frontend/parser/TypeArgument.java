@@ -8,30 +8,14 @@ import org.ooc.frontend.model.Type;
 
 public class TypeArgument extends Argument {
 
-	private Type type;
-
 	public TypeArgument(Type type) {
-		super("");
-		this.type = type;
-	}
-	
-	public Type getType() {
-		return type;
+		// TODO check if empty name isn't a problem
+		super(type, "");
 	}
 	
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
-	}
-	
-	@Override
-	public boolean hasChildren() {
-		return true;
-	}
-
-	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {
-		type.accept(visitor);
 	}
 
 }
