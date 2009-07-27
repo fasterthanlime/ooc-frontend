@@ -106,8 +106,11 @@ public class FuncCallResolver implements Hobgoblin {
 			public boolean take(FunctionDecl node,
 					Stack<Node> stack) {
 		
+				int offset = node.isStatic() ? 0 : 1;
+				
 				if(node.getName().equals(name) && (suffix.isEmpty() || suffix.equals(node.getSuffix()))) {
-					if(node.getArguments().size() == call.getArguments().size()) {
+					System.out.println("Comparing "+node.getName()+":"+node.getArguments().size()+" with "+call.getArguments().size());
+					if((node.getArguments().size() - offset) == call.getArguments().size()) {
 						System.out.println("Found impl (same number of arguments)");
 						call.setImpl(node);
 					} else if(node.getArguments().get(node.getArguments().size() - 1) instanceof VarArg

@@ -4,8 +4,11 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class ClassDecl extends Declaration {
+public class ClassDecl extends Declaration implements Scope {
 
+	private static Type type = new Type("Class");
+	private Type instanceType;
+	
 	private boolean isAbstract;
 	
 	private OocDocComment comment;
@@ -20,6 +23,8 @@ public class ClassDecl extends Declaration {
 		this.superName = "";
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
+		this.instanceType = new Type(name);
+		instanceType.setRef(this);
 	}
 	
 	public OocDocComment getComment() {
@@ -56,7 +61,11 @@ public class ClassDecl extends Declaration {
 
 	@Override
 	public Type getType() {
-		return new Type("class");
+		return type;
+	}
+	
+	public Type getInstanceType() {
+		return instanceType;
 	}
 	
 	@Override
@@ -73,6 +82,7 @@ public class ClassDecl extends Declaration {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variables.accept(visitor);
 		functions.accept(visitor);
+		instanceType.accept(visitor);
 	}
 	
 }

@@ -18,18 +18,19 @@ public abstract class Node implements Visitable {
 	}
 	
 	/** TODO find a better home for this function? Sucks that you can't add function to Stack<? extends Node> */
-	public static <T extends Node> int find(Class<T> clazz, Stack<Node> hierarchy) {
+	public static <T> int find(Class<T> clazz, Stack<?> hierarchy) {
 		return find(clazz, hierarchy, hierarchy.size() - 1);
 	}
 		
-	public static <T extends Node> int find(Class<T> clazz, Stack<Node> hierarchy, int offset) {
+	public static <T> int find(Class<T> clazz, Stack<?> hierarchy, int offset) {
 		
 		int i = offset;
-		while(i > 0) {
-			Node node = hierarchy.get(i);
+		while(i >= 0) {
+			Object node = hierarchy.get(i);
 			if(clazz.isInstance(node)) {
 				return i;
 			}
+			System.out.println(node.getClass().getSimpleName()+" is not a "+clazz.getSimpleName()+", skipping..");
 			i--;
 		}
 		

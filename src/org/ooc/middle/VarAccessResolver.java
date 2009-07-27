@@ -3,9 +3,11 @@ package org.ooc.middle;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
+import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.NodeList;
+import org.ooc.frontend.model.Scope;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
@@ -27,7 +29,7 @@ public class VarAccessResolver implements Hobgoblin {
 				
 				System.out.println("Got "+node.getClass().getSimpleName()+" "
 						+node.getName()+" child of a "+stack.peek().getClass().getSimpleName());
-				int index = Node.find(NodeList.class, stack);
+				int index = Node.find(Scope.class, stack);
 				if(index == -1) {
 					throw new Error("Found declaration "+node.getName()+" of type "
 							+node.getType()+" outside of any NodeList!");
@@ -53,12 +55,23 @@ public class VarAccessResolver implements Hobgoblin {
 				int index = stack.size();
 				stacksearch: while(index >= 0) {
 					
-					index = Node.find(NodeList.class, stack, index - 1);
+					index = Node.find(Scope.class, stack, index - 1);
 					if(index == -1) {
 						break stacksearch;
 					}
 					
-					for(Declaration decl: decls.get(stack.get(index))) {
+					Node stackElement = stack.get(index);
+					
+					/* The magnificent this (with a small t) hack. */
+					if((stackElement instanceof FunctionDecl) && node.getName().equals("this")) {
+						if(Node.find(ClassDecl.class, stack, index - 1) != -1) {
+							System.out.println("$$$$$$$$$$ It's a this in a FunctionDecl in a ClassDecl!!!");
+							//node.setRef((ClassDecl) stackElement);
+							//break stacksearch;
+						}
+					}
+					
+					for(Declaration decl: decls.get(stackElement)) {
 						System.out.println("Looking through declaration "+decl.getName()+" of type "+decl.getType());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);

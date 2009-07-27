@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class FunctionDecl extends Declaration {
+public class FunctionDecl extends Declaration implements Scope {
 
 	public static enum FunctionDeclType {
 		FUNC,

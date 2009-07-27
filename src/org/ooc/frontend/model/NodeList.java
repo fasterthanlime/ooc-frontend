@@ -19,6 +19,10 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		nodes.add(element);
 	}
 	
+	public void add(int index, T element) {
+		nodes.add(index, element);
+	}
+	
 	public boolean remove(T element) {
 		return nodes.remove(element);
 	}

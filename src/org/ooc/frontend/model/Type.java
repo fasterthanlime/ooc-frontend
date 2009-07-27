@@ -77,7 +77,7 @@ public class Type extends Node {
 	}
 
 	public boolean isFlat() {
-		return pointerLevel == 0;
+		return pointerLevel == 0 && !(ref instanceof ClassDecl);
 	}
 	
 }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.ooc.frontend.Visitor;
 
 
-public class SourceUnit extends Node {
+public class SourceUnit extends Node implements Scope {
 
 	private String simpleName;
 	private String name;
