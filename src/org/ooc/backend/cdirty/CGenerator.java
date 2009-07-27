@@ -95,6 +95,8 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 		current.newLine();
 		
+		// FIXME of course this is a dirty hack because this devbranch
+		// is missing the whole fancy cmdline frontend with sdk search etc.
 		current.append("#include \"mangoobject.h\"");
 		current.newLine();
 		for(Include include: sourceUnit.getIncludes()) {
@@ -543,12 +545,14 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(decl.getSuffix());
 			}
 			current.append('(');
+			/*
 			if(!decl.isStatic()) {
 				current.append("const ");
 				current.append(classDecl.getName());
 				current.append(" *this");
 				if(!decl.getArguments().isEmpty()) current.append(", ");
 			}
+			*/
 			Iterator<Argument> iter = decl.getArguments().iterator();
 			while(iter.hasNext()) {
 				Argument arg = iter.next();
@@ -661,10 +665,6 @@ public class CGenerator extends Generator implements Visitor {
 			}
 			current.append("_impl");
 			current.append('(');
-			current.append("const ");
-			current.append(classDecl.getName());
-			current.append(" *this");
-			if(!decl.getArguments().isEmpty()) current.append(", ");
 			Iterator<Argument> iter = decl.getArguments().iterator();
 			while(iter.hasNext()) {
 				Argument arg = iter.next();
@@ -785,10 +785,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append('_');
 				current.append(decl.getSuffix());
 			}
-			current.append("(const ");
-			current.append(classDecl.getName());
-			current.append(" *this");
-			if(!decl.getArguments().isEmpty()) current.append(", ");
+			current.append('(');
 			Iterator<Argument> iter = decl.getArguments().iterator();
 			while(iter.hasNext()) {
 				Argument arg = iter.next();
@@ -808,8 +805,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append('_');
 				current.append(decl.getSuffix());
 			}
-			current.append("(this");
-			if(!decl.getArguments().isEmpty()) current.append(", ");
+			current.append("(");
 			iter = decl.getArguments().iterator();
 			while(iter.hasNext()) {
 				Argument arg = iter.next();
@@ -931,9 +927,10 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(Type type) throws IOException {
 		
 		current.append(type.getName());
-		if(type.getPointerLevel() > 0) {
+		if(!type.isFlat()) {
 			current.append(' ');
 		}
+		if(type.getRef() instanceof ClassDecl) current.append('*');
 		for(int i = 0; i < type.getPointerLevel(); i++) {
 			current.append('*');
 		}
