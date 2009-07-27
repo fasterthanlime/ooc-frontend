@@ -66,5 +66,9 @@ public class Type extends Node {
 	public boolean isVoid() {
 		return (name.equals("void") || name.equals("Void")) && (getPointerLevel() == 0);
 	}
+
+	public boolean isFlat() {
+		return pointerLevel == 0;
+	}
 	
 }

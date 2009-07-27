@@ -32,7 +32,7 @@ public class DefaultConstructorGiver implements Hobgoblin {
 				
 				if(!hasNew) {
 					FunctionDecl con = new FunctionDecl(FunctionDeclType.FUNC, "new", "", false, true, false, false);
-					con.setReturnType(new Type(node.getName()));
+					con.setReturnType(new Type(node.getName(), 1));
 					node.getFunctions().add(con);
 					System.out.println("Added default constructor to class "+node.getName());
 				}

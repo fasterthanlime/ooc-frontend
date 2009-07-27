@@ -179,12 +179,22 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(FunctionCall functionCall) throws IOException {
 
-		current.append(functionCall.getName());
+		FunctionDecl decl = functionCall.getImpl();
+		current.append(decl.getName());
+		if(!decl.getSuffix().isEmpty()) {
+			current.append('_');
+			current.append(decl.getSuffix());
+		}
 		current.append('(');
+		writeExprList(functionCall.getArguments());
+		current.append(')');
 		
+	}
+
+	private void writeExprList(NodeList<Expression> args) throws IOException {
 		boolean isFirst = true;
-		
-		for(Expression expr: functionCall.getArguments()) {
+
+		for(Expression expr: args) {
 			
 			if(!isFirst) {
 				current.append(", ");
@@ -194,20 +204,36 @@ public class CGenerator extends Generator implements Visitor {
 			isFirst = false;
 
 		}
+	}
+
+	@Override
+	public void visit(MemberCall memberCall) throws IOException {
 		
+		current.append(memberCall.getExpression().getType().getName());
+		current.append('_');
+		current.append(memberCall.getName());
+		current.append('(');
+		memberCall.getExpression().accept(this);
+		if(!memberCall.getArguments().isEmpty()) current.append(", ");
+		writeExprList(memberCall.getArguments());
 		current.append(')');
 		
 	}
 
 	@Override
-	public void visit(MemberCall memberCall) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void visit(Instantiation inst) throws IOException {
-		// TODO Auto-generated method stub
+
+		FunctionDecl decl = inst.getImpl();
+		current.append(inst.getName()); // Actually the class name
+		current.append('_');
+		current.append(decl.getName());
+		if(!decl.getSuffix().isEmpty()) {
+			current.append('_');
+			current.append(decl.getSuffix());
+		}
+		current.append('(');
+		writeExprList(inst.getArguments());
+		current.append(')');
 		
 	}
 
@@ -394,7 +420,7 @@ public class CGenerator extends Generator implements Visitor {
 	private void writeFuncPrototype(FunctionDecl functionDecl) throws IOException {
 		
 		functionDecl.getReturnType().accept(this);
-		current.append(' ');
+		if(functionDecl.getReturnType().getPointerLevel() == 0) current.append(' ');
 		current.append(functionDecl.getName());
 		current.append('(');
 		
@@ -469,7 +495,7 @@ public class CGenerator extends Generator implements Visitor {
 			current.append("Class super;");
 		}
 		
-		/* Now write all virtual functions prototypes */
+		/* Now write all virtual functions prototypes in the class struct */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 	
 			if(decl.isStatic()) continue;
@@ -497,19 +523,24 @@ public class CGenerator extends Generator implements Visitor {
 		
 		/* Now write the function to get the type */
 		current.newLine();
-		current.append("MangoClass *");
+		current.append("const MangoClass *");
 		current.append(classDecl.getName());
 		current.append("_class();");
 		current.newLine();
 		
+		/* Now all other functions' prototypes */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			
 			current.newLine();
 			decl.getReturnType().accept(this);
-			current.append(' ');
+			if(decl.getReturnType().isFlat()) current.append(' ');
 			current.append(classDecl.getName());
 			current.append('_');
 			current.append(decl.getName());
+			if(!decl.getSuffix().isEmpty()) {
+				current.append('_');
+				current.append(decl.getSuffix());
+			}
 			current.append('(');
 			if(!decl.isStatic()) {
 				current.append("const ");
@@ -533,10 +564,130 @@ public class CGenerator extends Generator implements Visitor {
 		current = cw;
 		current.newLine();
 		
+		/* ctor */
+		current.newLine();
+		current.append("static void ");
+		current.append(classDecl.getName());
+		current.append("_ctor(");
+		current.append(classDecl.getName());
+		current.append(" *this) {");
+		current.tab();
+		
+		if(!classDecl.getSuperName().isEmpty()) {
+			current.newLine();
+			current.append(classDecl.getSuperName());
+			current.append("_class()->ctor(this);");
+		}
+		
+		current.newLine();
+		current.append("printf(\"");
+		current.append(classDecl.getName());
+		current.append(".ctor()\\n\");");
+		
+		current.untab();
+		current.newLine();
+		current.append('}');
+		
+		current.newLine();
+		current.newLine();
+		
+		/* dtor */
+		current.newLine();
+		current.append("static void ");
+		current.append(classDecl.getName());
+		current.append("_dtor(");
+		current.append(classDecl.getName());
+		current.append(" *this) {");
+		current.tab();
+		
+		if(!classDecl.getSuperName().isEmpty()) {
+			current.newLine();
+			current.append(classDecl.getSuperName());
+			current.append("_class()->dtor(this);");
+		}
+		
+		current.newLine();
+		current.append("printf(\"");
+		current.append(classDecl.getName());
+		current.append(".dtor()\\n\");");
+		
+		current.untab();
+		current.newLine();
+		current.append('}');
+		
+		current.newLine();
+		current.newLine();
+		
+		/* copy */
+		current.newLine();
+		current.append("static ");
+		current.append(classDecl.getName());
+		current.append(" *");
+		current.append(classDecl.getName());
+		current.append("_copy(");
+		current.append(classDecl.getName());
+		current.append(" *this) {");
+		current.tab();
+		
+		current.append("Pointer copy = mango_object_new(");
+		current.append(classDecl.getName());
+		current.append("_class());");
+		current.newLine();
+		current.append("return copy;");
+		
+		current.untab();
+		current.newLine();
+		current.append('}');
+		
+		current.newLine();
+		current.newLine();
+		
+		/* Non-static (ie. instance) functions */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			current.append("static ");
+			decl.getReturnType().accept(this);
+			if(decl.getReturnType().isFlat()) current.append(' ');
+			current.append(classDecl.getName());
+			current.append('_');
+			current.append(decl.getName());
+			if(!decl.getSuffix().isEmpty()) {
+				current.append('_');
+				current.append(decl.getSuffix());
+			}
+			current.append("_impl");
+			current.append('(');
+			current.append("const ");
+			current.append(classDecl.getName());
+			current.append(" *this");
+			if(!decl.getArguments().isEmpty()) current.append(", ");
+			Iterator<Argument> iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				arg.accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
+			current.append(") {");
+			current.tab();
+			
+			decl.getBody().accept(this);
+			
+			current.untab();
+			current.newLine();
+			current.append("}");
+			current.newLine();
+			current.newLine();
+			
+		}
+		
+		
 		// FIXME bad, bad, bad hardcoded.
 		current.append("const MangoClass *");
 		current.append(classDecl.getName());
-		current.append("_getClass() {");
+		current.append("_class() {");
 		current.tab();
 		current.newLine();
 		current.newLine();
@@ -545,40 +696,188 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(classDecl.getName());
 		current.append("Class class = {");
 		current.tab();
+		
+		/* class attributes */
 		current.newLine();
+		current.append('{');
+		current.tab();
 		
 		/* size of class */
+		current.newLine();
+		current.append(".size = ");
 		current.append("sizeof(");
 		current.append(classDecl.getName());
 		current.append("),");
-		current.newLine();
 		
 		/* name of class */
+		current.newLine();
+		current.append(".name = ");
 		current.append('"');
 		current.append(classDecl.getName());
 		current.append("\",");
-		current.newLine();
 		
 		/* ctor, dtor, copy */
+		current.newLine();
+		current.append(".ctor = ");
 		current.append(classDecl.getName());
 		current.append("_ctor,");
+
 		current.newLine();
+		current.append(".dtor = ");
 		current.append(classDecl.getName());
 		current.append("_dtor,");
+		
 		current.newLine();
+		current.append(".copy = ");
 		current.append(classDecl.getName());
 		current.append("_copy,");
+		
+		
+		current.untab();
 		current.newLine();
+		current.append("},");
+		
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			current.append('.');
+			current.append(decl.getName());
+			current.append(" = ");
+			current.append(classDecl.getName());
+			current.append('_');
+			current.append(decl.getName());
+			if(!decl.isFinal()) {
+				current.append("_impl");
+			}
+			current.append(',');
+			
+		}
 		
 		current.untab();
 		current.newLine();
 		current.append("};");
 		current.newLine();
 		
+		current.newLine();
+		current.append("return (const MangoClass *) &class;");
+		current.newLine();
+		
 		current.untab();
 		current.newLine();
 		current.append('}');
 		current.newLine();
+		
+		/* Now non-static virtual non-_impl functions (phew) */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			decl.getReturnType().accept(this);
+			if(decl.getReturnType().isFlat()) current.append(' ');
+			current.append(classDecl.getName());
+			current.append('_');
+			current.append(decl.getName());
+			if(!decl.getSuffix().isEmpty()) {
+				current.append('_');
+				current.append(decl.getSuffix());
+			}
+			current.append("(const ");
+			current.append(classDecl.getName());
+			current.append(" *this");
+			if(!decl.getArguments().isEmpty()) current.append(", ");
+			Iterator<Argument> iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				arg.accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
+			current.append(") {");
+			current.tab();
+			
+			current.newLine();
+			if(!decl.getReturnType().isVoid()) current.append("return ");
+			current.append("((");
+			current.append(classDecl.getName());
+			current.append("Class *)((MangoObject *)this)->type)->");
+			current.append(decl.getName());
+			if(!decl.getSuffix().isEmpty()) {
+				current.append('_');
+				current.append(decl.getSuffix());
+			}
+			current.append("(this");
+			if(!decl.getArguments().isEmpty()) current.append(", ");
+			iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				current.append(arg.getName());
+				if(iter.hasNext()) current.append(", ");
+			}
+			
+			current.append(");");
+			
+			current.untab();
+			current.newLine();
+			current.append("}");
+			current.newLine();
+			current.newLine();
+			
+		}
+		
+		/* Now static functions */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(!decl.isStatic()) continue;
+			
+			current.newLine();
+			decl.getReturnType().accept(this);
+			if(decl.getReturnType().isFlat()) current.append(' ');
+			current.append(classDecl.getName());
+			current.append('_');
+			current.append(decl.getName());
+			current.append('(');
+			Iterator<Argument> iter = decl.getArguments().iterator();
+			while(iter.hasNext()) {
+				Argument arg = iter.next();
+				arg.accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
+			current.append(") {");
+			current.tab();
+			
+			/* Special case: constructor */
+			if(decl.isConstructor()) {
+				current.newLine();
+				current.append(classDecl.getName());
+				// FIXME bad hardcoded
+				current.append(" *this = mango_object_new(");
+				current.append(classDecl.getName());
+				current.append("_class());");
+			}
+			
+			// FIXME it's probably wrong to write the constructor body
+			// in here. It should be in a ctor somewhere, the Mango specs
+			// aren't exactly clear on that, especially the difference
+			// betwen _new and _ctor, where user code should be put,
+			// how to manage multiple different ctors, etc.
+			decl.getBody().accept(this);
+			
+			/* Special case: constructor */
+			if(decl.isConstructor()) {
+				current.newLine();
+				current.append("return this;");
+			}
+			
+			current.untab();
+			current.newLine();
+			current.append("}");
+			current.newLine();
+			current.newLine();
+			
+		}
+		
 		current.newLine();
 		
 	}
