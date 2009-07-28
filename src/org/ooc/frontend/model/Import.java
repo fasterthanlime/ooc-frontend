@@ -33,4 +33,9 @@ public class Import extends Node {
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		return false;
+	}
+	
 }

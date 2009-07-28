@@ -42,5 +42,22 @@ public class Assignment extends Expression {
 		lvalue.accept(visitor);
 		rvalue.accept(visitor);
 	}
+
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+	
+		if(oldie == lvalue) {
+			lvalue = (Access) kiddo;
+			return true;
+		}
+		
+		if(oldie == rvalue) {
+			rvalue = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
 	
 }

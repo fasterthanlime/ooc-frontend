@@ -14,5 +14,16 @@ public class While extends Conditional {
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == condition) {
+			condition = (Expression) kiddo;
+			return true;
+		}
+		return false;
+		
+	}
 
 }

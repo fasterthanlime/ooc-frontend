@@ -64,7 +64,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		// TODO wrap the two lines into a new Block
 		
 		if(hierarchy.peek() instanceof Line
-		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl)
+		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
+		|| hierarchy.get(hierarchy.size() - 2) instanceof ClassDecl)
 			return false;
 		
 		int listIndex = find(NodeList.class, hierarchy);
@@ -88,6 +89,17 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		body.addBefore(line, new Line(this));
 		
 		return true;
+		
+	}
+
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == type) {
+			type = (Type) kiddo;
+			return true;
+		}
+		return false;
 		
 	}
 	

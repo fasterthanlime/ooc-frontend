@@ -51,4 +51,21 @@ public class ArrayAccess extends Access {
 		index.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == variable) {
+			variable = (Expression) kiddo;
+			return true;
+		}
+		
+		if(oldie == index) {
+			index = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

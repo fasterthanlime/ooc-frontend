@@ -79,15 +79,17 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		return nodes.indexOf(lostSheep);
 	}
 
-	public T replace(T oldie, T kiddo) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean replace(Node oldie, Node kiddo) {
 		int index = nodes.indexOf(oldie);
 		if(index == -1) {
 			throw new ArrayIndexOutOfBoundsException("Trying to replace a "
 					+oldie.getClass().getName()+" with a "+kiddo.getClass().getSimpleName()+
 					" in a "+this.getClass().getSimpleName()+", but couldn't find node to replace.");
 		}
-		nodes.set(index, kiddo);
-		return oldie;
+		nodes.set(index, (T) kiddo);
+		return true;
 	}
 
 	public void addBefore(Line ref, T kiddo) {

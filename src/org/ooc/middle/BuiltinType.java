@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Declaration;
+import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Type;
 
 public class BuiltinType extends Declaration {
@@ -31,6 +32,11 @@ public class BuiltinType extends Declaration {
 
 	@Override
 	public boolean hasChildren() {
+		return false;
+	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
 		return false;
 	}
 

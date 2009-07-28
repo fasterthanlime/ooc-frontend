@@ -8,6 +8,6 @@ extern func time(time_t);
 func main {
 
 	srand(time(null));
-	printf("The answer is %d\n", rand());
+	printf("The answer is %d\n", rand);
 
 }

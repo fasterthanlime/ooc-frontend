@@ -35,4 +35,18 @@ public class ValuedReturn extends Return {
 		expression.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(super.replace(oldie, kiddo)) return true;
+		
+		if(oldie == expression) {
+			expression = (Expression) kiddo;
+			return true;
+		}
+		
+		return super.replace(oldie, kiddo);
+		
+	}
+	
 }

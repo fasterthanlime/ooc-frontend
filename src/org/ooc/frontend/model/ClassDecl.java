@@ -85,4 +85,9 @@ public class ClassDecl extends Declaration implements Scope {
 		instanceType.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		return false;
+	}
+	
 }

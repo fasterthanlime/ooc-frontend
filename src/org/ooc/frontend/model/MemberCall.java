@@ -28,11 +28,6 @@ public class MemberCall extends FunctionCall {
 	}
 	
 	@Override
-	public Type getType() {
-		throw new UnsupportedOperationException(this.getClass()+" can't figure out return type just yet.");
-	}
-	
-	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
 	}

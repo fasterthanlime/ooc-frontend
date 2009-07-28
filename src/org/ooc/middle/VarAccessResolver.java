@@ -5,10 +5,12 @@ import java.util.Stack;
 
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
+import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Nosy.Opportunist;
@@ -20,28 +22,10 @@ public class VarAccessResolver implements Hobgoblin {
 		
 		System.out.println(">>> Running VarAccessResolver");
 
-		final MultiMap<Node, Declaration> decls = new MultiMap<Node, Declaration>();
-		
-		new Nosy<VariableDecl>(VariableDecl.class, new Opportunist<VariableDecl>() {
-			
-			@Override
-			public boolean take(VariableDecl node, Stack<Node> stack) throws IOException {
-				
-				System.out.println("Got "+node.getClass().getSimpleName()+" "
-						+node.getName()+" child of a "+stack.peek().getClass().getSimpleName());
-				int index = Node.find(Scope.class, stack);
-				if(index == -1) {
-					throw new Error("Found declaration "+node.getName()+" of type "
-							+node.getType()+" outside of any NodeList!");
-				}
-				decls.add(stack.get(index), node);
-				return true;
-				
-			}
-			
-		}).visit(unit);
-		
-		System.out.println("Decls: "+decls);
+		final MultiMap<Node, VariableDecl> vars = unit.getDeclarations(VariableDecl.class);
+		System.out.println("Vars: "+vars);
+		final MultiMap<Node, FunctionDecl> funcs = unit.getDeclarations(FunctionDecl.class);
+		System.out.println("Funcs: "+funcs);
 		
 		new Nosy<VariableAccess>(VariableAccess.class, new Opportunist<VariableAccess>() {
 			
@@ -71,11 +55,21 @@ public class VarAccessResolver implements Hobgoblin {
 						}
 					}
 					
-					for(Declaration decl: decls.get(stackElement)) {
+					for(Declaration decl: vars.get(stackElement)) {
 						System.out.println("Looking through declaration "+decl.getName()+" of type "+decl.getType());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
 							break stacksearch;
+						}
+					}
+					
+					for(FunctionDecl decl: funcs.get(stackElement)) {
+						if((decl.getArguments().size() == 0 || decl.getArguments().get(decl.getArguments().size() - 1)
+								instanceof VarArg) && decl.getName().equals(node.getName())) {
+							FunctionCall call = new FunctionCall(node.getName(), "");
+							call.setImpl(decl); // save FuncCallResolver the trouble.
+							stack.peek().replace(node, call);
+							return true; // We're done here
 						}
 					}
 					

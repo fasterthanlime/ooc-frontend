@@ -51,4 +51,21 @@ public abstract class BinaryOperation extends Expression {
 		right.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == left) {
+			left = (Expression) kiddo;
+			return true;
+		}
+		
+		if(oldie == right) {
+			right = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

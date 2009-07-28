@@ -30,12 +30,14 @@ public abstract class Node implements Visitable {
 			if(clazz.isInstance(node)) {
 				return i;
 			}
-			System.out.println(node.getClass().getSimpleName()+" is not a "+clazz.getSimpleName()+", skipping..");
+			//System.out.println(node.getClass().getSimpleName()+" is not a "+clazz.getSimpleName()+", skipping..");
 			i--;
 		}
 		
 		return -1;
 		
 	}
+
+	public abstract boolean replace(Node oldie, Node kiddo);
 	
 }

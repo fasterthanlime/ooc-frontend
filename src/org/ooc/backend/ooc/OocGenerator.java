@@ -29,6 +29,7 @@ import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Line;
+import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
@@ -500,6 +501,15 @@ public class OocGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(BuiltinType builtinType) throws IOException {
 		// nothing to do.
+	}
+
+	@Override
+	public void visit(MemberAccess memberAccess) throws IOException {
+
+		memberAccess.getExpression().accept(this);
+		w.append('.');
+		visit((VariableAccess) memberAccess);
+		
 	}
 	
 }

@@ -72,8 +72,10 @@ public class TypeResolver implements Hobgoblin {
 					
 					/* The magnificent This (with a capital T) hack. */
 					if(stackElement instanceof ClassDecl && node.getName().equals("This")) {
-						node.setRef((ClassDecl) stackElement);
-						break stacksearch;
+						ClassDecl classDecl = (ClassDecl) stackElement;
+						node.setName(classDecl.getName());
+						node.setRef(classDecl);
+						return true; // we're done here.
 					}
 					
 					for(Declaration decl: decls.get(stackElement)) {
@@ -103,6 +105,8 @@ public class TypeResolver implements Hobgoblin {
 		decls.add(unit, new BuiltinType("void"));
 		decls.add(unit, new BuiltinType("int"));
 		decls.add(unit, new BuiltinType("float"));
+		decls.add(unit, new BuiltinType("double"));
+		decls.add(unit, new BuiltinType("char"));
 		
 	}
 	

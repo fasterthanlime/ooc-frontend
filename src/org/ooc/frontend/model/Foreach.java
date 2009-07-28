@@ -47,4 +47,21 @@ public class Foreach extends ControlStatement {
 		body.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == variable) {
+			variable = (VariableDecl) kiddo;
+			return true;
+		}
+		
+		if(oldie == collection) {
+			collection = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

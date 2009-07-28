@@ -139,4 +139,16 @@ public class FunctionDecl extends Declaration implements Scope {
 		return name.equals("new");
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == returnType) {
+			returnType = (Type) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

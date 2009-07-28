@@ -34,4 +34,16 @@ public class Line extends Node {
 		statement.accept(visitor);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == statement) {
+			statement = (Statement) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

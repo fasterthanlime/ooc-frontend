@@ -16,5 +16,10 @@ public class NoOp extends Statement {
 	public boolean hasChildren() {
 		return false;
 	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		return false;
+	}
 
 }

@@ -32,4 +32,15 @@ public abstract class Conditional extends ControlStatement {
 		return true;
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == condition) {
+			condition = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+	}
+	
 }

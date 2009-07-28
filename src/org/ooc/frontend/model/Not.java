@@ -39,5 +39,17 @@ public class Not extends Expression {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		expression.accept(visitor);
 	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == expression) {
+			expression = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
 
 }

@@ -29,6 +29,7 @@ import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Line;
+import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
@@ -357,6 +358,15 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
+	public void visit(MemberAccess memberAccess) throws IOException {
+
+		memberAccess.getExpression().accept(this);
+		current.append("->");
+		current.append(memberAccess.getName());
+		
+	}
+	
+	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
 
 		current.append(variableAccess.getName());
@@ -475,6 +485,14 @@ public class CGenerator extends Generator implements Visitor {
 		} else {
 			current.append(classDecl.getSuperName());
 			current.append(" super;");
+		}
+		
+		for(VariableDecl decl: classDecl.getVariables()) {
+			
+			current.newLine();
+			decl.accept(this);
+			current.append(';');
+			
 		}
 		
 		current.untab();
@@ -930,7 +948,15 @@ public class CGenerator extends Generator implements Visitor {
 		if(!type.isFlat()) {
 			current.append(' ');
 		}
-		if(type.getRef() instanceof ClassDecl) current.append('*');
+		
+		if(type.getRef() == null) {
+			throw new Error("Unresolved Type "+type.getName()+" !!");
+		}
+		
+		if(type.getRef() instanceof ClassDecl) {
+			current.append('*');
+		}
+		
 		for(int i = 0; i < type.getPointerLevel(); i++) {
 			current.append('*');
 		}

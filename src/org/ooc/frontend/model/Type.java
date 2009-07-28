@@ -80,4 +80,16 @@ public class Type extends Node {
 		return pointerLevel == 0 && !(ref instanceof ClassDecl);
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == ref) {
+			ref = (Declaration) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

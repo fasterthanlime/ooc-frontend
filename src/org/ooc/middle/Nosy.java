@@ -22,6 +22,7 @@ import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Line;
+import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
@@ -70,17 +71,17 @@ public class Nosy<T> implements Visitor {
 	public void visit(Node node) throws IOException {
 		
 		//System.out.println("Nosy visiting a "+node.getClass().getSimpleName());
-		
-		if(clazz.isInstance(node)) {
-			if(!oppo.take(clazz.cast(node), stack)) {
-				return; // aborted. (D-Nied. Denied).
-			}
-		}
 
 		if(node.hasChildren()) {
 			stack.push(node);
 			node.acceptChildren(this);
 			stack.pop();
+		}
+		
+		if(clazz.isInstance(node)) {
+			if(!oppo.take(clazz.cast(node), stack)) {
+				return; // aborted. (D-Nied. Denied).
+			}
 		}
 		
 	}
@@ -299,6 +300,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(BuiltinType builtinType) throws IOException {
 		visit((Node) builtinType);
+	}
+
+	@Override
+	public void visit(MemberAccess memberAccess) throws IOException {
+		visit((Node) memberAccess);
 	}
 	
 }

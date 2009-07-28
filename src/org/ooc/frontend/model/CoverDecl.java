@@ -59,8 +59,21 @@ public class CoverDecl extends Declaration {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
+		if(fromType != null) { fromType.accept(visitor); }
 		variables.accept(visitor);
 		functions.accept(visitor);
+	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == fromType) {
+			fromType = (Type) kiddo;
+			return true;
+		}
+		
+		return false;
+		
 	}
 
 }

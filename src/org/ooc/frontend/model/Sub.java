@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-
 public class Sub extends BinaryOperation {
 
 	public Sub(Expression left, Expression right) {

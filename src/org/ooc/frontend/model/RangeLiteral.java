@@ -50,5 +50,22 @@ public class RangeLiteral extends Literal {
 		lower.accept(visitor);
 		upper.accept(visitor);
 	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == lower) {
+			lower = (Expression) kiddo;
+			return true;
+		}
+		
+		if(oldie == upper) {
+			upper = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
 
 }

@@ -25,6 +25,7 @@ public class VariableDeclAssigned extends VariableDecl {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
+		super.acceptChildren(visitor);
 		expression.accept(visitor);
 	}
 	

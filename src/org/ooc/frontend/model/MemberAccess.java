@@ -1,5 +1,9 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
+
+import org.ooc.frontend.Visitor;
+
 public class MemberAccess extends VariableAccess {
 	
 	private Expression expression;
@@ -20,6 +24,31 @@ public class MemberAccess extends VariableAccess {
 	
 	public void setExpression(Expression expression) {
 		this.expression = expression;
+	}
+	
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
+	}
+	
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		super.acceptChildren(visitor);
+		expression.accept(visitor);
+	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+	
+		if(this.replace(oldie, kiddo)) return true;
+		
+		if(oldie == expression) {
+			expression = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
 	}
 
 }

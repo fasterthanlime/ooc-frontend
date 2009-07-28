@@ -49,6 +49,13 @@ public class FunctionCall extends Access {
 	@Override
 	public Type getType() {
 		if(impl != null) {
+			/*
+			Declaration ref = impl.getReturnType().getRef();
+			if(ref instanceof ClassDecl) {
+				ClassDecl classDecl = (ClassDecl) ref;
+				return classDecl.getInstanceType();
+			}
+			*/
 			return impl.getReturnType();
 		}
 		return null;
@@ -68,6 +75,18 @@ public class FunctionCall extends Access {
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		arguments.accept(visitor);
+	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == impl) {
+			impl = (FunctionDecl) kiddo;
+			return true;
+		}
+		
+		return false;
+		
 	}
 	
 }

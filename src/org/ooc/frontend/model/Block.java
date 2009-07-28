@@ -26,5 +26,10 @@ public class Block extends Node {
 	public boolean hasChildren() {
 		return body.hasChildren();
 	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		return false;
+	}
 
 }

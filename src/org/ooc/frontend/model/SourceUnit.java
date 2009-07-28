@@ -2,8 +2,12 @@ package org.ooc.frontend.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.middle.MultiMap;
+import org.ooc.middle.Nosy;
+import org.ooc.middle.Nosy.Opportunist;
 
 
 public class SourceUnit extends Node implements Scope {
@@ -71,6 +75,37 @@ public class SourceUnit extends Node implements Scope {
 		includes.accept(visitor);
 		imports.accept(visitor);
 		body.accept(visitor);
+	}
+	
+	public <T extends Declaration> MultiMap<Node, T> getDeclarations(final Class<T> clazz) throws IOException {
+
+		final MultiMap<Node, T> vars = new MultiMap<Node, T>();
+		
+		new Nosy<T> (clazz, new Opportunist<T>() {
+	
+			@Override
+			public boolean take(T node, Stack<Node> stack) throws IOException {
+				
+				System.out.println("Got "+node.getClass().getSimpleName()+" "
+						+node.getName()+" child of a "+stack.peek().getClass().getSimpleName());
+				int index = Node.find(Scope.class, stack);
+				if(index == -1) {
+					throw new Error("Found declaration "+node.getName()+" of type "
+							+node.getType()+" outside of any NodeList!");
+				}
+				vars.add(stack.get(index), clazz.cast(node));
+				return true;
+				
+			}
+			
+		}).visit(this);
+		return vars;
+		
+	}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		return false;
 	}
 	
 }

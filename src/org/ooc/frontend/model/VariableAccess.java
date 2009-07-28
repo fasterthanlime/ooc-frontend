@@ -46,5 +46,17 @@ public class VariableAccess extends Access {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
+	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		
+		if(oldie == ref) {
+			ref = (Declaration) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
 
 }

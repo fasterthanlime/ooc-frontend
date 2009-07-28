@@ -20,6 +20,7 @@ import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Line;
+import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
@@ -86,6 +87,7 @@ public interface Visitor {
 	public void visit(Foreach foreach) throws IOException;
 
 	public void visit(VariableAccess variableAccess) throws IOException;
+	public void visit(MemberAccess memberAccess) throws IOException;
 	public void visit(ArrayAccess arrayAccess) throws IOException;
 
 	public void visit(VariableDecl variableDecl) throws IOException;
