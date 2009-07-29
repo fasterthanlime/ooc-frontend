@@ -14,9 +14,11 @@ import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
+import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
@@ -44,6 +46,7 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
@@ -55,7 +58,6 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.parser.TypeArgument;
-import org.ooc.middle.BuiltinType;
 import org.ubi.SourceReader;
 
 public class CGenerator extends Generator implements Visitor {
@@ -175,7 +177,7 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(Comment comment) throws IOException {
+	public void visit(MultiLineComment comment) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -321,7 +323,8 @@ public class CGenerator extends Generator implements Visitor {
 
 		current.newLine();
 		line.getStatement().accept(this);
-		if(!(line.getStatement() instanceof ControlStatement)) {
+		if(!(line.getStatement() instanceof ControlStatement)
+				&& !(line instanceof Comment)) {
 			current.append(';');
 		}
 		
@@ -383,7 +386,7 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(VariableDecl variableDecl) throws IOException {
 
 		variableDecl.getType().accept(this);
-		current.append(' ');
+		if(variableDecl.getType().isFlat()) current.append(' ');
 		current.append(variableDecl.getName());
 		
 	}
@@ -990,6 +993,14 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(BuiltinType builtinType) throws IOException {
 		// nothing to do.
+	}
+	
+
+
+	@Override
+	public void visit(SingleLineComment slComment) throws IOException {
+		current.append(" // ");
+		current.append(slComment.getContent().trim());
 	}
 
 }

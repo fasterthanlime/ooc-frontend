@@ -3,6 +3,7 @@ package org.ooc.middle;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
@@ -12,6 +13,23 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Type;
 import org.ooc.middle.Nosy.Opportunist;
 
+/**
+ * Resolves types, e.g. setRef on any type found, e.g. a ref can be a 
+ * ClassDecl, a CoverDecl, or a BuiltinType.
+ * 
+ * BuiltinTypes are those from C. They can't be used in VariableDecls and
+ * the such because they aren't CamelCase, thus you should use a cover, e.g.
+ * <code>
+ * cover Int from int;
+ * Int i = 42; // alright.
+ * </code>
+ * 
+ * Of course if you build a language from ooc, you probably want to put default
+ * covers in a file you'll import in every source file of your language.
+ * (e.g. like OocLib.ooc in ooc up to 0.2.1)
+ * 
+ * @author Amos Wenger
+ */
 public class TypeResolver implements Hobgoblin {
 
 	@Override
@@ -62,11 +80,11 @@ public class TypeResolver implements Hobgoblin {
 					
 					index = Node.find(Scope.class, stack, index - 1);
 					if(index == -1) {
-						System.out.println("no Scope remaining, abandon...");
+						//System.out.println("no Scope remaining, abandon...");
 						break stacksearch;
 					}
 					
-					System.out.println("Looking in stack element "+index);
+					//System.out.println("Looking in stack element "+index);
 					
 					Node stackElement = stack.get(index);
 					
@@ -79,7 +97,7 @@ public class TypeResolver implements Hobgoblin {
 					}
 					
 					for(Declaration decl: decls.get(stackElement)) {
-						System.out.println("Looking through declaration "+decl.toString());
+						//System.out.println("Looking through declaration "+decl.toString());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
 							break stacksearch;

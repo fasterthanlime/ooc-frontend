@@ -10,7 +10,7 @@ import org.ooc.frontend.model.SourceUnit;
  *  - Resolving symbols (functions, variables)
  *  - Ensuring encapsulation isn't violated (e.g. unauthorized access
  *  to private members)
- *  - Huh.. other things, I guess. 
+ *  - Huh.. other things, I guess, see all classes in this package 
  * 
  * @author Amos Wenger
  */
@@ -27,6 +27,7 @@ public class Tinkerer implements Hobgoblin {
 		
 		new TypeResolver().process(unit);
 		new VarAccessResolver().process(unit);
+		new NewGuesser().process(unit);
 		new FuncCallResolver().process(unit);
 		
 	}

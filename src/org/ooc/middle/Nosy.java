@@ -9,9 +9,10 @@ import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
+import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
@@ -37,6 +38,7 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
@@ -117,7 +119,7 @@ public class Nosy<T> implements Visitor {
 	}
 
 	@Override
-	public void visit(Comment comment) throws IOException {
+	public void visit(MultiLineComment comment) throws IOException {
 		visit((Node) comment);		
 	}
 
@@ -305,6 +307,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(MemberAccess memberAccess) throws IOException {
 		visit((Node) memberAccess);
+	}
+
+	@Override
+	public void visit(SingleLineComment slComment) throws IOException {
+		visit((Node) slComment);
 	}
 	
 }

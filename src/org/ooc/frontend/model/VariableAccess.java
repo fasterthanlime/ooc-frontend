@@ -31,7 +31,8 @@ public class VariableAccess extends Access {
 		if(ref != null) {
 			return ref.getType();
 		}
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()+" doesn't resolve the type yet.");
+		throw new UnsupportedOperationException(this.getClass().getSimpleName()
+				+" to "+variable+" has its type yet unresolved.");
 	}
 	
 	@Override

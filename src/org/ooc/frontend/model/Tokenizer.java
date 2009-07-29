@@ -245,7 +245,7 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.SLASH_EQ));
 				} else if(c2 == '/') {
 					reader.readLine();
-					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.SL_COMMENT));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.SL_COMMENT));
 				} else if(c2 == '*') {
 					reader.read();
 					char c3 = reader.peek();

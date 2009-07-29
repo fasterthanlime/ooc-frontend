@@ -15,6 +15,21 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Nosy.Opportunist;
 
+/**
+ * Resolve variable accesses, e.g.
+ * <code>
+ * Int i = 3;
+ * printf("value = %d\n", i);
+ * </code>
+ * 
+ * Resolves the variable access one line 2 to the variable declaration
+ * on line 1.
+ * 
+ * It also resolves member variable access, e.g. this.blah, and parenthesis-less
+ * function calls, e.g. this.getBlah
+ * 
+ * @author Amos Wenger
+ */
 public class VarAccessResolver implements Hobgoblin {
 
 	@Override

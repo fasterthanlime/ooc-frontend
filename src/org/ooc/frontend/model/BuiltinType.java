@@ -1,11 +1,8 @@
-package org.ooc.middle;
+package org.ooc.frontend.model;
 
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.Declaration;
-import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.Type;
 
 public class BuiltinType extends Declaration {
 

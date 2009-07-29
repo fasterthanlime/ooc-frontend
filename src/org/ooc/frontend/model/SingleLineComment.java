@@ -1,7 +1,11 @@
 package org.ooc.frontend.model;
 
+import java.io.IOException;
 
-public class SingleLineComment extends Line {
+import org.ooc.frontend.Visitor;
+
+
+public class SingleLineComment extends Line implements Comment {
 
 	private String content;
 	
@@ -16,6 +20,11 @@ public class SingleLineComment extends Line {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
 	}
 	
 }

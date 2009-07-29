@@ -86,7 +86,7 @@ public class FuncCallResolver implements Hobgoblin {
 				
 				if(node.getName().equals(className)) {
 					findImpl(call, node, name, suffix);
-					// FIXME check if really found it.
+					// FIXME check if we really found it.
 					return false; // we've found the holy grail.
 				}
 				return true;

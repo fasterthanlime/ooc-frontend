@@ -7,9 +7,10 @@ import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
+import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
@@ -35,6 +36,7 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
@@ -46,7 +48,6 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.parser.TypeArgument;
-import org.ooc.middle.BuiltinType;
 
 public interface Visitor {
 
@@ -59,7 +60,8 @@ public interface Visitor {
 	public void visit(Not not) throws IOException;
 	public void visit(Mod mod) throws IOException;
 	
-	public void visit(Comment comment) throws IOException;
+	public void visit(MultiLineComment comment) throws IOException;
+	public void visit(SingleLineComment slComment) throws IOException;
 
 	public void visit(FunctionCall functionCall) throws IOException;
 	public void visit(MemberCall memberCall) throws IOException;

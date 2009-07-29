@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class OocDocComment extends Comment {
+public class OocDocComment extends MultiLineComment {
 
 	public OocDocComment(String content) {
 		super(content);

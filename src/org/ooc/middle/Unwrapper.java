@@ -8,6 +8,26 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.middle.Nosy.Opportunist;
 
+/**
+ * The {@link Unwrapper} transforms this kind of statement
+ * <code>
+ * printf("The answer is %d\n", Int i = 42);
+ * </code>
+ * 
+ * Into this kind of statement:
+ * <code>
+ * {
+ *   Int i = 42;
+ *   printf("The answer is %d\n", i);
+ * }
+ * </code>
+ * 
+ * Of course, the {@link Unwrapper} does nothing by itself,
+ * it's all specified in node classes which implement
+ * the {@link MustBeUnwrapped} interface.
+ * 
+ * @author Amos Wenger
+ */
 public class Unwrapper implements Hobgoblin {
 
 	private static final int MAX = 1024;
@@ -26,11 +46,11 @@ public class Unwrapper implements Hobgoblin {
 				System.out.println("Trying to unwrap a "+node.getClass().getSimpleName());
 				if(node.unwrap(stack)) {
 					running = true;
-					System.out.println(node.getClass().getSimpleName()+" was dirty! Turning round");
-					return false;
+					//System.out.println(node.getClass().getSimpleName()+" was dirty! Turning round");
+					//return false;
 				}
 				
-				System.out.println(node.getClass().getSimpleName()+" was okay =)");
+				//System.out.println(node.getClass().getSimpleName()+" was okay =)");
 				return true;
 				
 			}

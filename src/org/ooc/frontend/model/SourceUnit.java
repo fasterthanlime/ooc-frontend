@@ -79,7 +79,7 @@ public class SourceUnit extends Node implements Scope {
 	
 	public <T extends Declaration> MultiMap<Node, T> getDeclarations(final Class<T> clazz) throws IOException {
 
-		final MultiMap<Node, T> vars = new MultiMap<Node, T>();
+		final MultiMap<Node, T> decls = new MultiMap<Node, T>();
 		
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
@@ -93,13 +93,13 @@ public class SourceUnit extends Node implements Scope {
 					throw new Error("Found declaration "+node.getName()+" of type "
 							+node.getType()+" outside of any NodeList!");
 				}
-				vars.add(stack.get(index), clazz.cast(node));
+				decls.add(stack.get(index), clazz.cast(node));
 				return true;
 				
 			}
 			
 		}).visit(this);
-		return vars;
+		return decls;
 		
 	}
 	
