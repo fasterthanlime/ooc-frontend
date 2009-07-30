@@ -451,7 +451,6 @@ public class CGenerator extends Generator implements Visitor {
 		String className = classDecl.getName();
 		String initializeName = className+"_initialize";
 		String destroyName = className+"_destroy";
-		String copyName = className+"_copy";
 		
 		writeStructTypedef(className);
 		writeStructTypedef(className+"Class");
@@ -465,9 +464,8 @@ public class CGenerator extends Generator implements Visitor {
 		
 		writeInitializeFunc(classDecl, className);
 		writeDestroyFunc(classDecl, className);
-		writeCopyFunc(className);
 		writeInstanceImplFuncs(classDecl, className);
-		writeClassGettingFunction(classDecl, className, initializeName, destroyName, copyName);
+		writeClassGettingFunction(classDecl, className, initializeName, destroyName);
 		writeVirtualNonImplFuncs(classDecl, className);
 		writeStaticFuncs(classDecl, className);
 		
@@ -684,25 +682,6 @@ public class CGenerator extends Generator implements Visitor {
 		closeSpacedBlock();
 	}
 
-	private void writeCopyFunc(String className) throws IOException {
-		
-		writeBuiltinClassFuncName(className, className+"*", "copy");
-		openSpacedBlock();
-		
-		current.append(className);
-		current.append(" *copy = (");
-		current.append(className);
-		current.append(" *) mango_object_new(");
-		current.append(className);
-		current.append("_class());");
-		current.newLine();
-		// TODO add copy all fields
-		current.append("return copy;");
-
-		closeSpacedBlock();
-		
-	}
-
 	private void closeSpacedBlock() throws IOException {
 		closeBlock();
 		current.newLine();
@@ -732,8 +711,7 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	private void writeClassGettingFunction(ClassDecl classDecl,
-			String className, String initializeName, String destroyName,
-			String copyName) throws IOException {
+			String className, String initializeName, String destroyName) throws IOException {
 		
 		current.append("const MangoClass *");
 		current.append(className);
@@ -765,7 +743,6 @@ public class CGenerator extends Generator implements Visitor {
 		/* initialize, destroy, copy */
 		writeDesignatedInit("initialize", "(void (*)(MangoObject *))"+ initializeName);
 		writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+destroyName);
-		writeDesignatedInit("copy", "(MangoObject *(*)(const MangoObject *))"+copyName);
 		
 		closeBlock();
 		

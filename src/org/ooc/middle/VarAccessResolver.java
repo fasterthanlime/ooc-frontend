@@ -7,6 +7,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
+import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
 import org.ooc.frontend.model.SourceUnit;
@@ -14,6 +15,7 @@ import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Nosy.Opportunist;
+import org.ubi.CompilationFailedError;
 
 /**
  * Resolve variable accesses, e.g.
@@ -50,6 +52,24 @@ public class VarAccessResolver implements Hobgoblin {
 				if(node.getRef() != null) return true; // already resolved
 				
 				System.out.println("# Should resolve access to "+node.getName()+", stack = "+stack);
+
+				if(false && node instanceof MemberAccess){
+					
+					MemberAccess memberAccess = (MemberAccess) node;
+					System.out.println("Found memberAccess to "+memberAccess.getName());
+					if(!(memberAccess.getExpression().getType().getRef() instanceof ClassDecl)) {
+						throw new CompilationFailedError(null, "Can't access to field "
+								+node.getName()+" of a "+memberAccess.getExpression().getClass().getSimpleName()
+								+", it's not a class!");
+					}
+					ClassDecl decl = (ClassDecl) memberAccess.getExpression().getType().getRef();
+					VariableDecl var = decl.getVariable(node.getName());
+					if(var != null) {
+						System.out.println("Found member variable named "+var.getName()+" in class "+decl.getName());
+						node.setRef(var);
+					}
+					
+				}
 				
 				int index = stack.size();
 				stacksearch: while(index >= 0) {
