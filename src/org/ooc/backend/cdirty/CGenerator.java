@@ -186,11 +186,7 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(FunctionCall functionCall) throws IOException {
 
 		FunctionDecl decl = functionCall.getImpl();
-		current.append(decl.getName());
-		if(!decl.getSuffix().isEmpty()) {
-			current.append('_');
-			current.append(decl.getSuffix());
-		}
+		writeSuffixedFuncName(decl);
 		current.append('(');
 		writeExprList(functionCall.getArguments());
 		current.append(')');
@@ -232,11 +228,7 @@ public class CGenerator extends Generator implements Visitor {
 		FunctionDecl decl = inst.getImpl();
 		current.append(inst.getName()); // Actually the class name
 		current.append('_');
-		current.append(decl.getName());
-		if(!decl.getSuffix().isEmpty()) {
-			current.append('_');
-			current.append(decl.getSuffix());
-		}
+		writeSuffixedFuncName(decl);
 		current.append('(');
 		writeExprList(inst.getArguments());
 		current.append(')');
@@ -415,19 +407,13 @@ public class CGenerator extends Generator implements Visitor {
 		
 			current = cw;
 			writeFuncPrototype(functionDecl);
-			cw.append(" {");
-			cw.tab();
-			cw.newLine();
+			openBlock();
 			
 			for(Line line: functionDecl.getBody()) {
 				line.accept(this);
 			}
 			
-			cw.untab();
-			cw.newLine();
-			cw.newLine();
-			cw.append("}");
-			cw.newLine();
+			closeSpacedBlock();
 			
 		}
 		
@@ -456,60 +442,410 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	@Override
+	@Override 
 	public void visit(ClassDecl classDecl) throws IOException {
 		
+		// TODO modularize the heck out of this function: it's a mess.
 		current = hw;
 		
-		current.append("typedef struct _");
-		current.append(classDecl.getName());
-		current.append(" ");
-		current.append(classDecl.getName());
-		current.append(";");
+		String className = classDecl.getName();
+		String initializeName = className+"_initialize";
+		String destroyName = className+"_destroy";
+		String copyName = className+"_copy";
+		
+		writeStructTypedef(className);
+		writeStructTypedef(className+"Class");
+		writeObjectStruct(classDecl, className);
+		writeClassStruct(classDecl, className);
+		writeMemberFuncPrototypes(classDecl, className);
+		
+		/* Now implementations */
+		current = cw;
 		current.newLine();
 		
-		current.append("typedef struct _");
-		current.append(classDecl.getName());
-		current.append("Class ");
-		current.append(classDecl.getName());
-		current.append("Class;");
-		current.newLine();
+		writeInitializeFunc(classDecl, className);
+		writeDestroyFunc(classDecl, className);
+		writeCopyFunc(className);
+		writeInstanceImplFuncs(classDecl, className);
+		writeClassGettingFunction(classDecl, className, initializeName, destroyName, copyName);
+		writeVirtualNonImplFuncs(classDecl, className);
+		writeStaticFuncs(classDecl, className);
 		
 		current.newLine();
-		current.append("struct _");
-		current.append(classDecl.getName());
-		current.append(" {");
-		current.tab();
-		current.newLine();
 		
-		if(classDecl.getSuperName().isEmpty()) {
-			// FIXME oooh hardcoded MangoObject, that is baad.
-			current.append("MangoObject super;");
-		} else {
-			current.append(classDecl.getSuperName());
-			current.append(" super;");
+	}
+	
+	private void writeMemberFuncPrototype(String className,
+			FunctionDecl decl) throws IOException {
+		
+		writeSpacedType(decl.getReturnType());
+		current.append(className);
+		current.append('_');
+		current.append(decl.getName());
+		writeFuncArgs(decl);
+		
+	}
+
+	private void writeFuncArgs(FunctionDecl decl)
+			throws IOException {
+		
+		current.append('(');
+		Iterator<Argument> iter = decl.getArguments().iterator();
+		while(iter.hasNext()) {
+			iter.next().accept(this);
+			if(iter.hasNext()) current.append(", ");
 		}
+		current.append(')');
 		
-		for(VariableDecl decl: classDecl.getVariables()) {
+	}
+
+	private void writeTypelessFuncArgsPlusThis(FunctionDecl decl)
+	throws IOException {
+
+		current.append('(');
+		Iterator<Argument> iter = decl.getArguments().iterator();
+		current.append("this");
+		if(iter.hasNext()) current.append(", ");
+		while(iter.hasNext()) {
+			current.append(iter.next().getName());
+			if(iter.hasNext()) current.append(", ");
+		}
+		current.append(')');
+
+	}
+	
+	private void writeFuncArgsPlusThis(String className, FunctionDecl decl)
+	throws IOException {
+
+		current.append('(');
+		Iterator<Argument> iter = decl.getArguments().iterator();
+		current.append(className);
+		current.append(" *this");
+		if(iter.hasNext()) current.append(", ");
+		while(iter.hasNext()) {
+			iter.next().accept(this);
+			if(iter.hasNext()) current.append(", ");
+		}
+		current.append(')');
+
+	}
+
+	private void writeStaticFuncs(ClassDecl classDecl, String className)
+			throws IOException {
+		
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(!decl.isStatic()) continue;
 			
 			current.newLine();
-			decl.accept(this);
-			current.append(';');
+			writeMemberFuncPrototype(className, decl);
+			openBlock();
+			
+			/* Special case: constructor */
+			if(decl.isConstructor()) {
+				current.newLine();
+				current.append(className);
+				current.append(" *this = (");
+				current.append(className);
+				current.append(" *) mango_object_new(");
+				current.append(className);
+				current.append("_class());");
+				current.newLine();
+				current.append(className);
+				current.append("_construct");
+				if(!decl.getSuffix().isEmpty()) {
+					current.append('_');
+					current.append(decl.getSuffix());
+				}
+				writeTypelessFuncArgsPlusThis(decl);
+				current.append(";");
+				current.newLine();
+				current.append("return this;");
+			} else {
+				decl.getBody().accept(this);
+			}
+			
+			closeSpacedBlock();
+			
+			if(decl.isConstructor()) {
+				// And now, write the corresponding construct function
+				current.append("void ");
+				current.append(className);
+				current.append("_construct");
+				if(!decl.getSuffix().isEmpty()) {
+					current.append('_');
+					current.append(decl.getSuffix());
+				}
+				writeFuncArgsPlusThis(className, decl);
+				openBlock();
+				for(Line line: decl.getBody()) {
+					line.accept(this);
+				}
+				closeSpacedBlock();
+			}
+			
+		}
+	}
+
+	private void writeVirtualNonImplFuncs(ClassDecl classDecl, String className)
+			throws IOException {
+		
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			writeMemberFuncPrototype(className, decl);
+			openSpacedBlock();
+			
+			if(!decl.getReturnType().isVoid()) current.append("return ");
+			current.append("((");
+			current.append(className);
+			current.append("Class *)((MangoObject *)this)->type)->");
+			writeSuffixedFuncName(decl);
+			
+			writeFuncArgs(decl);
+			current.append(";");
+			
+			closeSpacedBlock();
+			
+		}
+	}
+
+	private void writeSuffixedFuncName(FunctionDecl decl) throws IOException {
+		current.append(decl.getName());
+		if(!decl.getSuffix().isEmpty()) {
+			current.append('_');
+			current.append(decl.getSuffix());
+		}
+	}
+	
+	private void writeSuffixedMemberFuncName(String className, FunctionDecl decl) throws IOException {
+		current.append(className);
+		current.append('_');
+		writeSuffixedFuncName(decl);
+	}
+	
+	private void writeBuiltinClassFuncName(String className, String returnType, String name)
+		throws IOException {
+		current.newLine();
+		current.append("static ");
+		current.append(returnType);
+		current.append(' ');
+		current.append(className);
+		current.append('_');
+		current.append(name);
+		current.append('(');
+		current.append(className);
+		current.append(" *this)");
+	}
+
+	private void writeInitializeFunc(ClassDecl classDecl, String className)
+			throws IOException {
+		
+		writeBuiltinClassFuncName(className, "void", "initialize");
+		openBlock();
+		
+		if(!classDecl.getSuperName().isEmpty()) {
+			current.newLine();
+			current.append(classDecl.getSuperName());
+			current.append("_class()->initialize(this);");
+		}
+		
+		for(Line line: classDecl.getInitializer().getBody()) {
+			line.accept(this);
+		}
+		
+		closeSpacedBlock();
+		
+	}
+
+	private void writeDestroyFunc(ClassDecl classDecl, String className)
+			throws IOException {
+		
+		current.newLine();
+		writeBuiltinClassFuncName(className, "void", "destroy");
+		openBlock();
+		
+		openSpacedBlock();
+		current.append("const MangoClass * super = ((MangoObject *) this)->class->super;");
+		current.newLine();
+		current.append("if(super) super->destroy((MangoObject *) this);");
+		closeSpacedBlock();
+		
+		/*
+		if(!classDecl.getSuperName().isEmpty()) {
+			current.newLine();
+			current.append(classDecl.getSuperName());
+			current.append("_class()->destroy(this);");
+		}
+		*/
+		
+		closeSpacedBlock();
+	}
+
+	private void writeCopyFunc(String className) throws IOException {
+		
+		writeBuiltinClassFuncName(className, className+"*", "copy");
+		openSpacedBlock();
+		
+		current.append(className);
+		current.append(" *copy = (");
+		current.append(className);
+		current.append(" *) mango_object_new(");
+		current.append(className);
+		current.append("_class());");
+		current.newLine();
+		// TODO add copy all fields
+		current.append("return copy;");
+
+		closeSpacedBlock();
+		
+	}
+
+	private void closeSpacedBlock() throws IOException {
+		closeBlock();
+		current.newLine();
+		current.newLine();
+	}
+
+	private void writeInstanceImplFuncs(ClassDecl classDecl, String className)
+			throws IOException {
+		/* Non-static (ie. instance) functions */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			if(decl.isStatic()) continue;
+			
+			current.newLine();
+			current.append("static ");
+			writeSpacedType(decl.getReturnType());
+			current.append(className);
+			current.append('_');
+			writeSuffixedFuncName(decl);
+			current.append("_impl");
+			
+			writeFuncArgs(decl);
+			
+			openBlock();
+			decl.getBody().accept(this);
+			closeSpacedBlock();
+		}
+	}
+
+	private void writeClassGettingFunction(ClassDecl classDecl,
+			String className, String initializeName, String destroyName,
+			String copyName) throws IOException {
+		
+		current.append("const MangoClass *");
+		current.append(className);
+		current.append("_class()");
+		openSpacedBlock();
+		
+		current.append("static const ");
+		current.append(className);
+		current.append("Class class = ");
+		openBlock();
+		
+		/* class attributes */
+		openBlock();
+		
+		/* size of class */
+		current.newLine();
+		current.append(".size = ");
+		current.append("sizeof(");
+		current.append(className);
+		current.append("),");
+		
+		/* name of class */
+		current.newLine();
+		current.append(".name = ");
+		current.append('"');
+		current.append(className);
+		current.append("\",");
+		
+		/* initialize, destroy, copy */
+		writeDesignatedInit("initialize", "(void (*)(MangoObject *))"+ initializeName);
+		writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+destroyName);
+		writeDesignatedInit("copy", "(MangoObject *(*)(const MangoObject *))"+copyName);
+		
+		closeBlock();
+		
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			if(decl.isStatic()) continue;
+			
+			if(decl.isFinal()) writeDesignatedInit(decl.getName(), className + "_" + decl.getName() + "_impl");
+			else writeDesignatedInit(decl.getName(), className + "_" + decl.getName());
 			
 		}
 		
-		current.untab();
-		current.newLine();
-		current.append("};");
-		current.newLine();
-		current.newLine();
+		closeBlock();
+		current.append(';');
 		
 		current.newLine();
-		current.append("struct _");
-		current.append(classDecl.getName());
-		current.append("Class {");
-		current.tab();
+		current.append("return (const MangoClass *) &class;");
+		closeSpacedBlock();
+	}
+
+	private void writeMemberFuncPrototypes(ClassDecl classDecl, String className)
+			throws IOException {
 		current.newLine();
+		current.append("const MangoClass *");
+		current.append(className);
+		current.append("_class();");
+		current.newLine();
+		
+		/* Now all other functions' prototypes */
+		for(FunctionDecl decl: classDecl.getFunctions()) {
+			current.newLine();
+			writeSpacedType(decl.getReturnType());
+			writeSuffixedMemberFuncName(className, decl);
+			writeFuncArgs(decl);
+			current.append(';');
+			
+			if(decl.getName().equals("new")) {
+				current.newLine();
+				current.append("void ");
+				current.append(className);
+				current.append("_construct");
+				if(!decl.getSuffix().isEmpty()) {
+					current.append('_');
+					current.append(decl.getSuffix());
+				}
+				writeFuncArgsPlusThis(classDecl.getName(), decl);
+				current.append(';');
+			}
+		}
+		
+		current.newLine();
+	}
+
+	private void writeSpacedType(Type type) throws IOException {
+		type.accept(this);
+		if(type.isFlat()) current.append(' ');
+	}
+
+	private Iterator<Argument> writeFuncPointer(FunctionDecl decl)
+			throws IOException {
+		decl.getReturnType().accept(this);
+		current.append(" (*");
+		current.append(decl.getName());
+		current.append(")(");
+		Iterator<Argument> iter = decl.getArguments().iterator();
+		while(iter.hasNext()) {
+			Argument arg = iter.next();
+			arg.accept(this);
+			if(iter.hasNext()) current.append(", ");
+		}
+		current.append(')');
+		return iter;
+	}
+	
+	private void writeClassStruct(ClassDecl classDecl, String className)
+		throws IOException {
+		current.newLine();
+		current.append("struct _");
+		current.append(className);
+		current.append("Class");
+		openSpacedBlock();
 		
 		if(classDecl.getSuperName().isEmpty()) {
 			// FIXME oooh hardcoded MangoClass, that is baad.
@@ -521,388 +857,82 @@ public class CGenerator extends Generator implements Visitor {
 		
 		/* Now write all virtual functions prototypes in the class struct */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
-	
 			if(decl.isStatic()) continue;
-			
 			current.newLine();
-			decl.getReturnType().accept(this);
-			current.append(" (*");
-			current.append(decl.getName());
-			current.append(")(");
-			Iterator<Argument> iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				arg.accept(this);
-				if(iter.hasNext()) current.append(", ");
-			}
-			current.append(");");
-			
+			writeFuncPointer(decl);
+			current.append(';');
 		}
 		
-		current.untab();
+		closeBlock();
+		current.append(';');
 		current.newLine();
-		current.append("};");
 		current.newLine();
+	}
+
+	private void writeObjectStruct(ClassDecl classDecl, String className)
+			throws IOException {
 		current.newLine();
+		current.append("struct _");
+		current.append(className);
+		openSpacedBlock();
 		
-		/* Now write the function to get the type */
-		current.newLine();
-		current.append("const MangoClass *");
-		current.append(classDecl.getName());
-		current.append("_class();");
-		current.newLine();
-		
-		/* Now all other functions' prototypes */
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			
-			current.newLine();
-			decl.getReturnType().accept(this);
-			if(decl.getReturnType().isFlat()) current.append(' ');
-			current.append(classDecl.getName());
-			current.append('_');
-			current.append(decl.getName());
-			if(!decl.getSuffix().isEmpty()) {
-				current.append('_');
-				current.append(decl.getSuffix());
-			}
-			current.append('(');
-			/*
-			if(!decl.isStatic()) {
-				current.append("const ");
-				current.append(classDecl.getName());
-				current.append(" *this");
-				if(!decl.getArguments().isEmpty()) current.append(", ");
-			}
-			*/
-			Iterator<Argument> iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				arg.accept(this);
-				if(iter.hasNext()) current.append(", ");
-			}
-			current.append(");");
-			
-		}
-		
-		current.newLine();
-		
-		/* Now implementations */
-		current = cw;
-		current.newLine();
-		
-		/* ctor */
-		current.newLine();
-		current.append("static void ");
-		current.append(classDecl.getName());
-		current.append("_ctor(");
-		current.append(classDecl.getName());
-		current.append(" *this) {");
-		current.tab();
-		
-		if(!classDecl.getSuperName().isEmpty()) {
-			current.newLine();
+		if(classDecl.getSuperName().isEmpty()) {
+			current.append("MangoObject super;"); // FIXME oooh hardcoded MangoObject, that is baad.
+		} else {
 			current.append(classDecl.getSuperName());
-			current.append("_class()->ctor(this);");
+			current.append(" super;");
 		}
 		
-		current.newLine();
-		current.append("printf(\"");
-		current.append(classDecl.getName());
-		current.append(".ctor()\\n\");");
-		
-		current.untab();
-		current.newLine();
-		current.append('}');
-		
-		current.newLine();
-		current.newLine();
-		
-		/* dtor */
-		current.newLine();
-		current.append("static void ");
-		current.append(classDecl.getName());
-		current.append("_dtor(");
-		current.append(classDecl.getName());
-		current.append(" *this) {");
-		current.tab();
-		
-		if(!classDecl.getSuperName().isEmpty()) {
+		for(VariableDecl decl: classDecl.getVariables()) {
 			current.newLine();
-			current.append(classDecl.getSuperName());
-			current.append("_class()->dtor(this);");
+			decl.accept(this);
+			current.append(';');
 		}
 		
+		closeBlock();
+		current.append(';');
 		current.newLine();
-		current.append("printf(\"");
-		current.append(classDecl.getName());
-		current.append(".dtor()\\n\");");
-		
+		current.newLine();
+	}
+
+	private void writeStructTypedef(String structName) throws IOException {
+		current.append("typedef struct _");
+		current.append(structName);
+		current.append(" ");
+		current.append(structName);
+		current.append(";");
+		current.newLine();
+	}
+
+	private void closeBlock() throws IOException {
 		current.untab();
 		current.newLine();
-		current.append('}');
-		
-		current.newLine();
-		current.newLine();
-		
-		/* copy */
-		current.newLine();
-		current.append("static ");
-		current.append(classDecl.getName());
-		current.append(" *");
-		current.append(classDecl.getName());
-		current.append("_copy(");
-		current.append(classDecl.getName());
-		current.append(" *this) {");
-		current.tab();
-		
-		current.append("Pointer copy = mango_object_new(");
-		current.append(classDecl.getName());
-		current.append("_class());");
-		current.newLine();
-		current.append("return copy;");
-		
-		current.untab();
-		current.newLine();
-		current.append('}');
-		
-		current.newLine();
-		current.newLine();
-		
-		/* Non-static (ie. instance) functions */
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			
-			if(decl.isStatic()) continue;
-			
-			current.newLine();
-			current.append("static ");
-			decl.getReturnType().accept(this);
-			if(decl.getReturnType().isFlat()) current.append(' ');
-			current.append(classDecl.getName());
-			current.append('_');
-			current.append(decl.getName());
-			if(!decl.getSuffix().isEmpty()) {
-				current.append('_');
-				current.append(decl.getSuffix());
-			}
-			current.append("_impl");
-			current.append('(');
-			Iterator<Argument> iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				arg.accept(this);
-				if(iter.hasNext()) current.append(", ");
-			}
-			current.append(") {");
-			current.tab();
-			
-			decl.getBody().accept(this);
-			
-			current.untab();
-			current.newLine();
-			current.append("}");
-			current.newLine();
-			current.newLine();
-			
-		}
-		
-		
-		// FIXME bad, bad, bad hardcoded.
-		current.append("const MangoClass *");
-		current.append(classDecl.getName());
-		current.append("_class() {");
-		current.tab();
-		current.newLine();
-		current.newLine();
-		
-		current.append("static const ");
-		current.append(classDecl.getName());
-		current.append("Class class = {");
-		current.tab();
-		
-		/* class attributes */
+		current.append("}");
+	}
+
+	private void openBlock() throws IOException {
 		current.newLine();
 		current.append('{');
 		current.tab();
-		
-		/* size of class */
+	}
+	
+	private void openSpacedBlock() throws IOException {
+		openBlock();
 		current.newLine();
-		current.append(".size = ");
-		current.append("sizeof(");
-		current.append(classDecl.getName());
-		current.append("),");
-		
-		/* name of class */
-		current.newLine();
-		current.append(".name = ");
-		current.append('"');
-		current.append(classDecl.getName());
-		current.append("\",");
-		
-		/* ctor, dtor, copy */
-		current.newLine();
-		current.append(".ctor = ");
-		current.append(classDecl.getName());
-		current.append("_ctor,");
+	}
 
+	private void writeDesignatedInit(String contract, String implementation)
+			throws IOException {
 		current.newLine();
-		current.append(".dtor = ");
-		current.append(classDecl.getName());
-		current.append("_dtor,");
-		
-		current.newLine();
-		current.append(".copy = ");
-		current.append(classDecl.getName());
-		current.append("_copy,");
-		
-		
-		current.untab();
-		current.newLine();
-		current.append("},");
-		
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			
-			if(decl.isStatic()) continue;
-			
-			current.newLine();
-			current.append('.');
-			current.append(decl.getName());
-			current.append(" = ");
-			current.append(classDecl.getName());
-			current.append('_');
-			current.append(decl.getName());
-			if(!decl.isFinal()) {
-				current.append("_impl");
-			}
-			current.append(',');
-			
-		}
-		
-		current.untab();
-		current.newLine();
-		current.append("};");
-		current.newLine();
-		
-		current.newLine();
-		current.append("return (const MangoClass *) &class;");
-		current.newLine();
-		
-		current.untab();
-		current.newLine();
-		current.append('}');
-		current.newLine();
-		
-		/* Now non-static virtual non-_impl functions (phew) */
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			
-			if(decl.isStatic()) continue;
-			
-			current.newLine();
-			decl.getReturnType().accept(this);
-			if(decl.getReturnType().isFlat()) current.append(' ');
-			current.append(classDecl.getName());
-			current.append('_');
-			current.append(decl.getName());
-			if(!decl.getSuffix().isEmpty()) {
-				current.append('_');
-				current.append(decl.getSuffix());
-			}
-			current.append('(');
-			Iterator<Argument> iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				arg.accept(this);
-				if(iter.hasNext()) current.append(", ");
-			}
-			current.append(") {");
-			current.tab();
-			
-			current.newLine();
-			if(!decl.getReturnType().isVoid()) current.append("return ");
-			current.append("((");
-			current.append(classDecl.getName());
-			current.append("Class *)((MangoObject *)this)->type)->");
-			current.append(decl.getName());
-			if(!decl.getSuffix().isEmpty()) {
-				current.append('_');
-				current.append(decl.getSuffix());
-			}
-			current.append("(");
-			iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				current.append(arg.getName());
-				if(iter.hasNext()) current.append(", ");
-			}
-			
-			current.append(");");
-			
-			current.untab();
-			current.newLine();
-			current.append("}");
-			current.newLine();
-			current.newLine();
-			
-		}
-		
-		/* Now static functions */
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			
-			if(!decl.isStatic()) continue;
-			
-			current.newLine();
-			decl.getReturnType().accept(this);
-			if(decl.getReturnType().isFlat()) current.append(' ');
-			current.append(classDecl.getName());
-			current.append('_');
-			current.append(decl.getName());
-			current.append('(');
-			Iterator<Argument> iter = decl.getArguments().iterator();
-			while(iter.hasNext()) {
-				Argument arg = iter.next();
-				arg.accept(this);
-				if(iter.hasNext()) current.append(", ");
-			}
-			current.append(") {");
-			current.tab();
-			
-			/* Special case: constructor */
-			if(decl.isConstructor()) {
-				current.newLine();
-				current.append(classDecl.getName());
-				// FIXME bad hardcoded
-				current.append(" *this = mango_object_new(");
-				current.append(classDecl.getName());
-				current.append("_class());");
-			}
-			
-			// FIXME it's probably wrong to write the constructor body
-			// in here. It should be in a ctor somewhere, the Mango specs
-			// aren't exactly clear on that, especially the difference
-			// betwen _new and _ctor, where user code should be put,
-			// how to manage multiple different ctors, etc.
-			decl.getBody().accept(this);
-			
-			/* Special case: constructor */
-			if(decl.isConstructor()) {
-				current.newLine();
-				current.append("return this;");
-			}
-			
-			current.untab();
-			current.newLine();
-			current.append("}");
-			current.newLine();
-			current.newLine();
-			
-		}
-		
-		current.newLine();
-		
+		current.append('.');
+		current.append(contract);
+		current.append(" = ");
+		current.append(implementation);
+		current.append(',');
 	}
 	
 	@Override
 	public void visit(CoverDecl cover) throws IOException {
-
 		current = hw;
 		
 		Type fromType = cover.getFromType();
@@ -915,7 +945,6 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(cover.getName());
 		current.append(';');
 		current.newLine();
-		
 	}
 	
 	@Override
@@ -926,6 +955,9 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(RegularArgument regularArgument) throws IOException {
 
+		if(regularArgument.isConst()) {
+			current.append("const ");
+		}
 		regularArgument.getType().accept(this);
 		current.append(' ');
 		current.append(regularArgument.getName());
@@ -946,7 +978,6 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Type type) throws IOException {
-		
 		current.append(type.getName());
 		if(!type.isFlat()) {
 			current.append(' ');
@@ -963,14 +994,11 @@ public class CGenerator extends Generator implements Visitor {
 		for(int i = 0; i < type.getPointerLevel(); i++) {
 			current.append('*');
 		}
-		
 	}
 
 	@Override
 	public void visit(VarArg varArg) throws IOException {
-		
 		current.append("...");
-		
 	}
 	
 	@Override
@@ -980,14 +1008,9 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(Block block) throws IOException {
-		current.append('{');
-		current.tab();
-		current.newLine();
+		openBlock();
 		block.acceptChildren(this);
-		current.untab();
-		current.newLine();
-		current.append('}');
-		current.newLine();
+		closeBlock();
 	}
 
 	@Override

@@ -7,9 +7,9 @@ import org.ooc.frontend.Visitor;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
-	private boolean isConst;
-	private boolean isStatic;
-	private Type type;
+	protected boolean isConst;
+	protected boolean isStatic;
+	protected Type type;
 	
 	public VariableDecl(Type type, String name, boolean isConst, boolean isStatic) {
 		super(name);

@@ -7,8 +7,12 @@ import org.ooc.frontend.Visitor;
 public class VarArg extends Argument {
 
 	public VarArg() {
+		this(false);
+	}
+	
+	public VarArg(boolean isConst) {
 		// TODO add special trickery to properly handle "any type"
-		super(new Type(""), "...");
+		super(new Type(""), "...", isConst);
 	}
 
 	@Override

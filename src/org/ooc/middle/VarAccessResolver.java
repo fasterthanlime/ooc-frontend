@@ -91,7 +91,19 @@ public class VarAccessResolver implements Hobgoblin {
 				}
 				
 				if(node.getRef() == null) {
-					throw new Error("Couldn't resolve variable access "+node.getName());
+					// FIXME this is the infamous "resolve this in a constructor" hack. Not pretty, I must say.
+					while(true) {
+						if(node.getName().equals("this")) {
+							int fIndex = Node.find(FunctionDecl.class, stack);
+							if(fIndex != -1) {
+								FunctionDecl fDecl = (FunctionDecl) stack.get(fIndex);
+								if(fDecl.getName().equals("new")) {
+									break; // hidden goto, hihi.
+								}
+							}
+						}
+						throw new Error("Couldn't resolve variable access "+node.getName());
+					}
 				}
 				
 				return true;

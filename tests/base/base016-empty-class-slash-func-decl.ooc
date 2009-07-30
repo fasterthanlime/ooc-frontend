@@ -1,21 +1,21 @@
 include stdio;
 extern func printf(String, ...);
 cover Int from int;
+cover String from char*;
 
-class Funky {
-
-}
-
-class Foonky {
+class Foo {
 	
-	Int i = 42;
-
+	Int value = 99;
+	String msg;
+	
+	func new(=msg) { // in ooc, you can omit the type if it's a member variable's name, and '=' means to automatically assign it.
+		printf("msg = %s, value = %d\n", msg, this.value);
+	}
+	
 }
 
-func funkah;
-
-func funkah_dooh {
-
-	printf("funkah-dee-dooh. hop!\n");
-
+func main {
+	
+	new Foo("Dilbert");
+	
 }

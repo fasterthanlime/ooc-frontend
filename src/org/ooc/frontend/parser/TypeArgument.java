@@ -9,8 +9,12 @@ import org.ooc.frontend.model.Type;
 public class TypeArgument extends Argument {
 
 	public TypeArgument(Type type) {
+		this(type, false);
+	}
+	
+	public TypeArgument(Type type, boolean isConst) {
 		// TODO check if empty name isn't a problem
-		super(type, "");
+		super(type, "", isConst);
 	}
 	
 	@Override

@@ -7,7 +7,11 @@ import org.ooc.frontend.Visitor;
 public class RegularArgument extends Argument {
 
 	public RegularArgument(Type type, String name) {
-		super(type, name);
+		this(type, name, false);
+	}
+	
+	public RegularArgument(Type type, String name, boolean isConst) {
+		super(type, name, isConst);
 	}
 
 	@Override

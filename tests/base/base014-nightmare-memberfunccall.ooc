@@ -20,7 +20,6 @@ class Thinga {
 
 func main {
 
-	Thinga thinga = new Thinga();
-	new Thinga().getThis().getThis().getThis().getThis().thingo();
+	new Thinga.getThis().getThis().getThis().getThis().thingo();
 
 }

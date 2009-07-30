@@ -66,8 +66,12 @@ public class FuncCallResolver implements Hobgoblin {
 				}
 				
 				if(node.getImpl() == null) {
+					if(node instanceof Instantiation) {
+						throw new CompilationFailedError(null, "No constructor for class "
+								+node.getName()+" matches the given arguments.");
+					}
 					throw new CompilationFailedError(null, "No implementation found for function "
-						+node.getName()+"(), did you forget to import it?");
+							+node.getName()+"(), did you forget to import it?");
 				}
 				
 				return true;

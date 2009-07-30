@@ -7,8 +7,11 @@ import org.ooc.frontend.Visitor;
 public class MemberArgument extends Argument {
 
 	public MemberArgument(String name) {
-		// TODO add special trickery to resolve the type
-		super(new Type(""), name);
+		this(name, false);
+	}
+	
+	public MemberArgument(String name, boolean isConst) {
+		super(new Type(""), name, isConst);
 	}
 	
 	@Override

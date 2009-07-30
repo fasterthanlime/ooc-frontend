@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 
 public class ClassDecl extends Declaration implements Scope {
 
@@ -16,6 +17,7 @@ public class ClassDecl extends Declaration implements Scope {
 
 	private NodeList<VariableDecl> variables;
 	private NodeList<FunctionDecl> functions;
+	private FunctionDecl initializer;
 	
 	public ClassDecl(String name, boolean isAbstract) {
 		super(name);
@@ -25,6 +27,8 @@ public class ClassDecl extends Declaration implements Scope {
 		this.functions = new NodeList<FunctionDecl>();
 		this.instanceType = new Type(name);
 		instanceType.setRef(this);
+		this.initializer = new FunctionDecl(FunctionDeclType.FUNC, "initialize", "", false, false, false, false);
+		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
 	}
 	
 	public OocDocComment getComment() {
@@ -49,6 +53,10 @@ public class ClassDecl extends Declaration implements Scope {
 	
 	public NodeList<FunctionDecl> getFunctions() {
 		return functions;
+	}
+	
+	public FunctionDecl getInitializer() {
+		return initializer;
 	}
 	
 	public boolean isAbstract() {
@@ -82,12 +90,35 @@ public class ClassDecl extends Declaration implements Scope {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variables.accept(visitor);
 		functions.accept(visitor);
+		initializer.accept(visitor);
 		instanceType.accept(visitor);
 	}
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
+	}
+	
+	public FunctionDecl getFunction(String name, String suffix) {
+		
+		for(FunctionDecl decl: functions) {
+			if(decl.getName().equals(name)
+				&& (decl.getSuffix().isEmpty() || suffix.isEmpty()
+					|| decl.getSuffix().equals(suffix))) {
+				return decl;
+			}
+		}
+		return null;
+		
+	}
+
+	public VariableDecl getVariable(String name) {
+		
+		for(VariableDecl decl: variables) {
+			if(decl.getName().equals(name)) return decl;
+		}
+		return null;
+		
 	}
 	
 }
