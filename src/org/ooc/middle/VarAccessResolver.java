@@ -53,10 +53,12 @@ public class VarAccessResolver implements Hobgoblin {
 				
 				System.out.println("# Should resolve access to "+node.getName()+", stack = "+stack);
 
-				if(false && node instanceof MemberAccess){
+				if(node instanceof MemberAccess) {
 					
 					MemberAccess memberAccess = (MemberAccess) node;
 					System.out.println("Found memberAccess to "+memberAccess.getName());
+					System.out.println("Its expression is a "+memberAccess.getExpression().getClass().getSimpleName());
+					System.out.println("Its expression type is a "+memberAccess.getExpression().getType().getName());
 					if(!(memberAccess.getExpression().getType().getRef() instanceof ClassDecl)) {
 						throw new CompilationFailedError(null, "Can't access to field "
 								+node.getName()+" of a "+memberAccess.getExpression().getClass().getSimpleName()

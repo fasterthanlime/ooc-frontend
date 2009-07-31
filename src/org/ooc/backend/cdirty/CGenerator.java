@@ -100,7 +100,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		// FIXME of course this is a dirty hack because this devbranch
 		// is missing the whole fancy cmdline frontend with sdk search etc.
-		current.append("#include \"mangoobject.h\"");
+		current.append("#include <mango/mangoobject.h>");
 		current.newLine();
 		for(Include include: sourceUnit.getIncludes()) {
 			current.append("#include <");
@@ -496,6 +496,19 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(')');
 		
 	}
+	
+	private void writeTypelessFuncArgs(FunctionDecl decl)
+	throws IOException {
+
+		current.append('(');
+		Iterator<Argument> iter = decl.getArguments().iterator();
+		while(iter.hasNext()) {
+			current.append(iter.next().getName());
+			if(iter.hasNext()) current.append(", ");
+		}
+		current.append(')');
+
+	}
 
 	private void writeTypelessFuncArgsPlusThis(FunctionDecl decl)
 	throws IOException {
@@ -599,10 +612,10 @@ public class CGenerator extends Generator implements Visitor {
 			if(!decl.getReturnType().isVoid()) current.append("return ");
 			current.append("((");
 			current.append(className);
-			current.append("Class *)((MangoObject *)this)->type)->");
+			current.append("Class *)((MangoObject *)this)->class)->");
 			writeSuffixedFuncName(decl);
 			
-			writeFuncArgs(decl);
+			writeTypelessFuncArgs(decl);
 			current.append(";");
 			
 			closeSpacedBlock();
@@ -745,12 +758,13 @@ public class CGenerator extends Generator implements Visitor {
 		writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+destroyName);
 		
 		closeBlock();
+		current.append(',');
 		
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			if(decl.isStatic()) continue;
 			
-			if(decl.isFinal()) writeDesignatedInit(decl.getName(), className + "_" + decl.getName() + "_impl");
-			else writeDesignatedInit(decl.getName(), className + "_" + decl.getName());
+			if(decl.isFinal()) writeDesignatedInit(decl.getName(), className + "_" + decl.getName());
+			else writeDesignatedInit(decl.getName(), className + "_" + decl.getName() + "_impl");
 			
 		}
 		

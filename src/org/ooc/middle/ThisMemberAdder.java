@@ -47,7 +47,7 @@ public class ThisMemberAdder implements Hobgoblin {
 				if(index == -1) return true;
 				
 				ClassDecl classDecl = (ClassDecl) stack.get(index);
-				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", true));
+				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", false));
 				
 				return true;
 				
