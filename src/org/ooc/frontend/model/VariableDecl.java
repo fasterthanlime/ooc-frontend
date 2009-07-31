@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
 

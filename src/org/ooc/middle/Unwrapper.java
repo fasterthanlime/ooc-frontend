@@ -3,9 +3,9 @@ package org.ooc.middle;
 import java.io.IOException;
 import java.util.Stack;
 
-import org.ooc.frontend.model.MustBeUnwrapped;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.middle.Nosy.Opportunist;
 
 /**

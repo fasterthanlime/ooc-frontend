@@ -1,10 +1,13 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustResolveAccess;
+import org.ooc.middle.MultiMap;
 
-public class FunctionCall extends Access {
+public class FunctionCall extends Access implements MustResolveAccess {
 
 	protected String name;
 	protected String suffix;
@@ -49,17 +52,9 @@ public class FunctionCall extends Access {
 	@Override
 	public Type getType() {
 		if(impl != null) {
-			/*
-			Declaration ref = impl.getReturnType().getRef();
-			if(ref instanceof ClassDecl) {
-				ClassDecl classDecl = (ClassDecl) ref;
-				return classDecl.getInstanceType();
-			}
-			*/
 			return impl.getReturnType();
 		}
 		return null;
-		//throw new Error("FunctionCall not yet resolves the type, unfortunately ;)");
 	}
 	
 	@Override
@@ -79,11 +74,25 @@ public class FunctionCall extends Access {
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
 		if(oldie == impl) {
 			impl = (FunctionDecl) kiddo;
 			return true;
 		}
+		return false;
+	}
+
+	@Override
+	public boolean isResolved() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean resolveAccess(Stack<Node> stack,
+			MultiMap<Node, VariableDecl> vars,
+			MultiMap<Node, FunctionDecl> funcs) {
+		
+		
 		
 		return false;
 		

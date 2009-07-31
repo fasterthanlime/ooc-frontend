@@ -18,8 +18,8 @@ public abstract class Node implements Visitable {
 	}
 	
 	/** TODO find a better home for this function? Sucks that you can't add function to Stack<? extends Node> */
-	public static <T> int find(Class<T> clazz, Stack<?> hierarchy) {
-		return find(clazz, hierarchy, hierarchy.size() - 1);
+	public static <T> int find(Class<T> clazz, Stack<?> stack) {
+		return find(clazz, stack, stack.size() - 1);
 	}
 		
 	public static <T> int find(Class<T> clazz, Stack<?> hierarchy, int offset) {

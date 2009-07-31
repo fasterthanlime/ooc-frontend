@@ -1,10 +1,13 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustResolveAccess;
+import org.ooc.middle.MultiMap;
 
-public class VariableAccess extends Access {
+public class VariableAccess extends Access implements MustResolveAccess {
 
 	protected String variable;
 	protected Declaration ref;
@@ -50,14 +53,38 @@ public class VariableAccess extends Access {
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
 		if(oldie == ref) {
 			ref = (Declaration) kiddo;
 			return true;
 		}
+		return false;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return ref != null;
+	}
+
+	@Override
+	public boolean resolveAccess(Stack<Node> stack,
+			MultiMap<Node, VariableDecl> vars,
+			MultiMap<Node, FunctionDecl> funcs) {
+		
+		int index = stack.size() - 1;
+		search: while(index >= 0) {
+			index = Node.find(Scope.class, stack);
+			if(index == -1) break search;
+
+			Node scope = stack.get(index);
+			for(VariableDecl decl: vars.get(scope)) {
+				if(decl.getName().equals(variable)) {
+					setRef(decl);
+					break search;
+				}
+			}
+		}
 		
 		return false;
-		
 	}
 
 }

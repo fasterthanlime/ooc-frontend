@@ -26,9 +26,11 @@ public class Tinkerer implements Hobgoblin {
 		new Unwrapper().process(unit);
 		
 		new TypeResolver().process(unit);
-		new VarAccessResolver().process(unit);
-		new NewGuesser().process(unit);
-		new FuncCallResolver().process(unit);
+		new ModularAccessResolver().process(unit);
+		new AccessChecker().process(unit);
+		//new NewGuesser().process(unit);
+		//new VarAccessResolver().process(unit);
+		//new FuncCallResolver().process(unit);
 		
 	}
 

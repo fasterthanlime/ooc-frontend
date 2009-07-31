@@ -1,6 +1,8 @@
-package org.ooc.frontend.model;
+package org.ooc.frontend.model.interfaces;
 
 import java.util.Stack;
+
+import org.ooc.frontend.model.Node;
 
 /**
  * I like to use interfaces as "tags" we can apply to classes.
@@ -24,6 +26,6 @@ import java.util.Stack;
  */
 public interface MustBeUnwrapped {
 	
-	public boolean unwrap(Stack<Node> hierarchy);
+	public boolean unwrap(Stack<Node> stack);
 	
 }
