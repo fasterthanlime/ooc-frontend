@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.middle.MultiMap;
-import org.ooc.middle.Nosy;
-import org.ooc.middle.Nosy.Opportunist;
+import org.ooc.middle.structs.MultiMap;
+import org.ooc.middle.walkers.Nosy;
+import org.ooc.middle.walkers.Nosy.Opportunist;
 
 
 public class SourceUnit extends Node implements Scope {

@@ -1,4 +1,4 @@
-package org.ooc.middle;
+package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -8,7 +8,9 @@ import org.ooc.frontend.model.Instantiation;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.VariableDeclAssigned;
-import org.ooc.middle.Nosy.Opportunist;
+import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.walkers.Nosy;
+import org.ooc.middle.walkers.Nosy.Opportunist;
 
 /**
  * Guess the type of nameless 'new' calls, e.g.

@@ -1,4 +1,4 @@
-package org.ooc.middle;
+package org.ooc.middle.structs;
 
 import java.util.ArrayList;
 import java.util.Collections;

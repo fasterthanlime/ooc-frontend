@@ -3,6 +3,14 @@ package org.ooc.middle;
 import java.io.IOException;
 
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.middle.hobgoblins.AccessChecker;
+import org.ooc.middle.hobgoblins.CaseEnforcer;
+import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.ThisMemberAdder;
+import org.ooc.middle.hobgoblins.TypeResolver;
+import org.ooc.middle.hobgoblins.Unwrapper;
+import org.ooc.middle.hobgoblins.VoidReturnCrusher;
 
 /**
  * The Tinkerer(TM) handles all the work that there's to be done

@@ -1,4 +1,4 @@
-package org.ooc.middle;
+package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -7,7 +7,9 @@ import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.VariableAccess;
-import org.ooc.middle.Nosy.Opportunist;
+import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.walkers.Nosy;
+import org.ooc.middle.walkers.Nosy.Opportunist;
 import org.ubi.CompilationFailedError;
 
 public class AccessChecker implements Hobgoblin {

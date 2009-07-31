@@ -1,6 +1,7 @@
-package org.ooc.middle;
+package org.ooc.middle.hobgoblins;
 
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.middle.Hobgoblin;
 
 /**
  * Make sure class/cover names are CamelCase and func/vars camelCase

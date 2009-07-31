@@ -1,4 +1,4 @@
-package org.ooc.middle;
+package org.ooc.middle.walkers;
 
 import java.io.IOException;
 import java.util.Stack;

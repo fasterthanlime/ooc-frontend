@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
-import org.ooc.middle.MultiMap;
+import org.ooc.middle.structs.MultiMap;
 
 public class VariableAccess extends Access implements MustResolveAccess {
 
