@@ -72,8 +72,6 @@ public class Nosy<T> implements Visitor {
 
 	public void visit(Node node) throws IOException {
 		
-		//System.out.println("Nosy visiting a "+node.getClass().getSimpleName());
-
 		if(node.hasChildren()) {
 			stack.push(node);
 			node.acceptChildren(this);

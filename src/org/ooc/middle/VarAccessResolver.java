@@ -37,12 +37,8 @@ public class VarAccessResolver implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		System.out.println(">>> Running VarAccessResolver");
-
 		final MultiMap<Node, VariableDecl> vars = unit.getDeclarations(VariableDecl.class);
-		System.out.println("Vars: "+vars);
 		final MultiMap<Node, FunctionDecl> funcs = unit.getDeclarations(FunctionDecl.class);
-		System.out.println("Funcs: "+funcs);
 		
 		new Nosy<VariableAccess>(VariableAccess.class, new Opportunist<VariableAccess>() {
 			
@@ -51,14 +47,9 @@ public class VarAccessResolver implements Hobgoblin {
 				
 				if(node.getRef() != null) return true; // already resolved
 				
-				System.out.println("# Should resolve access to "+node.getName()+", stack = "+stack);
-
 				if(node instanceof MemberAccess) {
 					
 					MemberAccess memberAccess = (MemberAccess) node;
-					System.out.println("Found memberAccess to "+memberAccess.getName());
-					System.out.println("Its expression is a "+memberAccess.getExpression().getClass().getSimpleName());
-					System.out.println("Its expression type is a "+memberAccess.getExpression().getType().getName());
 					if(!(memberAccess.getExpression().getType().getRef() instanceof ClassDecl)) {
 						throw new CompilationFailedError(null, "Can't access to field "
 								+node.getName()+" of a "+memberAccess.getExpression().getClass().getSimpleName()
@@ -67,7 +58,6 @@ public class VarAccessResolver implements Hobgoblin {
 					ClassDecl decl = (ClassDecl) memberAccess.getExpression().getType().getRef();
 					VariableDecl var = decl.getVariable(node.getName());
 					if(var != null) {
-						System.out.println("Found member variable named "+var.getName()+" in class "+decl.getName());
 						node.setRef(var);
 					}
 					
@@ -83,17 +73,7 @@ public class VarAccessResolver implements Hobgoblin {
 					
 					Node stackElement = stack.get(index);
 					
-					/* The magnificent this (with a small t) hack. */
-					if((stackElement instanceof FunctionDecl) && node.getName().equals("this")) {
-						if(Node.find(ClassDecl.class, stack, index - 1) != -1) {
-							System.out.println("$$$$$$$$$$ It's a this in a FunctionDecl in a ClassDecl!!!");
-							//node.setRef((ClassDecl) stackElement);
-							//break stacksearch;
-						}
-					}
-					
 					for(Declaration decl: vars.get(stackElement)) {
-						System.out.println("Looking through declaration "+decl.getName()+" of type "+decl.getType());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
 							break stacksearch;

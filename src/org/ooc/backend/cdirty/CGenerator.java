@@ -100,8 +100,8 @@ public class CGenerator extends Generator implements Visitor {
 		
 		// FIXME of course this is a dirty hack because this devbranch
 		// is missing the whole fancy cmdline frontend with sdk search etc.
-		current.append("#include <mango/mangoobject.h>");
-		current.newLine();
+		current.append("#include <stdbool.h>\n");
+		current.append("#include <mango/mangoobject.h>\n");
 		for(Include include: sourceUnit.getIncludes()) {
 			current.append("#include <");
 			current.append(include.getPath());
@@ -237,7 +237,11 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Parenthesis parenthesis) throws IOException {
-		// TODO Auto-generated method stub
+
+		current.append('(');
+		System.out.println("Parenthesis expression is a "+parenthesis.getExpression().getClass().getSimpleName());
+		parenthesis.getExpression().accept(this);
+		current.append(')');
 		
 	}
 
@@ -299,8 +303,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(BoolLiteral boolLiteral) throws IOException {
-		// TODO Auto-generated method stub
-		
+		current.append(boolLiteral.getValue() ? "true" : "false");
 	}
 
 	@Override
@@ -312,14 +315,12 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Line line) throws IOException {
-
 		current.newLine();
 		line.getStatement().accept(this);
 		if(!(line.getStatement() instanceof ControlStatement)
 				&& !(line instanceof Comment)) {
 			current.append(';');
 		}
-		
 	}
 
 	@Override
@@ -336,7 +337,21 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(If if1) throws IOException {
-		// TODO Auto-generated method stub
+		
+		System.out.println("Condition is a "+if1.getCondition().getClass().getSimpleName());
+		
+		current.append("if");
+		if(if1.getCondition() instanceof Parenthesis) {
+			if1.getCondition().accept(this);
+		} else {
+			current.append('(');
+			if1.getCondition().accept(this);
+			current.append(')');
+		}
+		
+		openBlock();
+		if1.getBody().accept(this);
+		closeBlock();
 		
 	}
 

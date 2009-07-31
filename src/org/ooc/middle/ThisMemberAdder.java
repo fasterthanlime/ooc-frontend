@@ -22,8 +22,6 @@ public class ThisMemberAdder implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		System.out.println(">>> Running ThisMemberAdder...");
-		
 		new Nosy<FunctionDecl>(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
 			@Override

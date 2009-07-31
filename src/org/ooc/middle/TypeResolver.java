@@ -35,12 +35,8 @@ public class TypeResolver implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 
-		System.out.println(">>> Running TypeResolver");
-		
 		final MultiMap<Node, Declaration> decls = new MultiMap<Node, Declaration>();
 		addBuiltins(decls, unit);
-		
-		System.out.println("Builtin decls: "+decls);
 		
 		new Nosy<Declaration>(Declaration.class, new Opportunist<Declaration>() {
 			
@@ -49,8 +45,6 @@ public class TypeResolver implements Hobgoblin {
 				
 				if(!(node instanceof ClassDecl || node instanceof CoverDecl)) return true;
 				
-				System.out.println("Got "+node.getClass().getSimpleName()+" "
-						+node.getName()+" child of a "+stack.peek().getClass().getSimpleName());
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {
 					throw new Error("Found declaration "+node.getName()+" of type "
@@ -64,8 +58,6 @@ public class TypeResolver implements Hobgoblin {
 			
 		}).visit(unit);
 		
-		System.out.println("Class decls: "+decls);
-		
 		new Nosy<Type>(Type.class, new Opportunist<Type>() {
 			
 			@Override
@@ -73,18 +65,13 @@ public class TypeResolver implements Hobgoblin {
 				
 				if(node.getRef() != null) return true; // already resolved
 				
-				System.out.println("# Should resolve type "+node.getName()+", stack = "+stack);
-				
 				int index = stack.size();
 				stacksearch: while(index >= 0) {
 					
 					index = Node.find(Scope.class, stack, index - 1);
 					if(index == -1) {
-						//System.out.println("no Scope remaining, abandon...");
 						break stacksearch;
 					}
-					
-					//System.out.println("Looking in stack element "+index);
 					
 					Node stackElement = stack.get(index);
 					
@@ -97,7 +84,6 @@ public class TypeResolver implements Hobgoblin {
 					}
 					
 					for(Declaration decl: decls.get(stackElement)) {
-						//System.out.println("Looking through declaration "+decl.toString());
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
 							break stacksearch;
@@ -120,6 +106,7 @@ public class TypeResolver implements Hobgoblin {
 
 	private void addBuiltins(MultiMap<Node, Declaration> decls, SourceUnit unit) {
 
+		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(unit, new BuiltinType("void"));
 		decls.add(unit, new BuiltinType("int"));
 		decls.add(unit, new BuiltinType("float"));

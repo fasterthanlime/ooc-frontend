@@ -86,8 +86,6 @@ public class SourceUnit extends Node implements Scope {
 			@Override
 			public boolean take(T node, Stack<Node> stack) throws IOException {
 				
-				System.out.println("Got "+node.getClass().getSimpleName()+" "
-						+node.getName()+" child of a "+stack.peek().getClass().getSimpleName());
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {
 					throw new Error("Found declaration "+node.getName()+" of type "
