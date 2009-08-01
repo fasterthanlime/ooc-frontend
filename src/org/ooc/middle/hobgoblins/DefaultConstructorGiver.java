@@ -11,7 +11,7 @@ import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 public class DefaultConstructorGiver implements Hobgoblin {
 

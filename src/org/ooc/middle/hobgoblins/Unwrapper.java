@@ -8,7 +8,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 /**
  * The {@link Unwrapper} transforms this kind of statement

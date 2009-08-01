@@ -9,7 +9,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
 
 /**
@@ -28,7 +28,7 @@ public class VoidReturnCrusher implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 
-		new Nosy<ValuedReturn>(ValuedReturn.class, new Opportunist<ValuedReturn>() {
+		Nosy.get(ValuedReturn.class, new Opportunist<ValuedReturn>() {
 
 			@Override
 			public boolean take(ValuedReturn node, Stack<Node> stack) {

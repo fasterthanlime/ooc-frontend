@@ -14,7 +14,7 @@ import org.ooc.frontend.model.Type;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 /**
  * Resolves types, e.g. setRef on any type found, e.g. a ref can be a 

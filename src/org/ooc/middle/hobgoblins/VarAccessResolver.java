@@ -17,7 +17,7 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
 
 /**
@@ -43,7 +43,7 @@ public class VarAccessResolver implements Hobgoblin {
 		final MultiMap<Node, VariableDecl> vars = unit.getDeclarations(VariableDecl.class);
 		final MultiMap<Node, FunctionDecl> funcs = unit.getDeclarations(FunctionDecl.class);
 		
-		new Nosy<VariableAccess>(VariableAccess.class, new Opportunist<VariableAccess>() {
+		Nosy.get(VariableAccess.class, new Opportunist<VariableAccess>() {
 			
 			@Override
 			public boolean take(VariableAccess node, Stack<Node> stack) throws IOException {

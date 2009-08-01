@@ -11,7 +11,7 @@ import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 public class ModularAccessResolver implements Hobgoblin {
 
@@ -26,7 +26,7 @@ public class ModularAccessResolver implements Hobgoblin {
 		final MultiMap<Node, FunctionDecl> funcs = 
 			unit.getDeclarations(FunctionDecl.class);
 		
-		Nosy<MustResolveAccess> nosy = new Nosy<MustResolveAccess>(
+		Nosy<MustResolveAccess> nosy = Nosy.get(
 				MustResolveAccess.class, new Opportunist<MustResolveAccess>() {
 			@Override
 			public boolean take(MustResolveAccess node, Stack<Node> stack) throws IOException {

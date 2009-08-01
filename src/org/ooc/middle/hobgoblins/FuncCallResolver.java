@@ -16,7 +16,7 @@ import org.ooc.frontend.model.VarArg;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
 
 public class FuncCallResolver implements Hobgoblin {

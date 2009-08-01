@@ -12,7 +12,6 @@ import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
@@ -29,6 +28,7 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -39,11 +39,11 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
@@ -53,16 +53,13 @@ import org.ooc.frontend.parser.TypeArgument;
 
 public class Nosy<T> implements Visitor {
 
-	/**
-	 * @return false if you want to stop, true if you wanna continue.
-	 */
-	public static interface Opportunist<T> {
-		public boolean take(T node, Stack<Node> stack) throws IOException;
-	}
-	
 	public final Stack<Node> stack;
 	private Class<T> clazz;
 	private Opportunist<T> oppo;
+	
+	public static <T> Nosy<T> get(Class<T> clazz, Opportunist<T> oppo) {
+		return new Nosy<T>(clazz, oppo);
+	}
 	
 	public Nosy(Class<T> clazz, Opportunist<T> oppo) {
 		this.stack = new Stack<Node>();

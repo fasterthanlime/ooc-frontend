@@ -10,7 +10,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 /**
  * Guess the type of nameless 'new' calls, e.g.

@@ -1,6 +1,6 @@
 package org.ooc.frontend.model;
 
-import java.util.Stack;
+import java.util.List;
 
 import org.ooc.frontend.model.tokens.Token;
 
@@ -18,11 +18,11 @@ public abstract class Node implements Visitable {
 	}
 	
 	/** TODO find a better home for this function? Sucks that you can't add function to Stack<? extends Node> */
-	public static <T> int find(Class<T> clazz, Stack<?> stack) {
+	public static <T> int find(Class<T> clazz, List<?> stack) {
 		return find(clazz, stack, stack.size() - 1);
 	}
 		
-	public static <T> int find(Class<T> clazz, Stack<?> hierarchy, int offset) {
+	public static <T> int find(Class<T> clazz, List<?> hierarchy, int offset) {
 		
 		int i = offset;
 		while(i >= 0) {

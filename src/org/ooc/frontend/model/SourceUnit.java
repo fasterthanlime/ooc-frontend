@@ -7,7 +7,7 @@ import java.util.Stack;
 import org.ooc.frontend.Visitor;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
-import org.ooc.middle.walkers.Nosy.Opportunist;
+import org.ooc.middle.walkers.Opportunist;
 
 
 public class SourceUnit extends Node implements Scope {
