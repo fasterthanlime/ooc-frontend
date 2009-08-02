@@ -1,8 +1,10 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
 
 public class MemberAccess extends VariableAccess {
 	
@@ -48,6 +50,27 @@ public class MemberAccess extends VariableAccess {
 		}
 		
 		return false;
+		
+	}
+	
+	@Override
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res)
+			throws IOException {
+		
+		Declaration decl = expression.getType().getRef();
+		if(!(decl instanceof ClassDecl)) {
+			throw new Error("Trying to access to a member of not a ClassDecl, but a "
+					+decl.getClass().getSimpleName());
+		}
+
+		ClassDecl classDecl = (ClassDecl) decl;
+		VariableDecl varDecl = classDecl.getVariable(variable);
+		if(varDecl == null) {
+			throw new Error("Member "+variable+" not found in class "+classDecl.getType());
+		}
+		ref = varDecl;
+		
+		return ref != null;
 		
 	}
 

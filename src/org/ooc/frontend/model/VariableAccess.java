@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
-import org.ooc.middle.structs.MultiMap;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 
@@ -68,14 +68,12 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(Stack<Node> stack,
-			final MultiMap<Node, VariableDecl> vars,
-			final MultiMap<Node, FunctionDecl> funcs) throws IOException {
+	public boolean resolveAccess(Stack<Node> stack, final ModularAccessResolver res) throws IOException {
 
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
-				for(VariableDecl decl: vars.get((Node) node)) {
+				for(VariableDecl decl: res.vars.get((Node) node)) {
 					if(decl.getName().equals(variable)) {
 						System.out.println("Got it! Returning false.");
 						setRef(decl);

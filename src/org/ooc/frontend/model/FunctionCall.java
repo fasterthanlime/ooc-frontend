@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
-import org.ooc.middle.structs.MultiMap;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 
@@ -89,25 +89,21 @@ public class FunctionCall extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(Stack<Node> stack,
-			final MultiMap<Node, VariableDecl> vars,
-			final MultiMap<Node, FunctionDecl> funcs) throws IOException {
+	public boolean resolveAccess(Stack<Node> stack, final ModularAccessResolver res) throws IOException {
 		
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
-				for(FunctionDecl decl: funcs.get((Node) node)) {
+				for(FunctionDecl decl: res.funcs.get((Node) node)) {
 					if(!decl.getName().equals(name)) continue;
-					System.out.println("Same name, comparing suffixes!");
+					
 					if(!decl.getSuffix().isEmpty() && !suffix.isEmpty()
 							&& !decl.getSuffix().equals(suffix)) continue;
-					System.out.println("Same suffixes or no suffixes!");
-					int numArgs = decl.getArguments().size();
 					
+					int numArgs = decl.getArguments().size();
 					if(numArgs == arguments.size()
 						|| ((decl.getArguments().get(numArgs - 1) instanceof VarArg)
 						&& (decl.getArguments().size() - 1 <= arguments.size()))) {
-						System.out.println("We have a match.");
 						setImpl(decl);
 						return false;
 					}

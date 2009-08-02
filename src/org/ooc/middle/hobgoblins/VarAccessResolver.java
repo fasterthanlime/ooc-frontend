@@ -40,8 +40,8 @@ public class VarAccessResolver implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		final MultiMap<Node, VariableDecl> vars = unit.getDeclarations(VariableDecl.class);
-		final MultiMap<Node, FunctionDecl> funcs = unit.getDeclarations(FunctionDecl.class);
+		final MultiMap<Node, VariableDecl> vars = unit.getDeclarationsMap(VariableDecl.class);
+		final MultiMap<Node, FunctionDecl> funcs = unit.getDeclarationsMap(FunctionDecl.class);
 		
 		Nosy.get(VariableAccess.class, new Opportunist<VariableAccess>() {
 			

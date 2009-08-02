@@ -1,8 +1,10 @@
 package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Stack;
 
+import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
@@ -18,13 +20,16 @@ public class ModularAccessResolver implements Hobgoblin {
 	private static final int MAX = 1024;
 	boolean running;
 	
+	public MultiMap<Node, VariableDecl> vars;
+	public MultiMap<Node, FunctionDecl> funcs;
+	public List<ClassDecl> classes;
+	
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		final MultiMap<Node, VariableDecl> vars = 
-			unit.getDeclarations(VariableDecl.class);
-		final MultiMap<Node, FunctionDecl> funcs = 
-			unit.getDeclarations(FunctionDecl.class);
+		vars = unit.getDeclarationsMap(VariableDecl.class);
+		funcs = unit.getDeclarationsMap(FunctionDecl.class);
+		classes = unit.getDeclarationsList(ClassDecl.class);
 		
 		Nosy<MustResolveAccess> nosy = Nosy.get(
 				MustResolveAccess.class, new Opportunist<MustResolveAccess>() {
@@ -33,7 +38,7 @@ public class ModularAccessResolver implements Hobgoblin {
 				
 				if(!node.isResolved()) {
 					System.out.println("Must resolve access of a "+node.getClass().getSimpleName());
-					if(node.resolveAccess(stack, vars, funcs)) {
+					if(node.resolveAccess(stack, ModularAccessResolver.this)) {
 						// resolveAccess returned true, means we must do one more run
 						running = true;
 					}

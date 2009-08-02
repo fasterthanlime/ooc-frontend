@@ -2,6 +2,8 @@ package org.ooc.frontend.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
@@ -77,7 +79,7 @@ public class SourceUnit extends Node implements Scope {
 		body.accept(visitor);
 	}
 	
-	public <T extends Declaration> MultiMap<Node, T> getDeclarations(final Class<T> clazz) throws IOException {
+	public <T extends Declaration> MultiMap<Node, T> getDeclarationsMap(final Class<T> clazz) throws IOException {
 
 		final MultiMap<Node, T> decls = new MultiMap<Node, T>();
 		
@@ -92,6 +94,30 @@ public class SourceUnit extends Node implements Scope {
 							+node.getType()+" outside of any NodeList!");
 				}
 				decls.add(stack.get(index), clazz.cast(node));
+				return true;
+				
+			}
+			
+		}).visit(this);
+		return decls;
+		
+	}
+	
+	public <T extends Declaration> List<T> getDeclarationsList(final Class<T> clazz) throws IOException {
+
+		final List<T> decls = new ArrayList<T>();
+		
+		new Nosy<T> (clazz, new Opportunist<T>() {
+	
+			@Override
+			public boolean take(T node, Stack<Node> stack) throws IOException {
+				
+				int index = Node.find(Scope.class, stack);
+				if(index == -1) {
+					throw new Error("Found declaration "+node.getName()+" of type "
+							+node.getType()+" outside of any NodeList!");
+				}
+				decls.add(clazz.cast(node));
 				return true;
 				
 			}

@@ -7,7 +7,7 @@ extern func printf(String, ...);
 
 func main {
 
-	IntContainer cont = new;
+	IntContainer cont = new IntContainer;
 	cont.value = 42;
 	if true printf("The answer is %d\n", cont.value);
 
