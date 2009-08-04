@@ -36,10 +36,11 @@ public class Instantiation extends FunctionCall {
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
-				int numArgs = func.getArguments().size();				
-				if(numArgs - 1 == arguments.size()
-					|| ((func.getArguments().get(numArgs - 1) instanceof VarArg)
-					&& (func.getArguments().size() - 1 <= arguments.size()))) {
+				int numArgs = func.getArguments().size() - 1;
+				System.out.println("Reviewing constructor "+func.name+" with args "+func.getArguments());
+				if(numArgs == arguments.size()
+					|| ((!func.getArguments().isEmpty() && func.getArguments().getLast() instanceof VarArg)
+					&& (numArgs <= arguments.size()))) {
 					System.out.println("Found constructor match =)");
 					setImpl(func);
 					return false;

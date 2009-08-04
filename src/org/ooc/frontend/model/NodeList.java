@@ -109,5 +109,10 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		}
 		nodes.add(index, kiddo);
 	}
+	
+	@Override
+	public String toString() {
+		return nodes.toString();
+	}
 
 }

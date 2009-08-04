@@ -507,10 +507,12 @@ public class CGenerator extends Generator implements Visitor {
 		
 		current.append('(');
 		Iterator<Argument> iter = decl.getArguments().iterator();
-		if(skipFirst) iter.next();
-		while(iter.hasNext()) {
-			iter.next().accept(this);
-			if(iter.hasNext()) current.append(", ");
+		if(iter.hasNext()) { // of course, no point of doing all this if we have no arguments
+			if(skipFirst) iter.next(); // especially that.
+			while(iter.hasNext()) {
+				iter.next().accept(this);
+				if(iter.hasNext()) current.append(", ");
+			}
 		}
 		current.append(')');
 		
