@@ -1,8 +1,10 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
 
 public class MemberCall extends FunctionCall {
 
@@ -41,6 +43,26 @@ public class MemberCall extends FunctionCall {
 	@Override
 	public boolean hasChildren() {
 		return true;
+	}
+	
+	@Override
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res) throws IOException {
+		
+		Declaration decl = expression.getType().getRef();
+		if(!(decl instanceof ClassDecl)) {
+			throw new Error("Trying to call a member function of not a ClassDecl, but a "
+					+decl.getClass().getSimpleName());
+		}
+
+		ClassDecl classDecl = (ClassDecl) decl;
+		FunctionDecl funcDecl = classDecl.getFunction(name, suffix);
+		if(funcDecl == null) {
+			throw new Error("Member function "+name+" not found in class "+classDecl.getType());
+		}
+		impl = funcDecl;
+		
+		return impl != null;
+		
 	}
 	
 }

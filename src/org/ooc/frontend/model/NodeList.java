@@ -52,6 +52,14 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		nodes.addAll(list.nodes);
 	}
 	
+	public T getFirst() {
+		return nodes.get(0);
+	}
+	
+	public T getLast() {
+		return nodes.get(nodes.size() - 1);
+	}
+	
 	@Override
 	public Iterator<T> iterator() {
 		return nodes.iterator();

@@ -34,10 +34,10 @@ public class Instantiation extends FunctionCall {
 			
 			System.out.println("Found match for instantiation of "+name);
 			for(FunctionDecl func: decl.getFunctions()) {
-				if(!func.getName().equals("new")) continue;
+				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
 				int numArgs = func.getArguments().size();				
-				if(numArgs == arguments.size()
+				if(numArgs - 1 == arguments.size()
 					|| ((func.getArguments().get(numArgs - 1) instanceof VarArg)
 					&& (func.getArguments().size() - 1 <= arguments.size()))) {
 					System.out.println("Found constructor match =)");

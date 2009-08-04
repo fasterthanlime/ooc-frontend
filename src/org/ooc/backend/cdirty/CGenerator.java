@@ -481,7 +481,7 @@ public class CGenerator extends Generator implements Visitor {
 		writeDestroyFunc(classDecl, className);
 		writeInstanceImplFuncs(classDecl, className);
 		writeClassGettingFunction(classDecl, className, initializeName, destroyName);
-		writeVirtualNonImplFuncs(classDecl, className);
+		writeInstanceVirtualFuncs(classDecl, className);
 		writeStaticFuncs(classDecl, className);
 		
 		current.newLine();
@@ -499,11 +499,15 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeFuncArgs(FunctionDecl decl)
-			throws IOException {
+	private void writeFuncArgs(FunctionDecl decl) throws IOException {
+		writeFuncArgs(decl, false);
+	}
+	
+	private void writeFuncArgs(FunctionDecl decl, boolean skipFirst) throws IOException {
 		
 		current.append('(');
 		Iterator<Argument> iter = decl.getArguments().iterator();
+		if(skipFirst) iter.next();
 		while(iter.hasNext()) {
 			iter.next().accept(this);
 			if(iter.hasNext()) current.append(", ");
@@ -525,37 +529,6 @@ public class CGenerator extends Generator implements Visitor {
 
 	}
 
-	private void writeTypelessFuncArgsPlusThis(FunctionDecl decl)
-	throws IOException {
-
-		current.append('(');
-		Iterator<Argument> iter = decl.getArguments().iterator();
-		current.append("this");
-		if(iter.hasNext()) current.append(", ");
-		while(iter.hasNext()) {
-			current.append(iter.next().getName());
-			if(iter.hasNext()) current.append(", ");
-		}
-		current.append(')');
-
-	}
-	
-	private void writeFuncArgsPlusThis(String className, FunctionDecl decl)
-	throws IOException {
-
-		current.append('(');
-		Iterator<Argument> iter = decl.getArguments().iterator();
-		current.append(className);
-		current.append(" *this");
-		if(iter.hasNext()) current.append(", ");
-		while(iter.hasNext()) {
-			iter.next().accept(this);
-			if(iter.hasNext()) current.append(", ");
-		}
-		current.append(')');
-
-	}
-
 	private void writeStaticFuncs(ClassDecl classDecl, String className)
 			throws IOException {
 		
@@ -566,59 +539,18 @@ public class CGenerator extends Generator implements Visitor {
 			current.newLine();
 			writeMemberFuncPrototype(className, decl);
 			openBlock();
-			
-			/* Special case: constructor */
-			if(decl.isConstructor()) {
-				current.newLine();
-				current.append(className);
-				current.append(" *this = (");
-				current.append(className);
-				current.append(" *) mango_object_new(");
-				current.append(className);
-				current.append("_class());");
-				current.newLine();
-				current.append(className);
-				current.append("_construct");
-				if(!decl.getSuffix().isEmpty()) {
-					current.append('_');
-					current.append(decl.getSuffix());
-				}
-				writeTypelessFuncArgsPlusThis(decl);
-				current.append(";");
-				current.newLine();
-				current.append("return this;");
-			} else {
-				decl.getBody().accept(this);
-			}
-			
+			decl.getBody().accept(this);
 			closeSpacedBlock();
-			
-			if(decl.isConstructor()) {
-				// And now, write the corresponding construct function
-				current.append("void ");
-				current.append(className);
-				current.append("_construct");
-				if(!decl.getSuffix().isEmpty()) {
-					current.append('_');
-					current.append(decl.getSuffix());
-				}
-				writeFuncArgsPlusThis(className, decl);
-				openBlock();
-				for(Line line: decl.getBody()) {
-					line.accept(this);
-				}
-				closeSpacedBlock();
-			}
 			
 		}
 	}
 
-	private void writeVirtualNonImplFuncs(ClassDecl classDecl, String className)
+	private void writeInstanceVirtualFuncs(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			
-			if(decl.isStatic()) continue;
+			if(decl.isStatic() || decl.isFinal()) continue;
 			
 			current.newLine();
 			writeMemberFuncPrototype(className, decl);
@@ -718,24 +650,67 @@ public class CGenerator extends Generator implements Visitor {
 
 	private void writeInstanceImplFuncs(ClassDecl classDecl, String className)
 			throws IOException {
+		
 		/* Non-static (ie. instance) functions */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			if(decl.isStatic()) continue;
-			
+		
 			current.newLine();
-			current.append("static ");
+			if(!decl.isFinal()) current.append("static ");
 			writeSpacedType(decl.getReturnType());
 			current.append(className);
 			current.append('_');
 			writeSuffixedFuncName(decl);
-			current.append("_impl");
-			
-			writeFuncArgs(decl);
+			if(!decl.isFinal()) current.append("_impl");
+		
+			writeFuncArgs(decl, decl.isConstructor()); // if is constuctor, don't write the first arg
 			
 			openBlock();
-			decl.getBody().accept(this);
+			
+			/* Special case: constructor */
+			if(decl.isConstructor()) {
+				current.newLine();
+				current.append(className);
+				current.append(" *this = (");
+				current.append(className);
+				current.append(" *) mango_object_new(");
+				current.append(className);
+				current.append("_class());");
+				current.newLine();
+				current.append(className);
+				current.append("_construct");
+				if(!decl.getSuffix().isEmpty()) {
+					current.append('_');
+					current.append(decl.getSuffix());
+				}
+				writeTypelessFuncArgs(decl);
+				current.append(";");
+				current.newLine();
+				current.append("return this;");
+			} else {
+				decl.getBody().accept(this);
+			}			
 			closeSpacedBlock();
+			
+			/* Special case: constructor, now write the corresponding construct function */
+			if(decl.isConstructor()) {
+				// And now, write the corresponding construct function
+				current.append("void ");
+				current.append(className);
+				current.append("_construct");
+				if(!decl.getSuffix().isEmpty()) {
+					current.append('_');
+					current.append(decl.getSuffix());
+				}
+				writeFuncArgs(decl);
+				openBlock();
+				for(Line line: decl.getBody()) {
+					line.accept(this);
+				}
+				closeSpacedBlock();
+			}
 		}
+		
 	}
 
 	private void writeClassGettingFunction(ClassDecl classDecl,
@@ -777,6 +752,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			if(decl.isStatic()) continue;
+			if(decl.isConstructor()) continue;
 			
 			if(decl.isFinal()) writeDesignatedInit(decl.getName(), className + "_" + decl.getName());
 			else writeDesignatedInit(decl.getName(), className + "_" + decl.getName() + "_impl");
@@ -804,7 +780,7 @@ public class CGenerator extends Generator implements Visitor {
 			current.newLine();
 			writeSpacedType(decl.getReturnType());
 			writeSuffixedMemberFuncName(className, decl);
-			writeFuncArgs(decl);
+			writeFuncArgs(decl, decl.isConstructor());
 			current.append(';');
 			
 			if(decl.getName().equals("new")) {
@@ -816,7 +792,7 @@ public class CGenerator extends Generator implements Visitor {
 					current.append('_');
 					current.append(decl.getSuffix());
 				}
-				writeFuncArgsPlusThis(classDecl.getName(), decl);
+				writeFuncArgs(decl);
 				current.append(';');
 			}
 		}
@@ -863,7 +839,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		/* Now write all virtual functions prototypes in the class struct */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
-			if(decl.isStatic()) continue;
+			if(decl.isStatic() || decl.isConstructor()) continue;
 			current.newLine();
 			writeFuncPointer(decl);
 			current.append(';');

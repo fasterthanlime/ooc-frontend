@@ -8,6 +8,7 @@ import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -19,19 +20,19 @@ import org.ubi.CompilationFailedError;
  * 
  * @author Amos Wenger
  */
-public class ThisMemberAdder implements Hobgoblin {
+public class MemberHandler implements Hobgoblin {
 
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		new Nosy<FunctionDecl>(FunctionDecl.class, new Opportunist<FunctionDecl>() {
+		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
 			@Override
 			public boolean take(FunctionDecl node, Stack<Node> stack)
 					throws IOException {
 				
 				if(node.getName().equals("new")) {
-					node.setStatic(true); // constructors *are* static
+					node.setFinal(true);
 					int index = Node.find(ClassDecl.class, stack);
 					if(index == -1) {
 						throw new CompilationFailedError(null,
@@ -44,11 +45,27 @@ public class ThisMemberAdder implements Hobgoblin {
 				if(node.isStatic()) return true; // static functions don't have a this.
 				
 				int index = Node.find(ClassDecl.class, stack);
-				if(index == -1) return true;
+				if(index == -1) {
+					node.setMember(false);
+					return true;
+				}
 				
 				ClassDecl classDecl = (ClassDecl) stack.get(index);
 				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", false));
+				node.setMember(true);
 				
+				return true;
+				
+			}
+			
+		}).visit(unit);
+		
+		Nosy.get(VariableDecl.class, new Opportunist<VariableDecl>() {
+
+			@Override
+			public boolean take(VariableDecl node, Stack<Node> stack) throws IOException {
+				
+				node.setMember(stack.size() >= 2 && stack.get(stack.size() - 2) instanceof ClassDecl);
 				return true;
 				
 			}

@@ -89,33 +89,54 @@ public class FunctionCall extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, final ModularAccessResolver res) throws IOException {
+	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res) throws IOException {
 		
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
 				for(FunctionDecl decl: res.funcs.get((Node) node)) {
-					if(!decl.getName().equals(name)) continue;
-					
-					if(!decl.getSuffix().isEmpty() && !suffix.isEmpty()
-							&& !decl.getSuffix().equals(suffix)) continue;
-					
-					int numArgs = decl.getArguments().size();
-					if(numArgs == arguments.size()
-						|| ((decl.getArguments().get(numArgs - 1) instanceof VarArg)
-						&& (decl.getArguments().size() - 1 <= arguments.size()))) {
-						setImpl(decl);
+					System.out.println("Should resolve call to "+name);
+					System.out.println("Reviewing function decl "+decl.getName());
+					if(matches(decl)) {
+						System.out.println("Got it, returning false.");
+						impl = decl;
+						if(decl.isMember()) {
+							System.out.println("Ho, it's a member function! Too bad.");
+							VariableAccess thisAccess = new VariableAccess("this");
+							thisAccess.resolveAccess(mainStack, res);
+							MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
+							memberCall.setImpl(decl);
+							mainStack.peek().replace(FunctionCall.this, memberCall);
+						}
 						return false;
 					}
-					
-					return false;
 				}
-				System.out.println("Didn't get it, returning true..");
+				System.out.println("Didn't get it, returning true");
 				return true;
 			}
-		}, stack);
+		}, mainStack);
 		
 		return impl == null;
+		
+	}
+	
+	public boolean matches(FunctionDecl decl) {
+		
+		if(!decl.getName().equals(name)) return false;
+		
+		if(!decl.getSuffix().isEmpty() && !suffix.isEmpty()
+				&& !decl.getSuffix().equals(suffix)) return false;
+		
+		int numArgs = decl.getArguments().size();
+		if(decl.isMember()) numArgs--;
+		
+		if(numArgs == arguments.size()
+			|| ((decl.getArguments().getLast() instanceof VarArg)
+			&& (numArgs - 1 <= arguments.size()))) {
+			return true;
+		}
+		
+		return false;
 		
 	}
 	

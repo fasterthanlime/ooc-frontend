@@ -68,14 +68,28 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, final ModularAccessResolver res) throws IOException {
+	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res) throws IOException {
 
+		System.out.println("In a "+getClass().getSimpleName());
+		
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
 				for(VariableDecl decl: res.vars.get((Node) node)) {
 					if(decl.getName().equals(variable)) {
-						System.out.println("Got it! Returning false.");
+						System.out.println("Got it! It's '"+variable+"'");
+						System.out.println("Stack is "+stack);
+						if(decl.isMember()) {
+							System.out.println("Heck, it's a member variable!");
+							VariableAccess thisAccess = new VariableAccess("this");
+							thisAccess.resolveAccess(mainStack, res);
+							MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
+							membAcc.setRef(decl);
+							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
+								System.out.println("Couldn't replace it!");
+							}
+							System.out.println("Replaced it, returning false, it's alright.");
+						}
 						setRef(decl);
 						return false;
 					}
@@ -83,8 +97,9 @@ public class VariableAccess extends Access implements MustResolveAccess {
 				System.out.println("Didn't get it, returning true..");
 				return true;
 			}
-		}, stack);
+		}, mainStack);
 		
+		System.out.println("Solved? "+(ref != null));
 		return ref == null;
 		
 	}
