@@ -60,6 +60,11 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		return nodes.get(nodes.size() - 1);
 	}
 	
+	public T getBeforeLast() {
+		return nodes.get(nodes.size() - 2);
+	}
+
+	
 	@Override
 	public Iterator<T> iterator() {
 		return nodes.iterator();
@@ -114,5 +119,4 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	public String toString() {
 		return nodes.toString();
 	}
-
 }

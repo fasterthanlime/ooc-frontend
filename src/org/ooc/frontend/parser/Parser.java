@@ -882,7 +882,7 @@ public class Parser {
 					}
 				} else {
 					if(declType == FunctionDeclType.FUNC) {
-						Argument arg = argument(sReader, reader);
+						Argument arg = argument(sReader, reader, isExtern);
 						if(arg == null) {
 							throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 									"Expected variable declaration as an argument of a function definition");
@@ -943,7 +943,7 @@ public class Parser {
 		
 	}
 	
-	private Argument argument(SourceReader sReader, ListReader<Token> reader) throws IOException {
+	private Argument argument(SourceReader sReader, ListReader<Token> reader, boolean isExtern) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -975,6 +975,9 @@ public class Parser {
 		if(t.type != NAME) {
 			throw new CompilationFailedError(sReader.getLocation(t.start),
 			"Expecting member variable name in member-assign-argument");
+		}
+		if(isExtern) {
+			return new TypeArgument(new Type(t.get(sReader)));
 		}
 		return new MemberArgument(t.get(sReader));
 		

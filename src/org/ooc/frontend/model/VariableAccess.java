@@ -100,6 +100,22 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		}, mainStack);
 		
 		System.out.println("Solved? "+(ref != null));
+		
+		if(ref == null) {
+			int classIndex = Node.find(ClassDecl.class, mainStack);
+			if(classIndex != -1) {
+				ClassDecl classDecl = (ClassDecl) mainStack.get(classIndex);
+				FunctionDecl func = classDecl.getFunction(variable, "");
+				if(func != null) {
+					VariableAccess thisAccess = new VariableAccess("this");
+					MemberCall membCall = new MemberCall(thisAccess, variable, "");
+					membCall.setImpl(func);
+					mainStack.peek().replace(this, membCall);
+					return true;
+				}
+			}
+		}
+		
 		return ref == null;
 		
 	}

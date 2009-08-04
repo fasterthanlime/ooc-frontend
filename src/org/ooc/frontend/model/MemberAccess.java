@@ -64,9 +64,19 @@ public class MemberAccess extends VariableAccess {
 		}
 
 		ClassDecl classDecl = (ClassDecl) decl;
+		
 		VariableDecl varDecl = classDecl.getVariable(variable);
 		if(varDecl == null) {
-			throw new Error("Member "+variable+" not found in class "+classDecl.getType());
+			FunctionDecl funcDecl = classDecl.getFunction(variable, "");
+			if(funcDecl.getArguments().isEmpty() || funcDecl.getArguments().getLast() instanceof VarArg
+					|| funcDecl.isMember() && (funcDecl.getArguments().size() == 1
+							|| funcDecl.getArguments().getBeforeLast() instanceof VarArg)) {
+				System.out.println("Found as a function call");
+				MemberCall membCall = new MemberCall(expression, variable, "");
+				membCall.setImpl(funcDecl);
+				stack.peek().replace(this, membCall);
+				return true;
+			}
 		}
 		ref = varDecl;
 		
