@@ -52,6 +52,10 @@ public class ListReader<T> {
 		this.index = index;
 	}
 	
+	public void rewind() {
+		index--;
+	}
+	
 	public void skip() {
 		index++;
 	}

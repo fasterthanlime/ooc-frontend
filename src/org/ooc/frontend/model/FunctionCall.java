@@ -126,7 +126,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		if(decl.isMember()) numArgs--;
 		
 		if(numArgs == arguments.size()
-			|| ((decl.getArguments().getLast() instanceof VarArg)
+			|| ((numArgs > 0 && decl.getArguments().getLast() instanceof VarArg)
 			&& (numArgs - 1 <= arguments.size()))) {
 			return true;
 		}

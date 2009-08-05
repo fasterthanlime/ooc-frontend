@@ -1,5 +1,6 @@
 package org.ooc.frontend.parser;
 
+
 import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
@@ -23,7 +24,6 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.FINAL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.HASH;
 import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_NUMBER;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
@@ -50,6 +50,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STATIC_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STRING_LIT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.TILDE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRUE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
@@ -496,12 +497,12 @@ public class Parser {
 		String name = tName.get(sReader);
 		
 		String suffix = "";
-		if(reader.peek().type == HASH) {
+		if(reader.peek().type == TILDE) {
 			reader.skip();
 			Token tSuff = reader.read();
 			if(tSuff.type != NAME) {
 				throw new CompilationFailedError(sReader.getLocation(tSuff.start),
-				"Expecting suffix after 'functionname#' !");
+				"Expecting suffix after 'functionname~' !");
 			}
 			suffix = tSuff.get(sReader);
 		}
@@ -856,12 +857,12 @@ public class Parser {
 		String name = tName.get(sReader);
 		
 		String suffix = "";
-		if(reader.peek().type == HASH) {
+		if(reader.peek().type == TILDE) {
 			reader.skip();
 			Token tSuffix = reader.read();
 			if(tSuffix.type != NAME) {
 				throw new CompilationFailedError(sReader.getLocation(tSuffix.start),
-					"Expected suffix after function name and '#'");
+					"Expected suffix after functionName~");
 			}
 			suffix = tSuffix.get(sReader);
 		}
@@ -921,11 +922,24 @@ public class Parser {
 			functionDecl.setReturnType(returnType);
 			t = reader.read();
 		}
+		
+		// FIXME this is probably not a good place to be
+		if(functionDecl.getName().equals("main")) {
+			functionDecl.setReturnType(new Type("int"));
+		}
+		
 		if(t.type == SEMICOL) {
 			return functionDecl;
 		}
+		
 		if(t.type != OPEN_BRACK) {
-			throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
+			reader.rewind();
+			Line line = line(sReader, reader);
+			if(line == null) {
+				throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected opening brace after function name.");
+			}
+			functionDecl.getBody().add(line);
+			return functionDecl;
 		}
 	
 		while(reader.peek().type != CLOS_BRACK) {
@@ -938,10 +952,6 @@ public class Parser {
 		
 		}
 		reader.skip();
-		
-		if(functionDecl.getName().equals("main")) {
-			functionDecl.setReturnType(new Type("int"));
-		}
 		
 		return functionDecl;
 		

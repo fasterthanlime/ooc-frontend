@@ -456,6 +456,10 @@ public class CGenerator extends Generator implements Visitor {
 		functionDecl.getReturnType().accept(this);
 		if(functionDecl.getReturnType().getPointerLevel() == 0) current.append(' ');
 		current.append(functionDecl.getName());
+		if(!functionDecl.getSuffix().isEmpty()) {
+			current.append('_');
+			current.append(functionDecl.getSuffix());
+		}
 		current.append('(');
 		
 		boolean isFirst = true;

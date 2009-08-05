@@ -114,6 +114,12 @@ public class Tokenizer {
 				continue;
 			}
 			
+			if(c == '~') {
+				reader.read();
+				tokens.add(new Token(location.getIndex(), 1, TokenType.TILDE));
+				continue;
+			}
+			
 			if(c == ':') {
 				reader.read();
 				tokens.add(new Token(location.getIndex(), 1, TokenType.COL));

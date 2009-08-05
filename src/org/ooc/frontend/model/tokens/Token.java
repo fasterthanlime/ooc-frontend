@@ -59,6 +59,7 @@ public class Token {
 
 		AT, // @
 		HASH, // #
+		TILDE, // ~
 		COMMA, // ,
 		DOT, // .
 		DOUBLE_DOT, // ..
