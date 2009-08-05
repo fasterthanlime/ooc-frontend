@@ -68,9 +68,10 @@ public class MemberAccess extends VariableAccess {
 		VariableDecl varDecl = classDecl.getVariable(variable);
 		if(varDecl == null) {
 			FunctionDecl funcDecl = classDecl.getFunction(variable, "");
-			if(funcDecl.getArguments().isEmpty() || funcDecl.getArguments().getLast() instanceof VarArg
+			if(funcDecl != null && (funcDecl.getArguments().isEmpty()
+					|| funcDecl.getArguments().getLast() instanceof VarArg
 					|| funcDecl.isMember() && (funcDecl.getArguments().size() == 1
-							|| funcDecl.getArguments().getBeforeLast() instanceof VarArg)) {
+							|| funcDecl.getArguments().getBeforeLast() instanceof VarArg))) {
 				System.out.println("Found as a function call");
 				MemberCall membCall = new MemberCall(expression, variable, "");
 				membCall.setImpl(funcDecl);

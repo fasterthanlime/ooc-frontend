@@ -92,4 +92,15 @@ public class Type extends Node {
 		
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(obj instanceof Type) {
+			Type type = (Type) obj;
+			return name.equals(type.name) && pointerLevel == type.getPointerLevel();
+		}
+		return super.equals(obj);
+		
+	}
+	
 }

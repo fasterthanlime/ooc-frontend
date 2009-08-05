@@ -8,6 +8,7 @@ import org.ooc.middle.hobgoblins.CaseEnforcer;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.hobgoblins.MemberHandler;
+import org.ooc.middle.hobgoblins.SuperResolver;
 import org.ooc.middle.hobgoblins.TypeResolver;
 import org.ooc.middle.hobgoblins.Unwrapper;
 import org.ooc.middle.hobgoblins.VoidReturnCrusher;
@@ -28,7 +29,10 @@ public class Tinkerer implements Hobgoblin {
 	public void process(SourceUnit unit) throws IOException {
 
 		new CaseEnforcer().process(unit);
+		
 		new VoidReturnCrusher().process(unit);
+		new SuperResolver().process(unit);
+		
 		new DefaultConstructorGiver().process(unit);
 		new MemberHandler().process(unit);
 		new Unwrapper().process(unit);

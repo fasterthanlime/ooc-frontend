@@ -12,7 +12,7 @@ import org.ooc.middle.walkers.Opportunist;
 public class VariableAccess extends Access implements MustResolveAccess {
 
 	protected String variable;
-	protected Declaration ref;
+	protected VariableDecl ref;
 	
 	public VariableAccess(String variable) {
 		super();
@@ -23,11 +23,11 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		return variable;
 	}
 	
-	public Declaration getRef() {
+	public VariableDecl getRef() {
 		return ref;
 	}
 	
-	public void setRef(Declaration ref) {
+	public void setRef(VariableDecl ref) {
 		this.ref = ref;
 	}
 
@@ -56,7 +56,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		if(oldie == ref) {
-			ref = (Declaration) kiddo;
+			ref = (VariableDecl) kiddo;
 			return true;
 		}
 		return false;

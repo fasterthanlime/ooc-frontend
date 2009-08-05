@@ -18,7 +18,6 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
@@ -37,6 +36,7 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -51,6 +51,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.TypeDeclaration;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
@@ -211,13 +212,21 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(MemberCall memberCall) throws IOException {
 		
-		current.append(memberCall.getExpression().getType().getName());
+		current.append(memberCall.getImpl().getTypeDecl().getName());
 		current.append('_');
 		current.append(memberCall.getName());
 		current.append('(');
+		
+		TypeDeclaration typeDecl = memberCall.getImpl().getTypeDecl();
+		if(!typeDecl.getInstanceType().equals(memberCall.getExpression().getType())) {
+			current.append('(');
+			typeDecl.getInstanceType().accept(this);
+			current.append(") ");
+		}
 		memberCall.getExpression().accept(this);
 		if(!memberCall.getArguments().isEmpty()) current.append(", ");
 		writeExprList(memberCall.getArguments());
+		
 		current.append(')');
 		
 	}
@@ -370,7 +379,16 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(MemberAccess memberAccess) throws IOException {
 
-		memberAccess.getExpression().accept(this);
+		TypeDeclaration typeDecl = memberAccess.getRef().getTypeDecl();
+		if(typeDecl.getType().equals(memberAccess.getExpression().getType())) {		
+			memberAccess.getExpression().accept(this);
+		} else {
+			current.append("((");
+			typeDecl.getInstanceType().accept(this);
+			current.append(')');
+			memberAccess.getExpression().accept(this);
+			current.append(')');
+		}
 		current.append("->");
 		current.append(memberAccess.getName());
 		
@@ -464,8 +482,6 @@ public class CGenerator extends Generator implements Visitor {
 		current = hw;
 		
 		String className = classDecl.getName();
-		String initializeName = className+"_initialize";
-		String destroyName = className+"_destroy";
 		
 		writeStructTypedef(className);
 		writeStructTypedef(className+"Class");
@@ -480,7 +496,7 @@ public class CGenerator extends Generator implements Visitor {
 		writeInitializeFunc(classDecl, className);
 		writeDestroyFunc(classDecl, className);
 		writeInstanceImplFuncs(classDecl, className);
-		writeClassGettingFunction(classDecl, className, initializeName, destroyName);
+		writeClassGettingFunction(classDecl);
 		writeInstanceVirtualFuncs(classDecl, className);
 		writeStaticFuncs(classDecl, className);
 		
@@ -609,7 +625,7 @@ public class CGenerator extends Generator implements Visitor {
 		if(!classDecl.getSuperName().isEmpty()) {
 			current.newLine();
 			current.append(classDecl.getSuperName());
-			current.append("_class()->initialize(this);");
+			current.append("_class()->initialize((MangoObject *) this);");
 		}
 		
 		for(Line line: classDecl.getInitializer().getBody()) {
@@ -715,58 +731,72 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeClassGettingFunction(ClassDecl classDecl,
-			String className, String initializeName, String destroyName) throws IOException {
+	private void writeClassGettingFunction(ClassDecl classDecl) throws IOException {
 		
 		current.append("const MangoClass *");
-		current.append(className);
+		current.append(classDecl.getName());
 		current.append("_class()");
 		openSpacedBlock();
 		
 		current.append("static const ");
-		current.append(className);
+		current.append(classDecl.getName());
 		current.append("Class class = ");
-		openBlock();
 		
-		/* class attributes */
-		openBlock();
-		
-		/* size of class */
-		current.newLine();
-		current.append(".size = ");
-		current.append("sizeof(");
-		current.append(className);
-		current.append("),");
-		
-		/* name of class */
-		current.newLine();
-		current.append(".name = ");
-		current.append('"');
-		current.append(className);
-		current.append("\",");
-		
-		/* initialize, destroy, copy */
-		writeDesignatedInit("initialize", "(void (*)(MangoObject *))"+ initializeName);
-		writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+destroyName);
-		
-		closeBlock();
-		current.append(',');
-		
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			if(decl.isStatic()) continue;
-			if(decl.isConstructor()) continue;
-			
-			if(decl.isFinal()) writeDesignatedInit(decl.getName(), className + "_" + decl.getName());
-			else writeDesignatedInit(decl.getName(), className + "_" + decl.getName() + "_impl");
-			
-		}
-		
-		closeBlock();
+		writeFuncPointers(classDecl, classDecl);
 		current.append(';');
 		
 		current.newLine();
 		current.append("return (const MangoClass *) &class;");
 		closeSpacedBlock();
+	}
+
+	private void writeFuncPointers(ClassDecl currentClass, ClassDecl coreClass) throws IOException {
+		
+		openBlock();
+		
+		if(currentClass.getSuperRef() != null) {
+			
+			writeFuncPointers(currentClass.getSuperRef(), coreClass);
+			
+		} else {
+		
+			/* class attributes */
+			openBlock();
+			
+			/* size of class */
+			current.newLine();
+			current.append(".size = ");
+			current.append("sizeof(");
+			current.append(coreClass.getName());
+			current.append("),");
+			
+			/* name of class */
+			current.newLine();
+			current.append(".name = ");
+			current.append('"');
+			current.append(coreClass.getName());
+			current.append("\",");
+			
+			/* initialize, destroy */
+			writeDesignatedInit("initialize", "(void (*)(MangoObject *))"+coreClass.getName()+"_initialize");
+			writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+coreClass.getName()+"_destroy");
+			
+			closeBlock();
+			current.append(',');
+		
+		}
+		
+		for(FunctionDecl decl: currentClass.getFunctions()) {
+			if(decl.isStatic()) continue;
+			if(decl.isConstructor()) continue;
+			
+			if(decl.isFinal()) writeDesignatedInit(decl.getName(), currentClass.getName() + "_" + decl.getName());
+			else writeDesignatedInit(decl.getName(), currentClass.getName() + "_" + decl.getName() + "_impl");
+			
+		}
+		
+		closeBlock();
+		if(coreClass != currentClass) current.append(',');
 	}
 
 	private void writeMemberFuncPrototypes(ClassDecl classDecl, String className)

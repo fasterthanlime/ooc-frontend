@@ -8,6 +8,7 @@ import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.TypeDeclaration;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -46,13 +47,13 @@ public class MemberHandler implements Hobgoblin {
 				
 				int index = Node.find(ClassDecl.class, stack);
 				if(index == -1) {
-					node.setMember(false);
+					node.setTypeDecl(null);
 					return true;
 				}
 				
 				ClassDecl classDecl = (ClassDecl) stack.get(index);
 				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", false));
-				node.setMember(true);
+				node.setTypeDecl(classDecl);
 				
 				return true;
 				
@@ -65,7 +66,12 @@ public class MemberHandler implements Hobgoblin {
 			@Override
 			public boolean take(VariableDecl node, Stack<Node> stack) throws IOException {
 				
-				node.setMember(stack.size() >= 2 && stack.get(stack.size() - 2) instanceof ClassDecl);
+				if(stack.size() >= 2) {
+					Node decl = stack.get(stack.size() - 2);
+					if(decl instanceof TypeDeclaration) {
+						node.setTypeDecl((TypeDeclaration) decl);
+					}
+				}
 				return true;
 				
 			}

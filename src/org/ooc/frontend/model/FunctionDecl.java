@@ -19,7 +19,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	private boolean isAbstract;
 	private boolean isExtern;
 	
-	private boolean isMember;
+	private TypeDeclaration typeDecl;
 
 	private FunctionDeclType declType;
 	private String suffix;
@@ -37,7 +37,6 @@ public class FunctionDecl extends Declaration implements Scope {
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
 		this.isExtern = isExtern;
-		this.isMember = false;
 		this.body = new NodeList<Line>();
 		this.returnType = new Type("void");
 		this.arguments = new NodeList<Argument>();
@@ -100,12 +99,19 @@ public class FunctionDecl extends Declaration implements Scope {
 		this.isExtern = isExtern;
 	}
 	
-	public boolean isMember() {
-		return isMember;
+	public TypeDeclaration getTypeDecl() {
+		return typeDecl;
 	}
 	
-	public void setMember(boolean isMember) {
-		this.isMember = isMember;
+	public void setTypeDecl(TypeDeclaration typeDecl) {
+		this.typeDecl = typeDecl;
+	}
+	
+	/**
+	 * @return true if it's a member function
+	 */
+	public boolean isMember() {
+		return typeDecl != null;
 	}
 	
 	public NodeList<Line> getBody() {

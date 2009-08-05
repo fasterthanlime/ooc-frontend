@@ -11,15 +11,13 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	protected boolean isConst;
 	protected boolean isStatic;
 	
-	protected boolean isMember;
-	
 	protected Type type;
+	protected TypeDeclaration typeDecl;
 	
 	public VariableDecl(Type type, String name, boolean isConst, boolean isStatic) {
 		super(name);
 		this.isConst = isConst;
 		this.isStatic = isStatic;
-		this.isMember = false;
 		this.type = type;
 	}
 	
@@ -29,6 +27,18 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	public void setType(Type type) {
 		this.type = type;
+	}
+	
+	public TypeDeclaration getTypeDecl() {
+		return typeDecl;
+	}
+	
+	public void setTypeDecl(TypeDeclaration typeDecl) {
+		this.typeDecl = typeDecl;
+	}
+	
+	public boolean isMember() {
+		return typeDecl != null;
 	}
 	
 	public boolean isConst() {
@@ -45,14 +55,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	public void setStatic(boolean isStatic) {
 		this.isStatic = isStatic;
-	}
-	
-	public boolean isMember() {
-		return isMember;
-	}
-	
-	public void setMember(boolean isMember) {
-		this.isMember = isMember;
 	}
 	
 	@Override

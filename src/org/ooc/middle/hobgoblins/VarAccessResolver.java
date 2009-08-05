@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.MemberAccess;
@@ -76,7 +75,7 @@ public class VarAccessResolver implements Hobgoblin {
 					
 					Node stackElement = stack.get(index);
 					
-					for(Declaration decl: vars.get(stackElement)) {
+					for(VariableDecl decl: vars.get(stackElement)) {
 						if(decl.getName().equals(node.getName())) {
 							node.setRef(decl);
 							break stacksearch;

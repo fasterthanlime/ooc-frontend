@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class CoverDecl extends Declaration {
+public class CoverDecl extends TypeDeclaration {
 
 	private OocDocComment comment;
 	private Type fromType;
@@ -25,6 +25,11 @@ public class CoverDecl extends Declaration {
 			return new Type(name);
 		}
 		return fromType;
+	}
+	
+	@Override
+	public Type getInstanceType() {
+		throw new UnsupportedOperationException();
 	}
 	
 	public Type getFromType() {
