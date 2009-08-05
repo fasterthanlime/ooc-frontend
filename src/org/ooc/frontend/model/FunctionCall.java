@@ -95,13 +95,9 @@ public class FunctionCall extends Access implements MustResolveAccess {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
 				for(FunctionDecl decl: res.funcs.get((Node) node)) {
-					System.out.println("Should resolve call to "+name);
-					System.out.println("Reviewing function decl "+decl.getName());
 					if(matches(decl)) {
-						System.out.println("Got it, returning false.");
 						impl = decl;
 						if(decl.isMember()) {
-							System.out.println("Ho, it's a member function! Too bad.");
 							VariableAccess thisAccess = new VariableAccess("this");
 							thisAccess.resolveAccess(mainStack, res);
 							MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
@@ -111,7 +107,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 						return false;
 					}
 				}
-				System.out.println("Didn't get it, returning true");
 				return true;
 			}
 		}, mainStack);

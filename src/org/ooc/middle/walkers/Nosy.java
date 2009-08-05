@@ -56,6 +56,7 @@ public class Nosy<T> implements Visitor {
 	public final Stack<Node> stack;
 	private Class<T> clazz;
 	private Opportunist<T> oppo;
+	private boolean running = true;
 	
 	public static <T> Nosy<T> get(Class<T> clazz, Opportunist<T> oppo) {
 		return new Nosy<T>(clazz, oppo);
@@ -68,6 +69,8 @@ public class Nosy<T> implements Visitor {
 	}
 
 	public void visit(Node node) throws IOException {
+
+		if(!running) return; // if not running, do nothing
 		
 		if(node.hasChildren()) {
 			stack.push(node);
@@ -75,12 +78,19 @@ public class Nosy<T> implements Visitor {
 			stack.pop();
 		}
 		
+		if(!running) return; // if not running, do nothing
+		
 		if(clazz.isInstance(node)) {
 			if(!oppo.take(clazz.cast(node), stack)) {
-				return; // aborted. (D-Nied. Denied).
+				running = false; // aborted. (D-Nied. Denied).
 			}
 		}
 		
+	}
+	
+	public Nosy<T> start() {
+		running = true;
+		return this;
 	}
 	
 	@Override

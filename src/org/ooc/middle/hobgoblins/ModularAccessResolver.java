@@ -37,7 +37,6 @@ public class ModularAccessResolver implements Hobgoblin {
 			public boolean take(MustResolveAccess node, Stack<Node> stack) throws IOException {
 				
 				if(!node.isResolved()) {
-					System.out.println("Must resolve access of a "+node.getClass().getSimpleName());
 					if(node.resolveAccess(stack, ModularAccessResolver.this)) {
 						// resolveAccess returned true, means we must do one more run
 						running = true;
@@ -56,7 +55,7 @@ public class ModularAccessResolver implements Hobgoblin {
 				throw new Error("ModularAccessResolver going round in circles! More than "+MAX+" runs, abandoning...");
 			}
 			running = false;
-			nosy.visit(unit);
+			nosy.start().visit(unit);
 			count++;
 		}
 		

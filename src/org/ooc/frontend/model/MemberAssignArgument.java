@@ -23,8 +23,6 @@ public class MemberAssignArgument extends MemberArgument {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 		
-		System.out.println("Here MemberAssignArgument, should unwrap, hierarchy = "+hierarchy);
-		
 		int classIndex = Node.find(ClassDecl.class, hierarchy);
 		if(classIndex == -1) {
 			throw new CompilationFailedError(null, "Member-assign argument outside a class definition!");

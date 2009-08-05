@@ -248,7 +248,6 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(Parenthesis parenthesis) throws IOException {
 
 		current.append('(');
-		System.out.println("Parenthesis expression is a "+parenthesis.getExpression().getClass().getSimpleName());
 		parenthesis.getExpression().accept(this);
 		current.append(')');
 		

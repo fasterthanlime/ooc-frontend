@@ -72,10 +72,12 @@ public class MemberAccess extends VariableAccess {
 					|| funcDecl.getArguments().getLast() instanceof VarArg
 					|| funcDecl.isMember() && (funcDecl.getArguments().size() == 1
 							|| funcDecl.getArguments().getBeforeLast() instanceof VarArg))) {
-				System.out.println("Found as a function call");
 				MemberCall membCall = new MemberCall(expression, variable, "");
 				membCall.setImpl(funcDecl);
-				stack.peek().replace(this, membCall);
+				if(!stack.peek().replace(this, membCall)) {
+					throw new Error("Couldn't replace a MemberAccess with a MemberCall in a "
+							+stack.peek().getClass().getSimpleName());
+				}
 				return true;
 			}
 		}

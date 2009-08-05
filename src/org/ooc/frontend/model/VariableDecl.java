@@ -89,7 +89,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		NodeList<Node> list = (NodeList<Node>) hierarchy.get(listIndex);
 		list.replace(this, new VariableAccess(name));
-		System.out.println("Replaced variable decl with variable access! =)");
 		
 		int lineIndex = find(Line.class, hierarchy, listIndex - 1);
 		if(lineIndex == -1) {

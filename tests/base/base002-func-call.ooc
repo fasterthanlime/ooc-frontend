@@ -1,4 +1,4 @@
-extern func call;
+func call;
 
 func main {
 

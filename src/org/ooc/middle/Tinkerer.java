@@ -6,8 +6,8 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.middle.hobgoblins.AccessChecker;
 import org.ooc.middle.hobgoblins.CaseEnforcer;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.hobgoblins.MemberHandler;
+import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.hobgoblins.SuperResolver;
 import org.ooc.middle.hobgoblins.TypeResolver;
 import org.ooc.middle.hobgoblins.Unwrapper;
@@ -34,15 +34,12 @@ public class Tinkerer implements Hobgoblin {
 		new SuperResolver().process(unit);
 		
 		new DefaultConstructorGiver().process(unit);
-		new MemberHandler().process(unit);
 		new Unwrapper().process(unit);
+		new MemberHandler().process(unit);
 		
 		new TypeResolver().process(unit);
 		new ModularAccessResolver().process(unit);
 		new AccessChecker().process(unit);
-		//new NewGuesser().process(unit);
-		//new VarAccessResolver().process(unit);
-		//new FuncCallResolver().process(unit);
 		
 	}
 

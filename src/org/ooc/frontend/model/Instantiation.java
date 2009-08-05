@@ -29,19 +29,20 @@ public class Instantiation extends FunctionCall {
 	@Override
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res) throws IOException {
 		
+		if(name.isEmpty()) {
+			guessName(stack);
+		}
+		
 		for(ClassDecl decl: res.classes) {
 			if(!decl.getName().equals(name)) continue;
 			
-			System.out.println("Found match for instantiation of "+name);
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
 				int numArgs = func.getArguments().size() - 1;
-				System.out.println("Reviewing constructor "+func.name+" with args "+func.getArguments());
 				if(numArgs == arguments.size()
 					|| ((!func.getArguments().isEmpty() && func.getArguments().getLast() instanceof VarArg)
 					&& (numArgs <= arguments.size()))) {
-					System.out.println("Found constructor match =)");
 					setImpl(func);
 					return false;
 				}
@@ -49,6 +50,21 @@ public class Instantiation extends FunctionCall {
 		}
 		
 		return impl != null;
+		
+	}
+
+	private void guessName(Stack<Node> stack) throws Error {
+		
+		if(stack.peek() instanceof Assignment) {
+			Assignment ass = (Assignment) stack.peek();
+			name = ass.getLvalue().getType().getName();
+		} else if(stack.peek() instanceof VariableDeclAssigned) {
+			VariableDeclAssigned vda = (VariableDeclAssigned) stack.peek();
+			name = vda.getType().getName();
+		} else {
+			throw new Error("Couldn't guess type of 'new' (btw, we're in a "
+					+stack.peek().getClass().getSimpleName()+")");
+		}
 		
 	}
 	

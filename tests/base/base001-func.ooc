@@ -1,3 +1,3 @@
-func myFunc {
+func main {
 
 }
