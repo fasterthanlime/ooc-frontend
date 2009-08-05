@@ -53,6 +53,19 @@ public class Instantiation extends FunctionCall {
 		
 	}
 
+	/**
+	 * Guess the type of nameless 'new' calls, e.g.
+	 * <code>
+	 * class Blah {}
+	 * Blah b = new; // guessed: new Blah()
+	 * 
+	 * func accept(Blah b) {
+	 *   // [...]
+	 * }
+	 * 
+	 * accept(new); // guessed: new Blah()
+	 * </code>
+	 */
 	private void guessName(Stack<Node> stack) throws Error {
 		
 		if(stack.peek() instanceof Assignment) {
