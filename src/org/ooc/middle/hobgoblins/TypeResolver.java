@@ -116,6 +116,9 @@ public class TypeResolver implements Hobgoblin {
 		decls.add(unit, new BuiltinType("double"));
 		decls.add(unit, new BuiltinType("char"));
 		
+		decls.add(unit, new BuiltinType("size_t"));
+		decls.add(unit, new BuiltinType("time_t"));
+		
 	}
 	
 }

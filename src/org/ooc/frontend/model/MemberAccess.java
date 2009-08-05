@@ -42,7 +42,7 @@ public class MemberAccess extends VariableAccess {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 	
-		if(this.replace(oldie, kiddo)) return true;
+		if(super.replace(oldie, kiddo)) return true;
 		
 		if(oldie == expression) {
 			expression = (Expression) kiddo;

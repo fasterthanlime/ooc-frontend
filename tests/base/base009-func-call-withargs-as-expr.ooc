@@ -1,9 +1,11 @@
 include stdlib, stdio, time;
 cover Int from int;
+cover TimeT from time_t;
+cover String from char*;
 extern func printf(String, ...);
 extern func srand(Int);
 extern func rand -> Int;
-extern func time(time_t);
+extern func time(TimeT);
 
 func main {
 

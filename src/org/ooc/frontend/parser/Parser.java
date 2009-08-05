@@ -536,6 +536,10 @@ public class Parser {
 				break;
 			}
 			if(comma) {
+				if(reader.peek().type == SEMICOL) {
+					// lax grammar rule: close all parenthesis
+					return true;
+				}
 				if(reader.read().type != COMMA) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected comma between arguments of a function call");
 				}

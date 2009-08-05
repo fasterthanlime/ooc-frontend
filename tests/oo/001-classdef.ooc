@@ -1,4 +1,5 @@
 include stdio;
+cover String from char*;
 extern func printf(String, ...);
 
 class Sayer {
@@ -11,7 +12,7 @@ class Sayer {
 
 func main {
 	
-	Sayer* s = new Sayer();
+	Sayer s = new Sayer();
 	s.say();
 	
 }
