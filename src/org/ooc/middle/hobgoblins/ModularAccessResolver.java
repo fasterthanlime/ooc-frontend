@@ -19,6 +19,7 @@ public class ModularAccessResolver implements Hobgoblin {
 
 	private static final int MAX = 1024;
 	boolean running;
+	boolean fatal = false;
 	
 	public MultiMap<Node, VariableDecl> vars;
 	public MultiMap<Node, FunctionDecl> funcs;
@@ -27,9 +28,7 @@ public class ModularAccessResolver implements Hobgoblin {
 	@Override
 	public void process(SourceUnit unit) throws IOException {
 		
-		vars = unit.getDeclarationsMap(VariableDecl.class);
-		funcs = unit.getDeclarationsMap(FunctionDecl.class);
-		classes = unit.getDeclarationsList(ClassDecl.class);
+		getInfos(unit);
 		
 		Nosy<MustResolveAccess> nosy = Nosy.get(
 				MustResolveAccess.class, new Opportunist<MustResolveAccess>() {
@@ -37,7 +36,7 @@ public class ModularAccessResolver implements Hobgoblin {
 			public boolean take(MustResolveAccess node, Stack<Node> stack) throws IOException {
 				
 				if(!node.isResolved()) {
-					if(node.resolveAccess(stack, ModularAccessResolver.this)) {
+					if(node.resolveAccess(stack, ModularAccessResolver.this, fatal)) {
 						// resolveAccess returned true, means we must do one more run
 						running = true;
 					}
@@ -52,13 +51,22 @@ public class ModularAccessResolver implements Hobgoblin {
 		running = true;
 		while(running) {
 			if(count > MAX) {
+				fatal = true;
+				nosy.start().visit(unit);
 				throw new Error("ModularAccessResolver going round in circles! More than "+MAX+" runs, abandoning...");
 			}
 			running = false;
+			getInfos(unit);
 			nosy.start().visit(unit);
 			count++;
 		}
 		
+	}
+
+	private void getInfos(SourceUnit unit) throws IOException {
+		vars = unit.getDeclarationsMap(VariableDecl.class);
+		funcs = unit.getDeclarationsMap(FunctionDecl.class);
+		classes = unit.getDeclarationsList(ClassDecl.class);
 	}
 	
 }

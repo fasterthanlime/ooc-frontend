@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.ooc.frontend.Visitor;
 
@@ -165,6 +166,24 @@ public class FunctionDecl extends Declaration implements Scope {
 		}
 		
 		return false;
+		
+	}
+
+	public String getArgsRepr() {
+		
+		StringBuilder sB = new StringBuilder();
+		sB.append('(');
+		Iterator<Argument> iter = arguments.iterator();
+		while(iter.hasNext()) {
+			Argument arg = iter.next();
+			if(arg instanceof VarArg) sB.append("...");
+			else sB.append(arg.getType());
+			
+			if(iter.hasNext()) sB.append(", ");
+		}
+		sB.append(')');
+		
+		return sB.toString();
 		
 	}
 	

@@ -187,8 +187,25 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(FunctionCall functionCall) throws IOException {
 
 		FunctionDecl decl = functionCall.getImpl();
-		writeSuffixedFuncName(decl);
+		if(functionCall.isConstructorCall()) {
+			current.append(decl.getTypeDecl().getName());
+			current.append("_construct");
+			if(!decl.getSuffix().isEmpty()) {
+				current.append('_');
+				current.append(decl.getSuffix());
+			}
+		} else {
+			writeSuffixedFuncName(decl);
+		}
+		
 		current.append('(');
+		if(functionCall.isConstructorCall()) {
+			current.append('(');
+			decl.getTypeDecl().getInstanceType().accept(this);
+			current.append(')');
+			current.append(" this");
+			if(!functionCall.getArguments().isEmpty()) current.append(", ");
+		}
 		writeExprList(functionCall.getArguments());
 		current.append(')');
 		

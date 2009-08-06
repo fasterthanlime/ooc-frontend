@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ubi.CompilationFailedError;
 
 public class Instantiation extends FunctionCall {
 
@@ -27,7 +28,7 @@ public class Instantiation extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res) throws IOException {
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal) throws IOException {
 		
 		if(name.isEmpty()) {
 			guessName(stack);
@@ -49,6 +50,10 @@ public class Instantiation extends FunctionCall {
 			}
 		}
 		
+		if(fatal && impl == null) {
+			throw new CompilationFailedError(null, "Couldn't find a constructor in "+name+" for arguments "+getArgsRepr());
+		}
+		
 		return impl != null;
 		
 	}
@@ -66,10 +71,11 @@ public class Instantiation extends FunctionCall {
 	 * accept(new); // guessed: new Blah()
 	 * </code>
 	 */
-	private void guessName(Stack<Node> stack) throws Error {
+	private boolean guessName(Stack<Node> stack) throws Error {
 		
 		if(stack.peek() instanceof Assignment) {
 			Assignment ass = (Assignment) stack.peek();
+			if (ass.getLvalue().getType() == null) return false;
 			name = ass.getLvalue().getType().getName();
 		} else if(stack.peek() instanceof VariableDeclAssigned) {
 			VariableDeclAssigned vda = (VariableDeclAssigned) stack.peek();
@@ -78,6 +84,8 @@ public class Instantiation extends FunctionCall {
 			throw new Error("Couldn't guess type of 'new' (btw, we're in a "
 					+stack.peek().getClass().getSimpleName()+")");
 		}
+		
+		return true;
 		
 	}
 	

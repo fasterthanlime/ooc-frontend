@@ -8,6 +8,7 @@ import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
+import org.ubi.CompilationFailedError;
 
 public class VariableAccess extends Access implements MustResolveAccess {
 
@@ -36,8 +37,11 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		if(ref != null) {
 			return ref.getType();
 		}
+		return null;
+		/*
 		throw new UnsupportedOperationException(this.getClass().getSimpleName()
 				+" to "+variable+" has its type yet unresolved.");
+		*/
 	}
 	
 	@Override
@@ -68,16 +72,17 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res) throws IOException {
+	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res, final boolean fatal) throws IOException {
 
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
-				for(VariableDecl decl: res.vars.get((Node) node)) {
+				Iterable<VariableDecl> vars = res.vars.get((Node) node);
+				for(VariableDecl decl: vars) {
 					if(decl.getName().equals(variable)) {
 						if(decl.isMember()) {
 							VariableAccess thisAccess = new VariableAccess("this");
-							thisAccess.resolveAccess(mainStack, res);
+							thisAccess.resolveAccess(mainStack, res, fatal);
 							MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
 							membAcc.setRef(decl);
 							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
@@ -120,6 +125,10 @@ public class VariableAccess extends Access implements MustResolveAccess {
 					return true;
 				}
 			}
+		}
+
+		if(fatal && ref == null) {
+			throw new CompilationFailedError(null, "Can't resolve variable access to '"+variable+"'. Stack = "+mainStack);
 		}
 		
 		return ref == null;

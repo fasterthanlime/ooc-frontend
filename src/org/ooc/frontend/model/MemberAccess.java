@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ubi.CompilationFailedError;
 
 public class MemberAccess extends VariableAccess {
 	
@@ -54,7 +55,7 @@ public class MemberAccess extends VariableAccess {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res)
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal)
 			throws IOException {
 		
 		Declaration decl = expression.getType().getRef();
@@ -82,6 +83,10 @@ public class MemberAccess extends VariableAccess {
 			}
 		}
 		ref = varDecl;
+		
+		if(fatal && ref == null) {
+			throw new CompilationFailedError(null, "Can't resolve access to member "+expression.getType()+"."+variable);
+		}
 		
 		return ref != null;
 		

@@ -1,6 +1,5 @@
 package org.ooc.frontend.parser;
 
-
 import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
@@ -49,6 +48,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.SL_COMMENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STATIC_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STRING_LIT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.SUPER_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TILDE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
@@ -490,7 +490,7 @@ public class Parser {
 		int mark = reader.mark();
 		
 		Token tName = reader.read();
-		if(tName.type != NAME) {
+		if(tName.type != NAME && tName.type != THIS_KW && tName.type != SUPER_KW) {
 			reader.reset(mark);
 			return null;
 		}
@@ -510,8 +510,12 @@ public class Parser {
 		FunctionCall call = new FunctionCall(name, suffix);
 		
 		if(!exprList(sReader, reader, call.getArguments())) {
-			reader.reset(mark);
-			return null; // not a function call
+			Expression expr = flatExpression(sReader, reader);
+			if(expr == null) {
+				reader.reset(mark);
+				return null; // not a function call
+			}
+			call.getArguments().add(expr);
 		}
 		
 		//System.out.println("Parsed function call, ended on token "+reader.peek().type);
@@ -1154,11 +1158,11 @@ public class Parser {
 				Expression rvalue = expression(sReader, reader);
 				if(rvalue == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Expected rvalue for assignment");
+						"Expected expression after '='.");
 				}
 				if(!(expr instanceof Access)) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Trying to assign something which is not an access (ie. not a lvalue)");
+						"Attempting to assign to a constant.");
 				}
 				expr = new Assignment((Access) expr, rvalue);
 				continue;
@@ -1249,16 +1253,12 @@ public class Parser {
 		}
 		
 		//System.out.println("Attempting to parse assignment for flatUnparenExpression (next is "+reader.peek().type+")");
+		/*
 		Assignment ass = assignment(sReader, reader);
 		if(ass != null) {
 			return ass;
 		}
-		
-		//System.out.println("Attempting to parse declaration for flatUnparenExpression (next is "+reader.peek().type+")");
-		Declaration declaration = declaration(sReader, reader);
-		if(declaration != null) {
-			return declaration;
-		}
+		*/
 		
 		//System.out.println("Attempting to parse instantiation for flatUnparenExpression (next is "+reader.peek().type+")");
 		Instantiation instantiation = instantiation(sReader, reader);
@@ -1272,6 +1272,12 @@ public class Parser {
 			return funcCall;
 		}
 		
+		//System.out.println("Attempting to parse declaration for flatUnparenExpression (next is "+reader.peek().type+")");
+		Declaration declaration = declaration(sReader, reader);
+		if(declaration != null) {
+			return declaration;
+		}
+				
 		//System.out.println("Attempting to parse access for flatUnparenExpression (next is "+reader.peek().type+")");
 		Access access = access(sReader, reader);
 		if(access != null) {

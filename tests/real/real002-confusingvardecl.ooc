@@ -4,6 +4,7 @@ extern func printf(String fmt, ...);
 
 func main {
 	
-	printf "Hi, world!\n";
+	String str = "Hi, world!\n";
+	printf str;
 	
 }

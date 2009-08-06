@@ -8,7 +8,7 @@ import org.ooc.middle.hobgoblins.ModularAccessResolver;
 
 public interface MustResolveAccess {
 
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res) throws IOException;
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal) throws IOException;
 	
 	public boolean isResolved();
 	

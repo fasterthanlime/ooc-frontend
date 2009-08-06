@@ -11,6 +11,7 @@ class Animal {
 
 	String name;
 
+	func new~withName(=name);
 	func sayName printf("Hi, my name is %s\n", name);
 
 }
@@ -18,9 +19,7 @@ class Animal {
 class Dog from Animal {
 
 	func new {
-		this("Fido");
+		super("Fido");
 	}
-
-	func new~withName(=name);
 
 }

@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ubi.CompilationFailedError;
 
 public class MemberCall extends FunctionCall {
 
@@ -59,20 +60,25 @@ public class MemberCall extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res) throws IOException {
+	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, final boolean fatal) throws IOException {
 		
 		Declaration decl = expression.getType().getRef();
 		if(!(decl instanceof ClassDecl)) {
-			throw new Error("Trying to call a member function of not a ClassDecl, but a "
+			throw new CompilationFailedError(null, 
+					"Trying to call a member function of not a ClassDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
 		ClassDecl classDecl = (ClassDecl) decl;
 		FunctionDecl funcDecl = classDecl.getFunction(name, suffix);
 		if(funcDecl == null) {
-			throw new Error("Member function "+name+" not found in class "+classDecl.getType());
+			throw new CompilationFailedError(null, "Member function "+name+" not found in class "+classDecl.getType());
 		}
 		impl = funcDecl;
+		
+		if(fatal && impl == null) {
+			throw new CompilationFailedError(null, "Couldn't resolve call to member function "+name+getArgsRepr());
+		}
 		
 		return impl != null;
 		
