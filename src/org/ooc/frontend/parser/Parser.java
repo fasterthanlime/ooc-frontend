@@ -61,6 +61,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -125,6 +126,8 @@ import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
 
+import com.thoughtworks.xstream.XStream;
+
 public class Parser {
 
 	public Parser() {
@@ -136,6 +139,7 @@ public class Parser {
 		SourceReader sReader = SourceReader.getReaderFromFile(file);
 		List<Token> tokens = new Tokenizer().parse(sReader);
 		SourceUnit unit = sourceUnit(sReader, new ListReader<Token>(tokens));
+		new XStream().toXML(unit, new FileWriter("tree.xml"));
 		return unit;
 		
 	}
@@ -1113,6 +1117,7 @@ public class Parser {
 				reader.skip();
 				FunctionCall call = functionCall(sReader, reader);
 				if(call != null) {
+					System.out.println("Got memberCall "+call.getName()+call.getArgsRepr());
 					expr = new MemberCall(expr, call);
 					continue;
 				}

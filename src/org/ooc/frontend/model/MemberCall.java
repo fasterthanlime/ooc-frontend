@@ -19,7 +19,7 @@ public class MemberCall extends FunctionCall {
 	public MemberCall(Expression expression, FunctionCall call) {
 		super(call.name, call.suffix);
 		this.expression = expression;
-		
+		arguments.addAll(call.getArguments());
 	}
 
 	public Expression getExpression() {
@@ -63,8 +63,8 @@ public class MemberCall extends FunctionCall {
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, final boolean fatal) throws IOException {
 
 		
-		Type declType = expression.getType();
-		if(declType == null) {
+		Type exprType = expression.getType();
+		if(exprType == null) {
 			if(fatal) {
 				throw new CompilationFailedError(null, "Calling member function "
 						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
@@ -72,7 +72,7 @@ public class MemberCall extends FunctionCall {
 			}
 			return false;
 		}
-		Declaration decl = declType.getRef();
+		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDeclaration)) {
 			throw new CompilationFailedError(null, 
 					"Trying to call a member function of not a TypeDecl, but a "
@@ -80,17 +80,15 @@ public class MemberCall extends FunctionCall {
 		}
 
 		TypeDeclaration typeDeclaration = (TypeDeclaration) decl;
-		FunctionDecl funcDecl = typeDeclaration.getFunction(this);
-		if(funcDecl == null) {
-			throw new CompilationFailedError(null, "Member function "+name+getArgsRepr()+" not found in type "+typeDeclaration.getType());
-		}
-		impl = funcDecl;
+		impl = typeDeclaration.getFunction(this);
 		
 		if(fatal && impl == null) {
-			throw new CompilationFailedError(null, "Couldn't resolve call to member function "+name+getArgsRepr());
+			throw new CompilationFailedError(null, "Member function "+name+getArgsRepr()
+					+" not found in type "+typeDeclaration.getInstanceType()+" (args  = "+arguments+
+					"), funcs = "+typeDeclaration.getFunctions());
 		}
 		
-		return impl != null;
+		return impl == null;
 		
 	}
 	

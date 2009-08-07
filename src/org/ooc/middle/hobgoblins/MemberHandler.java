@@ -45,13 +45,13 @@ public class MemberHandler implements Hobgoblin {
 				
 				if(node.isStatic()) return true; // static functions don't have a this.
 				
-				int index = Node.find(ClassDecl.class, stack);
+				int index = Node.find(TypeDeclaration.class, stack);
 				if(index == -1) {
 					node.setTypeDecl(null);
 					return true;
 				}
 				
-				ClassDecl classDecl = (ClassDecl) stack.get(index);
+				TypeDeclaration classDecl = (TypeDeclaration) stack.get(index);
 				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", false));
 				node.setTypeDecl(classDecl);
 				

@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 
 public class FunctionDecl extends Declaration implements Scope {
@@ -184,6 +185,43 @@ public class FunctionDecl extends Declaration implements Scope {
 		sB.append(')');
 		
 		return sB.toString();
+		
+	}
+	
+	@Override
+	public String toString() {
+		
+		return getClass().getSimpleName()+" : "+name+getArgsRepr();
+		
+	}
+
+	public String getFullName() {
+		
+		StringBuilder sB = new StringBuilder();
+		try {
+			writeFullName(sB);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return sB.toString();
+		
+	}
+
+	public void writeFullName(Appendable dst) throws IOException {
+		
+		if(isMember()) {
+			dst.append(typeDecl.getName()).append('_');
+		}
+		writeSuffixedName(dst);
+		
+	}
+
+	public void writeSuffixedName(Appendable dst) throws IOException {
+		
+		dst.append(name);
+		if(!suffix.isEmpty()) {
+			dst.append('_').append(suffix);
+		}
 		
 	}
 	

@@ -22,11 +22,6 @@ public class CoverDecl extends TypeDeclaration {
 		return fromType;
 	}
 	
-	@Override
-	public Type getInstanceType() {
-		throw new UnsupportedOperationException();
-	}
-	
 	public Type getFromType() {
 		return fromType;
 	}

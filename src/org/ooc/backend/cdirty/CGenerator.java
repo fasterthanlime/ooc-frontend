@@ -210,7 +210,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(decl.getSuffix());
 			}
 		} else {
-			writeSuffixedFuncName(decl);
+			decl.writeFullName(current);
 		}
 		
 		current.append('(');
@@ -267,9 +267,7 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(Instantiation inst) throws IOException {
 
 		FunctionDecl decl = inst.getImpl();
-		current.append(inst.getName()); // Actually the class name
-		current.append('_');
-		writeSuffixedFuncName(decl);
+		decl.writeFullName(current);
 		current.append('(');
 		writeExprList(inst.getArguments());
 		current.append(')');
@@ -460,8 +458,8 @@ public class CGenerator extends Generator implements Visitor {
 		if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
 		
 			hw.newLine();
-			hw.append("/* Function "+unit.getName()+"."+functionDecl.getName()+" */");
-			hw.newLine();
+			//hw.append("/* Function "+unit.getName()+"."+functionDecl.getName()+" */");
+			//hw.newLine();
 			
 			current = hw;
 			writeFuncPrototype(functionDecl);
@@ -483,13 +481,8 @@ public class CGenerator extends Generator implements Visitor {
 
 	private void writeFuncPrototype(FunctionDecl functionDecl) throws IOException {
 		
-		functionDecl.getReturnType().accept(this);
-		if(functionDecl.getReturnType().getPointerLevel() == 0) current.append(' ');
-		current.append(functionDecl.getName());
-		if(!functionDecl.getSuffix().isEmpty()) {
-			current.append('_');
-			current.append(functionDecl.getSuffix());
-		}
+		writeSpacedType(functionDecl.getReturnType());
+		functionDecl.writeFullName(current);
 		current.append('(');
 		
 		boolean isFirst = true;
@@ -541,9 +534,7 @@ public class CGenerator extends Generator implements Visitor {
 			FunctionDecl decl) throws IOException {
 		
 		writeSpacedType(decl.getReturnType());
-		current.append(className);
-		current.append('_');
-		current.append(decl.getName());
+		current.append(className).append('_').append(decl.getName());
 		writeFuncArgs(decl);
 		
 	}
@@ -608,10 +599,8 @@ public class CGenerator extends Generator implements Visitor {
 			openSpacedBlock();
 			
 			if(!decl.getReturnType().isVoid()) current.append("return ");
-			current.append("((");
-			current.append(className);
-			current.append("Class *)((MangoObject *)this)->class)->");
-			writeSuffixedFuncName(decl);
+			current.append("((").append(className).append("Class *)((MangoObject *)this)->class)->");
+			decl.writeSuffixedName(current);
 			
 			writeTypelessFuncArgs(decl);
 			current.append(";");
@@ -619,20 +608,6 @@ public class CGenerator extends Generator implements Visitor {
 			closeSpacedBlock();
 			
 		}
-	}
-
-	private void writeSuffixedFuncName(FunctionDecl decl) throws IOException {
-		current.append(decl.getName());
-		if(!decl.getSuffix().isEmpty()) {
-			current.append('_');
-			current.append(decl.getSuffix());
-		}
-	}
-	
-	private void writeSuffixedMemberFuncName(String className, FunctionDecl decl) throws IOException {
-		current.append(className);
-		current.append('_');
-		writeSuffixedFuncName(decl);
 	}
 	
 	private void writeBuiltinClassFuncName(String className, String returnType, String name)
@@ -709,9 +684,7 @@ public class CGenerator extends Generator implements Visitor {
 			current.newLine();
 			if(!decl.isFinal()) current.append("static ");
 			writeSpacedType(decl.getReturnType());
-			current.append(className);
-			current.append('_');
-			writeSuffixedFuncName(decl);
+			decl.writeFullName(current);
 			if(!decl.isFinal()) current.append("_impl");
 		
 			writeFuncArgs(decl, decl.isConstructor()); // if is constuctor, don't write the first arg
@@ -844,7 +817,7 @@ public class CGenerator extends Generator implements Visitor {
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			current.newLine();
 			writeSpacedType(decl.getReturnType());
-			writeSuffixedMemberFuncName(className, decl);
+			decl.writeFullName(current);
 			writeFuncArgs(decl, decl.isConstructor());
 			current.append(';');
 			
@@ -987,11 +960,14 @@ public class CGenerator extends Generator implements Visitor {
 			throw new UnsupportedOperationException("Doesn't support compound covers yet.");
 		}
 		current.append("typedef ");
-		fromType.accept(this);
-		current.append(' ');
+		writeSpacedType(fromType);
 		current.append(cover.getName());
 		current.append(';');
 		current.newLine();
+		
+		for(FunctionDecl decl: cover.getFunctions()) {
+			decl.accept(this);
+		}
 	}
 	
 	@Override

@@ -5,14 +5,19 @@ public abstract class TypeDeclaration extends Declaration {
 
 	protected NodeList<VariableDecl> variables;
 	protected NodeList<FunctionDecl> functions;
+	protected Type instanceType;
 	
 	public TypeDeclaration(String name) {
 		super(name);
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
+		this.instanceType = new Type(name);
+		instanceType.setRef(this);
 	}
 	
-	public abstract Type getInstanceType();
+	public Type getInstanceType() {
+		return instanceType;
+	}
 	
 	public NodeList<VariableDecl> getVariables() {
 		return variables;

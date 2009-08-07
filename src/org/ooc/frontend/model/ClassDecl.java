@@ -8,7 +8,6 @@ import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 public class ClassDecl extends TypeDeclaration implements Scope {
 
 	private static Type type = new Type("Class");
-	private Type instanceType;
 	
 	private boolean isAbstract;
 	
@@ -22,8 +21,6 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 		super(name);
 		this.isAbstract = isAbstract;
 		this.superName = "";
-		this.instanceType = new Type(name);
-		instanceType.setRef(this);
 		this.initializer = new FunctionDecl(FunctionDeclType.FUNC, "initialize", "", false, false, false, false);
 		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
 		this.superRef = null;
@@ -68,11 +65,6 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 	@Override
 	public Type getType() {
 		return type;
-	}
-	
-	@Override
-	public Type getInstanceType() {
-		return instanceType;
 	}
 	
 	@Override
