@@ -183,7 +183,7 @@
                         </arguments>
                       </lvalue>
                       <rvalue class="org.ooc.frontend.model.FunctionCall">
-                        <name>strdup</name>
+                        <name>clone</name>
                         <suffix></suffix>
                         <arguments>
                           <nodes>

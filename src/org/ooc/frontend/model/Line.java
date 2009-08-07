@@ -19,6 +19,10 @@ public class Line extends Node {
 		return statement;
 	}
 	
+	public void setStatement(Statement statement) {
+		this.statement = statement;
+	}
+	
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);

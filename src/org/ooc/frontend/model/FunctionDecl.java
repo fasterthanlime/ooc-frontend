@@ -223,5 +223,9 @@ public class FunctionDecl extends Declaration implements Scope {
 		}
 		
 	}
+
+	public String getProtoRepr() {
+		return name+getArgsRepr();
+	}
 	
 }
