@@ -10,7 +10,7 @@ import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.MultiLineComment;
+import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
@@ -27,6 +27,7 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -59,6 +60,7 @@ public interface Visitor {
 	public void visit(Div div) throws IOException;
 	public void visit(Not not) throws IOException;
 	public void visit(Mod mod) throws IOException;
+	public void visit(Compare compare) throws IOException;
 	
 	public void visit(MultiLineComment comment) throws IOException;
 	public void visit(SingleLineComment slComment) throws IOException;

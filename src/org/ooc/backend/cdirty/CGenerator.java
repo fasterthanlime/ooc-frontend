@@ -18,6 +18,7 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Comment;
+import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
@@ -175,6 +176,20 @@ public class CGenerator extends Generator implements Visitor {
 		mod.getLeft().accept(this);
 		current.append(" % ");
 		mod.getRight().accept(this);
+	}
+	
+	@Override
+	public void visit(Compare compare) throws IOException {
+
+		compare.getLeft().accept(this);
+		switch(compare.getCompareType()) {
+			case GREATER: current.append(" > "); break;
+			case GREATER_OR_EQUAL: current.append(" >= "); break;
+			case LESSER: current.append(" < "); break;
+			case LESSER_OR_EQUAL: current.append(" <= "); break;
+		}
+		compare.getRight().accept(this);
+		
 	}
 
 	@Override
@@ -362,8 +377,6 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(If if1) throws IOException {
-		
-		System.out.println("Condition is a "+if1.getCondition().getClass().getSimpleName());
 		
 		current.append("if");
 		if(if1.getCondition() instanceof Parenthesis) {

@@ -13,6 +13,7 @@ cover Int from int {
 
 func main() {
 
-	printf("The greatest of 24 and 42 is %d\n", 24.max(42));
+	Int value = 24;
+	printf("The greatest of 24 and 42 is %d\n", value.max(42));
 
 }

@@ -113,15 +113,27 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		}, mainStack);
 		
 		if(ref == null) {
-			int classIndex = Node.find(ClassDecl.class, mainStack);
-			if(classIndex != -1) {
-				ClassDecl classDecl = (ClassDecl) mainStack.get(classIndex);
-				FunctionDecl func = classDecl.getFunction(variable, "");
-				if(func != null) {
+			int typeIndex = Node.find(TypeDeclaration.class, mainStack);
+			if(typeIndex != -1) {
+				TypeDeclaration typeDecl = (TypeDeclaration) mainStack.get(typeIndex);
+				VariableDecl varDecl = typeDecl.getVariable(variable);
+				if(varDecl != null) {
+					VariableAccess thisAccess = new VariableAccess("this");
+					MemberAccess membAccess = new MemberAccess(thisAccess, variable);
+					membAccess.setRef(varDecl);
+					if(!mainStack.peek().replace(this, membAccess)) {
+						throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
+					}
+					return true;
+				}
+				FunctionDecl funcDecl = typeDecl.getNoargFunction(variable);
+				if(funcDecl != null) {
 					VariableAccess thisAccess = new VariableAccess("this");
 					MemberCall membCall = new MemberCall(thisAccess, variable, "");
-					membCall.setImpl(func);
-					mainStack.peek().replace(this, membCall);
+					membCall.setImpl(funcDecl);
+					if(!mainStack.peek().replace(this, membCall)) {
+						throw new Error("Couldn't replace a VariableAccess with a MemberCall!");
+					}
 					return true;
 				}
 			}

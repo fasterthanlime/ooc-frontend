@@ -17,6 +17,7 @@ import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
@@ -518,6 +519,20 @@ public class OocGenerator extends Generator implements Visitor {
 		
 		w.append("//");
 		w.append(slComment.getContent());
+		
+	}
+
+	@Override
+	public void visit(Compare compare) throws IOException {
+
+		compare.getLeft().accept(this);
+		switch(compare.getCompareType()) {
+			case GREATER: w.append(" > "); break;
+			case GREATER_OR_EQUAL: w.append(" >= "); break;
+			case LESSER: w.append(" < "); break;
+			case LESSER_OR_EQUAL: w.append(" <= "); break;
+		}
+		compare.getRight().accept(this);
 		
 	}
 	

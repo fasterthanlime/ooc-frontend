@@ -9,14 +9,9 @@ public class CoverDecl extends TypeDeclaration {
 	private OocDocComment comment;
 	private Type fromType;
 	
-	private NodeList<VariableDecl> variables;
-	private NodeList<FunctionDecl> functions;
-	
 	public CoverDecl(String name, Type fromType) {
 		super(name);
 		this.fromType = fromType;
-		this.variables = new NodeList<VariableDecl>();
-		this.functions = new NodeList<FunctionDecl>();
 	}
 
 	@Override
@@ -42,14 +37,6 @@ public class CoverDecl extends TypeDeclaration {
 	
 	public void setComment(OocDocComment comment) {
 		this.comment = comment;
-	}
-	
-	public NodeList<VariableDecl> getVariables() {
-		return variables;
-	}
-	
-	public NodeList<FunctionDecl> getFunctions() {
-		return functions;
 	}
 
 	@Override

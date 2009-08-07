@@ -12,6 +12,7 @@ import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Foreach;
@@ -317,6 +318,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(SingleLineComment slComment) throws IOException {
 		visit((Node) slComment);
+	}
+
+	@Override
+	public void visit(Compare compare) throws IOException {
+		visit((Node) compare);
 	}
 	
 }

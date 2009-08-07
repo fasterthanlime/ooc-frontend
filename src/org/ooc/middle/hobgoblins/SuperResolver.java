@@ -29,7 +29,6 @@ public class SuperResolver implements Hobgoblin {
 				for(ClassDecl candidate: classes) {
 					if(node.getSuperName().equals(candidate.getName())) {
 						node.setSuperRef(candidate);
-						System.out.println("Resolved super-class "+node.getSuperName());
 						return false;
 					}
 				}

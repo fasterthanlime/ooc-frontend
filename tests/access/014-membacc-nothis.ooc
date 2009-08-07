@@ -7,7 +7,7 @@ extern func printf(String, ...);
 
 func main {
 
-	new Dog("Dogbert");
+	new Dog("Dogbert").print;
 
 }
 

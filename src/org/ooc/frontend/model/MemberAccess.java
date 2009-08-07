@@ -58,17 +58,26 @@ public class MemberAccess extends VariableAccess {
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal)
 			throws IOException {
 		
-		Declaration decl = expression.getType().getRef();
-		if(!(decl instanceof ClassDecl)) {
+		Type exprType = expression.getType();
+		if(exprType == null) {
+			if(fatal) {
+				throw new CompilationFailedError(null, "Accessing member "
+						+variable+" in an expression "+expression.getClass().getSimpleName()
+						+" which type hasn't been resolved yet!");
+			}
+			return false;
+		}
+		Declaration decl = exprType.getRef();
+		if(!(decl instanceof TypeDeclaration)) {
 			throw new Error("Trying to access to a member of not a ClassDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
-		ClassDecl classDecl = (ClassDecl) decl;
+		TypeDeclaration typeDecl = (TypeDeclaration) decl;
 		
-		VariableDecl varDecl = classDecl.getVariable(variable);
+		VariableDecl varDecl = typeDecl.getVariable(variable);
 		if(varDecl == null) {
-			FunctionDecl funcDecl = classDecl.getFunction(variable, "");
+			FunctionDecl funcDecl = typeDecl.getNoargFunction(variable);
 			if(funcDecl != null && (funcDecl.getArguments().isEmpty()
 					|| funcDecl.getArguments().getLast() instanceof VarArg
 					|| funcDecl.isMember() && (funcDecl.getArguments().size() == 1

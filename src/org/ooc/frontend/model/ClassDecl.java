@@ -16,16 +16,12 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 	private String superName;
 	private ClassDecl superRef;
 
-	private NodeList<VariableDecl> variables;
-	private NodeList<FunctionDecl> functions;
 	private FunctionDecl initializer;
 	
 	public ClassDecl(String name, boolean isAbstract) {
 		super(name);
 		this.isAbstract = isAbstract;
 		this.superName = "";
-		this.variables = new NodeList<VariableDecl>();
-		this.functions = new NodeList<FunctionDecl>();
 		this.instanceType = new Type(name);
 		instanceType.setRef(this);
 		this.initializer = new FunctionDecl(FunctionDeclType.FUNC, "initialize", "", false, false, false, false);
@@ -47,14 +43,6 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 	
 	public void setSuperName(String superName) {
 		this.superName = superName;
-	}
-	
-	public NodeList<VariableDecl> getVariables() {
-		return variables;
-	}
-	
-	public NodeList<FunctionDecl> getFunctions() {
-		return functions;
 	}
 	
 	public FunctionDecl getInitializer() {
@@ -110,30 +98,20 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 		return false;
 	}
 	
-	public FunctionDecl getFunction(String name, String suffix) {
-		
-		for(FunctionDecl decl: functions) {
-			if(decl.getName().equals(name)
-				&& (decl.getSuffix().isEmpty() || suffix.isEmpty()
-					|| decl.getSuffix().equals(suffix))) {
-				return decl;
-			}
-		}
-		
-		if(superRef != null) return superRef.getFunction(name, suffix);
+	@Override
+	public FunctionDecl getFunction(FunctionCall call) {
+		FunctionDecl function = super.getFunction(call);
+		if(function != null) return function;
+		if(superRef != null) return superRef.getFunction(call);
 		return null;
-		
 	}
-
+	
+	@Override
 	public VariableDecl getVariable(String name) {
-		
-		for(VariableDecl decl: variables) {
-			if(decl.getName().equals(name)) return decl;
-		}
-		
+		VariableDecl variable = super.getVariable(name);
+		if(variable != null) return variable;
 		if(superRef != null) return superRef.getVariable(name);
 		return null;
-		
 	}
 	
 }

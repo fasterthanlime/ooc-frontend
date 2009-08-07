@@ -61,18 +61,28 @@ public class MemberCall extends FunctionCall {
 	
 	@Override
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, final boolean fatal) throws IOException {
+
 		
-		Declaration decl = expression.getType().getRef();
-		if(!(decl instanceof ClassDecl)) {
+		Type declType = expression.getType();
+		if(declType == null) {
+			if(fatal) {
+				throw new CompilationFailedError(null, "Calling member function "
+						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
+						+" which type hasn't been resolved yet!");
+			}
+			return false;
+		}
+		Declaration decl = declType.getRef();
+		if(!(decl instanceof TypeDeclaration)) {
 			throw new CompilationFailedError(null, 
-					"Trying to call a member function of not a ClassDecl, but a "
+					"Trying to call a member function of not a TypeDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
-		ClassDecl classDecl = (ClassDecl) decl;
-		FunctionDecl funcDecl = classDecl.getFunction(name, suffix);
+		TypeDeclaration typeDeclaration = (TypeDeclaration) decl;
+		FunctionDecl funcDecl = typeDeclaration.getFunction(this);
 		if(funcDecl == null) {
-			throw new CompilationFailedError(null, "Member function "+name+" not found in class "+classDecl.getType());
+			throw new CompilationFailedError(null, "Member function "+name+getArgsRepr()+" not found in type "+typeDeclaration.getType());
 		}
 		impl = funcDecl;
 		

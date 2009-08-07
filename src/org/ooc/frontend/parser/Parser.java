@@ -23,11 +23,15 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.FINAL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.GT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.GTE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_NUMBER;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPORT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.INCLUDE_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.LT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.LTE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.MINUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ML_COMMENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
@@ -68,6 +72,7 @@ import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.Conditional;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
@@ -111,6 +116,7 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.Compare.CompareType;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.NumberLiteral.Format;
 import org.ooc.frontend.model.tokens.ListReader;
@@ -927,7 +933,7 @@ public class Parser {
 			t = reader.read();
 		}
 		
-		// FIXME this is probably not a good place to be
+		// FIXME this is probably not a good place for this
 		if(functionDecl.getName().equals("main")) {
 			functionDecl.setReturnType(new Type("int"));
 		}
@@ -1170,7 +1176,8 @@ public class Parser {
 			}
 			
 			if(t.type == PLUS || t.type == STAR
-					|| t.type == MINUS || t.type == SLASH || t.type == PERCENT) {
+					|| t.type == MINUS || t.type == SLASH || t.type == PERCENT
+					|| t.type == GT || t.type == LT || t.type == GTE || t.type == LTE) {
 				
 				reader.skip();
 				Expression rvalue = expression(sReader, reader);
@@ -1184,6 +1191,10 @@ public class Parser {
 					case MINUS: expr = new Sub(expr, rvalue); break;
 					case SLASH: expr = new Div(expr, rvalue); break;
 					case PERCENT: expr = new Mod(expr, rvalue); break;
+					case GT: expr = new Compare(expr, rvalue, CompareType.GREATER); break;
+					case GTE: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL); break;
+					case LT: expr = new Compare(expr, rvalue, CompareType.LESSER); break;
+					case LTE: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
