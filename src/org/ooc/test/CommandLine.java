@@ -19,7 +19,7 @@ public class CommandLine {
 	public static void main(String[] argv) throws InterruptedException, IOException {
 		
 		if(argv.length == 0) {
-			System.out.println("Usage: o3c [OPTIONS] file.ooc\nOptions:\n\t-c: generates C instead of regenerating ooc");
+			System.out.println("Usage: o3c [OPTIONS] file.ooc");
 			System.exit(0);
 		}
 		
