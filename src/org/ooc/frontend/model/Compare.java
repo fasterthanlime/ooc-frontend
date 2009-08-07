@@ -10,7 +10,9 @@ public class Compare extends BinaryOperation {
 		GREATER,
 		GREATER_OR_EQUAL,
 		LESSER,
-		LESSER_OR_EQUAL
+		LESSER_OR_EQUAL,
+		EQUAL,
+		NOT_EQUAL,
 	}
 
 	protected CompareType compareType;

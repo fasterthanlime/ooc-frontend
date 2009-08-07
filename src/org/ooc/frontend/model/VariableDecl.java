@@ -79,18 +79,15 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		// TODO wrap the two lines into a new Block
 		
 		if(hierarchy.peek() instanceof Line
+		|| hierarchy.peek() instanceof ControlStatement
 		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
-		|| hierarchy.get(hierarchy.size() - 2) instanceof ClassDecl)
+		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDeclaration
+		)
 			return false;
 		
-		int listIndex = find(NodeList.class, hierarchy);
-		if(listIndex == -1) {
-			throw new Error("Couldn't find list in which to replace VariableDecl expression. Stack = "+hierarchy);
-		}
-		NodeList<Node> list = (NodeList<Node>) hierarchy.get(listIndex);
-		list.replace(this, new VariableAccess(name));
+		hierarchy.peek().replace(this, new VariableAccess(name));
 		
-		int lineIndex = find(Line.class, hierarchy, listIndex - 1);
+		int lineIndex = find(Line.class, hierarchy);
 		if(lineIndex == -1) {
 			throw new Error("Not in a line! How are we supposed to add one? Stack = "+hierarchy);
 		}

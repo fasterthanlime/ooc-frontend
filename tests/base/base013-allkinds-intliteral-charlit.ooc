@@ -12,6 +12,8 @@ func main {
 	Int d = 0b1011;
 	String e = "abba zabba";
 	Char f = 'c';
-	printf("(a, b, c, d, e, f) = (%d, %d, %d, %d, %s, %c)\n", a, b, c, d, e, f);
+	Float g = 3.14;
+	Int h = 10_000_000;
+	printf("(a, b, c, d, e, f, g, h) = (%d, %d, %d, %d, %s, %c, %f, %d)\n", a, b, c, d, e, f, g, h);
 
 }

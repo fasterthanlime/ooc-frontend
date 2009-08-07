@@ -15,6 +15,7 @@ public class NumberLiteral extends Literal {
 	
 	private long value;
 	private Format format;
+	private static Type type = new Type("Int");
 	
 	public NumberLiteral(long value, Format format) {
 		
@@ -25,7 +26,7 @@ public class NumberLiteral extends Literal {
 	
 	@Override
 	public Type getType() {
-		return new Type("Int");
+		return type;
 	}
 	
 	public long getValue() {
@@ -43,11 +44,13 @@ public class NumberLiteral extends Literal {
 	
 	@Override
 	public boolean hasChildren() {
-		return false;
+		return true;
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
+	public void acceptChildren(Visitor visitor) throws IOException {
+		visitor.visit(type);
+	}
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {

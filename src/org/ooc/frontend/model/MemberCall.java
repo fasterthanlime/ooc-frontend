@@ -70,7 +70,15 @@ public class MemberCall extends FunctionCall {
 						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been resolved yet!");
 			}
-			return false;
+			return true;
+		}
+		if(exprType.getRef() == null) {
+			if(fatal) {
+				throw new CompilationFailedError(null, "Calling member function "
+						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
+						+" which type hasn't been ref'd yet");
+			}
+			return true;
 		}
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDeclaration)) {

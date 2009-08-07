@@ -12,7 +12,7 @@ import org.ooc.middle.hobgoblins.SuffixConflictAnnihilator;
 import org.ooc.middle.hobgoblins.SuperResolver;
 import org.ooc.middle.hobgoblins.TypeResolver;
 import org.ooc.middle.hobgoblins.Unwrapper;
-import org.ooc.middle.hobgoblins.VoidReturnCrusher;
+import org.ooc.middle.hobgoblins.ReturnHandler;
 
 /**
  * The Tinkerer(TM) handles all the work that there's to be done
@@ -31,7 +31,7 @@ public class Tinkerer implements Hobgoblin {
 
 		new CaseEnforcer().process(unit);
 		
-		new VoidReturnCrusher().process(unit);
+		new ReturnHandler().process(unit);
 		new SuperResolver().process(unit);
 		
 		new DefaultConstructorGiver().process(unit);

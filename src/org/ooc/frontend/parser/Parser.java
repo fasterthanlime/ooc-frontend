@@ -35,6 +35,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.LTE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.MINUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ML_COMMENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
+import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NEW_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NULL;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OCT_NUMBER;
@@ -57,7 +58,8 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TILDE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRUE;
-import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.EQUALS;
+import static org.ooc.frontend.model.tokens.Token.TokenType.NOT_EQ;
 
 import java.io.EOFException;
 import java.io.File;
@@ -1182,7 +1184,8 @@ public class Parser {
 			
 			if(t.type == PLUS || t.type == STAR
 					|| t.type == MINUS || t.type == SLASH || t.type == PERCENT
-					|| t.type == GT || t.type == LT || t.type == GTE || t.type == LTE) {
+					|| t.type == GT || t.type == LT || t.type == GTE || t.type == LTE
+					|| t.type == EQUALS || t.type == NOT_EQ) {
 				
 				reader.skip();
 				Expression rvalue = expression(sReader, reader);
@@ -1200,6 +1203,8 @@ public class Parser {
 					case GTE: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL); break;
 					case LT: expr = new Compare(expr, rvalue, CompareType.LESSER); break;
 					case LTE: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
+					case EQUALS: expr = new Compare(expr, rvalue, CompareType.EQUAL); break;
+					case NOT_EQ: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}

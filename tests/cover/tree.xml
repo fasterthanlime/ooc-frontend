@@ -1,11 +1,17 @@
 <org.ooc.frontend.model.SourceUnit>
-  <simpleName>002-from-funcs</simpleName>
-  <name>002-from-funcs</name>
-  <fileName>002-from-funcs.ooc</fileName>
+  <simpleName>006-stringrepl</simpleName>
+  <name>006-stringrepl</name>
+  <fileName>006-stringrepl.ooc</fileName>
   <includes>
     <nodes>
       <org.ooc.frontend.model.Include>
         <include>stdio</include>
+      </org.ooc.frontend.model.Include>
+      <org.ooc.frontend.model.Include>
+        <include>memory</include>
+      </org.ooc.frontend.model.Include>
+      <org.ooc.frontend.model.Include>
+        <include>string</include>
       </org.ooc.frontend.model.Include>
     </nodes>
   </includes>
@@ -52,8 +58,66 @@
           </nodes>
         </arguments>
       </org.ooc.frontend.model.FunctionDecl>
+      <org.ooc.frontend.model.FunctionDecl>
+        <name>strdup</name>
+        <isFinal>false</isFinal>
+        <isStatic>false</isStatic>
+        <isAbstract>false</isAbstract>
+        <isExtern>true</isExtern>
+        <declType>FUNC</declType>
+        <suffix></suffix>
+        <body>
+          <nodes/>
+        </body>
+        <returnType>
+          <name>String</name>
+          <pointerLevel>0</pointerLevel>
+        </returnType>
+        <arguments>
+          <nodes>
+            <org.ooc.frontend.parser.TypeArgument>
+              <name></name>
+              <isConst>false</isConst>
+              <isStatic>false</isStatic>
+              <type>
+                <name>String</name>
+                <pointerLevel>0</pointerLevel>
+              </type>
+            </org.ooc.frontend.parser.TypeArgument>
+          </nodes>
+        </arguments>
+      </org.ooc.frontend.model.FunctionDecl>
+      <org.ooc.frontend.model.FunctionDecl>
+        <name>strlen</name>
+        <isFinal>false</isFinal>
+        <isStatic>false</isStatic>
+        <isAbstract>false</isAbstract>
+        <isExtern>true</isExtern>
+        <declType>FUNC</declType>
+        <suffix></suffix>
+        <body>
+          <nodes/>
+        </body>
+        <returnType>
+          <name>Int</name>
+          <pointerLevel>0</pointerLevel>
+        </returnType>
+        <arguments>
+          <nodes>
+            <org.ooc.frontend.parser.TypeArgument>
+              <name></name>
+              <isConst>false</isConst>
+              <isStatic>false</isStatic>
+              <type>
+                <name>String</name>
+                <pointerLevel>0</pointerLevel>
+              </type>
+            </org.ooc.frontend.parser.TypeArgument>
+          </nodes>
+        </arguments>
+      </org.ooc.frontend.model.FunctionDecl>
       <org.ooc.frontend.model.CoverDecl>
-        <name>String</name>
+        <name>Int</name>
         <variables>
           <nodes/>
         </variables>
@@ -61,24 +125,42 @@
           <nodes/>
         </functions>
         <instanceType>
-          <name>String</name>
+          <name>Int</name>
+          <pointerLevel>0</pointerLevel>
+          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
+        </instanceType>
+        <fromType>
+          <name>int</name>
+          <pointerLevel>0</pointerLevel>
+        </fromType>
+      </org.ooc.frontend.model.CoverDecl>
+      <org.ooc.frontend.model.CoverDecl>
+        <name>Char</name>
+        <variables>
+          <nodes/>
+        </variables>
+        <functions>
+          <nodes/>
+        </functions>
+        <instanceType>
+          <name>Char</name>
           <pointerLevel>0</pointerLevel>
           <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
         </instanceType>
         <fromType>
           <name>char</name>
-          <pointerLevel>1</pointerLevel>
+          <pointerLevel>0</pointerLevel>
         </fromType>
       </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.CoverDecl>
-        <name>Int</name>
+        <name>String</name>
         <variables>
           <nodes/>
         </variables>
         <functions>
           <nodes>
             <org.ooc.frontend.model.FunctionDecl>
-              <name>max</name>
+              <name>replace</name>
               <isFinal>false</isFinal>
               <isStatic>false</isStatic>
               <isAbstract>false</isAbstract>
@@ -88,35 +170,154 @@
               <body>
                 <nodes>
                   <org.ooc.frontend.model.Line>
-                    <statement class="org.ooc.frontend.model.If">
+                    <statement class="org.ooc.frontend.model.Assignment">
+                      <lvalue class="org.ooc.frontend.model.FunctionCall">
+                        <name>String</name>
+                        <suffix></suffix>
+                        <arguments>
+                          <nodes>
+                            <org.ooc.frontend.model.VariableAccess>
+                              <variable>copy</variable>
+                            </org.ooc.frontend.model.VariableAccess>
+                          </nodes>
+                        </arguments>
+                      </lvalue>
+                      <rvalue class="org.ooc.frontend.model.FunctionCall">
+                        <name>strdup</name>
+                        <suffix></suffix>
+                        <arguments>
+                          <nodes>
+                            <org.ooc.frontend.model.VariableAccess>
+                              <variable>this</variable>
+                            </org.ooc.frontend.model.VariableAccess>
+                          </nodes>
+                        </arguments>
+                      </rvalue>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.Foreach">
                       <body>
                         <nodes>
                           <org.ooc.frontend.model.Line>
-                            <statement class="org.ooc.frontend.model.ValuedReturn">
-                              <expression class="org.ooc.frontend.model.VariableAccess">
-                                <variable>this</variable>
-                              </expression>
+                            <statement class="org.ooc.frontend.model.If">
+                              <body>
+                                <nodes>
+                                  <org.ooc.frontend.model.Line>
+                                    <statement class="org.ooc.frontend.model.Assignment">
+                                      <lvalue class="org.ooc.frontend.model.ArrayAccess">
+                                        <variable class="org.ooc.frontend.model.VariableAccess">
+                                          <variable>copy</variable>
+                                        </variable>
+                                        <index class="org.ooc.frontend.model.VariableAccess">
+                                          <variable>i</variable>
+                                        </index>
+                                      </lvalue>
+                                      <rvalue class="org.ooc.frontend.model.VariableAccess">
+                                        <variable>kiddo</variable>
+                                      </rvalue>
+                                    </statement>
+                                  </org.ooc.frontend.model.Line>
+                                </nodes>
+                              </body>
+                              <condition class="org.ooc.frontend.model.Parenthesis">
+                                <expression class="org.ooc.frontend.model.Compare">
+                                  <left class="org.ooc.frontend.model.ArrayAccess">
+                                    <variable class="org.ooc.frontend.model.VariableAccess">
+                                      <variable>copy</variable>
+                                    </variable>
+                                    <index class="org.ooc.frontend.model.VariableAccess">
+                                      <variable>i</variable>
+                                    </index>
+                                  </left>
+                                  <right class="org.ooc.frontend.model.VariableAccess">
+                                    <variable>oldie</variable>
+                                  </right>
+                                  <compareType>EQUAL</compareType>
+                                </expression>
+                              </condition>
                             </statement>
                           </org.ooc.frontend.model.Line>
                         </nodes>
                       </body>
-                      <condition class="org.ooc.frontend.model.Parenthesis">
-                        <expression class="org.ooc.frontend.model.Compare">
-                          <left class="org.ooc.frontend.model.VariableAccess">
-                            <variable>this</variable>
-                          </left>
-                          <right class="org.ooc.frontend.model.VariableAccess">
-                            <variable>other</variable>
-                          </right>
-                          <compareType>GREATER_OR_EQUAL</compareType>
-                        </expression>
-                      </condition>
+                      <variable>
+                        <name>i</name>
+                        <isConst>false</isConst>
+                        <isStatic>false</isStatic>
+                        <type>
+                          <name>Int</name>
+                          <pointerLevel>0</pointerLevel>
+                        </type>
+                      </variable>
+                      <collection class="org.ooc.frontend.model.RangeLiteral">
+                        <lower class="org.ooc.frontend.model.NumberLiteral">
+                          <value>0</value>
+                          <format>DEC</format>
+                        </lower>
+                        <upper class="org.ooc.frontend.model.VariableAccess">
+                          <variable>length</variable>
+                        </upper>
+                      </collection>
                     </statement>
                   </org.ooc.frontend.model.Line>
                   <org.ooc.frontend.model.Line>
                     <statement class="org.ooc.frontend.model.ValuedReturn">
                       <expression class="org.ooc.frontend.model.VariableAccess">
-                        <variable>other</variable>
+                        <variable>copy</variable>
+                      </expression>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                </nodes>
+              </body>
+              <returnType>
+                <name>String</name>
+                <pointerLevel>0</pointerLevel>
+              </returnType>
+              <arguments>
+                <nodes>
+                  <org.ooc.frontend.model.RegularArgument>
+                    <name>oldie</name>
+                    <isConst>false</isConst>
+                    <isStatic>false</isStatic>
+                    <type>
+                      <name>Char</name>
+                      <pointerLevel>0</pointerLevel>
+                    </type>
+                  </org.ooc.frontend.model.RegularArgument>
+                  <org.ooc.frontend.model.RegularArgument>
+                    <name>kiddo</name>
+                    <isConst>false</isConst>
+                    <isStatic>false</isStatic>
+                    <type>
+                      <name>Char</name>
+                      <pointerLevel>0</pointerLevel>
+                    </type>
+                  </org.ooc.frontend.model.RegularArgument>
+                </nodes>
+              </arguments>
+            </org.ooc.frontend.model.FunctionDecl>
+            <org.ooc.frontend.model.FunctionDecl>
+              <name>length</name>
+              <isFinal>false</isFinal>
+              <isStatic>false</isStatic>
+              <isAbstract>false</isAbstract>
+              <isExtern>false</isExtern>
+              <declType>FUNC</declType>
+              <suffix></suffix>
+              <body>
+                <nodes>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.ValuedReturn">
+                      <expression class="org.ooc.frontend.model.FunctionCall">
+                        <name>strlen</name>
+                        <suffix></suffix>
+                        <arguments>
+                          <nodes>
+                            <org.ooc.frontend.model.VariableAccess>
+                              <variable>this</variable>
+                            </org.ooc.frontend.model.VariableAccess>
+                          </nodes>
+                        </arguments>
                       </expression>
                     </statement>
                   </org.ooc.frontend.model.Line>
@@ -127,29 +328,19 @@
                 <pointerLevel>0</pointerLevel>
               </returnType>
               <arguments>
-                <nodes>
-                  <org.ooc.frontend.model.RegularArgument>
-                    <name>other</name>
-                    <isConst>false</isConst>
-                    <isStatic>false</isStatic>
-                    <type>
-                      <name>Int</name>
-                      <pointerLevel>0</pointerLevel>
-                    </type>
-                  </org.ooc.frontend.model.RegularArgument>
-                </nodes>
+                <nodes/>
               </arguments>
             </org.ooc.frontend.model.FunctionDecl>
           </nodes>
         </functions>
         <instanceType>
-          <name>Int</name>
+          <name>String</name>
           <pointerLevel>0</pointerLevel>
           <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
         </instanceType>
         <fromType>
-          <name>int</name>
-          <pointerLevel>0</pointerLevel>
+          <name>Char</name>
+          <pointerLevel>1</pointerLevel>
         </fromType>
       </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.FunctionDecl>
@@ -163,66 +354,31 @@
         <body>
           <nodes>
             <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Assignment">
-                <lvalue class="org.ooc.frontend.model.FunctionCall">
-                  <name>Int</name>
-                  <suffix></suffix>
-                  <arguments>
-                    <nodes>
-                      <org.ooc.frontend.model.VariableAccess>
-                        <variable>value</variable>
-                      </org.ooc.frontend.model.VariableAccess>
-                    </nodes>
-                  </arguments>
-                </lvalue>
-                <rvalue class="org.ooc.frontend.model.NumberLiteral">
-                  <value>24</value>
-                  <format>DEC</format>
-                </rvalue>
-              </statement>
-            </org.ooc.frontend.model.Line>
-            <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Assignment">
-                <lvalue class="org.ooc.frontend.model.FunctionCall">
-                  <name>Int</name>
-                  <suffix></suffix>
-                  <arguments>
-                    <nodes>
-                      <org.ooc.frontend.model.VariableAccess>
-                        <variable>value2</variable>
-                      </org.ooc.frontend.model.VariableAccess>
-                    </nodes>
-                  </arguments>
-                </lvalue>
-                <rvalue class="org.ooc.frontend.model.MemberCall">
-                  <name>max</name>
-                  <suffix></suffix>
-                  <arguments>
-                    <nodes>
-                      <org.ooc.frontend.model.NumberLiteral>
-                        <value>42</value>
-                        <format>DEC</format>
-                      </org.ooc.frontend.model.NumberLiteral>
-                    </nodes>
-                  </arguments>
-                  <expression class="org.ooc.frontend.model.VariableAccess">
-                    <variable>value</variable>
-                  </expression>
-                </rvalue>
-              </statement>
-            </org.ooc.frontend.model.Line>
-            <org.ooc.frontend.model.Line>
               <statement class="org.ooc.frontend.model.FunctionCall">
                 <name>printf</name>
                 <suffix></suffix>
                 <arguments>
                   <nodes>
                     <org.ooc.frontend.model.StringLiteral>
-                      <value>The greatest of 24 and 42 is %d\n</value>
+                      <value>A dog is a not a %s\n</value>
                     </org.ooc.frontend.model.StringLiteral>
-                    <org.ooc.frontend.model.VariableAccess>
-                      <variable>value2</variable>
-                    </org.ooc.frontend.model.VariableAccess>
+                    <org.ooc.frontend.model.MemberCall>
+                      <name>replace</name>
+                      <suffix></suffix>
+                      <arguments>
+                        <nodes>
+                          <org.ooc.frontend.model.CharLiteral>
+                            <value>o</value>
+                          </org.ooc.frontend.model.CharLiteral>
+                          <org.ooc.frontend.model.CharLiteral>
+                            <value>a</value>
+                          </org.ooc.frontend.model.CharLiteral>
+                        </nodes>
+                      </arguments>
+                      <expression class="org.ooc.frontend.model.StringLiteral">
+                        <value>dog</value>
+                      </expression>
+                    </org.ooc.frontend.model.MemberCall>
                   </nodes>
                 </arguments>
               </statement>

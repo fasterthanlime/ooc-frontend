@@ -3,7 +3,6 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 
 public class FunctionDecl extends Declaration implements Scope {

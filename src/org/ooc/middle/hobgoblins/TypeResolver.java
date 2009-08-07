@@ -5,12 +5,12 @@ import java.util.Stack;
 
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.TypeDeclaration;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
@@ -46,7 +46,7 @@ public class TypeResolver implements Hobgoblin {
 			@Override
 			public boolean take(Declaration node, Stack<Node> stack) throws IOException {
 				
-				if(!(node instanceof ClassDecl || node instanceof CoverDecl)) return true;
+				if(!(node instanceof TypeDeclaration)) return true;
 				
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {

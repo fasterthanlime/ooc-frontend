@@ -99,7 +99,7 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		if(index == -1) {
 			throw new ArrayIndexOutOfBoundsException("Trying to replace a "
 					+oldie.getClass().getName()+" with a "+kiddo.getClass().getSimpleName()+
-					" in a "+this.getClass().getSimpleName()+", but couldn't find node to replace.");
+					" in a "+this.getClass().getSimpleName()+", but couldn't find node to replace in NodeList.");
 		}
 		nodes.set(index, (T) kiddo);
 		return true;

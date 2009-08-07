@@ -187,6 +187,8 @@ public class CGenerator extends Generator implements Visitor {
 			case GREATER_OR_EQUAL: current.append(" >= "); break;
 			case LESSER: current.append(" < "); break;
 			case LESSER_OR_EQUAL: current.append(" <= "); break;
+			case EQUAL: current.append(" == "); break;
+			case NOT_EQUAL: current.append(" != "); break;
 		}
 		compare.getRight().accept(this);
 		

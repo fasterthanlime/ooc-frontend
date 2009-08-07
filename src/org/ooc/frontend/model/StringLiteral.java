@@ -7,6 +7,7 @@ import org.ooc.frontend.Visitor;
 public class StringLiteral extends Literal {
 
 	private String value;
+	private static Type type = new Type("String");
 	
 	public StringLiteral(String value) {
 		this.value = value;
@@ -14,7 +15,7 @@ public class StringLiteral extends Literal {
 	
 	@Override
 	public Type getType() {
-		return new Type("String");
+		return type;
 	}
 	
 	public String getValue() {
@@ -28,11 +29,13 @@ public class StringLiteral extends Literal {
 	
 	@Override
 	public boolean hasChildren() {
-		return false;
+		return true;
 	}
 	
 	@Override
-	public void acceptChildren(Visitor visitor) throws IOException {}
+	public void acceptChildren(Visitor visitor) throws IOException {
+		type.accept(visitor);
+	}
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {

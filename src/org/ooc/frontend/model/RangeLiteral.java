@@ -8,6 +8,7 @@ public class RangeLiteral extends Literal {
 
 	private Expression lower;
 	private Expression upper;
+	private static Type type = new Type("Range");
 	
 	public RangeLiteral(Expression lower, Expression upper) {
 		this.lower = lower;
@@ -32,7 +33,7 @@ public class RangeLiteral extends Literal {
 
 	@Override
 	public Type getType() {
-		return new Type("Range");
+		return type;
 	}
 	
 	@Override

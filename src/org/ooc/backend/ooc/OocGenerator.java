@@ -531,6 +531,8 @@ public class OocGenerator extends Generator implements Visitor {
 			case GREATER_OR_EQUAL: w.append(" >= "); break;
 			case LESSER: w.append(" < "); break;
 			case LESSER_OR_EQUAL: w.append(" <= "); break;
+			case EQUAL: w.append(" == "); break;
+			case NOT_EQUAL: w.append(" != "); break;
 		}
 		compare.getRight().accept(this);
 		

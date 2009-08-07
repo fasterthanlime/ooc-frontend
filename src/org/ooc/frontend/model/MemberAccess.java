@@ -65,7 +65,7 @@ public class MemberAccess extends VariableAccess {
 						+variable+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been resolved yet!");
 			}
-			return false;
+			return true;
 		}
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDeclaration)) {
@@ -88,7 +88,7 @@ public class MemberAccess extends VariableAccess {
 					throw new Error("Couldn't replace a MemberAccess with a MemberCall in a "
 							+stack.peek().getClass().getSimpleName());
 				}
-				return true;
+				return false;
 			}
 		}
 		ref = varDecl;

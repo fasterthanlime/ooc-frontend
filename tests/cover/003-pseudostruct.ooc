@@ -6,9 +6,12 @@ cover String from char*;
 cover Float from float;
 cover Point3f {
 
-	Float x, y, z;
+	Float x;
+	Float y;
+	Float z;
+
 	func length -> Float {
-		return sqrt(x * x + y * y + z * z)
+		return sqrt(x * x + y * y + z * z);
 	}
 
 }
