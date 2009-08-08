@@ -23,6 +23,7 @@ import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
+import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -42,7 +43,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -311,7 +312,7 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(NumberLiteral numberLiteral) throws IOException {
+	public void visit(IntLiteral numberLiteral) throws IOException {
 
 		switch(numberLiteral.getFormat()) {
 			case HEX:
@@ -401,7 +402,25 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Foreach foreach) throws IOException {
-		// TODO Auto-generated method stub
+
+		if(foreach.getCollection() instanceof RangeLiteral) {
+			System.out.println("Foreach over a range. Nice =)");
+			RangeLiteral range = (RangeLiteral) foreach.getCollection();
+			current.append("for (");
+			foreach.getVariable().accept(this);
+			current.append(" = ");
+			range.getLower().accept(this);
+			current.append("; ").append(foreach.getVariable().getName()).append(" < ");
+			range.getUpper().accept(this);
+			current.append("; ").append(foreach.getVariable().getName()).append("++");
+			current.append(")");
+			openBlock();
+			foreach.getBody().accept(this);
+			closeBlock();
+		} else { 
+			throw new UnsupportedOperationException("Iterating over.. not a Range but a "
+					+foreach.getCollection().getType());
+		}
 		
 	}
 
@@ -425,15 +444,15 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
-
 		current.append(variableAccess.getName());
-		
 	}
 
 	@Override
 	public void visit(ArrayAccess arrayAccess) throws IOException {
-		// TODO Auto-generated method stub
-		
+		arrayAccess.getVariable().accept(this);
+		current.append('[');
+		arrayAccess.getIndex().accept(this);
+		current.append(']');
 	}
 
 	@Override
@@ -441,7 +460,11 @@ public class CGenerator extends Generator implements Visitor {
 
 		variableDecl.getType().accept(this);
 		if(variableDecl.getType().isFlat()) current.append(' ');
-		current.append(variableDecl.getName());
+		Iterator<String> iter = variableDecl.getNames().iterator();
+		while(iter.hasNext()) {
+			current.append(iter.next());
+			if(iter.hasNext()) current.append(", ");
+		}
 		
 	}
 
@@ -1049,6 +1072,11 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(SingleLineComment slComment) throws IOException {
 		current.append(" // ");
 		current.append(slComment.getContent().trim());
+	}
+
+	@Override
+	public void visit(FloatLiteral floatLiteral) throws IOException {
+		current.append(Double.toString(floatLiteral.getValue()));
 	}
 
 }

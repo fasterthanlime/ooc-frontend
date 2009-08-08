@@ -32,8 +32,6 @@ public class MemberArgument extends Argument {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 		
-		System.out.println("Here MemberArgument, should unwrap, hierarchy = "+hierarchy);
-		
 		int classIndex = Node.find(ClassDecl.class, hierarchy);
 		if(classIndex == -1) {
 			throw new CompilationFailedError(null, "Member argument outside a class definition!");

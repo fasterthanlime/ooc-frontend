@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 
+
 public abstract class TypeDeclaration extends Declaration {
 
 	protected NodeList<VariableDecl> variables;
@@ -27,6 +28,8 @@ public abstract class TypeDeclaration extends Declaration {
 		return functions;
 	}
 	
+	public abstract NodeList<FunctionDecl> getFunctionsRecursive();
+
 	public FunctionDecl getFunction(FunctionCall call) {
 		for(FunctionDecl decl: functions) {
 			if(call.matches(decl)) return decl;

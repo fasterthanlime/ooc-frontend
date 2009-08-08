@@ -3,7 +3,7 @@ package org.ooc.frontend.parser;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CHAR_LIT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLASS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_BRACK;
@@ -13,9 +13,11 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.COL;
 import static org.ooc.frontend.model.tokens.Token.TokenType.COMMA;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CONST_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.COVER_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.DEC_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.DEC_FLOAT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.DEC_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.DOT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.DOUBLE_DOT;
+import static org.ooc.frontend.model.tokens.Token.TokenType.EQUALS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.EXCL;
 import static org.ooc.frontend.model.tokens.Token.TokenType.EXTERN_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FALSE;
@@ -25,7 +27,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.FROM_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.FUNC_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.GT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.GTE;
-import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPORT_KW;
@@ -35,10 +37,10 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.LTE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.MINUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ML_COMMENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
-import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NEW_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.NOT_EQ;
 import static org.ooc.frontend.model.tokens.Token.TokenType.NULL;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OCT_NUMBER;
+import static org.ooc.frontend.model.tokens.Token.TokenType.OCT_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OOCDOC;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_BRACK;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
@@ -58,13 +60,13 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TILDE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.TRUE;
-import static org.ooc.frontend.model.tokens.Token.TokenType.EQUALS;
-import static org.ooc.frontend.model.tokens.Token.TokenType.NOT_EQ;
+import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ooc.frontend.model.Access;
@@ -82,6 +84,7 @@ import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
+import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -89,6 +92,7 @@ import org.ooc.frontend.model.If;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Literal;
 import org.ooc.frontend.model.MemberAccess;
@@ -100,7 +104,6 @@ import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.NumberLiteral;
 import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
@@ -121,7 +124,7 @@ import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.Compare.CompareType;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
-import org.ooc.frontend.model.NumberLiteral.Format;
+import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
 import org.ubi.CompilationFailedError;
@@ -522,12 +525,12 @@ public class Parser {
 		FunctionCall call = new FunctionCall(name, suffix);
 		
 		if(!exprList(sReader, reader, call.getArguments())) {
-			Expression expr = flatExpression(sReader, reader);
-			if(expr == null) {
+			//Expression expr = flatExpression(sReader, reader);
+			//if(expr == null) {
 				reader.reset(mark);
 				return null; // not a function call
-			}
-			call.getArguments().add(expr);
+			//}
+			//call.getArguments().add(expr);
 		}
 		
 		//System.out.println("Parsed function call, ended on token "+reader.peek().type);
@@ -631,26 +634,42 @@ public class Parser {
 		}
 		
 		Type type = type(sReader, reader);
-		if(type != null) {
-			Token t = reader.peek();
-			if(t.type == NAME) {
-				reader.skip();
-				Token t2 = reader.peek();
-				if(t2.type == ASSIGN) {
-					reader.skip();
-					Expression expr = expression(sReader, reader);
-					if(expr == null) {
-						throw new CompilationFailedError(sReader.getLocation(t2.start),
-								"Expected expression as an initializer to a variable declaration.");
-					}
-					return new VariableDeclAssigned(type, t.get(sReader), expr, isConst, isStatic);
-				}
-				return new VariableDecl(type, t.get(sReader), isConst, isStatic);
-			}
+		if(type == null) {
+			reader.reset(mark);
+			return null;
 		}
 		
-		reader.reset(mark);
-		return null;
+		List<String> names = new ArrayList<String>();
+		Token t = reader.peek();
+		if(t.type != NAME) {
+			reader.reset(mark);
+			return null;
+		}
+		String name = t.get(sReader);
+		reader.skip();
+		Token t2 = reader.peek();
+		if(t2.type == ASSIGN) {
+			reader.skip();
+			Expression expr = expression(sReader, reader);
+			if(expr == null) {
+				throw new CompilationFailedError(sReader.getLocation(t2.start),
+						"Expected expression as an initializer to a variable declaration.");
+			}
+			return new VariableDeclAssigned(type, name, expr, isConst, isStatic);
+		}
+		names.add(name);
+		
+		while(reader.peek().type == COMMA) {
+			reader.skip();
+			Token t3 = reader.read();
+			if(t3.type != NAME) {
+				throw new CompilationFailedError(sReader.getLocation(t3.start),
+				"Expected name in multi variable decl, after a comma.");
+			}
+			names.add(t3.get(sReader));
+		}
+		
+		return new VariableDecl(type, names, isConst, isStatic);
 		
 	}
 	
@@ -1119,7 +1138,6 @@ public class Parser {
 				reader.skip();
 				FunctionCall call = functionCall(sReader, reader);
 				if(call != null) {
-					System.out.println("Got memberCall "+call.getName()+call.getArgsRepr());
 					expr = new MemberCall(expr, call);
 					continue;
 				}
@@ -1175,7 +1193,7 @@ public class Parser {
 				}
 				if(!(expr instanceof Access)) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Attempting to assign to a constant.");
+						"Attempting to assign to a constant, e.g. "+expr);
 				}
 				expr = new Assignment((Access) expr, rvalue);
 				continue;
@@ -1325,17 +1343,20 @@ public class Parser {
 				throw new CompilationFailedError(sReader.getLocation(t.start), "Malformed char literal");
 			}
 		}
-		if(t.type == DEC_NUMBER) {
-			return new NumberLiteral(Long.parseLong(t.get(sReader)), Format.DEC);
+		if(t.type == DEC_INT) {
+			return new IntLiteral(Long.parseLong(t.get(sReader).replace("_", "")), Format.DEC);
 		}
-		if(t.type == HEX_NUMBER) {
-			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 16), Format.HEX);
+		if(t.type == HEX_INT) {
+			return new IntLiteral(Long.parseLong(t.get(sReader).replace("_", "").toUpperCase(), 16), Format.HEX);
 		}
-		if(t.type == OCT_NUMBER) {
-			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 8), Format.OCT);
+		if(t.type == OCT_INT) {
+			return new IntLiteral(Long.parseLong(t.get(sReader).replace("_", "").toUpperCase(), 8), Format.OCT);
 		}
-		if(t.type == BIN_NUMBER) {
-			return new NumberLiteral(Long.parseLong(t.get(sReader).toUpperCase(), 2), Format.BIN);
+		if(t.type == BIN_INT) {
+			return new IntLiteral(Long.parseLong(t.get(sReader).replace("_", "").toUpperCase(), 2), Format.BIN);
+		}
+		if(t.type == DEC_FLOAT) {
+			return new FloatLiteral(Double.parseDouble(t.get(sReader).replace("_", "")));
 		}
 		if(t.type == TRUE) {
 			return new BoolLiteral(true);

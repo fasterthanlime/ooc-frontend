@@ -26,6 +26,11 @@ public class CoverDecl extends TypeDeclaration {
 		return fromType;
 	}
 	
+	@Override
+	public NodeList<FunctionDecl> getFunctionsRecursive() {
+		return functions;
+	}
+	
 	public OocDocComment getComment() {
 		return comment;
 	}

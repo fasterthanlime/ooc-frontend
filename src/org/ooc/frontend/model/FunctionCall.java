@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Stack;
 
+import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
@@ -100,18 +101,51 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		else resolveRegular(mainStack, res, fatal);
 		
 		if(impl == null) {
-			if(fatal) throw new CompilationFailedError(null, "Couldn't resolve call to function "+name+getArgsRepr());
+			if(fatal) {
+				String message = "Couldn't resolve call to function "+name+getArgsRepr()+".";
+				String guess = guessCorrectName(mainStack, res);
+				if(guess != null) {
+					message += " Did you mean "+guess+" ?";
+				} else {
+					System.out.println("No guess!");
+				}
+				throw new CompilationFailedError(null, message);
+			}
 			
-			if(!tryVarDecl(mainStack)) return false;
+			//if(!tryVarDecl(mainStack)) return false;
+			return false;
 		}
 		
 		return impl == null;
 		
 	}
 
+	private String guessCorrectName(final Stack<Node> mainStack, final ModularAccessResolver res) {
+		
+		int bestDistance = Integer.MAX_VALUE;
+		String bestMatch = null;
+		
+		for(int i = mainStack.size() - 1; i >= 0; i--) {
+			if(!(mainStack.get(i) instanceof Scope)) continue;
+			
+			for(FunctionDecl decl: res.funcs.get(mainStack.get(i))) {
+				int distance = Levenshtein.distance(name, decl.getName());
+				if(distance < bestDistance) {
+					bestDistance = distance;
+					bestMatch = decl.getProtoRepr();
+				}
+			}
+		}
+		
+		return bestMatch;
+		
+	}
+
 	private boolean tryVarDecl(final Stack<Node> mainStack) throws Error, IOException {
 		
 		if(arguments.size() != 1) return true;
+		
+		System.out.println("Trying varDecl.. for function call to "+name+arguments);
 		
 		Expression firstArg = arguments.getFirst();
 		if(!(firstArg instanceof VariableAccess)) return true;
@@ -124,7 +158,8 @@ public class FunctionCall extends Access implements MustResolveAccess {
 			if(!grandparent.replace(parent,
 					new VariableDeclAssigned(new Type(name), varName,
 					ass.getRvalue(), false, false))) {
-				throw new Error("Couldn't replace an Assignment with a VariableDeclAssigned");
+				throw new Error("Couldn't replace an Assignment with a VariableDeclAssigned in a "
+						+grandparent.getClass().getSimpleName());
 			}
 		} else {
 			if(!parent.replace(this, new VariableDecl(new Type(name), varName, false, false))) {
@@ -135,6 +170,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		SourceUnit unit = (SourceUnit) mainStack.get(0);
 		new TypeResolver().process(unit);
 		new Unwrapper().process(unit);
+		System.out.println("Returned false.");
 		return false;
 		
 	}

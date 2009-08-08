@@ -7,11 +7,11 @@ import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.ValuedReturn;
-import org.ooc.frontend.model.NumberLiteral.Format;
+import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -58,13 +58,16 @@ public class ReturnHandler implements Hobgoblin {
 				if(node.isExtern() || node.isAbstract()) return true;
 				
 				if(node.getBody().isEmpty()) {
-					throw new CompilationFailedError(null, "Returning nothing in on-void function "+node.getProtoRepr());
+					if(node.getName().equals("main")) {
+						node.getBody().add(new Line(new ValuedReturn(new IntLiteral(0, Format.DEC))));
+					} else throw new CompilationFailedError(null,
+							"Returning nothing in non-void function "+node.getProtoRepr());
 				}
 				
 				Line line = node.getBody().getLast();
 				if(!(line.getStatement() instanceof Return)) {
 					if(node.getName().equals("main")) {
-						node.getBody().add(new Line(new ValuedReturn(new NumberLiteral(0, Format.DEC))));
+						node.getBody().add(new Line(new ValuedReturn(new IntLiteral(0, Format.DEC))));
 					} else if(line.getStatement() instanceof Expression) {
 						line.setStatement(new ValuedReturn((Expression) line.getStatement()));
 					} else {

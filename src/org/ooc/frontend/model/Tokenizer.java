@@ -310,7 +310,7 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty hexadecimal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.HEX_NUMBER));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.HEX_INT));
 					continue;
 				} else if(c2 == 'c') {
 					reader.read();
@@ -318,7 +318,7 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty octal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.OCT_NUMBER));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.OCT_INT));
 					continue;
 				} else if(c2 == 'b') {
 					reader.read();
@@ -326,15 +326,22 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty binary number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.BIN_NUMBER));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.BIN_INT));
 					continue;
 				}
 			}
 			
 			if(Character.isDigit(c)) {
 				reader.readMany("0123456789", "_", true);
-				tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
-						TokenType.DEC_NUMBER));
+				if(reader.peek() == '.') {
+					reader.read();
+					reader.readMany("0123456789", "_", true);
+					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+							TokenType.DEC_FLOAT));
+				} else {
+					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+						TokenType.DEC_INT));
+				}
 				continue;
 			}
 			

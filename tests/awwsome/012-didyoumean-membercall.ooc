@@ -4,7 +4,12 @@ cover Int from int;
 cover String from char*;
 
 func main {
-	calll();
+	new Speaker.coall();
 }
 
-func call printf("Hi, cruel world");
+class Speaker {
+
+	func call print "Hi, cruel world";
+	func bah;
+	func clo;
+}

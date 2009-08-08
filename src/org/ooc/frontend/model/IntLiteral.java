@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class NumberLiteral extends Literal {
+public class IntLiteral extends Literal {
 
 	public static enum Format {
 		DEC,
@@ -17,7 +17,7 @@ public class NumberLiteral extends Literal {
 	private Format format;
 	private static Type type = new Type("Int");
 	
-	public NumberLiteral(long value, Format format) {
+	public IntLiteral(long value, Format format) {
 		
 		this.value = value;
 		this.format = format;

@@ -40,7 +40,7 @@ public class Line extends Node {
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
+
 		if(oldie == statement) {
 			statement = (Statement) kiddo;
 			return true;

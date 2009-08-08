@@ -1,7 +1,7 @@
 <org.ooc.frontend.model.SourceUnit>
-  <simpleName>009-didyoumean</simpleName>
-  <name>009-didyoumean</name>
-  <fileName>009-didyoumean.ooc</fileName>
+  <simpleName>001-multassign</simpleName>
+  <name>001-multassign</name>
+  <fileName>001-multassign.ooc</fileName>
   <includes>
     <nodes>
       <org.ooc.frontend.model.Include>
@@ -14,62 +14,6 @@
   </imports>
   <body>
     <nodes>
-      <org.ooc.frontend.model.FunctionDecl>
-        <name>printf</name>
-        <isFinal>false</isFinal>
-        <isStatic>false</isStatic>
-        <isAbstract>false</isAbstract>
-        <isExtern>true</isExtern>
-        <declType>FUNC</declType>
-        <suffix></suffix>
-        <body>
-          <nodes/>
-        </body>
-        <returnType>
-          <name>void</name>
-          <pointerLevel>0</pointerLevel>
-        </returnType>
-        <arguments>
-          <nodes>
-            <org.ooc.frontend.parser.TypeArgument>
-              <name></name>
-              <isConst>false</isConst>
-              <isStatic>false</isStatic>
-              <type>
-                <name>String</name>
-                <pointerLevel>0</pointerLevel>
-              </type>
-            </org.ooc.frontend.parser.TypeArgument>
-            <org.ooc.frontend.model.VarArg>
-              <name>...</name>
-              <isConst>false</isConst>
-              <isStatic>false</isStatic>
-              <type>
-                <name></name>
-                <pointerLevel>0</pointerLevel>
-              </type>
-            </org.ooc.frontend.model.VarArg>
-          </nodes>
-        </arguments>
-      </org.ooc.frontend.model.FunctionDecl>
-      <org.ooc.frontend.model.CoverDecl>
-        <name>Int</name>
-        <variables>
-          <nodes/>
-        </variables>
-        <functions>
-          <nodes/>
-        </functions>
-        <instanceType>
-          <name>Int</name>
-          <pointerLevel>0</pointerLevel>
-          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
-        </instanceType>
-        <fromType>
-          <name>int</name>
-          <pointerLevel>0</pointerLevel>
-        </fromType>
-      </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.CoverDecl>
         <name>String</name>
         <variables>
@@ -89,6 +33,84 @@
         </fromType>
       </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.FunctionDecl>
+        <name>printf</name>
+        <isFinal>false</isFinal>
+        <isStatic>false</isStatic>
+        <isAbstract>false</isAbstract>
+        <isExtern>true</isExtern>
+        <declType>FUNC</declType>
+        <suffix></suffix>
+        <body>
+          <nodes/>
+        </body>
+        <returnType>
+          <name>void</name>
+          <pointerLevel>0</pointerLevel>
+        </returnType>
+        <arguments>
+          <nodes>
+            <org.ooc.frontend.parser.TypeArgument>
+              <isConst>false</isConst>
+              <isStatic>false</isStatic>
+              <type>
+                <name>String</name>
+                <pointerLevel>0</pointerLevel>
+              </type>
+              <names>
+                <string></string>
+              </names>
+            </org.ooc.frontend.parser.TypeArgument>
+            <org.ooc.frontend.model.VarArg>
+              <isConst>false</isConst>
+              <isStatic>false</isStatic>
+              <type>
+                <name></name>
+                <pointerLevel>0</pointerLevel>
+              </type>
+              <names>
+                <string>...</string>
+              </names>
+            </org.ooc.frontend.model.VarArg>
+          </nodes>
+        </arguments>
+      </org.ooc.frontend.model.FunctionDecl>
+      <org.ooc.frontend.model.CoverDecl>
+        <name>Float</name>
+        <variables>
+          <nodes/>
+        </variables>
+        <functions>
+          <nodes/>
+        </functions>
+        <instanceType>
+          <name>Float</name>
+          <pointerLevel>0</pointerLevel>
+          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
+        </instanceType>
+        <fromType>
+          <name>double</name>
+          <pointerLevel>0</pointerLevel>
+        </fromType>
+      </org.ooc.frontend.model.CoverDecl>
+      <org.ooc.frontend.model.CoverDecl>
+        <name>Int</name>
+        <variables>
+          <nodes/>
+        </variables>
+        <functions>
+          <nodes/>
+        </functions>
+        <instanceType>
+          <name>Int</name>
+          <pointerLevel>0</pointerLevel>
+          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
+        </instanceType>
+        <fromType>
+          <name>int</name>
+          <pointerLevel>0</pointerLevel>
+        </fromType>
+      </org.ooc.frontend.model.CoverDecl>
+      <org.ooc.frontend.model.FunctionDecl>
         <name>main</name>
         <isFinal>false</isFinal>
         <isStatic>false</isStatic>
@@ -99,34 +121,55 @@
         <body>
           <nodes>
             <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.FunctionCall">
-                <name>calll</name>
-                <suffix></suffix>
-                <arguments>
-                  <nodes/>
-                </arguments>
+              <statement class="org.ooc.frontend.model.VariableDecl">
+                <isConst>false</isConst>
+                <isStatic>false</isStatic>
+                <type>
+                  <name>Float</name>
+                  <pointerLevel>0</pointerLevel>
+                </type>
+                <names>
+                  <string>x</string>
+                  <string>y</string>
+                  <string>z</string>
+                </names>
               </statement>
             </org.ooc.frontend.model.Line>
-          </nodes>
-        </body>
-        <returnType>
-          <name>int</name>
-          <pointerLevel>0</pointerLevel>
-        </returnType>
-        <arguments>
-          <nodes/>
-        </arguments>
-      </org.ooc.frontend.model.FunctionDecl>
-      <org.ooc.frontend.model.FunctionDecl>
-        <name>call</name>
-        <isFinal>false</isFinal>
-        <isStatic>false</isStatic>
-        <isAbstract>false</isAbstract>
-        <isExtern>false</isExtern>
-        <declType>FUNC</declType>
-        <suffix></suffix>
-        <body>
-          <nodes>
+            <org.ooc.frontend.model.SingleLineComment>
+              <statement class="org.ooc.frontend.model.NoOp"/>
+              <content>(x, y, z) = (1.0, 4.2, 3.7);
+</content>
+            </org.ooc.frontend.model.SingleLineComment>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.Assignment">
+                <lvalue class="org.ooc.frontend.model.VariableAccess">
+                  <variable>x</variable>
+                </lvalue>
+                <rvalue class="org.ooc.frontend.model.FloatLiteral">
+                  <value>1.0</value>
+                </rvalue>
+              </statement>
+            </org.ooc.frontend.model.Line>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.Assignment">
+                <lvalue class="org.ooc.frontend.model.VariableAccess">
+                  <variable>y</variable>
+                </lvalue>
+                <rvalue class="org.ooc.frontend.model.FloatLiteral">
+                  <value>4.2</value>
+                </rvalue>
+              </statement>
+            </org.ooc.frontend.model.Line>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.Assignment">
+                <lvalue class="org.ooc.frontend.model.VariableAccess">
+                  <variable>z</variable>
+                </lvalue>
+                <rvalue class="org.ooc.frontend.model.FloatLiteral">
+                  <value>3.7</value>
+                </rvalue>
+              </statement>
+            </org.ooc.frontend.model.Line>
             <org.ooc.frontend.model.Line>
               <statement class="org.ooc.frontend.model.FunctionCall">
                 <name>printf</name>
@@ -134,8 +177,17 @@
                 <arguments>
                   <nodes>
                     <org.ooc.frontend.model.StringLiteral>
-                      <value>Hi, cruel world</value>
+                      <value>Assigned to values (%f, %f, %f)\n</value>
                     </org.ooc.frontend.model.StringLiteral>
+                    <org.ooc.frontend.model.VariableAccess>
+                      <variable>x</variable>
+                    </org.ooc.frontend.model.VariableAccess>
+                    <org.ooc.frontend.model.VariableAccess>
+                      <variable>y</variable>
+                    </org.ooc.frontend.model.VariableAccess>
+                    <org.ooc.frontend.model.VariableAccess>
+                      <variable>z</variable>
+                    </org.ooc.frontend.model.VariableAccess>
                   </nodes>
                 </arguments>
               </statement>
@@ -143,7 +195,7 @@
           </nodes>
         </body>
         <returnType>
-          <name>void</name>
+          <name>int</name>
           <pointerLevel>0</pointerLevel>
         </returnType>
         <arguments>

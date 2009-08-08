@@ -47,5 +47,17 @@ public class VariableDeclAssigned extends VariableDecl {
 		
 	}
 	
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		if (super.replace(oldie, kiddo)) return true;
+		
+		if(oldie == expression) {
+			expression = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+	}
+	
 }
 

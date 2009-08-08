@@ -13,6 +13,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -32,7 +33,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -75,7 +76,8 @@ public interface Visitor {
 	public void visit(Return return1) throws IOException;
 	
 	public void visit(NullLiteral nullLiteral) throws IOException;
-	public void visit(NumberLiteral numberLiteral) throws IOException;
+	public void visit(IntLiteral numberLiteral) throws IOException;
+	public void visit(FloatLiteral floatLiteral) throws IOException;
 	public void visit(StringLiteral stringLiteral) throws IOException;
 	public void visit(RangeLiteral rangeLiteral) throws IOException;
 	public void visit(BoolLiteral boolLiteral) throws IOException;

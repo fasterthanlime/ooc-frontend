@@ -18,6 +18,7 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
+import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
@@ -41,7 +42,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.NumberLiteral;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -196,7 +197,7 @@ public class OocGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(NumberLiteral number) throws IOException {
+	public void visit(IntLiteral number) throws IOException {
 		switch(number.getFormat()) {
 		case DEC: 
 			w.append(Long.toString(number.getValue())); break;
@@ -507,19 +508,15 @@ public class OocGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(MemberAccess memberAccess) throws IOException {
-
 		memberAccess.getExpression().accept(this);
 		w.append('.');
 		visit((VariableAccess) memberAccess);
-		
 	}
 
 	@Override
 	public void visit(SingleLineComment slComment) throws IOException {
-		
 		w.append("//");
 		w.append(slComment.getContent());
-		
 	}
 
 	@Override
@@ -536,6 +533,11 @@ public class OocGenerator extends Generator implements Visitor {
 		}
 		compare.getRight().accept(this);
 		
+	}
+
+	@Override
+	public void visit(FloatLiteral floatLiteral) throws IOException {
+		w.append(Double.toString(floatLiteral.getValue()));
 	}
 	
 }

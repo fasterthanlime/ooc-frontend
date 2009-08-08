@@ -174,6 +174,7 @@ public class FunctionDecl extends Declaration implements Scope {
 		StringBuilder sB = new StringBuilder();
 		sB.append('(');
 		Iterator<Argument> iter = arguments.iterator();
+		if(isMember()) iter.next();
 		while(iter.hasNext()) {
 			Argument arg = iter.next();
 			if(arg instanceof VarArg) sB.append("...");
@@ -226,6 +227,10 @@ public class FunctionDecl extends Declaration implements Scope {
 
 	public String getProtoRepr() {
 		return name+getArgsRepr();
+	}
+
+	public boolean sameProto(FunctionDecl decl2) {
+		return name.equals(decl2.getName()) && (suffix.equals(decl2.getSuffix()));
 	}
 	
 }

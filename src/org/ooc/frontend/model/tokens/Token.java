@@ -100,10 +100,11 @@ public class Token {
 		CHAR_LIT, // 'c'
 		STRING_LIT, // "blah\n"
 		
-		DEC_NUMBER, // 234
-		HEX_NUMBER, // 0xdeadbeef007
-		OCT_NUMBER, // 0c777
-		BIN_NUMBER, // 0b1011
+		DEC_INT, // 234
+		HEX_INT, // 0xdeadbeef007
+		OCT_INT, // 0c777
+		BIN_INT, // 0b1011
+		DEC_FLOAT, // 3.14
 		
 		OPEN_PAREN, // (
 		CLOS_PAREN, // )

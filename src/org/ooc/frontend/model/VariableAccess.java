@@ -79,7 +79,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 				
 				Iterable<VariableDecl> vars = res.vars.get((Node) node);
 				for(VariableDecl decl: vars) {
-					if(decl.getName().equals(variable)) {
+					if(decl.hasName(variable)) {
 						if(decl.isMember()) {
 							VariableAccess thisAccess = new VariableAccess("this");
 							thisAccess.resolveAccess(mainStack, res, fatal);
@@ -122,7 +122,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 					MemberAccess membAccess = new MemberAccess(thisAccess, variable);
 					membAccess.setRef(varDecl);
 					if(!mainStack.peek().replace(this, membAccess)) {
-						throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
+						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
 					}
 					return true;
 				}
@@ -132,7 +132,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 					MemberCall membCall = new MemberCall(thisAccess, variable, "");
 					membCall.setImpl(funcDecl);
 					if(!mainStack.peek().replace(this, membCall)) {
-						throw new Error("Couldn't replace a VariableAccess with a MemberCall!");
+						throw new Error("Couldn't replace a VariableAccess with a MemberCall! Stack = "+mainStack);
 					}
 					return true;
 				}

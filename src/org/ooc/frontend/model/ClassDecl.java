@@ -61,6 +61,29 @@ public class ClassDecl extends TypeDeclaration implements Scope {
 	public void setSuperRef(ClassDecl superRef) {
 		this.superRef = superRef;
 	}
+	
+	@Override
+	public NodeList<FunctionDecl> getFunctionsRecursive() {
+		NodeList<FunctionDecl> allFuncs = new NodeList<FunctionDecl>();
+		getFunctionsRecursive(allFuncs);
+		return allFuncs;
+	}
+	
+	private void getFunctionsRecursive(NodeList<FunctionDecl> allFuncs) {
+		for(FunctionDecl decl: functions) {
+			boolean already = false;
+			for(FunctionDecl decl2: allFuncs) {
+				if(decl.sameProto(decl2)) {
+					already = true;
+					break;
+				}
+			}
+			if(!already) {
+				allFuncs.add(decl);
+			}
+		}
+		if(superRef != null) superRef.getFunctionsRecursive(allFuncs);
+	}
 
 	@Override
 	public Type getType() {

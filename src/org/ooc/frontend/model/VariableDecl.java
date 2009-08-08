@@ -1,6 +1,8 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
@@ -14,11 +16,35 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	protected Type type;
 	protected TypeDeclaration typeDecl;
 	
+	protected List<String> names;
+	
+	public VariableDecl(Type type, List<String> names, boolean isConst, boolean isStatic) {
+		this(type, isConst, isStatic);
+		this.names.addAll(names);
+	}
+	
 	public VariableDecl(Type type, String name, boolean isConst, boolean isStatic) {
-		super(name);
+		this(type, isConst, isStatic);
+		this.names.add(name);
+	}
+	
+	private VariableDecl(Type type, boolean isConst, boolean isStatic) {
+		super(null);
 		this.isConst = isConst;
 		this.isStatic = isStatic;
 		this.type = type;
+		this.names = new ArrayList<String>();
+	}
+	
+	@Override
+	public String getName() {
+		if(names.size() == 1) return names.get(0);
+		throw new UnsupportedOperationException("Can't getName on a VariableDeclaration with multiple variables "+names);
+	}
+	
+	@Override
+	public void setName(String name) {
+		throw new UnsupportedOperationException("Can't setName on a VariableDeclaration");
 	}
 	
 	public Type getType() {
@@ -112,6 +138,14 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		return false;
 		
+	}
+
+	public boolean hasName(String name) {
+		return names.contains(name);
+	}
+	
+	public List<String> getNames() {
+		return names;
 	}
 	
 }

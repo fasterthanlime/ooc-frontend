@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ubi.CompilationFailedError;
@@ -60,7 +61,7 @@ public class MemberCall extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, final boolean fatal) throws IOException {
+	public boolean resolveAccess(Stack<Node> mainStack, ModularAccessResolver res, final boolean fatal) throws IOException {
 
 		
 		Type exprType = expression.getType();
@@ -91,12 +92,35 @@ public class MemberCall extends FunctionCall {
 		impl = typeDeclaration.getFunction(this);
 		
 		if(fatal && impl == null) {
-			throw new CompilationFailedError(null, "Member function "+name+getArgsRepr()
-					+" not found in type "+typeDeclaration.getInstanceType()+" (args  = "+arguments+
-					"), funcs = "+typeDeclaration.getFunctions());
+			String message = "Couldn't resolve call to function "
+				+typeDeclaration.getInstanceType()+"."+name+getArgsRepr()+".";
+			String guess = guessCorrectName(typeDeclaration);
+			if(guess != null) {
+				message += " Did you mean "+guess+" ?";
+			} else {
+				System.out.println("No guess!");
+			}
+			throw new CompilationFailedError(null, message);
 		}
 		
 		return impl == null;
+		
+	}
+	
+	private String guessCorrectName(final TypeDeclaration typeDeclaration) {
+		
+		int bestDistance = Integer.MAX_VALUE;
+		String bestMatch = null;
+		
+		for(FunctionDecl decl: typeDeclaration.getFunctionsRecursive()) {
+			int distance = Levenshtein.distance(name, decl.getName());
+			if(distance < bestDistance) {
+				bestDistance = distance;
+				bestMatch = decl.getProtoRepr();
+			}
+		}
+		
+		return bestMatch;
 		
 	}
 	
