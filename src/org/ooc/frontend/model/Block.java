@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class Block extends Node {
+public class Block extends Statement {
 
 	private final NodeList<Line> body;
 	

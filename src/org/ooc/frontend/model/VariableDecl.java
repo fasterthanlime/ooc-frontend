@@ -169,7 +169,10 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			return false;
 		}
 		
-		hierarchy.peek().replace(this, new VariableAccess(name));
+		if(atoms.size() != 1) {
+			throw new Error("Multi-var decls used an expression.. wtf?");
+		}
+		hierarchy.peek().replace(this, new VariableAccess(atoms.get(0).name));
 		
 		int lineIndex = find(Line.class, hierarchy);
 		if(lineIndex == -1) {
@@ -183,9 +186,9 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		
 		NodeList<Line> body = (NodeList<Line>) hierarchy.get(bodyIndex);
 		Block block = new Block();
-		block.getBody().add(line);
 		block.getBody().add(new Line(this));
-		body.replace(line, block);
+		block.getBody().add(line);
+		body.replace(line, new Line(block));
 		
 		return true;
 		
@@ -199,7 +202,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			classDecl.getInitializer().getBody().add(
 				new Line(
 					new Assignment(
-						new MemberAccess(name), atom.expression
+						new MemberAccess(atom.getName()), atom.getExpression()
 					)
 				)
 			);
