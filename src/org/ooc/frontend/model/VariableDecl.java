@@ -48,13 +48,18 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		public Expression getExpression() {
 			return expression;
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString()+": "+name;
+		}
 	}
 	
 	protected boolean isConst;
 	protected boolean isStatic;
 	
 	protected Type type;
-	protected TypeDeclaration typeDecl;
+	protected TypeDecl typeDecl;
 	
 	protected NodeList<VariableDeclAtom> atoms;
 	
@@ -96,11 +101,11 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		this.type = type;
 	}
 	
-	public TypeDeclaration getTypeDecl() {
+	public TypeDecl getTypeDecl() {
 		return typeDecl;
 	}
 	
-	public void setTypeDecl(TypeDeclaration typeDecl) {
+	public void setTypeDecl(TypeDecl typeDecl) {
 		this.typeDecl = typeDecl;
 	}
 	
@@ -143,10 +148,12 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 
+		System.out.println("Should unwrap variable decls "+atoms);
+		
 		int index = Node.find(ClassDecl.class, hierarchy);
 		if(index != -1) {
 			unwrapToClassInitializers(hierarchy, (ClassDecl) hierarchy.get(index));
-			return true;
+			return false;
 		}
 		
 		return unwrapToVarAcc(hierarchy);
@@ -155,11 +162,11 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 	@SuppressWarnings("unchecked")
 	private boolean unwrapToVarAcc(Stack<Node> hierarchy) throws Error {
-		
+
 		if(hierarchy.peek() instanceof Line
 		|| hierarchy.peek() instanceof ControlStatement
 		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
-		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDeclaration
+		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDecl
 		) {
 			return false;
 		}
@@ -190,6 +197,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		
 		for(VariableDeclAtom atom: atoms) {
 
+			if(atom.getExpression() == null) continue;
 			classDecl.getInitializer().getBody().add(
 				new Line(
 					new Assignment(
@@ -212,6 +220,11 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		return false;
 		
+	}
+	
+	@Override
+	public String toString() {
+		return type+": "+atoms.toString();
 	}
 	
 }

@@ -20,7 +20,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	private boolean isAbstract;
 	private boolean isExtern;
 	
-	private TypeDeclaration typeDecl;
+	private TypeDecl typeDecl;
 
 	private FunctionDeclType declType;
 	private String suffix;
@@ -100,11 +100,11 @@ public class FunctionDecl extends Declaration implements Scope {
 		this.isExtern = isExtern;
 	}
 	
-	public TypeDeclaration getTypeDecl() {
+	public TypeDecl getTypeDecl() {
 		return typeDecl;
 	}
 	
-	public void setTypeDecl(TypeDeclaration typeDecl) {
+	public void setTypeDecl(TypeDecl typeDecl) {
 		this.typeDecl = typeDecl;
 	}
 	

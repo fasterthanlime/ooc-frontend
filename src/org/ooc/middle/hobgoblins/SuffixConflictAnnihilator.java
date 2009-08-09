@@ -8,7 +8,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.SourceUnit;
-import org.ooc.frontend.model.TypeDeclaration;
+import org.ooc.frontend.model.TypeDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -20,8 +20,8 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 	public void process(SourceUnit unit) throws IOException {
 
 		final HashSet<String> funcNames = new HashSet<String>();
-		final HashMap<TypeDeclaration, HashSet<String>> classFuncNames
-			= new HashMap<TypeDeclaration, HashSet<String>>();
+		final HashMap<TypeDecl, HashSet<String>> classFuncNames
+			= new HashMap<TypeDecl, HashSet<String>>();
 		
 		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 			@Override

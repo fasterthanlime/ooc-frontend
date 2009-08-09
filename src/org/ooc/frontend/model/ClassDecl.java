@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 
-public class ClassDecl extends TypeDeclaration implements Scope {
+public class ClassDecl extends TypeDecl implements Scope {
 
 	private static Type type = new Type("Class");
 	

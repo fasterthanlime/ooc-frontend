@@ -10,7 +10,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Type;
-import org.ooc.frontend.model.TypeDeclaration;
+import org.ooc.frontend.model.TypeDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
@@ -46,7 +46,7 @@ public class TypeResolver implements Hobgoblin {
 			@Override
 			public boolean take(Declaration node, Stack<Node> stack) throws IOException {
 				
-				if(!(node instanceof TypeDeclaration)) return true;
+				if(!(node instanceof TypeDecl)) return true;
 				
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {
@@ -115,6 +115,7 @@ public class TypeResolver implements Hobgoblin {
 		decls.add(unit, new BuiltinType("float"));
 		decls.add(unit, new BuiltinType("double"));
 		decls.add(unit, new BuiltinType("char"));
+		decls.add(unit, new BuiltinType("Tuple")); // FIXME that's a tough one.
 		
 		decls.add(unit, new BuiltinType("size_t"));
 		decls.add(unit, new BuiltinType("time_t"));

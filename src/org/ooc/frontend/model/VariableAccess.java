@@ -113,9 +113,9 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		}, mainStack);
 		
 		if(ref == null) {
-			int typeIndex = Node.find(TypeDeclaration.class, mainStack);
+			int typeIndex = Node.find(TypeDecl.class, mainStack);
 			if(typeIndex != -1) {
-				TypeDeclaration typeDecl = (TypeDeclaration) mainStack.get(typeIndex);
+				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 				VariableDecl varDecl = typeDecl.getVariable(variable);
 				if(varDecl != null) {
 					VariableAccess thisAccess = new VariableAccess("this");

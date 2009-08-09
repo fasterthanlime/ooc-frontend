@@ -6,23 +6,33 @@ import org.ooc.frontend.Visitor;
 
 public class Parenthesis extends Expression {
 
-	Expression expression;
+	NodeList<Expression> expressions;
+	private static Type tupleType = new Type("Tuple");
 	
 	public Parenthesis(Expression expression) {
-		this.expression = expression;
+		this.expressions = new NodeList<Expression>();
+		this.expressions.add(expression);
 	}
 
 	public Expression getExpression() {
-		return expression;
+		if(expressions.size() == 1) return expressions.get(0);
+		throw new UnsupportedOperationException(
+				"Trying to getExpression on a Parenthesis which has several expressions: "+expressions);
 	}
 	
 	public void setExpression(Expression expression) {
-		this.expression = expression;
+		if(expressions.size() == 1) {
+			expressions.set(0, expression);
+			return;
+		}
+		throw new UnsupportedOperationException(
+				"Trying to setExpression on a Parenthesis which has several expressions: "+expressions);
 	}
 
 	@Override
 	public Type getType() {
-		return expression.getType();
+		if(expressions.size() == 1) return expressions.get(0).getType();
+		return tupleType;
 	}
 
 	@Override
@@ -37,19 +47,13 @@ public class Parenthesis extends Expression {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		expression.accept(visitor);
+		expressions.accept(visitor);
+		tupleType.accept(visitor);
 	}
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
-		if(oldie == expression) {
-			expression = (Expression) kiddo;
-			return true;
-		}
-		
 		return false;
-		
 	}
 	
 }

@@ -53,7 +53,7 @@ import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
-import org.ooc.frontend.model.TypeDeclaration;
+import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
@@ -252,7 +252,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(memberCall.getName());
 		current.append('(');
 		
-		TypeDeclaration typeDecl = memberCall.getImpl().getTypeDecl();
+		TypeDecl typeDecl = memberCall.getImpl().getTypeDecl();
 		if(!typeDecl.getInstanceType().equals(memberCall.getExpression().getType())) {
 			current.append('(');
 			typeDecl.getInstanceType().accept(this);
@@ -427,7 +427,7 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(MemberAccess memberAccess) throws IOException {
 
-		TypeDeclaration typeDecl = memberAccess.getRef().getTypeDecl();
+		TypeDecl typeDecl = memberAccess.getRef().getTypeDecl();
 		if(typeDecl.getType().equals(memberAccess.getExpression().getType())) {		
 			memberAccess.getExpression().accept(this);
 		} else {

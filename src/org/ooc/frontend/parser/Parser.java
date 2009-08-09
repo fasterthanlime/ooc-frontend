@@ -636,16 +636,16 @@ public class Parser {
 		}
 		while(reader.peek().type == NAME) {
 			String name = reader.read().get(sReader);
+			Expression expr = null;
 			if(reader.peek().type == ASSIGN) {
 				reader.skip();
-				Expression expr = expression(sReader, reader);
+				expr = expression(sReader, reader);
 				if(expr == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected expression as an initializer to a variable declaration.");
 				}
-				decl.getAtoms().add(new VariableDeclAtom(name, expr));
 			}
-			
+			decl.getAtoms().add(new VariableDeclAtom(name, expr));
 			if(reader.peek().type != COMMA) break;
 			reader.skip();
 		}

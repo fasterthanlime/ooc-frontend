@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class CoverDecl extends TypeDeclaration {
+public class CoverDecl extends TypeDecl {
 
 	private OocDocComment comment;
 	private Type fromType;

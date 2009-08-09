@@ -1,14 +1,12 @@
 package org.ooc.frontend.model;
 
-
-
-public abstract class TypeDeclaration extends Declaration {
+public abstract class TypeDecl extends Declaration {
 
 	protected NodeList<VariableDecl> variables;
 	protected NodeList<FunctionDecl> functions;
 	protected Type instanceType;
 	
-	public TypeDeclaration(String name) {
+	public TypeDecl(String name) {
 		super(name);
 		this.variables = new NodeList<VariableDecl>();
 		this.functions = new NodeList<FunctionDecl>();
@@ -40,7 +38,6 @@ public abstract class TypeDeclaration extends Declaration {
 
 	public VariableDecl getVariable(String name) {
 		for(VariableDecl decl: variables) {
-			System.out.println("Matching "+name+" with "+decl.getName());
 			if(decl.hasAtom(name)) return decl;
 		}
 		

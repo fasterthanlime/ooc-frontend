@@ -72,12 +72,12 @@ public class MemberAccess extends VariableAccess {
 			return true;
 		}
 		Declaration decl = exprType.getRef();
-		if(!(decl instanceof TypeDeclaration)) {
+		if(!(decl instanceof TypeDecl)) {
 			throw new Error("Trying to access to a member of not a ClassDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
-		TypeDeclaration typeDecl = (TypeDeclaration) decl;
+		TypeDecl typeDecl = (TypeDecl) decl;
 		
 		VariableDecl varDecl = typeDecl.getVariable(variable);
 		if(varDecl == null) {

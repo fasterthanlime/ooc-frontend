@@ -82,13 +82,13 @@ public class MemberCall extends FunctionCall {
 			return true;
 		}
 		Declaration decl = exprType.getRef();
-		if(!(decl instanceof TypeDeclaration)) {
+		if(!(decl instanceof TypeDecl)) {
 			throw new CompilationFailedError(null, 
 					"Trying to call a member function of not a TypeDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
-		TypeDeclaration typeDeclaration = (TypeDeclaration) decl;
+		TypeDecl typeDeclaration = (TypeDecl) decl;
 		impl = typeDeclaration.getFunction(this);
 		
 		if(fatal && impl == null) {
@@ -107,7 +107,7 @@ public class MemberCall extends FunctionCall {
 		
 	}
 	
-	private String guessCorrectName(final TypeDeclaration typeDeclaration) {
+	private String guessCorrectName(final TypeDecl typeDeclaration) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
