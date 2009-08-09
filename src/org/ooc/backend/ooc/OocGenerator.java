@@ -18,12 +18,11 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
-import org.ooc.frontend.model.FloatLiteral;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
+import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
@@ -31,6 +30,7 @@ import org.ooc.frontend.model.If;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
@@ -38,27 +38,27 @@ import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
+import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
-import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
 
@@ -334,18 +334,24 @@ public class OocGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(VariableDecl decl) throws IOException {
-		decl.getType().accept(this);
-		w.append(' ');
-		w.append(decl.getName());
+	public void visit(VariableDecl variableDecl) throws IOException {
+		variableDecl.getType().accept(this);
+		if(variableDecl.getType().isFlat()) w.append(' ');
+		Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
+		while(iter.hasNext()) {
+			VariableDeclAtom atom = iter.next();
+			w.append(atom.getName());
+			if(atom.getExpression() != null) {
+				w.append(" = ");
+				atom.getExpression().accept(this);
+			}
+			if(iter.hasNext()) w.append(", ");
+		}
 	}
 
 	@Override
-	public void visit(VariableDeclAssigned decl)
-			throws IOException {
-		visit((VariableDecl) decl);
-		w.append(" = ");
-		decl.getExpression().accept(this);
+	public void visit(VariableDeclAtom variableDeclAtom) throws IOException {
+		// do nothing.
 	}
 
 	@Override

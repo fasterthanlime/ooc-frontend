@@ -1,7 +1,7 @@
 <org.ooc.frontend.model.SourceUnit>
-  <simpleName>014-membacc-nothis</simpleName>
-  <name>014-membacc-nothis</name>
-  <fileName>014-membacc-nothis.ooc</fileName>
+  <simpleName>base017-nightmare-withoutparen</simpleName>
+  <name>base017-nightmare-withoutparen</name>
+  <fileName>base017-nightmare-withoutparen.ooc</fileName>
   <includes>
     <nodes>
       <org.ooc.frontend.model.Include>
@@ -94,56 +94,20 @@
           </nodes>
         </arguments>
       </org.ooc.frontend.model.FunctionDecl>
-      <org.ooc.frontend.model.FunctionDecl>
-        <name>main</name>
-        <isFinal>false</isFinal>
-        <isStatic>false</isStatic>
-        <isAbstract>false</isAbstract>
-        <isExtern>false</isExtern>
-        <declType>FUNC</declType>
-        <suffix></suffix>
-        <body>
-          <nodes>
-            <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.MemberAccess">
-                <variable>print</variable>
-                <expression class="org.ooc.frontend.model.Instantiation">
-                  <name>Dog</name>
-                  <suffix></suffix>
-                  <arguments>
-                    <nodes>
-                      <org.ooc.frontend.model.StringLiteral>
-                        <value>Dogbert</value>
-                      </org.ooc.frontend.model.StringLiteral>
-                    </nodes>
-                  </arguments>
-                </expression>
-              </statement>
-            </org.ooc.frontend.model.Line>
-          </nodes>
-        </body>
-        <returnType>
-          <name>int</name>
-          <pointerLevel>0</pointerLevel>
-        </returnType>
-        <arguments>
-          <nodes/>
-        </arguments>
-      </org.ooc.frontend.model.FunctionDecl>
       <org.ooc.frontend.model.ClassDecl>
-        <name>Animal</name>
+        <name>Thinga</name>
         <variables>
           <nodes>
             <org.ooc.frontend.model.VariableDecl>
-              <name>name</name>
+              <name>count</name>
               <isConst>false</isConst>
               <isStatic>false</isStatic>
               <type>
-                <name>String</name>
+                <name>Int</name>
                 <pointerLevel>0</pointerLevel>
               </type>
               <names>
-                <string>name</string>
+                <string>count</string>
               </names>
             </org.ooc.frontend.model.VariableDecl>
           </nodes>
@@ -151,7 +115,7 @@
         <functions>
           <nodes>
             <org.ooc.frontend.model.FunctionDecl>
-              <name>new</name>
+              <name>getThis</name>
               <isFinal>false</isFinal>
               <isStatic>false</isStatic>
               <isAbstract>false</isAbstract>
@@ -159,33 +123,89 @@
               <declType>FUNC</declType>
               <suffix></suffix>
               <body>
+                <nodes>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.Assignment">
+                      <lvalue class="org.ooc.frontend.model.MemberAccess">
+                        <variable>count</variable>
+                        <expression class="org.ooc.frontend.model.VariableAccess">
+                          <variable>this</variable>
+                        </expression>
+                      </lvalue>
+                      <rvalue class="org.ooc.frontend.model.Add">
+                        <left class="org.ooc.frontend.model.MemberAccess">
+                          <variable>count</variable>
+                          <expression class="org.ooc.frontend.model.VariableAccess">
+                            <variable>this</variable>
+                          </expression>
+                        </left>
+                        <right class="org.ooc.frontend.model.IntLiteral">
+                          <value>1</value>
+                          <format>DEC</format>
+                        </right>
+                      </rvalue>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.ValuedReturn">
+                      <expression class="org.ooc.frontend.model.VariableAccess">
+                        <variable>this</variable>
+                      </expression>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                </nodes>
+              </body>
+              <returnType>
+                <name>This</name>
+                <pointerLevel>0</pointerLevel>
+              </returnType>
+              <arguments>
                 <nodes/>
+              </arguments>
+            </org.ooc.frontend.model.FunctionDecl>
+            <org.ooc.frontend.model.FunctionDecl>
+              <name>thingo</name>
+              <isFinal>false</isFinal>
+              <isStatic>false</isStatic>
+              <isAbstract>false</isAbstract>
+              <isExtern>false</isExtern>
+              <declType>FUNC</declType>
+              <suffix></suffix>
+              <body>
+                <nodes>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.FunctionCall">
+                      <name>printf</name>
+                      <suffix></suffix>
+                      <arguments>
+                        <nodes>
+                          <org.ooc.frontend.model.StringLiteral>
+                            <value>Thingo bingo =) count = %d\n</value>
+                          </org.ooc.frontend.model.StringLiteral>
+                          <org.ooc.frontend.model.MemberAccess>
+                            <variable>count</variable>
+                            <expression class="org.ooc.frontend.model.VariableAccess">
+                              <variable>this</variable>
+                            </expression>
+                          </org.ooc.frontend.model.MemberAccess>
+                        </nodes>
+                      </arguments>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                </nodes>
               </body>
               <returnType>
                 <name>void</name>
                 <pointerLevel>0</pointerLevel>
               </returnType>
               <arguments>
-                <nodes>
-                  <org.ooc.frontend.model.MemberAssignArgument>
-                    <name>name</name>
-                    <isConst>false</isConst>
-                    <isStatic>false</isStatic>
-                    <type>
-                      <name></name>
-                      <pointerLevel>0</pointerLevel>
-                    </type>
-                    <names>
-                      <string>name</string>
-                    </names>
-                  </org.ooc.frontend.model.MemberAssignArgument>
-                </nodes>
+                <nodes/>
               </arguments>
             </org.ooc.frontend.model.FunctionDecl>
           </nodes>
         </functions>
         <instanceType>
-          <name>Animal</name>
+          <name>Thinga</name>
           <pointerLevel>0</pointerLevel>
           <ref class="org.ooc.frontend.model.ClassDecl" reference="../.."/>
         </instanceType>
@@ -221,134 +241,83 @@
           </arguments>
         </initializer>
       </org.ooc.frontend.model.ClassDecl>
-      <org.ooc.frontend.model.ClassDecl>
-        <name>Dog</name>
-        <variables>
-          <nodes/>
-        </variables>
-        <functions>
-          <nodes>
-            <org.ooc.frontend.model.FunctionDecl>
-              <name>new</name>
-              <isFinal>false</isFinal>
-              <isStatic>false</isStatic>
-              <isAbstract>false</isAbstract>
-              <isExtern>false</isExtern>
-              <declType>FUNC</declType>
-              <suffix></suffix>
-              <body>
-                <nodes>
-                  <org.ooc.frontend.model.Line>
-                    <statement class="org.ooc.frontend.model.FunctionCall">
-                      <name>super</name>
-                      <suffix></suffix>
-                      <arguments>
-                        <nodes>
-                          <org.ooc.frontend.model.VariableAccess>
-                            <variable>name</variable>
-                          </org.ooc.frontend.model.VariableAccess>
-                        </nodes>
-                      </arguments>
-                    </statement>
-                  </org.ooc.frontend.model.Line>
-                </nodes>
-              </body>
-              <returnType>
-                <name>void</name>
-                <pointerLevel>0</pointerLevel>
-              </returnType>
-              <arguments>
-                <nodes>
-                  <org.ooc.frontend.model.MemberArgument>
-                    <name>name</name>
-                    <isConst>false</isConst>
-                    <isStatic>false</isStatic>
-                    <type>
-                      <name></name>
-                      <pointerLevel>0</pointerLevel>
-                    </type>
-                    <names>
-                      <string>name</string>
-                    </names>
-                  </org.ooc.frontend.model.MemberArgument>
-                </nodes>
-              </arguments>
-            </org.ooc.frontend.model.FunctionDecl>
-            <org.ooc.frontend.model.FunctionDecl>
-              <name>print</name>
-              <isFinal>false</isFinal>
-              <isStatic>false</isStatic>
-              <isAbstract>false</isAbstract>
-              <isExtern>false</isExtern>
-              <declType>FUNC</declType>
-              <suffix></suffix>
-              <body>
-                <nodes>
-                  <org.ooc.frontend.model.Line>
-                    <statement class="org.ooc.frontend.model.FunctionCall">
-                      <name>printf</name>
-                      <suffix></suffix>
-                      <arguments>
-                        <nodes>
-                          <org.ooc.frontend.model.StringLiteral>
-                            <value>My name is %s\n</value>
-                          </org.ooc.frontend.model.StringLiteral>
-                          <org.ooc.frontend.model.VariableAccess>
-                            <variable>name</variable>
-                          </org.ooc.frontend.model.VariableAccess>
-                        </nodes>
-                      </arguments>
-                    </statement>
-                  </org.ooc.frontend.model.Line>
-                </nodes>
-              </body>
-              <returnType>
-                <name>void</name>
-                <pointerLevel>0</pointerLevel>
-              </returnType>
-              <arguments>
-                <nodes/>
-              </arguments>
-            </org.ooc.frontend.model.FunctionDecl>
-          </nodes>
-        </functions>
-        <instanceType>
-          <name>Dog</name>
-          <pointerLevel>0</pointerLevel>
-          <ref class="org.ooc.frontend.model.ClassDecl" reference="../.."/>
-        </instanceType>
+      <org.ooc.frontend.model.FunctionDecl>
+        <name>main</name>
+        <isFinal>false</isFinal>
+        <isStatic>false</isStatic>
         <isAbstract>false</isAbstract>
-        <superName>Animal</superName>
-        <initializer>
-          <name>initialize</name>
-          <isFinal>false</isFinal>
-          <isStatic>false</isStatic>
-          <isAbstract>false</isAbstract>
-          <isExtern>false</isExtern>
-          <declType>FUNC</declType>
-          <suffix></suffix>
-          <body>
-            <nodes/>
-          </body>
-          <returnType>
-            <name>void</name>
-            <pointerLevel>0</pointerLevel>
-          </returnType>
-          <arguments>
-            <nodes>
-              <org.ooc.frontend.model.RegularArgument>
-                <name>this</name>
+        <isExtern>false</isExtern>
+        <declType>FUNC</declType>
+        <suffix></suffix>
+        <body>
+          <nodes>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.VariableDeclAssigned">
+                <name>thinga</name>
                 <isConst>false</isConst>
                 <isStatic>false</isStatic>
-                <type reference="../../../../../instanceType"/>
+                <type>
+                  <name>Thinga</name>
+                  <pointerLevel>0</pointerLevel>
+                </type>
                 <names>
-                  <string>this</string>
+                  <string>thinga</string>
                 </names>
-              </org.ooc.frontend.model.RegularArgument>
-            </nodes>
-          </arguments>
-        </initializer>
-      </org.ooc.frontend.model.ClassDecl>
+                <expression class="org.ooc.frontend.model.Instantiation">
+                  <name>Thinga</name>
+                  <suffix></suffix>
+                  <arguments>
+                    <nodes/>
+                  </arguments>
+                </expression>
+              </statement>
+            </org.ooc.frontend.model.Line>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.MemberCall">
+                <name>thingo</name>
+                <suffix></suffix>
+                <arguments>
+                  <nodes/>
+                </arguments>
+                <expression class="org.ooc.frontend.model.MemberCall">
+                  <name>getThis</name>
+                  <suffix></suffix>
+                  <arguments>
+                    <nodes/>
+                  </arguments>
+                  <expression class="org.ooc.frontend.model.MemberAccess">
+                    <variable>getThis</variable>
+                    <expression class="org.ooc.frontend.model.MemberCall">
+                      <name>getThis</name>
+                      <suffix></suffix>
+                      <arguments>
+                        <nodes/>
+                      </arguments>
+                      <expression class="org.ooc.frontend.model.MemberAccess">
+                        <variable>getThis</variable>
+                        <expression class="org.ooc.frontend.model.Instantiation">
+                          <name>Thinga</name>
+                          <suffix></suffix>
+                          <arguments>
+                            <nodes/>
+                          </arguments>
+                        </expression>
+                      </expression>
+                    </expression>
+                  </expression>
+                </expression>
+              </statement>
+            </org.ooc.frontend.model.Line>
+          </nodes>
+        </body>
+        <returnType>
+          <name>int</name>
+          <pointerLevel>0</pointerLevel>
+        </returnType>
+        <arguments>
+          <nodes/>
+        </arguments>
+      </org.ooc.frontend.model.FunctionDecl>
     </nodes>
   </body>
 </org.ooc.frontend.model.SourceUnit>

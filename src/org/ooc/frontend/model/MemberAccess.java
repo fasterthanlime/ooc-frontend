@@ -11,6 +11,10 @@ public class MemberAccess extends VariableAccess {
 	
 	private Expression expression;
 
+	public MemberAccess(String variable) {
+		this(new VariableAccess("this"), variable);
+	}
+	
 	public MemberAccess(Expression expression, String variable) {
 		super(variable);
 		this.expression = expression;

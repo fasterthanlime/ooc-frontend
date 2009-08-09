@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
 import org.ubi.CompilationFailedError;
 
@@ -77,9 +78,12 @@ public class Instantiation extends FunctionCall {
 			Assignment ass = (Assignment) stack.peek();
 			if (ass.getLvalue().getType() == null) return false;
 			name = ass.getLvalue().getType().getName();
-		} else if(stack.peek() instanceof VariableDeclAssigned) {
-			VariableDeclAssigned vda = (VariableDeclAssigned) stack.peek();
-			name = vda.getType().getName();
+		} else if(stack.peek() instanceof VariableDeclAtom) {
+			VariableDeclAtom vda = (VariableDeclAtom) stack.peek();
+			if(vda.getExpression() == this) {
+				VariableDecl vd = (VariableDecl) stack.get(Node.find(VariableDecl.class, stack));
+				name = vd.getType().getName();
+			}
 		} else {
 			throw new Error("Couldn't guess type of 'new' (btw, we're in a "
 					+stack.peek().getClass().getSimpleName()+")");

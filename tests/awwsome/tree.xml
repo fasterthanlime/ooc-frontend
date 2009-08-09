@@ -1,7 +1,7 @@
 <org.ooc.frontend.model.SourceUnit>
-  <simpleName>001-multassign</simpleName>
-  <name>001-multassign</name>
-  <fileName>001-multassign.ooc</fileName>
+  <simpleName>002-multdeclassign</simpleName>
+  <name>002-multdeclassign</name>
+  <fileName>002-multdeclassign.ooc</fileName>
   <includes>
     <nodes>
       <org.ooc.frontend.model.Include>
@@ -50,26 +50,28 @@
         <arguments>
           <nodes>
             <org.ooc.frontend.parser.TypeArgument>
+              <name></name>
               <isConst>false</isConst>
               <isStatic>false</isStatic>
               <type>
                 <name>String</name>
                 <pointerLevel>0</pointerLevel>
               </type>
-              <names>
-                <string></string>
-              </names>
+              <atoms>
+                <nodes/>
+              </atoms>
             </org.ooc.frontend.parser.TypeArgument>
             <org.ooc.frontend.model.VarArg>
+              <name>...</name>
               <isConst>false</isConst>
               <isStatic>false</isStatic>
               <type>
                 <name></name>
                 <pointerLevel>0</pointerLevel>
               </type>
-              <names>
-                <string>...</string>
-              </names>
+              <atoms>
+                <nodes/>
+              </atoms>
             </org.ooc.frontend.model.VarArg>
           </nodes>
         </arguments>
@@ -88,7 +90,7 @@
           <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
         </instanceType>
         <fromType>
-          <name>double</name>
+          <name>float</name>
           <pointerLevel>0</pointerLevel>
         </fromType>
       </org.ooc.frontend.model.CoverDecl>
@@ -128,46 +130,28 @@
                   <name>Float</name>
                   <pointerLevel>0</pointerLevel>
                 </type>
-                <names>
-                  <string>x</string>
-                  <string>y</string>
-                  <string>z</string>
-                </names>
-              </statement>
-            </org.ooc.frontend.model.Line>
-            <org.ooc.frontend.model.SingleLineComment>
-              <statement class="org.ooc.frontend.model.NoOp"/>
-              <content>(x, y, z) = (1.0, 4.2, 3.7);
-</content>
-            </org.ooc.frontend.model.SingleLineComment>
-            <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Assignment">
-                <lvalue class="org.ooc.frontend.model.VariableAccess">
-                  <variable>x</variable>
-                </lvalue>
-                <rvalue class="org.ooc.frontend.model.FloatLiteral">
-                  <value>1.0</value>
-                </rvalue>
-              </statement>
-            </org.ooc.frontend.model.Line>
-            <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Assignment">
-                <lvalue class="org.ooc.frontend.model.VariableAccess">
-                  <variable>y</variable>
-                </lvalue>
-                <rvalue class="org.ooc.frontend.model.FloatLiteral">
-                  <value>4.2</value>
-                </rvalue>
-              </statement>
-            </org.ooc.frontend.model.Line>
-            <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Assignment">
-                <lvalue class="org.ooc.frontend.model.VariableAccess">
-                  <variable>z</variable>
-                </lvalue>
-                <rvalue class="org.ooc.frontend.model.FloatLiteral">
-                  <value>3.7</value>
-                </rvalue>
+                <atoms>
+                  <nodes>
+                    <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                      <name>x</name>
+                      <expression class="org.ooc.frontend.model.FloatLiteral">
+                        <value>1.0</value>
+                      </expression>
+                    </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                    <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                      <name>y</name>
+                      <expression class="org.ooc.frontend.model.FloatLiteral">
+                        <value>4.2</value>
+                      </expression>
+                    </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                    <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                      <name>z</name>
+                      <expression class="org.ooc.frontend.model.FloatLiteral">
+                        <value>3.7</value>
+                      </expression>
+                    </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                  </nodes>
+                </atoms>
               </statement>
             </org.ooc.frontend.model.Line>
             <org.ooc.frontend.model.Line>

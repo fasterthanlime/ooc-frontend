@@ -66,7 +66,6 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.ooc.frontend.model.Access;
@@ -119,12 +118,12 @@ import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
-import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.Compare.CompareType;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.IntLiteral.Format;
+import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
 import org.ubi.CompilationFailedError;
@@ -525,15 +524,9 @@ public class Parser {
 		FunctionCall call = new FunctionCall(name, suffix);
 		
 		if(!exprList(sReader, reader, call.getArguments())) {
-			//Expression expr = flatExpression(sReader, reader);
-			//if(expr == null) {
-				reader.reset(mark);
-				return null; // not a function call
-			//}
-			//call.getArguments().add(expr);
+			reader.reset(mark);
+			return null; // not a function call
 		}
-		
-		//System.out.println("Parsed function call, ended on token "+reader.peek().type);
 		
 		return call;
 		
@@ -556,10 +549,6 @@ public class Parser {
 				break;
 			}
 			if(comma) {
-				if(reader.peek().type == SEMICOL) {
-					// lax grammar rule: close all parenthesis
-					return true;
-				}
 				if(reader.read().type != COMMA) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start), "Expected comma between arguments of a function call");
 				}
@@ -639,37 +628,29 @@ public class Parser {
 			return null;
 		}
 		
-		List<String> names = new ArrayList<String>();
-		Token t = reader.peek();
-		if(t.type != NAME) {
+		VariableDecl decl = new VariableDecl(type, isConst, isStatic);
+
+		if(reader.peek().type != NAME) {
 			reader.reset(mark);
 			return null;
 		}
-		String name = t.get(sReader);
-		reader.skip();
-		Token t2 = reader.peek();
-		if(t2.type == ASSIGN) {
-			reader.skip();
-			Expression expr = expression(sReader, reader);
-			if(expr == null) {
-				throw new CompilationFailedError(sReader.getLocation(t2.start),
-						"Expected expression as an initializer to a variable declaration.");
+		while(reader.peek().type == NAME) {
+			String name = reader.read().get(sReader);
+			if(reader.peek().type == ASSIGN) {
+				reader.skip();
+				Expression expr = expression(sReader, reader);
+				if(expr == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"Expected expression as an initializer to a variable declaration.");
+				}
+				decl.getAtoms().add(new VariableDeclAtom(name, expr));
 			}
-			return new VariableDeclAssigned(type, name, expr, isConst, isStatic);
-		}
-		names.add(name);
-		
-		while(reader.peek().type == COMMA) {
+			
+			if(reader.peek().type != COMMA) break;
 			reader.skip();
-			Token t3 = reader.read();
-			if(t3.type != NAME) {
-				throw new CompilationFailedError(sReader.getLocation(t3.start),
-				"Expected name in multi variable decl, after a comma.");
-			}
-			names.add(t3.get(sReader));
 		}
-		
-		return new VariableDecl(type, names, isConst, isStatic);
+
+		return decl;
 		
 	}
 	
@@ -1260,7 +1241,7 @@ public class Parser {
 		if(expression == null) {
 			if(parenNumber > 0) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-					"Expected expression into parenthesis");
+					"Expected expression in parenthesis");
 			}
 			reader.reset(mark);
 			return null;

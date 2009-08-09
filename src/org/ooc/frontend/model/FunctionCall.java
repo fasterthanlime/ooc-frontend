@@ -8,8 +8,6 @@ import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
-import org.ooc.middle.hobgoblins.TypeResolver;
-import org.ooc.middle.hobgoblins.Unwrapper;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
@@ -138,40 +136,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		}
 		
 		return bestMatch;
-		
-	}
-
-	private boolean tryVarDecl(final Stack<Node> mainStack) throws Error, IOException {
-		
-		if(arguments.size() != 1) return true;
-		
-		System.out.println("Trying varDecl.. for function call to "+name+arguments);
-		
-		Expression firstArg = arguments.getFirst();
-		if(!(firstArg instanceof VariableAccess)) return true;
-		
-		Node parent = mainStack.peek();
-		String varName = ((VariableAccess) firstArg).getName();
-		if(parent instanceof Assignment) {
-			Assignment ass = (Assignment) parent;
-			Node grandparent = mainStack.get(mainStack.size() - 2);
-			if(!grandparent.replace(parent,
-					new VariableDeclAssigned(new Type(name), varName,
-					ass.getRvalue(), false, false))) {
-				throw new Error("Couldn't replace an Assignment with a VariableDeclAssigned in a "
-						+grandparent.getClass().getSimpleName());
-			}
-		} else {
-			if(!parent.replace(this, new VariableDecl(new Type(name), varName, false, false))) {
-				throw new Error("Couldn't replace a FunctionCall with a VariableDecl");
-			}
-		}
-		// FIXME this should all be handled in the ModularAccessResolver instead
-		SourceUnit unit = (SourceUnit) mainStack.get(0);
-		new TypeResolver().process(unit);
-		new Unwrapper().process(unit);
-		System.out.println("Returned false.");
-		return false;
 		
 	}
 

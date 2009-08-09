@@ -40,7 +40,8 @@ public abstract class TypeDeclaration extends Declaration {
 
 	public VariableDecl getVariable(String name) {
 		for(VariableDecl decl: variables) {
-			if(decl.getName().equals(name)) return decl;
+			System.out.println("Matching "+name+" with "+decl.getName());
+			if(decl.hasAtom(name)) return decl;
 		}
 		
 		return null;

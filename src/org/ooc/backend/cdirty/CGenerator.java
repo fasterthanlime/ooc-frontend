@@ -31,6 +31,7 @@ import org.ooc.frontend.model.If;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Instantiation;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberArgument;
@@ -43,7 +44,6 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
-import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -58,8 +58,8 @@ import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
-import org.ooc.frontend.model.VariableDeclAssigned;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
 
@@ -460,21 +460,17 @@ public class CGenerator extends Generator implements Visitor {
 
 		variableDecl.getType().accept(this);
 		if(variableDecl.getType().isFlat()) current.append(' ');
-		Iterator<String> iter = variableDecl.getNames().iterator();
+		Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
 		while(iter.hasNext()) {
-			current.append(iter.next());
+			VariableDeclAtom atom = iter.next();
+			current.append(atom.getName());
+			if(atom.getExpression() != null) {
+				current.append(" = ");
+				atom.getExpression().accept(this);
+			}
 			if(iter.hasNext()) current.append(", ");
 		}
 		
-	}
-
-	@Override
-	public void visit(VariableDeclAssigned variableDeclAssigned)
-			throws IOException {
-		
-		visit((VariableDecl) variableDeclAssigned);
-		current.append(" = ");
-		variableDeclAssigned.getExpression().accept(this);
 	}
 
 	@Override
@@ -1065,8 +1061,6 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(BuiltinType builtinType) throws IOException {
 		// nothing to do.
 	}
-	
-
 
 	@Override
 	public void visit(SingleLineComment slComment) throws IOException {
@@ -1077,6 +1071,11 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(FloatLiteral floatLiteral) throws IOException {
 		current.append(Double.toString(floatLiteral.getValue()));
+	}
+
+	@Override
+	public void visit(VariableDeclAtom variableDeclAtom) throws IOException {
+		// do nothing.
 	}
 
 }

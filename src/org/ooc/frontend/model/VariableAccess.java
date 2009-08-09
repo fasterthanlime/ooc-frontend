@@ -79,7 +79,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 				
 				Iterable<VariableDecl> vars = res.vars.get((Node) node);
 				for(VariableDecl decl: vars) {
-					if(decl.hasName(variable)) {
+					if(decl.hasAtom(variable)) {
 						if(decl.isMember()) {
 							VariableAccess thisAccess = new VariableAccess("this");
 							thisAccess.resolveAccess(mainStack, res, fatal);
