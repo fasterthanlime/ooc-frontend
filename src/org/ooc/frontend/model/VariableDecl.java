@@ -148,8 +148,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 
-		System.out.println("Should unwrap variable decls "+atoms);
-		
 		int index = Node.find(ClassDecl.class, hierarchy);
 		if(index != -1) {
 			unwrapToClassInitializers(hierarchy, (ClassDecl) hierarchy.get(index));

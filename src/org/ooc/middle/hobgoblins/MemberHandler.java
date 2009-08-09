@@ -54,6 +54,7 @@ public class MemberHandler implements Hobgoblin {
 				TypeDecl classDecl = (TypeDecl) stack.get(index);
 				node.getArguments().add(0, new RegularArgument(classDecl.getInstanceType(), "this", false));
 				node.setTypeDecl(classDecl);
+				System.out.println("Added this to function "+node);
 				
 				return true;
 				
