@@ -1,12 +1,14 @@
 package org.ooc.frontend.model;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
 public class Import extends Node {
 
-	private String name;
+	protected String name;
+	protected SourceUnit unit;
 
 	public Import(String name) {
 		this.name = name;
@@ -18,6 +20,14 @@ public class Import extends Node {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public SourceUnit getUnit() {
+		return unit;
+	}
+	
+	public void setUnit(SourceUnit unit) {
+		this.unit = unit;
 	}
 	
 	@Override
@@ -36,6 +46,10 @@ public class Import extends Node {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
+	}
+
+	public String getPath() {
+		return name.replace('.', File.separatorChar) + ".ooc";
 	}
 	
 }

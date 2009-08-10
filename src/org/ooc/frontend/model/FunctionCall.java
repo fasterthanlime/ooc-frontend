@@ -1,7 +1,9 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
@@ -189,8 +191,38 @@ public class FunctionCall extends Access implements MustResolveAccess {
 				return true;
 			}
 		}, mainStack);
+		
+		if(impl == null) {
+			// Still null? Try top-level funcs in dependencies.
+			SourceUnit root = (SourceUnit) mainStack.get(0);
+			Set<SourceUnit> done = new HashSet<SourceUnit>();
+			searchIn(root, done);
+		}
+		
 	}
 	
+	private void searchIn(SourceUnit unit, Set<SourceUnit> done) {
+		
+		done.add(unit);
+		for(Node node: unit.getBody()) {
+			if(node instanceof FunctionDecl) {
+				FunctionDecl decl = (FunctionDecl) node;
+				if(matches(decl)) {
+					System.out.println("Found match in "+unit.getName()+" for "+getName()+getArgsRepr());
+					impl = decl;
+					return;
+				}
+			}
+		}
+		
+		for(Import imp: unit.getImports()) {
+			if(!done.contains(imp.getUnit())) {
+				searchIn(imp.getUnit(), done);
+			}
+		}
+		
+	}
+
 	public boolean matches(FunctionDecl decl) {
 		
 		return matchesName(decl) && matchesArgs(decl);

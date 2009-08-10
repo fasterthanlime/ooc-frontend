@@ -3,12 +3,15 @@ package org.ooc.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.ooc.ShellUtils;
 import org.ooc.backend.cdirty.CGenerator;
 import org.ooc.compiler.ProcessUtils;
 import org.ooc.compiler.libraries.Target;
+import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.parser.Parser;
 import org.ooc.libs.DistribLocator;
@@ -54,10 +57,20 @@ public class CommandLine {
 		
 		File file = new File(fileName);
 		SourceUnit unit = new Parser().parse(file);
-		new Tinkerer().process(unit);
-		new CGenerator(outPath, unit).generate();
+		translate(outPath, unit, new HashSet<SourceUnit>());
 		compile(outPath, unit, distLoc);
 			
+	}
+
+	private void translate(File outPath, SourceUnit unit, Set<SourceUnit> done) throws IOException {
+		done.add(unit);
+		new Tinkerer().process(unit);
+		new CGenerator(outPath, unit).generate();
+		for(Import imp: unit.getImports()) {
+			if(!done.contains(imp.getUnit())) {
+				translate(outPath, imp.getUnit(), done);
+			}
+		}
 	}
 
 	private void compile(File outPath, SourceUnit unit, File distLoc) throws Error,
@@ -79,7 +92,7 @@ public class CommandLine {
 		command.add(new File(distLoc, "libs/headers/").getPath());
 		// FIXME ooh hardcoded, that is bad.
 		command.add(new File(distLoc, "libs/universal/mango/mangoobject.c").getPath());
-		command.add(new File(unit.getName() + ".c").getPath());
+		addDeps(command, unit, new HashSet<SourceUnit>());
 		command.add("-o");
 		command.add(unit.getSimpleName());
 		command.add(new File(distLoc, "libs/" + Target.guessHost().toString() + "/libgc.a").getPath());
@@ -98,6 +111,19 @@ public class CommandLine {
 		Process process = builder.start();
 		ProcessUtils.redirectIO(process);
 		process.waitFor();
+		
+	}
+
+	private void addDeps(List<String> command, SourceUnit unit, Set<SourceUnit> done) {
+		
+		done.add(unit);
+		command.add(new File(unit.getName().replace('.', File.separatorChar) + ".c").getPath());
+		
+		for(Import imp: unit.getImports()) {
+			if(!done.contains(imp.getUnit())) {
+				addDeps(command, imp.getUnit(), done);
+			}
+		}
 		
 	}
 

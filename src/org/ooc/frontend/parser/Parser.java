@@ -64,9 +64,10 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ooc.frontend.model.Access;
 import org.ooc.frontend.model.Add;
@@ -130,9 +131,10 @@ import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
 
-import com.thoughtworks.xstream.XStream;
-
 public class Parser {
+
+	// unit.fullName -> unit
+	private Map<String, SourceUnit> cache = new HashMap<String, SourceUnit>();
 
 	public Parser() {
 		
@@ -140,17 +142,19 @@ public class Parser {
 	
 	public SourceUnit parse(File file) throws IOException {
 
+		System.out.println("Parsing "+file.getPath());
+		
 		SourceReader sReader = SourceReader.getReaderFromFile(file);
 		List<Token> tokens = new Tokenizer().parse(sReader);
-		SourceUnit unit = sourceUnit(sReader, new ListReader<Token>(tokens));
-		new XStream().toXML(unit, new FileWriter("tree.xml"));
+		SourceUnit unit = sourceUnit(file, sReader, new ListReader<Token>(tokens));
+		//new XStream().toXML(unit, new FileWriter("tree.xml"));
 		return unit;
 		
 	}
 	
-	private SourceUnit sourceUnit(SourceReader sReader, ListReader<Token> reader) throws IOException {
+	private SourceUnit sourceUnit(File file, SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
-		SourceUnit unit = new SourceUnit(sReader.getLocation().getFileName());
+		SourceUnit unit = new SourceUnit(file.getPath());
 		
 		while(reader.hasNext()) {
 			
@@ -176,6 +180,16 @@ public class Parser {
 			throw new CompilationFailedError(sReader.getLocation(reader.prev().start + reader.prev().length),
 					"Expected declaration, include, or import in source unit");
 			
+		}
+		
+		cache.put(unit.getName(), unit);
+		for(Import imp: unit.getImports()) {
+			SourceUnit cached = cache.get(imp.getPath());
+			if(cached == null) {
+				cached = parse(new File(imp.getPath()));
+				cache.put(imp.getPath(), cached);
+			}
+			imp.setUnit(cached);
 		}
 		
 		return unit;
@@ -233,7 +247,7 @@ public class Parser {
 		
 	}
 	
-	private boolean importStatement(SourceReader sReader,	ListReader<Token> reader, NodeList<Import> imports) throws EOFException, CompilationFailedError {
+	private boolean importStatement(SourceReader sReader, ListReader<Token> reader, NodeList<Import> imports) throws EOFException, CompilationFailedError {
 
 		if(reader.peek().type != IMPORT_KW) {
 			return false;

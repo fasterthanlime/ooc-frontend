@@ -71,8 +71,12 @@ public class CGenerator extends Generator implements Visitor {
 
 	public CGenerator(File outPath, SourceUnit unit) throws IOException {
 		super(outPath, unit);
-		this.hw = new TabbedWriter(new FileWriter(new File(outPath, unit.getName() + ".h")));
-		this.cw = new TabbedWriter(new FileWriter(new File(outPath, unit.getName() + ".c")));
+		String basePath = unit.getName().replace('.', File.separatorChar);
+		File hFile = new File(outPath, basePath + ".h");
+		hFile.getParentFile().mkdirs();
+		this.hw = new TabbedWriter(new FileWriter(hFile));
+		File cFile = new File(outPath, basePath + ".c");
+		this.cw = new TabbedWriter(new FileWriter(cFile));
 		this.current = hw;
 	}
 
@@ -92,7 +96,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(" header file, generated with ooc */");
 		current.newLine();
 		
-		String hName = "__" + sourceUnit.getName().toUpperCase().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
+		String hName = "__" + sourceUnit.getName().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
 		current.append("#ifndef ");
 		current.append(hName);
 		current.newLine();
@@ -124,6 +128,13 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(unit.getSimpleName());
 		current.append(".h\"");
 		current.newLine();
+		
+		for(Import imp: unit.getImports()) {
+			current.append("#include \"");
+			current.append(imp.getUnit().getName().replace('.', File.separatorChar));
+			current.append(".h\"");
+			current.newLine();
+		}
 		current.newLine();
 		
 		sourceUnit.acceptChildren(this);
