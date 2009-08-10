@@ -1,4 +1,4 @@
-import my.long.package.MyModule;
+import my.package.MyModule.call;
 
 cover Int from int;
 

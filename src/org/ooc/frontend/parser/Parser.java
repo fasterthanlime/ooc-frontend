@@ -49,7 +49,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.OVER_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.PERCENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.PLUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.RETURN_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.SEMICOL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.LINESEP;
 import static org.ooc.frontend.model.tokens.Token.TokenType.SLASH;
 import static org.ooc.frontend.model.tokens.Token.TokenType.SL_COMMENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
@@ -232,7 +232,7 @@ public class Parser {
 		while(true) {
 		
 			Token t = reader.read();
-			if(t.type == SEMICOL) {
+			if(t.type == LINESEP) {
 				includes.add(new Include(sb.toString()));
 				break;
 			}
@@ -265,7 +265,7 @@ public class Parser {
 		while(true) {
 		
 			Token t = reader.read();
-			if(t.type == SEMICOL) {
+			if(t.type == LINESEP) {
 				imports.add(new Import(sb.toString()));
 				break;
 			}
@@ -275,6 +275,9 @@ public class Parser {
 			} else if(t.type == NAME) {
 				sb.append(t.get(sReader));
 			} else if(t.type == DOT) {
+				if(t.type == STAR) {
+					
+				}
 				sb.append('.');
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(t.start), "Unexpected token "+t.type);
@@ -295,10 +298,14 @@ public class Parser {
 			return new SingleLineComment(t.get(sReader));
 		}
 		
+		while(reader.peek().type == LINESEP) {
+			reader.skip();
+		}
+		
 		Statement statement = statement(sReader, reader);
 		if(statement != null) {
 			// control statements (if, else, for, version, etc.) don't need a semicolon
-			if(!(statement instanceof ControlStatement) && reader.read().type != SEMICOL) {
+			if(!(statement instanceof ControlStatement) && reader.read().type != LINESEP) {
 				throw new CompilationFailedError(sReader.getLocation(reader.prev(2).start),
 						"Missing semi-colon at the end of a line (got a "+reader.prev(2).type+" instead)");
 			}
@@ -707,7 +714,7 @@ public class Parser {
 			
 			Token t2 = reader.read();
 			if(t2.type != OPEN_BRACK) {
-				if(t2.type == SEMICOL) {
+				if(t2.type == LINESEP) {
 					return coverDecl; // empty cover, acts like a typedef
 				}
 				throw new CompilationFailedError(sReader.getLocation(t2.start),
@@ -718,7 +725,7 @@ public class Parser {
 			
 				VariableDecl varDecl = variableDecl(sReader, reader);
 				if(varDecl != null) {
-					if(reader.read().type != SEMICOL) {
+					if(reader.read().type != LINESEP) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
@@ -801,7 +808,7 @@ public class Parser {
 			
 				VariableDecl varDecl = variableDecl(sReader, reader);
 				if(varDecl != null) {
-					if(reader.read().type != SEMICOL) {
+					if(reader.read().type != LINESEP) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
@@ -964,7 +971,7 @@ public class Parser {
 			functionDecl.setReturnType(new Type("int"));
 		}
 		
-		if(t.type == SEMICOL) {
+		if(t.type == LINESEP) {
 			return functionDecl;
 		}
 		

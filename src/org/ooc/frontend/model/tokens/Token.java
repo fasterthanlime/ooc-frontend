@@ -66,7 +66,7 @@ public class Token {
 		TRIPLE_DOT, // ...
 		ARROW, // ->
 		COL, // :
-		SEMICOL, // ;
+		LINESEP, // ;
 		
 		PLUS, // +
 		PLUS_EQ, // +=

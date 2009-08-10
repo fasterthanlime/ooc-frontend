@@ -20,7 +20,7 @@ public class Tokenizer {
 		
 		while(reader.hasNext()) {
 			
-			reader.skipWhitespace();
+			reader.skipChars("\t ");
 			if(!reader.hasNext()) {
 				break;
 			}
@@ -102,9 +102,12 @@ public class Tokenizer {
 				continue;
 			}
 			
-			if(c == ';') {
+			if(c == ';' || c == '\n') {
 				reader.read();
-				tokens.add(new Token(location.getIndex(), 1, TokenType.SEMICOL));
+				while(reader.peek() == '\n') {
+					reader.read();
+				}
+				tokens.add(new Token(location.getIndex(), 1, TokenType.LINESEP));
 				continue;
 			}
 			
