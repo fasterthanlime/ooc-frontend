@@ -8,7 +8,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.middle.Hobgoblin;
@@ -36,10 +36,10 @@ import org.ooc.middle.walkers.Opportunist;
 public class TypeResolver implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		final MultiMap<Node, Declaration> decls = new MultiMap<Node, Declaration>();
-		addBuiltins(decls, unit);
+		addBuiltins(decls, module);
 		
 		new Nosy<Declaration>(Declaration.class, new Opportunist<Declaration>() {
 			
@@ -59,7 +59,7 @@ public class TypeResolver implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 		new Nosy<Type>(Type.class, new Opportunist<Type>() {
 			
@@ -103,22 +103,22 @@ public class TypeResolver implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 	}
 
-	private void addBuiltins(MultiMap<Node, Declaration> decls, SourceUnit unit) {
+	private void addBuiltins(MultiMap<Node, Declaration> decls, Module module) {
 
 		// TODO This should probably not be hardcoded. Or should it? Think of meta.
-		decls.add(unit, new BuiltinType("void"));
-		decls.add(unit, new BuiltinType("int"));
-		decls.add(unit, new BuiltinType("float"));
-		decls.add(unit, new BuiltinType("double"));
-		decls.add(unit, new BuiltinType("char"));
-		decls.add(unit, new BuiltinType("Tuple")); // FIXME that's a tough one.
+		decls.add(module, new BuiltinType("void"));
+		decls.add(module, new BuiltinType("int"));
+		decls.add(module, new BuiltinType("float"));
+		decls.add(module, new BuiltinType("double"));
+		decls.add(module, new BuiltinType("char"));
+		decls.add(module, new BuiltinType("Tuple")); // FIXME that's a tough one.
 		
-		decls.add(unit, new BuiltinType("size_t"));
-		decls.add(unit, new BuiltinType("time_t"));
+		decls.add(module, new BuiltinType("size_t"));
+		decls.add(module, new BuiltinType("time_t"));
 		
 	}
 	

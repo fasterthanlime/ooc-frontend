@@ -8,7 +8,7 @@ import org.ooc.frontend.Visitor;
 public class Import extends Node {
 
 	protected String name;
-	protected SourceUnit unit;
+	protected Module module;
 
 	public Import(String name) {
 		this.name = name;
@@ -22,12 +22,12 @@ public class Import extends Node {
 		this.name = name;
 	}
 	
-	public SourceUnit getUnit() {
-		return unit;
+	public Module getModule() {
+		return module;
 	}
 	
-	public void setUnit(SourceUnit unit) {
-		this.unit = unit;
+	public void setModule(Module module) {
+		this.module = module;
 	}
 	
 	@Override

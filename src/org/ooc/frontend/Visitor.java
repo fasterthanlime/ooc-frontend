@@ -39,7 +39,7 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -53,7 +53,7 @@ import org.ooc.frontend.parser.TypeArgument;
 
 public interface Visitor {
 
-	public void visit(SourceUnit sourceUnit) throws IOException;
+	public void visit(Module module) throws IOException;
 	
 	public void visit(Add add) throws IOException;
 	public void visit(Mul mul) throws IOException;

@@ -41,7 +41,7 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -96,8 +96,8 @@ public class Nosy<T> implements Visitor {
 	}
 	
 	@Override
-	public void visit(SourceUnit sourceUnit) throws IOException {
-		visit((Node) sourceUnit);
+	public void visit(Module module) throws IOException {
+		visit((Node) module);
 	}
 
 	@Override

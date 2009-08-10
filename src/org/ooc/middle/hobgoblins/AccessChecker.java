@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -15,7 +15,7 @@ import org.ubi.CompilationFailedError;
 public class AccessChecker implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		Nosy.get(VariableAccess.class, new Opportunist<VariableAccess>() {
 			@Override
@@ -27,7 +27,7 @@ public class AccessChecker implements Hobgoblin {
 				}
 				return true;
 			}
-		}).visit(unit);
+		}).visit(module);
 		
 		Nosy.get(FunctionCall.class, new Opportunist<FunctionCall>() {
 			@Override
@@ -39,7 +39,7 @@ public class AccessChecker implements Hobgoblin {
 				}
 				return true;
 			}
-		}).visit(unit); 
+		}).visit(module); 
 		
 	}
 

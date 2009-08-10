@@ -48,7 +48,7 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -66,20 +66,20 @@ public class OocGenerator extends Generator implements Visitor {
 
 	private TabbedWriter w;
 
-	public OocGenerator(File outPath, SourceUnit unit) throws IOException {
-		super(outPath, unit);
-		this.w = new TabbedWriter(new FileWriter(new File(outPath, unit.getFileName() + ".gen")));
+	public OocGenerator(File outPath, Module module) throws IOException {
+		super(outPath, module);
+		this.w = new TabbedWriter(new FileWriter(new File(outPath, module.getFileName() + ".gen")));
 	}
 	
 	@Override
 	public void generate() throws IOException {
-		unit.accept(this);
+		module.accept(this);
 		w.close();
 	}
 	
 	@Override
-	public void visit(SourceUnit sourceUnit) throws IOException {
-		sourceUnit.acceptChildren(this);
+	public void visit(Module module) throws IOException {
+		module.acceptChildren(this);
 		w.append('\n'); // traditions make me cry a little bit :)
 	}
 

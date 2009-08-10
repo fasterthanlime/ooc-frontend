@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 
 import org.ooc.outputting.FileUtils;
 
-public class DistribLocator {
+public class DistLocator {
 
 	public static File locate() {
 		
@@ -22,7 +22,5 @@ public class DistribLocator {
 		return null;
 		
 	}
-
-	
 	
 }

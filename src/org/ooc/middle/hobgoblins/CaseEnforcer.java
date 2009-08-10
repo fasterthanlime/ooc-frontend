@@ -6,7 +6,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Type;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -21,7 +21,7 @@ import org.ubi.CompilationFailedError;
 public class CaseEnforcer implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		Nosy.get(Type.class, new Opportunist<Type>() {
 
@@ -40,7 +40,7 @@ public class CaseEnforcer implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 	}
 

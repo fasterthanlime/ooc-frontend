@@ -9,7 +9,7 @@ import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.middle.Hobgoblin;
@@ -31,7 +31,7 @@ import org.ubi.CompilationFailedError;
 public class ReturnHandler implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		Nosy.get(ValuedReturn.class, new Opportunist<ValuedReturn>() {
 
@@ -47,7 +47,7 @@ public class ReturnHandler implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
@@ -78,7 +78,7 @@ public class ReturnHandler implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 	}
 

@@ -7,7 +7,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.RegularArgument;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.middle.Hobgoblin;
@@ -24,7 +24,7 @@ import org.ubi.CompilationFailedError;
 public class MemberHandler implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 		
 		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
@@ -59,7 +59,7 @@ public class MemberHandler implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 		Nosy.get(VariableDecl.class, new Opportunist<VariableDecl>() {
 
@@ -76,7 +76,7 @@ public class MemberHandler implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 
 	}
 

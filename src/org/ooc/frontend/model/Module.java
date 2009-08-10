@@ -14,7 +14,7 @@ import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
 
 
-public class SourceUnit extends Node implements Scope {
+public class Module extends Node implements Scope {
 
 	private String simpleName;
 	private String name;
@@ -23,7 +23,7 @@ public class SourceUnit extends Node implements Scope {
 	private NodeList<Import> imports;
 	private NodeList<Node> body;
 	
-	public SourceUnit(String fileName) {
+	public Module(String fileName) {
 		
 		this.fileName = fileName;
 		this.name = fileName.substring(0, fileName.lastIndexOf('.'))
@@ -83,14 +83,14 @@ public class SourceUnit extends Node implements Scope {
 	public <T extends Declaration> MultiMap<Node, T> getDeclarationsMap(final Class<T> clazz) throws IOException {
 
 		final MultiMap<Node, T> decls = new MultiMap<Node, T>();
-		final Set<SourceUnit> done = new HashSet<SourceUnit>();
+		final Set<Module> done = new HashSet<Module>();
 		getDeclarationsMap(clazz, decls, done);
 		return decls;
 		
 	}
 
 	private <T extends Declaration> void getDeclarationsMap(final Class<T> clazz,
-			final MultiMap<Node, T> decls, final Set<SourceUnit> done) throws IOException {
+			final MultiMap<Node, T> decls, final Set<Module> done) throws IOException {
 		
 		done.add(this);
 		new Nosy<T> (clazz, new Opportunist<T>() {
@@ -111,9 +111,9 @@ public class SourceUnit extends Node implements Scope {
 		}).visit(this);
 		
 		for(Import imp: imports) {
-			if(!done.contains(imp.getUnit())) {
-				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getUnit().getName());
-				imp.getUnit().getDeclarationsMap(clazz, decls, done);
+			if(!done.contains(imp.getModule())) {
+				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getModule().getName());
+				imp.getModule().getDeclarationsMap(clazz, decls, done);
 			}
 		}
 		
@@ -122,14 +122,14 @@ public class SourceUnit extends Node implements Scope {
 	public <T extends Declaration> List<T> getDeclarationsList(final Class<T> clazz) throws IOException {
 
 		final List<T> decls = new ArrayList<T>();
-		final Set<SourceUnit> done = new HashSet<SourceUnit>();
+		final Set<Module> done = new HashSet<Module>();
 		getDeclarationsList(clazz, decls, done);
 		return decls;
 		
 	}
 
 	private <T extends Declaration> void getDeclarationsList(final Class<T> clazz,
-			final List<T> decls, final Set<SourceUnit> done) throws IOException {
+			final List<T> decls, final Set<Module> done) throws IOException {
 		done.add(this);
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
@@ -149,9 +149,9 @@ public class SourceUnit extends Node implements Scope {
 		}).visit(this);
 		
 		for(Import imp: imports) {
-			if(!done.contains(imp.getUnit())) {
-				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getUnit().getName());
-				imp.getUnit().getDeclarationsList(clazz, decls, done);
+			if(!done.contains(imp.getModule())) {
+				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getModule().getName());
+				imp.getModule().getDeclarationsList(clazz, decls, done);
 			}
 		}
 	}
@@ -159,6 +159,15 @@ public class SourceUnit extends Node implements Scope {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
+	}
+
+	public String getPath() {
+		String extension = ".ooc";
+		return getPath(extension);
+	}
+
+	public String getPath(String extension) {
+		return name.replace('.', File.separatorChar) + extension;
 	}
 	
 }

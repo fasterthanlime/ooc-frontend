@@ -194,30 +194,30 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		
 		if(impl == null) {
 			// Still null? Try top-level funcs in dependencies.
-			SourceUnit root = (SourceUnit) mainStack.get(0);
-			Set<SourceUnit> done = new HashSet<SourceUnit>();
+			Module root = (Module) mainStack.get(0);
+			Set<Module> done = new HashSet<Module>();
 			searchIn(root, done);
 		}
 		
 	}
 	
-	private void searchIn(SourceUnit unit, Set<SourceUnit> done) {
+	private void searchIn(Module module, Set<Module> done) {
 		
-		done.add(unit);
-		for(Node node: unit.getBody()) {
+		done.add(module);
+		for(Node node: module.getBody()) {
 			if(node instanceof FunctionDecl) {
 				FunctionDecl decl = (FunctionDecl) node;
 				if(matches(decl)) {
-					System.out.println("Found match in "+unit.getName()+" for "+getName()+getArgsRepr());
+					System.out.println("Found match in "+module.getName()+" for "+getName()+getArgsRepr());
 					impl = decl;
 					return;
 				}
 			}
 		}
 		
-		for(Import imp: unit.getImports()) {
-			if(!done.contains(imp.getUnit())) {
-				searchIn(imp.getUnit(), done);
+		for(Import imp: module.getImports()) {
+			if(!done.contains(imp.getModule())) {
+				searchIn(imp.getModule(), done);
 			}
 		}
 		

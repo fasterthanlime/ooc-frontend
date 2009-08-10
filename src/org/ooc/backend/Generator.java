@@ -3,15 +3,15 @@ package org.ooc.backend;
 import java.io.File;
 import java.io.IOException;
 
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 
 public abstract class Generator {
 
-	protected SourceUnit unit;
+	protected Module module;
 
-	public Generator(File outPath, SourceUnit unit) {
+	public Generator(File outPath, Module module) {
 		
-		this.unit = unit;
+		this.module = module;
 		
 	}
 	

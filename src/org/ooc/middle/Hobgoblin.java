@@ -2,10 +2,10 @@ package org.ooc.middle;
 
 import java.io.IOException;
 
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 
 public interface Hobgoblin {
 
-	public void process(SourceUnit unit) throws IOException;
+	public void process(Module module) throws IOException;
 	
 }

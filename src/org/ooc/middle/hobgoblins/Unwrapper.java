@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -36,7 +36,7 @@ public class Unwrapper implements Hobgoblin {
 	boolean running;
 	
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		Nosy<MustBeUnwrapped> nosy = new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
 
@@ -59,7 +59,7 @@ public class Unwrapper implements Hobgoblin {
 				throw new Error("Unwrapper going round in circles! More than "+MAX+" runs, abandoning...");
 			}
 			running = false;
-			nosy.visit(unit); // changes running to true if there was damage
+			nosy.visit(module); // changes running to true if there was damage
 			count++;
 		}
 		

@@ -100,6 +100,7 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -109,7 +110,6 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.SourceUnit;
 import org.ooc.frontend.model.Statement;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
@@ -134,41 +134,47 @@ import org.ubi.SyntaxError;
 public class Parser {
 
 	// unit.fullName -> unit
-	private Map<String, SourceUnit> cache = new HashMap<String, SourceUnit>();
-
-	public Parser() {
-		
+	private Map<String, Module> cache = new HashMap<String, Module>();
+	private boolean debug = false;
+	
+	public Parser setDebug(boolean debug) {
+		this.debug = debug;
+		return this;
 	}
 	
-	public SourceUnit parse(File file) throws IOException {
+	public boolean isDebug() {
+		return debug;
+	}
+	
+	public Module parse(File file) throws IOException {
 
 		System.out.println("Parsing "+file.getPath());
 		
 		SourceReader sReader = SourceReader.getReaderFromFile(file);
 		List<Token> tokens = new Tokenizer().parse(sReader);
-		SourceUnit unit = sourceUnit(file, sReader, new ListReader<Token>(tokens));
+		Module module = module(file, sReader, new ListReader<Token>(tokens));
 		//new XStream().toXML(unit, new FileWriter("tree.xml"));
-		return unit;
+		return module;
 		
 	}
 	
-	private SourceUnit sourceUnit(File file, SourceReader sReader, ListReader<Token> reader) throws IOException {
+	private Module module(File file, SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
-		SourceUnit unit = new SourceUnit(file.getPath());
+		Module module = new Module(file.getPath());
 		
 		while(reader.hasNext()) {
 			
 			Declaration declaration = declaration(sReader, reader);
 			if(declaration != null) {
-				unit.getBody().add(declaration);
+				module.getBody().add(declaration);
 				continue;
 			}
 			
-			if(include(sReader, reader, unit.getIncludes())) {
+			if(include(sReader, reader, module.getIncludes())) {
 				continue;
 			}
 			
-			if(importStatement(sReader, reader, unit.getImports())) {
+			if(importStatement(sReader, reader, module.getImports())) {
 				continue;
 			}
 			
@@ -182,17 +188,17 @@ public class Parser {
 			
 		}
 		
-		cache.put(unit.getName(), unit);
-		for(Import imp: unit.getImports()) {
-			SourceUnit cached = cache.get(imp.getPath());
+		cache.put(module.getName(), module);
+		for(Import imp: module.getImports()) {
+			Module cached = cache.get(imp.getPath());
 			if(cached == null) {
 				cached = parse(new File(imp.getPath()));
 				cache.put(imp.getPath(), cached);
 			}
-			imp.setUnit(cached);
+			imp.setModule(cached);
 		}
 		
-		return unit;
+		return module;
 		
 	}
 	

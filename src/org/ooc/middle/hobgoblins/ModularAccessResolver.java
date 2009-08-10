@@ -7,7 +7,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.Hobgoblin;
@@ -26,9 +26,9 @@ public class ModularAccessResolver implements Hobgoblin {
 	public List<ClassDecl> classes;
 	
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 		
-		getInfos(unit);
+		getInfos(module);
 		
 		Nosy<MustResolveAccess> nosy = Nosy.get(
 				MustResolveAccess.class, new Opportunist<MustResolveAccess>() {
@@ -52,21 +52,21 @@ public class ModularAccessResolver implements Hobgoblin {
 		while(running) {
 			if(count > MAX) {
 				fatal = true;
-				nosy.start().visit(unit);
+				nosy.start().visit(module);
 				throw new Error("ModularAccessResolver going round in circles! More than "+MAX+" runs, abandoning...");
 			}
 			running = false;
-			getInfos(unit);
-			nosy.start().visit(unit);
+			getInfos(module);
+			nosy.start().visit(module);
 			count++;
 		}
 		
 	}
 
-	private void getInfos(SourceUnit unit) throws IOException {
-		vars = unit.getDeclarationsMap(VariableDecl.class);
-		funcs = unit.getDeclarationsMap(FunctionDecl.class);
-		classes = unit.getDeclarationsList(ClassDecl.class);
+	private void getInfos(Module module) throws IOException {
+		vars = module.getDeclarationsMap(VariableDecl.class);
+		funcs = module.getDeclarationsMap(FunctionDecl.class);
+		classes = module.getDeclarationsList(ClassDecl.class);
 	}
 	
 }

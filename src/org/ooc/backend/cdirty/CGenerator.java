@@ -49,7 +49,7 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -69,9 +69,9 @@ public class CGenerator extends Generator implements Visitor {
 	private TabbedWriter cw;
 	private TabbedWriter current;
 
-	public CGenerator(File outPath, SourceUnit unit) throws IOException {
-		super(outPath, unit);
-		String basePath = unit.getName().replace('.', File.separatorChar);
+	public CGenerator(File outPath, Module module) throws IOException {
+		super(outPath, module);
+		String basePath = module.getName().replace('.', File.separatorChar);
 		File hFile = new File(outPath, basePath + ".h");
 		hFile.getParentFile().mkdirs();
 		this.hw = new TabbedWriter(new FileWriter(hFile));
@@ -82,21 +82,21 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void generate() throws IOException {
-		unit.accept(this);
+		module.accept(this);
 		hw.close();
 		cw.close();
 	}
 
 	@Override
-	public void visit(SourceUnit sourceUnit) throws IOException {
+	public void visit(Module module) throws IOException {
 		
 		current = hw;
 		current.append("/* ");
-		current.append(unit.getName());
+		current.append(module.getName());
 		current.append(" header file, generated with ooc */");
 		current.newLine();
 		
-		String hName = "__" + sourceUnit.getName().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
+		String hName = "__" + module.getName().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
 		current.append("#ifndef ");
 		current.append(hName);
 		current.newLine();
@@ -109,7 +109,7 @@ public class CGenerator extends Generator implements Visitor {
 		// is missing the whole fancy cmdline frontend with sdk search etc.
 		current.append("#include <stdbool.h>\n");
 		current.append("#include <mango/mangoobject.h>\n");
-		for(Include include: sourceUnit.getIncludes()) {
+		for(Include include: module.getIncludes()) {
 			current.append("#include <");
 			current.append(include.getPath());
 			current.append(".h>");
@@ -120,24 +120,24 @@ public class CGenerator extends Generator implements Visitor {
 		
 		current = cw;
 		current.append("/* ");
-		current.append(unit.getName());
+		current.append(module.getName());
 		current.append(" source file, generated with ooc */");
 		current.newLine();
 		
 		current.append("#include \"");
-		current.append(unit.getSimpleName());
+		current.append(module.getSimpleName());
 		current.append(".h\"");
 		current.newLine();
 		
-		for(Import imp: unit.getImports()) {
+		for(Import imp: module.getImports()) {
 			current.append("#include \"");
-			current.append(imp.getUnit().getName().replace('.', File.separatorChar));
+			current.append(imp.getModule().getName().replace('.', File.separatorChar));
 			current.append(".h\"");
 			current.newLine();
 		}
 		current.newLine();
 		
-		sourceUnit.acceptChildren(this);
+		module.acceptChildren(this);
 		
 		current = hw;
 		current.newLine();

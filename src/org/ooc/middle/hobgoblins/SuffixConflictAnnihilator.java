@@ -7,7 +7,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -17,7 +17,7 @@ import org.ubi.CompilationFailedError;
 public class SuffixConflictAnnihilator implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		final HashSet<String> funcNames = new HashSet<String>();
 		final HashMap<TypeDecl, HashSet<String>> classFuncNames
@@ -47,7 +47,7 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 				return true;
 				
 			}
-		}).visit(unit);
+		}).visit(module);
 		
 	}
 

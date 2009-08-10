@@ -6,7 +6,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.SourceUnit;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.middle.Hobgoblin;
@@ -16,7 +16,7 @@ import org.ooc.middle.walkers.Opportunist;
 public class DefaultConstructorGiver implements Hobgoblin {
 
 	@Override
-	public void process(SourceUnit unit) throws IOException {
+	public void process(Module module) throws IOException {
 
 		new Nosy<ClassDecl>(ClassDecl.class, new Opportunist<ClassDecl>() {
 
@@ -42,7 +42,7 @@ public class DefaultConstructorGiver implements Hobgoblin {
 				
 			}
 			
-		}).visit(unit);
+		}).visit(module);
 		
 	}
 
