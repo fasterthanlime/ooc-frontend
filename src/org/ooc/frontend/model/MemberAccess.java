@@ -13,8 +13,6 @@ public class MemberAccess extends VariableAccess {
 
 	public MemberAccess(String variable) {
 		this(new VariableAccess("this"), variable);
-		System.out.println("Created MemberAccess to this."+variable);
-		Thread.dumpStack();
 	}
 	
 	public MemberAccess(Expression expression, String variable) {

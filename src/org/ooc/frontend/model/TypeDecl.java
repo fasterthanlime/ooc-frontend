@@ -45,7 +45,6 @@ public abstract class TypeDecl extends Declaration {
 	}
 	
 	public FunctionDecl getNoargFunction(String name) {
-		System.out.println("Should get function "+name+" in type "+this.name+" with funcs "+functions);
 		for(FunctionDecl decl: functions) {
 			if(name.matches(decl.getName()) && decl.getArguments().size() == 1) return decl;
 		}

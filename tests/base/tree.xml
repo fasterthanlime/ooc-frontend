@@ -1,7 +1,7 @@
 <org.ooc.frontend.model.SourceUnit>
-  <simpleName>base016-initializers</simpleName>
-  <name>base016-initializers</name>
-  <fileName>base016-initializers.ooc</fileName>
+  <simpleName>base017-nightmare-withoutparen</simpleName>
+  <name>base017-nightmare-withoutparen</name>
+  <fileName>base017-nightmare-withoutparen.ooc</fileName>
   <includes>
     <nodes>
       <org.ooc.frontend.model.Include>
@@ -14,6 +14,42 @@
   </imports>
   <body>
     <nodes>
+      <org.ooc.frontend.model.CoverDecl>
+        <name>Int</name>
+        <variables>
+          <nodes/>
+        </variables>
+        <functions>
+          <nodes/>
+        </functions>
+        <instanceType>
+          <name>Int</name>
+          <pointerLevel>0</pointerLevel>
+          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
+        </instanceType>
+        <fromType>
+          <name>int</name>
+          <pointerLevel>0</pointerLevel>
+        </fromType>
+      </org.ooc.frontend.model.CoverDecl>
+      <org.ooc.frontend.model.CoverDecl>
+        <name>String</name>
+        <variables>
+          <nodes/>
+        </variables>
+        <functions>
+          <nodes/>
+        </functions>
+        <instanceType>
+          <name>String</name>
+          <pointerLevel>0</pointerLevel>
+          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
+        </instanceType>
+        <fromType>
+          <name>char</name>
+          <pointerLevel>1</pointerLevel>
+        </fromType>
+      </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.FunctionDecl>
         <name>printf</name>
         <isFinal>false</isFinal>
@@ -66,44 +102,8 @@
           </nodes>
         </arguments>
       </org.ooc.frontend.model.FunctionDecl>
-      <org.ooc.frontend.model.CoverDecl>
-        <name>Int</name>
-        <variables>
-          <nodes/>
-        </variables>
-        <functions>
-          <nodes/>
-        </functions>
-        <instanceType>
-          <name>Int</name>
-          <pointerLevel>0</pointerLevel>
-          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
-        </instanceType>
-        <fromType>
-          <name>int</name>
-          <pointerLevel>0</pointerLevel>
-        </fromType>
-      </org.ooc.frontend.model.CoverDecl>
-      <org.ooc.frontend.model.CoverDecl>
-        <name>String</name>
-        <variables>
-          <nodes/>
-        </variables>
-        <functions>
-          <nodes/>
-        </functions>
-        <instanceType>
-          <name>String</name>
-          <pointerLevel>0</pointerLevel>
-          <ref class="org.ooc.frontend.model.CoverDecl" reference="../.."/>
-        </instanceType>
-        <fromType>
-          <name>char</name>
-          <pointerLevel>1</pointerLevel>
-        </fromType>
-      </org.ooc.frontend.model.CoverDecl>
       <org.ooc.frontend.model.ClassDecl>
-        <name>Foo</name>
+        <name>Thinga</name>
         <variables>
           <nodes>
             <org.ooc.frontend.model.VariableDecl>
@@ -116,26 +116,7 @@
               <atoms>
                 <nodes>
                   <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
-                    <name>value</name>
-                    <expression class="org.ooc.frontend.model.IntLiteral">
-                      <value>99</value>
-                      <format>DEC</format>
-                    </expression>
-                  </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
-                </nodes>
-              </atoms>
-            </org.ooc.frontend.model.VariableDecl>
-            <org.ooc.frontend.model.VariableDecl>
-              <isConst>false</isConst>
-              <isStatic>false</isStatic>
-              <type>
-                <name>String</name>
-                <pointerLevel>0</pointerLevel>
-              </type>
-              <atoms>
-                <nodes>
-                  <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
-                    <name>msg</name>
+                    <name>count</name>
                   </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
                 </nodes>
               </atoms>
@@ -145,7 +126,7 @@
         <functions>
           <nodes>
             <org.ooc.frontend.model.FunctionDecl>
-              <name>new</name>
+              <name>getThis</name>
               <isFinal>false</isFinal>
               <isStatic>false</isStatic>
               <isAbstract>false</isAbstract>
@@ -154,11 +135,55 @@
               <suffix></suffix>
               <body>
                 <nodes>
-                  <org.ooc.frontend.model.SingleLineComment>
-                    <statement class="org.ooc.frontend.model.NoOp"/>
-                    <content> in ooc, you can omit the type if it&apos;s a member variable&apos;s name, and &apos;=&apos; means to automatically assign it.
-</content>
-                  </org.ooc.frontend.model.SingleLineComment>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.Assignment">
+                      <lvalue class="org.ooc.frontend.model.MemberAccess">
+                        <variable>count</variable>
+                        <expression class="org.ooc.frontend.model.VariableAccess">
+                          <variable>this</variable>
+                        </expression>
+                      </lvalue>
+                      <rvalue class="org.ooc.frontend.model.Add">
+                        <left class="org.ooc.frontend.model.MemberAccess">
+                          <variable>count</variable>
+                          <expression class="org.ooc.frontend.model.VariableAccess">
+                            <variable>this</variable>
+                          </expression>
+                        </left>
+                        <right class="org.ooc.frontend.model.IntLiteral">
+                          <value>1</value>
+                          <format>DEC</format>
+                        </right>
+                      </rvalue>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                  <org.ooc.frontend.model.Line>
+                    <statement class="org.ooc.frontend.model.ValuedReturn">
+                      <expression class="org.ooc.frontend.model.VariableAccess">
+                        <variable>this</variable>
+                      </expression>
+                    </statement>
+                  </org.ooc.frontend.model.Line>
+                </nodes>
+              </body>
+              <returnType>
+                <name>This</name>
+                <pointerLevel>0</pointerLevel>
+              </returnType>
+              <arguments>
+                <nodes/>
+              </arguments>
+            </org.ooc.frontend.model.FunctionDecl>
+            <org.ooc.frontend.model.FunctionDecl>
+              <name>thingo</name>
+              <isFinal>false</isFinal>
+              <isStatic>false</isStatic>
+              <isAbstract>false</isAbstract>
+              <isExtern>false</isExtern>
+              <declType>FUNC</declType>
+              <suffix></suffix>
+              <body>
+                <nodes>
                   <org.ooc.frontend.model.Line>
                     <statement class="org.ooc.frontend.model.FunctionCall">
                       <name>printf</name>
@@ -166,13 +191,10 @@
                       <arguments>
                         <nodes>
                           <org.ooc.frontend.model.StringLiteral>
-                            <value>msg = %s, value = %d\n</value>
+                            <value>Thingo bingo =) count = %d\n</value>
                           </org.ooc.frontend.model.StringLiteral>
-                          <org.ooc.frontend.model.VariableAccess>
-                            <variable>msg</variable>
-                          </org.ooc.frontend.model.VariableAccess>
                           <org.ooc.frontend.model.MemberAccess>
-                            <variable>value</variable>
+                            <variable>count</variable>
                             <expression class="org.ooc.frontend.model.VariableAccess">
                               <variable>this</variable>
                             </expression>
@@ -188,30 +210,13 @@
                 <pointerLevel>0</pointerLevel>
               </returnType>
               <arguments>
-                <nodes>
-                  <org.ooc.frontend.model.MemberAssignArgument>
-                    <name>msg</name>
-                    <isConst>false</isConst>
-                    <isStatic>false</isStatic>
-                    <type>
-                      <name></name>
-                      <pointerLevel>0</pointerLevel>
-                    </type>
-                    <atoms>
-                      <nodes>
-                        <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
-                          <name>msg</name>
-                        </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
-                      </nodes>
-                    </atoms>
-                  </org.ooc.frontend.model.MemberAssignArgument>
-                </nodes>
+                <nodes/>
               </arguments>
             </org.ooc.frontend.model.FunctionDecl>
           </nodes>
         </functions>
         <instanceType>
-          <name>Foo</name>
+          <name>Thinga</name>
           <pointerLevel>0</pointerLevel>
           <ref class="org.ooc.frontend.model.ClassDecl" reference="../.."/>
         </instanceType>
@@ -262,16 +267,63 @@
         <body>
           <nodes>
             <org.ooc.frontend.model.Line>
-              <statement class="org.ooc.frontend.model.Instantiation">
-                <name>Foo</name>
+              <statement class="org.ooc.frontend.model.VariableDecl">
+                <isConst>false</isConst>
+                <isStatic>false</isStatic>
+                <type>
+                  <name>Thinga</name>
+                  <pointerLevel>0</pointerLevel>
+                </type>
+                <atoms>
+                  <nodes>
+                    <org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                      <name>thinga</name>
+                      <expression class="org.ooc.frontend.model.Instantiation">
+                        <name>Thinga</name>
+                        <suffix></suffix>
+                        <arguments>
+                          <nodes/>
+                        </arguments>
+                      </expression>
+                    </org.ooc.frontend.model.VariableDecl_-VariableDeclAtom>
+                  </nodes>
+                </atoms>
+              </statement>
+            </org.ooc.frontend.model.Line>
+            <org.ooc.frontend.model.Line>
+              <statement class="org.ooc.frontend.model.MemberCall">
+                <name>thingo</name>
                 <suffix></suffix>
                 <arguments>
-                  <nodes>
-                    <org.ooc.frontend.model.StringLiteral>
-                      <value>Dilbert</value>
-                    </org.ooc.frontend.model.StringLiteral>
-                  </nodes>
+                  <nodes/>
                 </arguments>
+                <expression class="org.ooc.frontend.model.MemberCall">
+                  <name>getThis</name>
+                  <suffix></suffix>
+                  <arguments>
+                    <nodes/>
+                  </arguments>
+                  <expression class="org.ooc.frontend.model.MemberAccess">
+                    <variable>getThis</variable>
+                    <expression class="org.ooc.frontend.model.MemberCall">
+                      <name>getThis</name>
+                      <suffix></suffix>
+                      <arguments>
+                        <nodes/>
+                      </arguments>
+                      <expression class="org.ooc.frontend.model.MemberAccess">
+                        <variable>getThis</variable>
+                        <expression class="org.ooc.frontend.model.Instantiation">
+                          <name>Thinga</name>
+                          <suffix></suffix>
+                          <arguments>
+                            <nodes/>
+                          </arguments>
+                        </expression>
+                      </expression>
+                    </expression>
+                  </expression>
+                </expression>
               </statement>
             </org.ooc.frontend.model.Line>
           </nodes>
