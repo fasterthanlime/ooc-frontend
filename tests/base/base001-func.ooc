@@ -1,4 +1,4 @@
-cover Int from int;
+cover Int from int
 
 func main {
 

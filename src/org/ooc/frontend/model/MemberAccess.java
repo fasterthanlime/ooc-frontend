@@ -62,8 +62,6 @@ public class MemberAccess extends VariableAccess {
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal)
 			throws IOException {
 		
-		System.out.println("Should resolve access to variable "+variable+", stack = "+stack);
-		
 		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
@@ -83,7 +81,6 @@ public class MemberAccess extends VariableAccess {
 		
 		VariableDecl varDecl = typeDecl.getVariable(variable);
 		if(varDecl == null) {
-			System.out.println("looking for a function named "+variable);
 			FunctionDecl funcDecl = typeDecl.getNoargFunction(variable);
 			if(funcDecl != null && (funcDecl.getArguments().isEmpty()
 					|| funcDecl.getArguments().getLast() instanceof VarArg

@@ -119,7 +119,7 @@ public class Token {
 	
 	public final int start;
 	public final int length;
-	public final TokenType type;
+	public TokenType type;
 	
 	public Token(int start, int length, TokenType type) {
 		super();

@@ -1,26 +1,26 @@
-include stdio;
+include stdio
 
-cover Int from int;
-cover String from char*;
+cover Int from int
+cover String from char*
 
-extern func printf(String, ...);
+extern func printf(String, ...)
 
 func main {
 
-	new IntContainer(42);
+	new IntContainer(42)
 
 }
 
 class IntContainer {
 
-	Int value;
+	Int value
 
 	func new(=value) {
-		print;
+		print
 	}
 
 	func print {
-		printf("The answer is %d\n", value);
+		printf("The answer is %d\n", value)
 	}
 
 }

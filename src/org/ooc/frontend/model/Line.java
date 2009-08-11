@@ -50,4 +50,9 @@ public class Line extends Node {
 		
 	}
 	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": "+getStatement();
+	}
+	
 }

@@ -256,7 +256,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 	}
 	
 	public String getArgsRepr() {
-		
 		StringBuilder sB = new StringBuilder();
 		sB.append('(');
 		Iterator<Expression> iter = arguments.iterator();
@@ -267,13 +266,19 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		sB.append(')');
 		
 		return sB.toString();
-		
 	}
 
 	public boolean isConstructorCall() {
-
 		return name.equals("this") || name.equals("super");
-		
+	}
+	
+	public String getProtoRepr() {
+		return name+getArgsRepr();
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": "+getProtoRepr();
 	}
 	
 }

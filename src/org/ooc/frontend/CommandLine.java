@@ -21,13 +21,14 @@ import org.ooc.frontend.model.Module;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
 import org.ooc.middle.Tinkerer;
+import org.ooc.outputting.FileUtils;
 
 public class CommandLine {
 	
 	public static void main(String[] argv) throws InterruptedException, IOException {
 		
 		if(argv.length == 0) {
-			System.out.println("Usage: o3c [OPTIONS] file.ooc");
+			System.out.println("Usage: ooc [OPTIONS] file.ooc");
 			System.exit(0);
 		}
 		
@@ -177,11 +178,13 @@ public class CommandLine {
 			return;
 		}
 		parse(module);
+		if(params.clean) {
+			FileUtils.deleteRecursive(params.outPath);
+		}
 		
 	}
 	
 	private void parse(String module) throws InterruptedException, IOException {
-		
 		long tt1 = System.nanoTime();
 		params.outPath.mkdirs();
 		process(module);
@@ -190,7 +193,6 @@ public class CommandLine {
 		if(timing) {
 			System.out.printf("Took %.2f ms.\n", Float.valueOf((tt2 - tt1) / 1000000.0f));
 		}
-			
 	}
 
 	private void process(String fileName) throws InterruptedException, IOException {
