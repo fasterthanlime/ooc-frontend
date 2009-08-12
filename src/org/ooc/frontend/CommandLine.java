@@ -177,29 +177,28 @@ public class CommandLine {
 			System.err.println("ooc: no files.");
 			return;
 		}
+		
+		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
+		params.sourcePath.add(params.distLocation + File.separator + "sdk");
+		
 		parse(module);
+		
 		if(params.clean) {
 			FileUtils.deleteRecursive(params.outPath);
 		}
 		
 	}
 	
-	private void parse(String module) throws InterruptedException, IOException {
+	private void parse(String fileName) throws InterruptedException, IOException {
 		long tt1 = System.nanoTime();
 		params.outPath.mkdirs();
-		process(module);
-		long tt2 = System.nanoTime();
-
-		if(timing) {
-			System.out.printf("Took %.2f ms.\n", Float.valueOf((tt2 - tt1) / 1000000.0f));
-		}
-	}
-
-	private void process(String fileName) throws InterruptedException, IOException {
-		File file = new File(fileName);
-		Module module = new Parser().setDebug(params.debug).parse(file);
+		Module module = new Parser(params).parse(fileName);
 		translate(module, new HashSet<Module>());
 		compile(module);
+		long tt2 = System.nanoTime();
+
+		if(timing)
+			System.out.printf("Took %.2f ms.\n", Float.valueOf((tt2 - tt1) / 1000000.0f));
 	}
 
 	private void translate(Module module, Set<Module> done) throws IOException {

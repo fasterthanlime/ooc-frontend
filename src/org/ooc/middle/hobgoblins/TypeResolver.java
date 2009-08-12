@@ -6,9 +6,10 @@ import java.util.Stack;
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Declaration;
+import org.ooc.frontend.model.Import;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Scope;
-import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.middle.Hobgoblin;
@@ -36,12 +37,12 @@ import org.ooc.middle.walkers.Opportunist;
 public class TypeResolver implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(final Module module) throws IOException {
 
 		final MultiMap<Node, Declaration> decls = new MultiMap<Node, Declaration>();
 		addBuiltins(decls, module);
 		
-		new Nosy<Declaration>(Declaration.class, new Opportunist<Declaration>() {
+		Nosy<Declaration> declNosy = new Nosy<Declaration>(Declaration.class, new Opportunist<Declaration>() {
 			
 			@Override
 			public boolean take(Declaration node, Stack<Node> stack) throws IOException {
@@ -59,7 +60,12 @@ public class TypeResolver implements Hobgoblin {
 				
 			}
 			
-		}).visit(module);
+		});
+		
+		declNosy.visit(module);
+		for(Import imp: module.getImports()) {
+			declNosy.visit(imp.getModule());
+		}
 		
 		new Nosy<Type>(Type.class, new Opportunist<Type>() {
 			
@@ -69,7 +75,7 @@ public class TypeResolver implements Hobgoblin {
 				if(node.getRef() != null) return true; // already resolved
 				
 				int index = stack.size();
-				stacksearch: while(index >= 0) {
+				stacksearch: while(index >= 0 && node.getRef() == null) {
 					
 					index = Node.find(Scope.class, stack, index - 1);
 					if(index == -1) {
@@ -86,13 +92,15 @@ public class TypeResolver implements Hobgoblin {
 						return true; // we're done here.
 					}
 					
-					for(Declaration decl: decls.get(stackElement)) {
-						if(decl.getName().equals(node.getName())) {
-							node.setRef(decl);
-							break stacksearch;
-						}
-					}
+					Iterable<Declaration> declList = decls.get(stackElement);
+					searchRef(node, declList);
 					
+				}
+				
+				if(node.getRef() == null) {
+					for(Import imp: module.getImports()) {
+						searchRef(node, decls.get(imp.getModule()));
+					}
 				}
 				
 				if(node.getRef() == null) {
@@ -101,6 +109,14 @@ public class TypeResolver implements Hobgoblin {
 				
 				return true;
 				
+			}
+
+			private void searchRef(Type node, Iterable<Declaration> declList) {
+				for(Declaration decl: declList) {
+					if(decl.getName().equals(node.getName())) {
+						node.setRef(decl);
+					}
+				}
 			}
 			
 		}).visit(module);
@@ -111,11 +127,24 @@ public class TypeResolver implements Hobgoblin {
 
 		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(module, new BuiltinType("void"));
+		decls.add(module, new BuiltinType("short"));
 		decls.add(module, new BuiltinType("int"));
+		decls.add(module, new BuiltinType("unsigned int"));
+		decls.add(module, new BuiltinType("long"));
+		decls.add(module, new BuiltinType("long long"));
+		decls.add(module, new BuiltinType("long double"));
 		decls.add(module, new BuiltinType("float"));
 		decls.add(module, new BuiltinType("double"));
 		decls.add(module, new BuiltinType("char"));
 		decls.add(module, new BuiltinType("Tuple")); // FIXME that's a tough one.
+		
+		decls.add(module, new BuiltinType("int8_t"));
+		decls.add(module, new BuiltinType("int16_t"));
+		decls.add(module, new BuiltinType("int32_t"));
+		
+		decls.add(module, new BuiltinType("uint8_t"));
+		decls.add(module, new BuiltinType("uint16_t"));
+		decls.add(module, new BuiltinType("uint32_t"));
 		
 		decls.add(module, new BuiltinType("size_t"));
 		decls.add(module, new BuiltinType("time_t"));

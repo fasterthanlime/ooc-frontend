@@ -14,41 +14,50 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class Module extends Node implements Scope {
 
-	private String simpleName;
+	private String fullName;
 	private String name;
-	private String fileName;
 	private NodeList<Include> includes;
 	private NodeList<Import> imports;
 	private NodeList<Node> body;
+	private String fileName;
 	
-	public Module(String fileName) {
+	public Module(String fullName) {
 		
-		this.fileName = fileName;
-		this.name = fileName.substring(0, fileName.lastIndexOf('.'))
-					.replace(File.separatorChar, '.').replace('/', '.'); // just to make sure
-		
-		this.simpleName = name;
-		int index = name.lastIndexOf('.');
-		if(index != -1) simpleName = name.substring(index + 1);
+		this.fullName = fullName; // just to make sure
+		this.fileName = fullName.replace('.', File.separatorChar);
+		int index = fullName.lastIndexOf('.');
+		if(index == -1) name = fullName;
+		else name = fullName.substring(index + 1);
 		
 		this.includes = new NodeList<Include>();
 		this.imports = new NodeList<Import>();
 		this.body = new NodeList<Node>();
 		
+		if(!fullName.endsWith("ooclib"))
+			imports.add(new Import("ooclib"));
+		
 	}
 	
 	public String getSimpleName() {
-		return simpleName;
-	}
-	
-	public String getName() {
 		return name;
 	}
-
+	
+	public String getFullName() {
+		return fullName;
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}
 	
+	public String getPath() {
+		return getPath(".ooc");
+	}
+
+	public String getPath(String extension) {
+		return getFileName() + extension;
+	}
+
 	public NodeList<Include> getIncludes() {
 		return includes;
 	}
@@ -145,15 +154,6 @@ public class Module extends Node implements Scope {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
-	}
-
-	public String getPath() {
-		String extension = ".ooc";
-		return getPath(extension);
-	}
-
-	public String getPath(String extension) {
-		return name.replace('.', File.separatorChar) + extension;
 	}
 	
 }

@@ -208,7 +208,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 			if(node instanceof FunctionDecl) {
 				FunctionDecl decl = (FunctionDecl) node;
 				if(matches(decl)) {
-					System.out.println("Found match in "+module.getName()+" for "+getName()+getArgsRepr());
 					impl = decl;
 					return;
 				}

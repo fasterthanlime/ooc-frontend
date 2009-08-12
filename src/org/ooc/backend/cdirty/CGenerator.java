@@ -72,7 +72,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	public CGenerator(File outPath, Module module) throws IOException {
 		super(outPath, module);
-		String basePath = module.getName().replace('.', File.separatorChar);
+		String basePath = module.getFullName().replace('.', File.separatorChar);
 		File hFile = new File(outPath, basePath + ".h");
 		hFile.getParentFile().mkdirs();
 		this.hw = new TabbedWriter(new FileWriter(hFile));
@@ -93,11 +93,11 @@ public class CGenerator extends Generator implements Visitor {
 		
 		current = hw;
 		current.append("/* ");
-		current.append(module.getName());
+		current.append(module.getFullName());
 		current.append(" header file, generated with ooc */");
 		current.newLine();
 		
-		String hName = "__" + module.getName().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
+		String hName = "__" + module.getFullName().replaceAll("[^a-zA-Z0-9_]", "_") + "__";
 		current.append("#ifndef ");
 		current.append(hName);
 		current.newLine();
@@ -121,7 +121,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		current = cw;
 		current.append("/* ");
-		current.append(module.getName());
+		current.append(module.getFullName());
 		current.append(" source file, generated with ooc */");
 		current.newLine();
 		
@@ -132,7 +132,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		for(Import imp: module.getImports()) {
 			current.append("#include \"");
-			current.append(imp.getModule().getName().replace('.', File.separatorChar));
+			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
 			current.append(".h\"");
 			current.newLine();
 		}

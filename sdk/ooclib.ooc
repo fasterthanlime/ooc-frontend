@@ -18,9 +18,11 @@ cover Void from void;
 cover Size from size_t;
 cover Octet from uint8_t;
 
+/*
 func GC_calloc ~ (Int nmemb, Size size) -> Object {
 	Size memsize = nmemb * size;
 	Object tmp = GC_malloc(memsize);
 	memset(tmp, 0, memsize);
 	return tmp;
 }
+*/

@@ -2,8 +2,8 @@ package org.ooc.frontend.parser;
 
 import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.AS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
+import static org.ooc.frontend.model.tokens.Token.TokenType.AS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CHAR_LIT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLASS_KW;
@@ -130,6 +130,7 @@ import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.ListReader;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
@@ -137,34 +138,37 @@ import org.ubi.SyntaxError;
 public class Parser {
 
 	// unit.fullName -> unit
-	private Map<String, Module> cache = new HashMap<String, Module>();
-	private boolean debug = false;
+	private final Map<String, Module> cache = new HashMap<String, Module>();
+	private BuildParams params;
 	
-	public Parser setDebug(boolean debug) {
-		this.debug = debug;
-		return this;
+	public Parser(BuildParams params) {
+		this.params = params;
 	}
-	
-	public boolean isDebug() {
-		return debug;
-	}
-	
-	public Module parse(File file) throws IOException {
 
-		if(debug)
-			System.out.println("Parsing "+file.getPath());
+	public Module parse(String path) throws IOException {
+
+		if(params.debug)
+			System.out.println("Parsing "+path);
+		
+		File file = params.sourcePath.getFile(path);
+		if(file == null) {
+			throw new CompilationFailedError(null, "File "+path+" not found in sourcePath."
+				+" sourcePath = "+params.sourcePath);
+		}
 		
 		SourceReader sReader = SourceReader.getReaderFromFile(file);
 		List<Token> tokens = new Tokenizer().parse(sReader);
-		Module module = module(file, sReader, new ListReader<Token>(tokens));
+		String fullName = path.substring(0, path.lastIndexOf('.'))
+			.replace(File.separatorChar, '.').replace('/', '.');
+		Module module = module(fullName, file, sReader, new ListReader<Token>(tokens));
 		//new XStream().toXML(unit, new FileWriter("tree.xml"));
 		return module;
 		
 	}
 	
-	private Module module(File file, SourceReader sReader, ListReader<Token> reader) throws IOException {
+	private Module module(String fullName, File file, SourceReader sReader, ListReader<Token> reader) throws IOException {
 		
-		Module module = new Module(file.getPath());
+		Module module = new Module(fullName);
 		
 		while(reader.hasNext()) {
 
@@ -196,11 +200,11 @@ public class Parser {
 			
 		}
 		
-		cache.put(module.getName(), module);
+		cache.put(module.getFullName(), module);
 		for(Import imp: module.getImports()) {
 			Module cached = cache.get(imp.getPath());
 			if(cached == null) {
-				cached = parse(new File(imp.getPath()));
+				cached = parse(imp.getPath());
 				cache.put(imp.getPath(), cached);
 			}
 			imp.setModule(cached);
@@ -221,7 +225,7 @@ public class Parser {
 
 		if(t.type == ML_COMMENT) {
 			reader.skip();
-			
+			return new SingleLineComment(t.get(sReader)); // FIXME lazy 
 		}
 		
 		return null;
@@ -673,7 +677,7 @@ public class Parser {
 					return coverDecl; // empty cover, acts like a typedef
 				}
 				throw new CompilationFailedError(sReader.getLocation(t2.start),
-						"Expected opening bracket to begin cover declaration.");
+						"Expected opening bracket to begin cover declaration, got "+t2.type);
 			}
 			
 			while(reader.hasNext() && reader.peek().type != CLOS_BRACK) {
@@ -866,12 +870,11 @@ public class Parser {
 		String suffix = "";
 		if(reader.peek().type == TILDE) {
 			reader.skip();
-			Token tSuffix = reader.read();
-			if(tSuffix.type != NAME) {
-				throw new CompilationFailedError(sReader.getLocation(tSuffix.start),
-					"Expected suffix after functionName~");
+			Token tSuffix = reader.peek();
+			if(tSuffix.type == NAME) {
+				reader.skip();
+				suffix = tSuffix.get(sReader);
 			}
-			suffix = tSuffix.get(sReader);
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(declType,
@@ -1057,19 +1060,35 @@ public class Parser {
 	
 	private Type type(SourceReader sReader, ListReader<Token> reader) {
 		
-		//TODO read unsigned, signed, long
+		String name = "";
+		int pointerLevel = 0;
 		
-		Token t = reader.peek();
-		if(t.type == NAME) {
-			reader.skip();
-			int pointerLevel = 0;
-			while(reader.peek().type == STAR) {
+		while(reader.hasNext()) {
+			Token t = reader.peek();
+			if(t.type == TokenType.UNSIGNED) {
 				reader.skip();
-				pointerLevel++;
-			}
-			return new Type(t.get(sReader), pointerLevel);
+				name += "unsigned ";
+			} else if(t.type == TokenType.SIGNED) {
+				reader.skip();
+				name += "signed ";
+			} else if(t.type == TokenType.LONG) {
+				reader.skip();
+				name += "long ";
+			} else break;
+		}
+			
+		while(reader.peek().type == NAME) {
+			name += reader.read().get(sReader);
 		}
 		
+		while(reader.peek().type == STAR) {
+			pointerLevel++;
+			reader.skip();
+		}
+		
+		if(!name.isEmpty()) {
+			return new Type(name.trim(), pointerLevel);
+		}
 		return null;
 		
 	}
