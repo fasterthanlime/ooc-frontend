@@ -114,6 +114,10 @@ public class Token {
 		
 		OPEN_SQUAR, // [
 		CLOS_SQUAR, // ]
+		
+		UNSIGNED,
+		SIGNED,
+		LONG,
 	
 	}
 	

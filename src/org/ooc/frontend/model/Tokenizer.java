@@ -411,6 +411,12 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 4, TokenType.NULL));
 				} else if(name.equals("extern")) {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.EXTERN_KW));
+				} else if(name.equals("unsigned")) {
+					tokens.add(new Token(location.getIndex(), 8, TokenType.UNSIGNED));
+				} else if(name.equals("signed")) {
+					tokens.add(new Token(location.getIndex(), 6, TokenType.SIGNED));
+				} else if(name.equals("long")) {
+					tokens.add(new Token(location.getIndex(), 4, TokenType.LONG));
 				} else {
 					tokens.add(new Token(location.getIndex(), name.length(), TokenType.NAME));
 				}

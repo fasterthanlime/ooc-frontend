@@ -1055,6 +1055,8 @@ public class Parser {
 	
 	private Type type(SourceReader sReader, ListReader<Token> reader) {
 		
+		//TODO read unsigned, signed, long
+		
 		Token t = reader.peek();
 		if(t.type == NAME) {
 			reader.skip();

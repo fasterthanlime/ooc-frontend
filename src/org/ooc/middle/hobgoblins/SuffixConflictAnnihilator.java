@@ -38,7 +38,7 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 								"Conflicting function names "+node.getName()+", add suffix to one of them!");
 					}
 				} else {
-					if(!funcNames.add(node.getName()+"_")) {
+					if(!funcNames.add(node.getName()+"_"+node.getSuffix())) {
 						throw new CompilationFailedError(null,
 								"Conflicting function names "+node.getName()+", add suffix to one of them!");
 					}
