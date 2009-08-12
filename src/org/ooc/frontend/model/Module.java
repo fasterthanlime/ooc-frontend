@@ -3,9 +3,7 @@ package org.ooc.frontend.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
@@ -83,16 +81,17 @@ public class Module extends Node implements Scope {
 	public <T extends Declaration> MultiMap<Node, T> getDeclarationsMap(final Class<T> clazz) throws IOException {
 
 		final MultiMap<Node, T> decls = new MultiMap<Node, T>();
-		final Set<Module> done = new HashSet<Module>();
-		getDeclarationsMap(clazz, decls, done);
+		this.getDeclarationsMap(clazz, decls);
+		for(Import imp: imports) {
+			imp.getModule().getDeclarationsMap(clazz, decls);
+		}
 		return decls;
 		
 	}
 
 	private <T extends Declaration> void getDeclarationsMap(final Class<T> clazz,
-			final MultiMap<Node, T> decls, final Set<Module> done) throws IOException {
+			final MultiMap<Node, T> decls) throws IOException {
 		
-		done.add(this);
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
 			@Override
@@ -110,27 +109,21 @@ public class Module extends Node implements Scope {
 			
 		}).visit(this);
 		
-		for(Import imp: imports) {
-			if(!done.contains(imp.getModule())) {
-				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getModule().getName());
-				imp.getModule().getDeclarationsMap(clazz, decls, done);
-			}
-		}
-		
 	}
 	
 	public <T extends Declaration> List<T> getDeclarationsList(final Class<T> clazz) throws IOException {
 
 		final List<T> decls = new ArrayList<T>();
-		final Set<Module> done = new HashSet<Module>();
-		getDeclarationsList(clazz, decls, done);
+		this.getDeclarationsList(clazz, decls);
+		for(Import imp: imports) {
+			imp.getModule().getDeclarationsList(clazz, decls);
+		}
 		return decls;
 		
 	}
 
 	private <T extends Declaration> void getDeclarationsList(final Class<T> clazz,
-			final List<T> decls, final Set<Module> done) throws IOException {
-		done.add(this);
+			final List<T> decls) throws IOException {
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
 			@Override
@@ -147,13 +140,6 @@ public class Module extends Node implements Scope {
 			}
 			
 		}).visit(this);
-		
-		for(Import imp: imports) {
-			if(!done.contains(imp.getModule())) {
-				System.out.println("Adding "+clazz.getSimpleName()+" decls in "+imp.getModule().getName());
-				imp.getModule().getDeclarationsList(clazz, decls, done);
-			}
-		}
 	}
 	
 	@Override

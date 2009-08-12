@@ -39,6 +39,8 @@ public class Token {
 		SWITCH_KW,
 		CASE_KW,
 		
+		AS_KW,
+		
 		VERSION_KW, // version keyword
 		
 		CTYPE_KW,

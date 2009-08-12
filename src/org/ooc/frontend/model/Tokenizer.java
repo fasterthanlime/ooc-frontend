@@ -401,6 +401,8 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.SWITCH_KW));
 				} else if(name.equals("return")) {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.RETURN_KW));
+				} else if(name.equals("as")) {
+					tokens.add(new Token(location.getIndex(), 2, TokenType.AS_KW));
 				} else if(name.equals("version")) {
 					tokens.add(new Token(location.getIndex(), 7, TokenType.VERSION_KW));
 				} else if(name.equals("true")) {

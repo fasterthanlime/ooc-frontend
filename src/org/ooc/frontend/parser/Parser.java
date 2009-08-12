@@ -2,6 +2,7 @@ package org.ooc.frontend.parser;
 
 import static org.ooc.frontend.model.tokens.Token.TokenType.ABSTRACT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ARROW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.AS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
 import static org.ooc.frontend.model.tokens.Token.TokenType.BIN_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CHAR_LIT;
@@ -75,6 +76,7 @@ import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.BoolLiteral;
+import org.ooc.frontend.model.Cast;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
@@ -1186,6 +1188,19 @@ public class Parser {
 				}
 				continue;
 				
+				
+			}
+			
+			if(t.type == AS_KW) {
+				
+				reader.skip();
+				Type type = type(sReader, reader);
+				if(type == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"Expected destination type after 'as' keyword (e.g. for casting)");
+				}
+				expr = new Cast(expr, type);
+				continue;
 				
 			}
 			

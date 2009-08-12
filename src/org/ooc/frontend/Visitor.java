@@ -8,6 +8,7 @@ import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
+import org.ooc.frontend.model.Cast;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
@@ -115,5 +116,7 @@ public interface Visitor {
 	public void visit(NodeList<? extends Node> list) throws IOException;
 
 	public void visit(Block block) throws IOException;
+
+	public void visit(Cast cast) throws IOException;
 	
 }
