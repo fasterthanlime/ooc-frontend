@@ -1,10 +1,10 @@
-func main {
+main: func {
 
 	say("Alan", "Heya world")
 
 }
 
-func say(name: String, msg: String) {
+say: func (name: String, msg: String) {
 
 	printf("%s says: %s\n", name, msg)
 

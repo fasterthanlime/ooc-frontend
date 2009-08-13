@@ -1,5 +1,5 @@
-func main {
+main: func {
 
-	printf("Hello, world !\n")
+	println("Hello, world !")
 
 }

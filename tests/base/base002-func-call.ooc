@@ -1,6 +1,6 @@
-func call
+call: func
 
-func main {
+main: func {
 
 	call()
 

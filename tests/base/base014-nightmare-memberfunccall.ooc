@@ -1,19 +1,19 @@
-class Thinga {
+Thinga: class {
 
 	count: Int
 
-	func getThis -> This {
+	getThis : func -> This {
 		this.count = this.count + 1
 		return this
 	}
 
-	func thingo {
+	thingo: func {
 		printf("Thingo bingo =) count = %d\n", this.count)
 	}
 
 }
 
-func main {
+main: func {
 
 	new Thinga.getThis().getThis().getThis().getThis().thingo()
 

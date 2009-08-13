@@ -104,7 +104,7 @@ public class Tokenizer {
 			
 			if(c == ';' || c == '\n') {
 				reader.read();
-				while(reader.peek() == '\n') {
+				while(reader.peek() == '\n' && reader.hasNext()) {
 					reader.read();
 				}
 				tokens.add(new Token(location.getIndex(), 1, TokenType.LINESEP));

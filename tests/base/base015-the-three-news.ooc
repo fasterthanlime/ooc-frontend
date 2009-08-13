@@ -6,8 +6,6 @@ Funky: class {
 
 }
 
-accept: func (Funky f)
-
 main: func {
 
 	f = new Funky() : Funky // Fully explicit

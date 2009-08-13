@@ -1,27 +1,21 @@
-include stdio
+Thinga: class {
 
-cover Int from int
-cover String from char*
-extern func printf(String, ...)
+	count: Int
 
-class Thinga {
-
-	Int count
-
-	func getThis -> This {
+	getThis: func -> This {
 		this.count = this.count + 1
 		return this
 	}
 
-	func thingo {
+	thingo: func {
 		printf("Thingo bingo =) count = %d\n", this.count)
 	}
 
 }
 
-func main {
+main: func {
 
-	Thinga thinga = new Thinga()
+	thinga = new Thinga() : Thinga
 	new Thinga().getThis.getThis().getThis.getThis().thingo()
 
 }

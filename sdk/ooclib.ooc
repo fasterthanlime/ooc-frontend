@@ -17,7 +17,7 @@ cover Size from size_t;
 cover Octet from uint8_t;
 
 printf: extern func (String, ...);
-echo: func(str: String) {
+println: func(str: String) {
 	printf("%s\n", str)
 }
 

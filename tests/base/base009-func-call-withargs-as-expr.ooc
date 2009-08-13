@@ -1,10 +1,10 @@
 include time
 cover TimeT from time_t
-extern func srand(Int)
-extern func rand -> Int
-extern func time(TimeT)
+srand: extern func (Int)
+rand: extern func -> Int
+time: extern func (TimeT)
 
-func main {
+main: func {
 
 	srand(time(null))
 	printf("The answer is %d\n", rand())

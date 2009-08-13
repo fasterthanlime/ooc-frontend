@@ -1,4 +1,4 @@
-func main {
+main: func {
 
 	i: Int
 	i = 42

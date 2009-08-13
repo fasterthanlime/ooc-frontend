@@ -1,5 +1,5 @@
-func main {
+main: func {
 
-	printf("Hello,\t tabbed world !\n")
+	println("Hello,\t tabbed world !")
 
 }

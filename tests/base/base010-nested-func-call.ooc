@@ -1,17 +1,17 @@
 include time
-extern func srand(Int)
-extern func rand -> Int
-extern func time(TimeT)
 cover TimeT from time_t
+srand: extern func (Int)
+rand: extern func -> Int
+time: extern func (TimeT)
 
-func random(max : Int) -> Int {
+random: func (max : Int) -> Int {
 	
 	srand(time(null))
 	return (rand + 1) % max
 	
 }
 
-func main {
+main: func {
 
 	printf("The answer is %d\n", random(random(random(random(random(random(2500)))))))
 
