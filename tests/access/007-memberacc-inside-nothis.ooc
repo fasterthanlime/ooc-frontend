@@ -1,26 +1,19 @@
-include stdio
+main: func {
 
-cover Int from int
-cover String from char*
-
-extern func printf(String, ...)
-
-func main {
-
-	new IntContainer
+	new IntContainer()
 
 }
 
-class IntContainer {
+IntContainer: class {
 
-	Int value
+	value: Int
 
-	func new {
+	new: func {
 		value = 42
-		print()
+		this print
 	}
 
-	func print {
+	print: func {
 		printf("The answer is %d\n", value)
 	}
 

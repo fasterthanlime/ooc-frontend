@@ -1,13 +1,13 @@
-func main {
+main: func {
 
-	cont : Container = new
+	cont = new : IntContainer
 	cont value = 42
-	if true printf("The answer is %d\n", cont value)
+	if (true) printf("The answer is %d\n", cont value)
 
 }
 
-class IntContainer {
+IntContainer: class {
 
-	Int value
+	value: Int
 
 }

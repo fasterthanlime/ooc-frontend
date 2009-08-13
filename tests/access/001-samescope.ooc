@@ -1,13 +1,6 @@
-include stdio
+main: func {
 
-cover Int from int
-cover String from char*
-
-extern func printf(String, ...)
-
-func main {
-
-	Int i = 42
+	i = 42: Int
 	printf("The answer is %d\n", i)
 
 }

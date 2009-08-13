@@ -1,20 +1,20 @@
 include stdlib, stdio, stdint, stdbool, memory, gc/gc;
 
-cover Char from char;
-cover String from Char*;
-cover Object from void*;
-cover Int from int;
-cover UInt from unsigned int;
-cover Float from float;
-cover Double from double;
-cover LDouble from long double;
-cover Short from short;
-cover Long from long;
-cover LLong from long long;
-cover Void from void;
+Char: cover from char;
+String: cover from Char*;
+Object: cover from void*;
+Int: cover from int;
+UInt: cover from unsigned int;
+Float: cover from float;
+Double: cover from double;
+LDouble: cover from long double;
+Short: cover from short;
+Long: cover from long;
+LLong: cover from long long;
+Void: cover from void;
 //cover Func?
-cover Size from size_t;
-cover Octet from uint8_t;
+Size: cover from size_t;
+Octet: cover from uint8_t;
 
 printf: extern func (String, ...);
 println: func(str: String) {
@@ -22,9 +22,9 @@ println: func(str: String) {
 }
 
 /*
-func GC_calloc ~ (Int nmemb, Size size) -> Object {
-	Size memsize = nmemb * size;
-	Object tmp = GC_malloc(memsize);
+GC_calloc: func ~ (nmemb: Int, size: Size) -> Object {
+	memsize = nmemb * size : Size;
+	tmp = GC_malloc(memsize) : Object;
 	memset(tmp, 0, memsize);
 	return tmp;
 }

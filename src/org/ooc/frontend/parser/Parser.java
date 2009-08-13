@@ -367,10 +367,20 @@ public class Parser {
 			return null;
 		}
 		
+		if(reader.read().type != OPEN_PAREN) {
+			throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+				"Expected opening parenthesis after "+token.get(sReader));
+		}
+		
 		Expression condition = expression(sReader, reader);
 		if(condition == null) {
 			throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Expected expression as while condition");
+		}
+		
+		if(reader.read().type != CLOS_PAREN) {
+			throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+				"Expected closing parenthesis after expression of an "+token.get(sReader));
 		}
 		
 		Conditional statement;
@@ -657,13 +667,18 @@ public class Parser {
 			comment = new OocDocComment(t.get(sReader));
 		}
 		
-		if(reader.read().type == COVER_KW) {
-			
-			Token t = reader.read();
-			if(t.type != NAME) {
-				throw new CompilationFailedError(sReader.getLocation(t.start),
-						"Expected cover name after the cover keyword.");
+		String name = "";
+		Token tName = reader.peek();
+		if(tName.type == NAME || tName.type == NEW_KW) {
+			name = tName.get(sReader);
+			reader.skip();
+			if(reader.read().type != COLON) {
+				reader.reset(mark);
+				return null;
 			}
+		}
+		
+		if(reader.read().type == COVER_KW) {
 			
 			Type fromType = null;
 			if(reader.peek().type == FROM_KW) {
@@ -675,7 +690,7 @@ public class Parser {
 				}
 			}
 			
-			CoverDecl coverDecl = new CoverDecl(t.get(sReader), fromType);
+			CoverDecl coverDecl = new CoverDecl(name, fromType);
 			if(comment != null) coverDecl.setComment(comment);
 			
 			Token t2 = reader.read();
@@ -1010,10 +1025,15 @@ public class Parser {
 			return new MemberAssignArgument(t2.get(sReader));
 		}
 		
-		if(t.type != NAME) {
-			throw new CompilationFailedError(sReader.getLocation(t.start),
-			"Expecting member variable name in member-assign-argument");
+		if(t.type == DOT) {
+			Token t2 = reader.read();
+			if(t2.type != NAME) {
+				throw new CompilationFailedError(sReader.getLocation(t2.start),
+						"Expecting member variable name in member-assign-argument");
+			}
+			return new MemberArgument(t2.get(sReader));
 		}
+		
 		if(isExtern) {
 			Type type = type(sReader, reader);
 			if(type == null) {
@@ -1022,7 +1042,9 @@ public class Parser {
 			}
 			return new TypeArgument(type);
 		}
-		return new MemberArgument(t.get(sReader));
+		
+		reader.reset();
+		return null;
 		
 	}
 	
@@ -1112,9 +1134,8 @@ public class Parser {
 		while(reader.hasNext()) {
 			
 			Token t = reader.peek();
-			if(t.type == DOT) {
+			if(t.type == NAME) {
 				
-				reader.skip();
 				FunctionCall call = functionCall(sReader, reader);
 				if(call != null) {
 					expr = new MemberCall(expr, call);

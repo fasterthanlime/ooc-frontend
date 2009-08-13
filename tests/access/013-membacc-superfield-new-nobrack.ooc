@@ -1,29 +1,22 @@
-include stdio
+main: func {
 
-cover Int from int
-cover String from char*
-
-extern func printf(String, ...)
-
-func main {
-
-	new Dog("Dogbert")
+	new Dog("Dogbert") print
 
 }
 
-class Animal {
+Animal: class {
 
-	String name
-	func new(=name)
+	name: String
+	new: func(=name)
 
 }
 
-class Dog from Animal {
+Dog: class from Animal {
 
-	func new(name) super(name)
+	new: func(.name) super(name)
 
-	func print {
-		printf("My name is %s\n", this.name)
+	print: func {
+		printf("My name is %s\n", this name)
 	}
 
 }

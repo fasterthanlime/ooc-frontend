@@ -1,5 +1,5 @@
 include time
-cover TimeT from time_t
+TimeT: cover from time_t
 srand: extern func (Int)
 rand: extern func -> Int
 time: extern func (TimeT)

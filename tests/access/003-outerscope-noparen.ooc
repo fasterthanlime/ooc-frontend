@@ -1,15 +1,7 @@
-include stdio
+main: func {
 
-cover Int from int
-cover String from char*
-
-extern func printf(String, ...)
-
-func main {
-
-	Int i = 42
-	if true {
+	i = 42: Int
+	if (true)
 		printf("The answer is %d\n", i)
-	}
 
 }
