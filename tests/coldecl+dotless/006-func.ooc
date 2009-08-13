@@ -1,5 +1,5 @@
 main: func {
 
-	echo(("Hi, world =)")
+	println("Hi, world =)")
 
 }

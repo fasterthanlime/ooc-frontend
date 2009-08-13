@@ -1,4 +1,4 @@
-func main {
+main: func {
 
 	answer : Int
 	answer = 42
