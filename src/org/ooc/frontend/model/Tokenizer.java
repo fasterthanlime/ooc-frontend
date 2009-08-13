@@ -125,7 +125,7 @@ public class Tokenizer {
 			
 			if(c == ':') {
 				reader.read();
-				tokens.add(new Token(location.getIndex(), 1, TokenType.COL));
+				tokens.add(new Token(location.getIndex(), 1, TokenType.COLON));
 				continue;
 			}
 			

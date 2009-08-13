@@ -1,15 +1,10 @@
-include stdio
-extern func printf(String, ...)
-cover String from char*
-cover Int from int
-
 func main {
 
 	say("Heya world")
 
 }
 
-func say(String msg) {
+func say(msg : String) {
 
 	printf("Says: %s\n", msg)
 

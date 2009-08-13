@@ -1,7 +1,5 @@
 include stdlib, stdio, stdint, stdbool, memory, gc/gc;
 
-extern func printf(String, ...);
-
 cover Char from char;
 cover String from Char*;
 cover Object from void*;
@@ -17,6 +15,11 @@ cover Void from void;
 //cover Func?
 cover Size from size_t;
 cover Octet from uint8_t;
+
+printf: extern func (String, ...);
+echo: func(str: String) {
+	printf("%s\n", str)
+}
 
 /*
 func GC_calloc ~ (Int nmemb, Size size) -> Object {

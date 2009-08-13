@@ -123,4 +123,8 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	public void addAll(NodeList<T> list) {
 		nodes.addAll(list.nodes);
 	}
+	
+	public void addAll(List<T> list) {
+		nodes.addAll(list);
+	}
 }

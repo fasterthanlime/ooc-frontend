@@ -10,7 +10,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.CLASS_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_BRACK;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_PAREN;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_SQUAR;
-import static org.ooc.frontend.model.tokens.Token.TokenType.COL;
+import static org.ooc.frontend.model.tokens.Token.TokenType.COLON;
 import static org.ooc.frontend.model.tokens.Token.TokenType.COMMA;
 import static org.ooc.frontend.model.tokens.Token.TokenType.CONST_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.COVER_KW;
@@ -66,6 +66,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.WHILE_KW;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -342,15 +343,10 @@ public class Parser {
 		if(foreach != null) return foreach;
 		
 		Conditional conditional = conditional(sReader, reader);
-		if(conditional != null) {
-			return conditional;
-		}
+		if(conditional != null) return conditional;
 		
 		Return ret = returnStatement(sReader, reader);
 		if(ret != null) return ret;
-		
-		Assignment ass = assignment(sReader, reader);
-		if(ass != null) return ass;
 		
 		Expression expression = expression(sReader, reader);
 		if(expression != null) return expression;
@@ -408,7 +404,7 @@ public class Parser {
 				return null;
 			}
 			
-			if(reader.read().type != COL) {
+			if(reader.read().type != COLON) {
 				return null;
 			}
 			
@@ -593,6 +589,34 @@ public class Parser {
 	
 	private VariableDecl variableDecl(SourceReader sReader, ListReader<Token> reader) throws IOException {
 		int mark = reader.mark();
+
+		List<VariableDeclAtom> atoms = new ArrayList<VariableDeclAtom>();
+		
+		if(reader.peek().type != NAME) {
+			reader.reset(mark);
+			return null;
+		}
+		while(reader.peek().type == NAME) {
+			String name = reader.read().get(sReader);
+			Expression expr = null;
+			if(reader.peek().type == ASSIGN) {
+				reader.skip();
+				expr = expression(sReader, reader);
+				if(expr == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"Expected expression as an initializer to a variable declaration.");
+				}
+			}
+			atoms.add(new VariableDeclAtom(name, expr));
+			if(reader.peek().type != COMMA) break;
+			reader.skip();
+		}
+		
+		if(reader.read().type != COLON) {
+			reader.reset();
+			return null;
+		}
+		
 		boolean isConst = false;
 		boolean isStatic = false;
 		
@@ -616,27 +640,7 @@ public class Parser {
 		}
 		
 		VariableDecl decl = new VariableDecl(type, isConst, isStatic);
-
-		if(reader.peek().type != NAME) {
-			reader.reset(mark);
-			return null;
-		}
-		while(reader.peek().type == NAME) {
-			String name = reader.read().get(sReader);
-			Expression expr = null;
-			if(reader.peek().type == ASSIGN) {
-				reader.skip();
-				expr = expression(sReader, reader);
-				if(expr == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-							"Expected expression as an initializer to a variable declaration.");
-				}
-			}
-			decl.getAtoms().add(new VariableDeclAtom(name, expr));
-			if(reader.peek().type != COMMA) break;
-			reader.skip();
-		}
-
+		decl.getAtoms().addAll(atoms);
 		return decl;
 	}
 	
@@ -791,7 +795,7 @@ public class Parser {
 				}
 				
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Expected variable declaration or function declaration in a class declaration");
+						"Expected variable declaration or function declaration in a class declaration, got "+reader.peek().type);
 			
 			}
 			reader.skip();
@@ -813,6 +817,18 @@ public class Parser {
 		if(reader.peek().type == OOCDOC) {
 			Token t = reader.read();
 			comment = new OocDocComment(t.get(sReader));
+		}
+		
+		String name = "";
+		Token tName = reader.peek();
+		if(tName.type == NAME || tName.type == NEW_KW) {
+			name = tName.get(sReader);
+			reader.skip();
+			if(reader.read().type != COLON) {
+				System.out.println("Got name but not colon, (e.g. "+reader.prev().type+")");
+				reader.reset(mark);
+				return null;
+			}
 		}
 		
 		boolean isAbstract = false;
@@ -859,13 +875,6 @@ public class Parser {
 			reader.reset(mark);
 			return null;
 		}
-		
-		Token tName = reader.read();
-		if(tName.type != NAME && tName.type != NEW_KW) {
-			throw new CompilationFailedError(sReader.getLocation(tName.start),
-					"Expected function name after 'func' keyword");
-		}
-		String name = tName.get(sReader);
 		
 		String suffix = "";
 		if(reader.peek().type == TILDE) {
@@ -977,23 +986,29 @@ public class Parser {
 			return new VarArg();
 		}
 		
-		Type type = type(sReader, reader);
-		if(type != null) {
-			Token t = reader.peek();
-			if(t.type == NAME) {
-				reader.skip();
-				return new RegularArgument(type, t.get(sReader));
-			}
-		}
-		reader.reset(mark);
 		
 		Token t = reader.read();
+		if(t.type == NAME) {
+			if(reader.peek().type == COLON) {
+				reader.skip();
+				Type type = type(sReader, reader);
+				if(type == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+							"Expected argument type after its name and ':'");
+				}
+				return new RegularArgument(type, t.get(sReader));
+			}
+			System.out.println("Found name "+t.get(sReader)+" but no semicolon, instead a "+reader.peek().type);
+			reader.rewind();
+		}
+		
 		if(t.type == ASSIGN) {
 			Token t2 = reader.read();
 			if(t2.type != NAME) {
 				throw new CompilationFailedError(sReader.getLocation(t2.start),
 						"Expecting member variable name in member-assign-argument");
 			}
+			System.out.println("MemberAssignArgument");
 			return new MemberAssignArgument(t2.get(sReader));
 		}
 		
@@ -1002,30 +1017,15 @@ public class Parser {
 			"Expecting member variable name in member-assign-argument");
 		}
 		if(isExtern) {
-			return new TypeArgument(new Type(t.get(sReader)));
+			System.out.println("TypeArgument with type");
+			Type type = type(sReader, reader);
+			if(type == null) {
+				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					"Expected argument type in extern func definition ':'");
+			}
+			return new TypeArgument(type);
 		}
 		return new MemberArgument(t.get(sReader));
-		
-	}
-
-	private Assignment assignment(SourceReader sReader, ListReader<Token> reader) throws IOException {
-		
-		int mark = reader.mark();
-
-		Access lvalue = access(sReader, reader);
-		if(lvalue != null) {
-			Token t = reader.peek();
-			if(t.type == ASSIGN) {
-				reader.skip();
-				Expression rvalue = expression(sReader, reader);
-				if(rvalue != null) {
-					return new Assignment(lvalue, rvalue);
-				}
-			}
-		}
-		
-		reader.reset(mark);
-		return null;
 		
 	}
 	
@@ -1077,7 +1077,7 @@ public class Parser {
 			} else break;
 		}
 			
-		while(reader.peek().type == NAME) {
+		if(reader.peek().type == NAME) {
 			name += reader.read().get(sReader);
 		}
 		

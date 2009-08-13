@@ -1,13 +1,10 @@
-include stdlib, stdio, time
-extern func printf(String, ...)
+include time
 extern func srand(Int)
 extern func rand -> Int
 extern func time(TimeT)
 cover TimeT from time_t
-cover String from char*
-cover Int from int
 
-func random(Int max) -> Int {
+func random(max : Int) -> Int {
 	
 	srand(time(null))
 	return (rand + 1) % max

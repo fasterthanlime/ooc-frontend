@@ -108,7 +108,6 @@ public class CGenerator extends Generator implements Visitor {
 		
 		// FIXME of course this is a dirty hack because this devbranch
 		// is missing the whole fancy cmdline frontend with sdk search etc.
-		current.append("#include <stdbool.h>\n");
 		current.append("#include <mango/mangoobject.h>\n");
 		for(Include include: module.getIncludes()) {
 			current.append("#include <");
@@ -116,6 +115,13 @@ public class CGenerator extends Generator implements Visitor {
 			current.append(".h>");
 			current.newLine();
 		}
+		for(Import imp: module.getImports()) {
+			current.append("#include \"");
+			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
+			current.append(".h\"");
+			current.newLine();
+		}
+		current.newLine();
 		
 		current.newLine();
 		
@@ -128,14 +134,6 @@ public class CGenerator extends Generator implements Visitor {
 		current.append("#include \"");
 		current.append(module.getSimpleName());
 		current.append(".h\"");
-		current.newLine();
-		
-		for(Import imp: module.getImports()) {
-			current.append("#include \"");
-			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
-			current.append(".h\"");
-			current.newLine();
-		}
 		current.newLine();
 		
 		module.acceptChildren(this);

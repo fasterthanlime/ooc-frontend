@@ -1,8 +1,5 @@
-include stdlib, stdio, time
-cover Int from int
-cover String from char*
+include time
 cover TimeT from time_t
-extern func printf(String, ...)
 extern func srand(Int)
 extern func rand -> Int
 extern func time(TimeT)

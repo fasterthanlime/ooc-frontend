@@ -1,12 +1,6 @@
-include stdio
-
-cover Int from int
-cover String from char*
-extern func printf(String, ...)
-
 class Thinga {
 
-	Int count
+	count: Int
 
 	func getThis -> This {
 		this.count = this.count + 1

@@ -43,9 +43,6 @@ public class Token {
 		
 		VERSION_KW, // version keyword
 		
-		CTYPE_KW,
-		TYPEDEF_KW,
-		
 		RETURN_KW,
 		
 		TRUE,
@@ -67,7 +64,7 @@ public class Token {
 		DOUBLE_DOT, // ..
 		TRIPLE_DOT, // ...
 		ARROW, // ->
-		COL, // :
+		COLON, // :
 		LINESEP, // ;
 		
 		PLUS, // +

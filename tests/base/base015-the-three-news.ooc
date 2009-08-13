@@ -1,23 +1,18 @@
-include stdio
-cover String from char*
-cover Int from int
-extern func printf(String, ...)
+Funky: class {
 
-class Funky {
-
-	func new {
+	new: func {
 		printf("Created a Funky =)\n")
 	}
 
 }
 
-func accept(Funky f)
+accept: func (Funky f)
 
-func main {
+main: func {
 
-	Funky f = new Funky() // Fully explicit
-	Funky f2 = new Funky // No-parenthesis
-	Funky f3 = new // VariableDeclAssigned
-	Funky f4
+	f = new Funky() : Funky // Fully explicit
+	f2 = new Funky : Funky // No-parenthesis
+	f3 = new : Funky // VariableDeclAssigned
+	f4 : Funky
 	f4 = new // Assignment
 }
