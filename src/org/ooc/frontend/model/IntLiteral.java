@@ -15,7 +15,7 @@ public class IntLiteral extends Literal {
 	
 	private long value;
 	private Format format;
-	private static Type type = new Type("Int");
+	public static Type type = new Type("Int");
 	
 	public IntLiteral(long value, Format format) {
 		

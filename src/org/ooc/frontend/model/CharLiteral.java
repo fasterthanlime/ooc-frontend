@@ -7,7 +7,7 @@ import org.ooc.frontend.Visitor;
 public class CharLiteral extends Literal {
 
 	private char value;
-	private static Type type = new Type("Char");
+	public static Type type = new Type("Char");
 	
 	public CharLiteral(char value) {
 		this.value = value;

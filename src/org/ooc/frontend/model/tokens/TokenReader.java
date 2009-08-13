@@ -10,13 +10,13 @@ public class TokenReader extends ListReader<Token> {
 		super(list);
 	}
 
-	public void skipNonWhite() {
+	public void skipNonWhitespace() {
 		while(list.get(index).type == TokenType.LINESEP) {
 			index++;
 		}
 	}
 	
-	public Token peekNonWhite() {
+	public Token peekWhiteless() {
 		int index2 = index;
 		while(list.get(index2).type == TokenType.LINESEP) {
 			index2++;
@@ -24,8 +24,8 @@ public class TokenReader extends ListReader<Token> {
 		return list.get(index2);
 	}
 	
-	public Token readNonWhite() {
-		skipNonWhite();
+	public Token readWhiteless() {
+		skipNonWhitespace();
 		return list.get(index++);
 	}
 	

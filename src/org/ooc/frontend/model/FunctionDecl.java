@@ -7,12 +7,6 @@ import org.ooc.frontend.Visitor;
 
 public class FunctionDecl extends Declaration implements Scope {
 
-	public static enum FunctionDeclType {
-		FUNC,
-		IMPL,
-		OVER,
-	}
-	
 	private OocDocComment comment;
 	
 	private boolean isFinal;
@@ -22,17 +16,15 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	private TypeDecl typeDecl;
 
-	private FunctionDeclType declType;
 	private String suffix;
 	private final NodeList<Line> body;
 	private Type returnType;
 	private final NodeList<Argument> arguments;
 	
-	public FunctionDecl(FunctionDeclType declType, String name, String suffix,
+	public FunctionDecl(String name, String suffix,
 			boolean isFinal, boolean isStatic, boolean isAbstract, boolean isExtern) {
 		
 		super(name);
-		this.declType = declType;
 		this.suffix = suffix;
 		this.isFinal = isFinal;
 		this.isStatic = isStatic;
@@ -50,14 +42,6 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	public OocDocComment getComment() {
 		return comment;
-	}
-	
-	public FunctionDeclType getDeclType() {
-		return declType;
-	}
-	
-	public void setDeclType(FunctionDeclType declType) {
-		this.declType = declType;
 	}
 	
 	public String getSuffix() {

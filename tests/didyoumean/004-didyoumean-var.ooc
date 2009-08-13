@@ -1,10 +1,4 @@
-include stdio;
-extern func printf(String, ...);
-cover Int from int;
-cover String from char*;
-
-func main {
-	call;
+main: func {
+	answer = 42 : Int
+	printf("The answer is %d\n", anser)
 }
-
-func call print "Hi, cruel world";

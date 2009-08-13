@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Module;
@@ -41,6 +42,10 @@ public class MemberHandler implements Hobgoblin {
 								" Function named 'new' are only used as constructors in classes.");
 					}
 					node.setReturnType(((ClassDecl) stack.get(index)).getInstanceType());
+				}
+				
+				if(node.getName().equals("main")) {
+					node.setReturnType(IntLiteral.type);
 				}
 				
 				if(node.isStatic()) return true; // static functions don't have a this.

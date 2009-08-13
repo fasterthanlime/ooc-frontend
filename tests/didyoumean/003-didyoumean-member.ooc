@@ -1,10 +1,7 @@
-include stdio;
-extern func printf(String, ...);
-cover Int from int;
-cover String from char*;
-
-func main {
-	call;
+main: func {
+	printf("Speaker's value = %d\n", new Speaker valu);
 }
 
-func call print "Hi, cruel world";
+Speaker: class {
+	value: Int
+}

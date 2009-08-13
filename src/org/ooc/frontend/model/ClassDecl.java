@@ -3,7 +3,6 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 
 public class ClassDecl extends TypeDecl implements Scope {
 
@@ -21,7 +20,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 		super(name);
 		this.isAbstract = isAbstract;
 		this.superName = "";
-		this.initializer = new FunctionDecl(FunctionDeclType.FUNC, "initialize", "", false, false, false, false);
+		this.initializer = new FunctionDecl("initialize", "", false, false, false, false);
 		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
 		this.superRef = null;
 	}

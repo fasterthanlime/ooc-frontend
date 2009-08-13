@@ -1,10 +1,5 @@
-include stdio;
-extern func printf(String, ...);
-cover Int from int;
-cover String from char*;
-
-func main {
+main: func {
 	call;
 }
 
-func call print "Hi, cruel world";
+call: func print("Hi, cruel world");

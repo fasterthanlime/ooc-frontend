@@ -383,10 +383,6 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 8, TokenType.CONTINUE_KW));
 				} else if(name.equals("fallthrough")) {
 					tokens.add(new Token(location.getIndex(), 11, TokenType.FALLTHR_KW));
-				} else if(name.equals("implement")) {
-					tokens.add(new Token(location.getIndex(), 9, TokenType.IMPL_KW));
-				} else if(name.equals("override")) {
-					tokens.add(new Token(location.getIndex(), 8, TokenType.OVER_KW));
 				} else if(name.equals("if")) {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.IF_KW));
 				} else if(name.equals("else")) {

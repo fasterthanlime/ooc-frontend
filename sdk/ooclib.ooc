@@ -2,7 +2,7 @@ include stdlib, stdio, stdint, stdbool, memory, gc/gc;
 
 Char: cover from char;
 String: cover from Char*;
-Object: cover from void*;
+Pointer: cover from void*;
 Int: cover from int;
 UInt: cover from unsigned int;
 Float: cover from float;
@@ -17,6 +17,7 @@ Size: cover from size_t;
 Octet: cover from uint8_t;
 
 printf: extern func (String, ...);
+sprintf: extern func (String, String, ...);
 println: func(str: String) {
 	printf("%s\n", str)
 }

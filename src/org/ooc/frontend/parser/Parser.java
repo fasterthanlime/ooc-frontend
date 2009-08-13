@@ -30,7 +30,6 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.GT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.GTE;
 import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.IMPL_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPORT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.INCLUDE_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.LINESEP;
@@ -47,7 +46,6 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.OOCDOC;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_BRACK;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
 import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_SQUAR;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OVER_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.PERCENT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.PLUS;
 import static org.ooc.frontend.model.tokens.Token.TokenType.RETURN_KW;
@@ -126,7 +124,6 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.Compare.CompareType;
-import org.ooc.frontend.model.FunctionDecl.FunctionDeclType;
 import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.Token;
@@ -565,7 +562,7 @@ public class Parser {
 							"Expected comma between arguments of a function call");
 				}
 			} else {
-				reader.skipNonWhite();
+				reader.skipNonWhitespace();
 				Expression expr = expression(sReader, reader);
 				if(expr == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
@@ -853,15 +850,12 @@ public class Parser {
 		boolean isFinal = false;
 		boolean isExtern = false;
 		
-		FunctionDeclType declType = FunctionDeclType.FUNC;
-		
 		Token kw = reader.peek();
 		while(kw.type == ABSTRACT_KW
 		   || kw.type == STATIC_KW
 		   || kw.type == FINAL_KW
-		   || kw.type == IMPL_KW
-		   || kw.type == OVER_KW
-		   || kw.type == EXTERN_KW) {
+		   || kw.type == EXTERN_KW
+		   ) {
 			
 			reader.skip();
 			
@@ -870,25 +864,13 @@ public class Parser {
 			case STATIC_KW: isStatic = true; break;
 			case FINAL_KW: isFinal = true; break;
 			case EXTERN_KW: isExtern = true; break;
-			case IMPL_KW: 
-				if(declType != FunctionDeclType.FUNC) {
-					throw new CompilationFailedError(sReader.getLocation(kw.start),
-							"multiple qualifiers for a function, impl and "+declType);
-				}
-				declType = FunctionDeclType.IMPL; break;
-			case OVER_KW: 
-				if(declType != FunctionDeclType.FUNC) {
-					throw new CompilationFailedError(sReader.getLocation(kw.start),
-							"multiple qualifiers for a function, over and "+declType);
-				}
-				declType = FunctionDeclType.OVER; break;
-			default: // eclipse, cool down.
+			default:
 			}
 			
 			kw = reader.peek();
 		}
 		
-		if(declType == FunctionDeclType.FUNC && reader.read().type != FUNC_KW) {
+		if(reader.read().type != FUNC_KW) {
 			reader.reset(mark);
 			return null;
 		}
@@ -903,7 +885,7 @@ public class Parser {
 			}
 		}
 		
-		FunctionDecl functionDecl = new FunctionDecl(declType,
+		FunctionDecl functionDecl = new FunctionDecl(
 				name, suffix, isFinal, isStatic, isAbstract, isExtern);
 		if(comment != null) functionDecl.setComment(comment);
 		
@@ -922,32 +904,19 @@ public class Parser {
 								"Expected comma between arguments of a function definition");
 					}
 				} else {
-					if(declType == FunctionDeclType.FUNC) {
-						Argument arg = argument(sReader, reader, isExtern);
-						if(arg == null) {
-							throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-									"Expected variable declaration as an argument of a function definition");
-						}
-						functionDecl.getArguments().add(arg);
-					} else {
-						Type type = type(sReader, reader);
-						if(type == null) {
-							if(reader.peek().type == TRIPLE_DOT) {
-								reader.skip();
-								functionDecl.getArguments().add(new VarArg());
-							} else {
-								throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-									"Expected type as an argument of an extern function definition");
-							}
-						} else {
-							functionDecl.getArguments().add(new TypeArgument(type));
-						}
+					Argument arg = argument(sReader, reader, isExtern);
+					if(arg == null) {
+						throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+								"Expected variable declaration as an argument of a function definition");
 					}
+					functionDecl.getArguments().add(arg);
 				}
 				comma = !comma;
 				
 			}
 		}
+		
+		if(reader.peek().type == LINESEP) return functionDecl;
 		
 		Token t = reader.read();
 		if(t.type == ARROW) {
@@ -959,14 +928,7 @@ public class Parser {
 			t = reader.read();
 		}
 		
-		// FIXME this is probably not a good place for this
-		if(functionDecl.getName().equals("main")) {
-			functionDecl.setReturnType(new Type("int"));
-		}
-		
-		if(t.type == LINESEP) {
-			return functionDecl;
-		}
+		if(t.type == LINESEP) return functionDecl;
 
 		if(t.type != OPEN_BRACK) {
 			reader.rewind();

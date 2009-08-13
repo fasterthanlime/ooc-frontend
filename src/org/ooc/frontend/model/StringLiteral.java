@@ -7,7 +7,7 @@ import org.ooc.frontend.Visitor;
 public class StringLiteral extends Literal {
 
 	private String value;
-	private static Type type = new Type("String");
+	public static Type type = new Type("String");
 	
 	public StringLiteral(String value) {
 		this.value = value;
