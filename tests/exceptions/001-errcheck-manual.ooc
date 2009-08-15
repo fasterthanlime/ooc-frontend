@@ -28,9 +28,9 @@
 
 include stdlib, stdio, errno, string, sys/time
 
-malloc: extern func (SizeT) -> Pointer
+malloc: extern func (Int)
 exit: extern func (Int)
-errno: Int
+errno: extern Int
 
 /*************** Exceptions structures *******************/
 
@@ -54,7 +54,7 @@ strerror: extern func (Int) -> String
 
 safe_malloc: func (size: SizeT) -> ReturnValue {
 	
-	mem = malloc(size) : Pointer
+	mem = GC_malloc(size) : Pointer
 	if(!mem) {
 		return new ReturnValue(new Exception("OutOfMemoryException", strerror(errno)), null)
 	}
@@ -83,7 +83,7 @@ try_alloc_safe: func (size: SizeT) {
 
 try_alloc_unsafe: func (size: SizeT) {
 	
-	block = malloc(size) : String
+	block = GC_malloc(size) : String
 	//free(block)
 	
 }
@@ -99,11 +99,11 @@ ALLOC_SIZE = 3000000000: const Int
 main: func -> Int {
 	
 	for(i: Int in 0..MAX_ITER) {
-		try_alloc_unsafe(ALLOC_SIZE)
+		try_alloc_safe(ALLOC_SIZE)
 	}
 	
 	for(i: Int in 0..MAX_ITER) {
-		try_alloc_safe(ALLOC_SIZE)
+		try_alloc_unsafe(ALLOC_SIZE)
 	}
 	
 	return 0

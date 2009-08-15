@@ -25,11 +25,8 @@ println: func ~empty {
 	printf("\n");
 }
 
-/*
-GC_calloc: func ~ (nmemb: Int, size: Size) -> Object {
-	memsize = nmemb * size : Size;
-	tmp = GC_malloc(memsize) : Object;
-	memset(tmp, 0, memsize);
-	return tmp;
+GC_malloc: extern func (size: SizeT) -> Pointer;
+GC_realloc: extern func (ptr: Pointer, size: SizeT) -> Pointer;
+GC_calloc: func ~ (nmemb: SizeT, size: SizeT) -> Pointer {
+	return GC_malloc(nmemb * size)
 }
-*/
