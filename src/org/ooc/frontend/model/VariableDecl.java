@@ -57,17 +57,19 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	protected boolean isConst;
 	protected boolean isStatic;
+	protected boolean isExtern;
 	
 	protected Type type;
 	protected TypeDecl typeDecl;
 	
 	protected NodeList<VariableDeclAtom> atoms;
 	
-	public VariableDecl(Type type, boolean isConst, boolean isStatic) {
+	public VariableDecl(Type type, boolean isConst, boolean isStatic, boolean isExtern) {
 		super(null);
 		this.type = type;
 		this.isConst = isConst;
 		this.isStatic = isStatic;
+		this.isExtern = isExtern;
 		this.atoms = new NodeList<VariableDeclAtom>();
 	}
 	
@@ -129,6 +131,14 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		this.isStatic = isStatic;
 	}
 	
+	public void setExtern(boolean isExtern) {
+		this.isExtern = isExtern;
+	}
+	
+	public boolean isExtern() {
+		return isExtern;
+	}
+	
 	@Override
 	public void accept(Visitor visitor) throws IOException {
 		visitor.visit(this);
@@ -163,6 +173,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 		if(hierarchy.peek() instanceof Line
 		|| hierarchy.peek() instanceof ControlStatement
+		|| hierarchy.get(hierarchy.size() - 2) instanceof Module
 		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
 		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDecl
 		) {

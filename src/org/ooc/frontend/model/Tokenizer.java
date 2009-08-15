@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -129,6 +130,18 @@ public class Tokenizer {
 				continue;
 			}
 			
+			if(c == '\\') {
+				reader.read();
+				char c2 = reader.peek();
+				if(c2 == '\\') {
+					reader.read();
+					tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_BACKSLASH));
+				} else {
+					tokens.add(new Token(location.getIndex(), 1, TokenType.BACKSLASH));
+				}
+				continue;
+			}
+			
 			if(c == '!') {
 				reader.read();
 				char c2 = reader.peek();
@@ -187,7 +200,11 @@ public class Tokenizer {
 			if(c == '"') {
 				reader.read();
 				// TODO: optimize. readStringLiteral actually stores it into a String, but we don't care
-				reader.readStringLiteral();
+				try {
+					reader.readStringLiteral();
+				} catch(EOFException eof) {
+					throw new CompilationFailedError(location, "Never-ending string literal (reached end of file)");
+				}
 				tokens.add(new Token(location.getIndex() + 1,
 						reader.mark() - location.getIndex() - 2,
 						TokenType.STRING_LIT));
@@ -338,13 +355,16 @@ public class Tokenizer {
 				reader.readMany("0123456789", "_", true);
 				if(reader.peek() == '.') {
 					reader.read();
-					reader.readMany("0123456789", "_", true);
-					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
-							TokenType.DEC_FLOAT));
-				} else {
-					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
-						TokenType.DEC_INT));
+					if(reader.peek() != '.') {
+						reader.readMany("0123456789", "_", true);
+						tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+								TokenType.DEC_FLOAT));
+						continue;
+					}
+					reader.rewind(1);
 				}
+				tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+					TokenType.DEC_INT));
 				continue;
 			}
 			
@@ -399,6 +419,8 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 6, TokenType.RETURN_KW));
 				} else if(name.equals("as")) {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.AS_KW));
+				} else if(name.equals("in")) {
+					tokens.add(new Token(location.getIndex(), 2, TokenType.IN_KW));
 				} else if(name.equals("version")) {
 					tokens.add(new Token(location.getIndex(), 7, TokenType.VERSION_KW));
 				} else if(name.equals("true")) {

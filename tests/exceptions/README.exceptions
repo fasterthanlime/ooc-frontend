@@ -1,0 +1,5 @@
+Exceptions shouldn't induce additional costs when not used
+(e.g. most people disable C++ exceptions because of the slow down)
+
+We should implement zero-cost exceptions, there's an example
+in the Itanium C++ ABI, and probably elsewhere also (e.g. gnat)

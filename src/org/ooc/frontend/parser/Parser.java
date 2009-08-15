@@ -32,6 +32,7 @@ import static org.ooc.frontend.model.tokens.Token.TokenType.HEX_INT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IF_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.IMPORT_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.INCLUDE_KW;
+import static org.ooc.frontend.model.tokens.Token.TokenType.IN_KW;
 import static org.ooc.frontend.model.tokens.Token.TokenType.LINESEP;
 import static org.ooc.frontend.model.tokens.Token.TokenType.LT;
 import static org.ooc.frontend.model.tokens.Token.TokenType.LTE;
@@ -176,7 +177,11 @@ public class Parser {
 			
 			Declaration declaration = declaration(sReader, reader);
 			if(declaration != null) {
-				module.getBody().add(declaration);
+				if(declaration instanceof VariableDecl) {
+					module.getBody().add(new Line(declaration));
+				} else {
+					module.getBody().add(declaration);
+				}
 				continue;
 			}
 			
@@ -224,6 +229,11 @@ public class Parser {
 		if(t.type == ML_COMMENT) {
 			reader.skip();
 			return new SingleLineComment(t.get(sReader)); // FIXME lazy 
+		}
+		
+		if(t.type == OOCDOC) {
+			reader.skip();
+			return new SingleLineComment(t.get(sReader)); // FIXME lazy
 		}
 		
 		return null;
@@ -302,6 +312,8 @@ public class Parser {
 	private Line line(SourceReader sReader, TokenReader reader) throws IOException {
 
 		int mark = reader.mark();
+		
+		reader.skipNonWhitespace();
 		
 		if(reader.peek().type == SL_COMMENT) {
 			Token t = reader.read();
@@ -400,30 +412,31 @@ public class Parser {
 		int mark = reader.mark();
 		
 		if(reader.read().type == FOR_KW) {
-			boolean hasParen = false;
-			if(reader.peek().type == OPEN_PAREN) {
-				reader.skip();
-				hasParen = true;
+			if(reader.read().type != OPEN_PAREN) {
+				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					"Expected opening parenthesis after for");
 			}
 			
 			VariableDecl variable = variableDecl(sReader, reader);
 			if(variable == null) {
+				reader.reset(mark);
 				return null;
 			}
 			
-			if(reader.read().type != COLON) {
+			if(reader.read().type != IN_KW) {
+				reader.reset(mark);
 				return null;
 			}
 			
 			Expression collection = expression(sReader, reader);
 			if(collection == null) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Expected expression after colon in a foreach");
+						"Expected expression after 'in' keyword in a foreach");
 			}
 			
-			if(hasParen && reader.read().type != CLOS_PAREN) {
+			if(reader.read().type != CLOS_PAREN) {
 				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-				"Expected closing parenthesis at the end of a parenthesized foreach");
+					"Expected closing parenthesis at the end of a foreach");
 			}
 			
 			Foreach foreach = new Foreach(variable, collection);
@@ -629,6 +642,7 @@ public class Parser {
 		
 		boolean isConst = false;
 		boolean isStatic = false;
+		boolean isExtern = false;
 		
 		while(true) {
 			Token t = reader.peek();
@@ -637,6 +651,9 @@ public class Parser {
 				reader.skip();
 			} else if(t.type == STATIC_KW) {
 				isStatic = true;
+				reader.skip();
+			} else if(t.type == EXTERN_KW) {
+				isExtern = true;
 				reader.skip();
 			} else {
 				break;
@@ -649,7 +666,7 @@ public class Parser {
 			return null;
 		}
 		
-		VariableDecl decl = new VariableDecl(type, isConst, isStatic);
+		VariableDecl decl = new VariableDecl(type, isConst, isStatic, isExtern);
 		decl.getAtoms().addAll(atoms);
 		return decl;
 	}
@@ -963,7 +980,6 @@ public class Parser {
 			return new VarArg();
 		}
 		
-		
 		Token t = reader.read();
 		if(t.type == NAME) {
 			if(reader.peek().type == COLON) {
@@ -1096,6 +1112,7 @@ public class Parser {
 		while(reader.hasNext()) {
 			
 			Token t = reader.peek();
+			
 			if(t.type == NAME) {
 				
 				FunctionCall call = functionCall(sReader, reader);

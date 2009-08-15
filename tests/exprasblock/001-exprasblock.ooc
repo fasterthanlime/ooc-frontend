@@ -1,30 +1,26 @@
 include stdio;
 
-class Dog {
+Dog: class {
 
-	String name;
+	name: String | private
 
-	func(=name);
+	new: func (=name)
 
-	func sayName printf("My name is %s\n", name);
-	func barf printf("Woof!\n);
+	sayName: func printf("My name is %s\n", name)
+	barf: func printf("Woof!\n")
 
 }
 
-class Point3f {
+Point3f: class {
 
-	private Float x, y, z;
-
-	property x {get, set}
-	property y {get, set}
-	property z {get, set}
+	x, y, z : Float | private, get, set
 
 }
 
 func main {
 
-	new Dog("Dogbert") {sayName; barf};
-	new Point3f {x = 3.0f, y = 2.13f, z = 3.2f};
-	new Dog {name = "Fido"};
+	new Dog("Dogbert") sayName(), barf();
+	new Point3f x = 3.0f, y = 2.13f, z = 3.2f;
+	new Dog name = "Fido";
 
 }

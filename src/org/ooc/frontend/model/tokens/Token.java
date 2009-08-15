@@ -37,6 +37,7 @@ public class Token {
 		CASE_KW,
 		
 		AS_KW,
+		IN_KW,
 		
 		VERSION_KW, // version keyword
 		
@@ -53,6 +54,8 @@ public class Token {
 		REFERENCE, // @functionName
 		NAME, // mostly a Java identifier
 
+		BACKSLASH, // \
+		DOUBLE_BACKSLASH, // \\
 		AT, // @
 		HASH, // #
 		TILDE, // ~

@@ -3,7 +3,7 @@ package org.ooc.frontend.model;
 public abstract class Argument extends VariableDecl {
 
 	public Argument(Type type, String name, boolean isConst) {
-		super(type, isConst, false);
+		super(type, isConst, false, false);
 		getAtoms().add(new VariableDeclAtom(name, null));
 		this.name = name;
 	}

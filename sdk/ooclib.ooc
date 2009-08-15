@@ -13,13 +13,16 @@ Long: cover from long;
 LLong: cover from long long;
 Void: cover from void;
 //cover Func?
-Size: cover from size_t;
+SizeT: cover from size_t;
 Octet: cover from uint8_t;
 
 printf: extern func (String, ...);
 sprintf: extern func (String, String, ...);
-println: func(str: String) {
+println: func (str: String) {
 	printf("%s\n", str)
+}
+println: func ~empty {
+	printf("\n");
 }
 
 /*
