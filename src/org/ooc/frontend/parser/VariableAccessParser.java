@@ -1,11 +1,9 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
-import static org.ooc.frontend.model.tokens.Token.TokenType.THIS_KW;
-
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.SourceReader;
 
 public class VariableAccessParser {
@@ -14,7 +12,7 @@ public class VariableAccessParser {
 		int mark = reader.mark();
 		
 		Token t = reader.peek();
-		if(t.type == NAME || t.type == THIS_KW) {
+		if(t.type == TokenType.NAME || t.type == TokenType.THIS_KW) {
 			reader.skip();
 			return new VariableAccess(t.get(sReader));
 		}

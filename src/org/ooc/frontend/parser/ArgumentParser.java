@@ -1,11 +1,5 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.COLON;
-import static org.ooc.frontend.model.tokens.Token.TokenType.DOT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
-import static org.ooc.frontend.model.tokens.Token.TokenType.TRIPLE_DOT;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.Argument;
@@ -16,6 +10,7 @@ import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -23,14 +18,14 @@ public class ArgumentParser {
 
 	public static Argument parse(SourceReader sReader, TokenReader reader, boolean isExtern) throws IOException {
 
-		if(reader.peek().type == TRIPLE_DOT) {
+		if(reader.peek().type == TokenType.TRIPLE_DOT) {
 			reader.skip();
 			return new VarArg();
 		}
 		
 		Token t = reader.read();
-		if(t.type == NAME) {
-			if(reader.peek().type == COLON) {
+		if(t.type == TokenType.NAME) {
+			if(reader.peek().type == TokenType.COLON) {
 				reader.skip();
 				Type type = TypeParser.parse(sReader, reader);
 				if(type == null) {
@@ -42,18 +37,18 @@ public class ArgumentParser {
 			reader.rewind();
 		}
 		
-		if(t.type == ASSIGN) {
+		if(t.type == TokenType.ASSIGN) {
 			Token t2 = reader.read();
-			if(t2.type != NAME) {
+			if(t2.type != TokenType.NAME) {
 				throw new CompilationFailedError(sReader.getLocation(t2.start),
 						"Expecting member variable name in member-assign-argument");
 			}
 			return new MemberAssignArgument(t2.get(sReader));
 		}
 		
-		if(t.type == DOT) {
+		if(t.type == TokenType.DOT) {
 			Token t2 = reader.read();
-			if(t2.type != NAME) {
+			if(t2.type != TokenType.NAME) {
 				throw new CompilationFailedError(sReader.getLocation(t2.start),
 						"Expecting member variable name in member-assign-argument");
 			}

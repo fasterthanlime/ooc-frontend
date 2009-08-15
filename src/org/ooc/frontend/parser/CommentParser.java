@@ -1,13 +1,10 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.ML_COMMENT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OOCDOC;
-import static org.ooc.frontend.model.tokens.Token.TokenType.SL_COMMENT;
-
 import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.SourceReader;
 
 public class CommentParser {
@@ -16,17 +13,17 @@ public class CommentParser {
 		
 		Token t = reader.peek();
 		
-		if(t.type == SL_COMMENT) {
+		if(t.type == TokenType.SL_COMMENT) {
 			reader.skip();
 			return new SingleLineComment(t.get(sReader));
 		}
 
-		if(t.type == ML_COMMENT) {
+		if(t.type == TokenType.ML_COMMENT) {
 			reader.skip();
 			return new SingleLineComment(t.get(sReader)); // FIXME lazy 
 		}
 		
-		if(t.type == OOCDOC) {
+		if(t.type == TokenType.OOCDOC) {
 			reader.skip();
 			return new SingleLineComment(t.get(sReader)); // FIXME lazy
 		}

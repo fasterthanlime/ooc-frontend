@@ -1,14 +1,11 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_PAREN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.COMMA;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -21,7 +18,7 @@ public class ExpressionListFiller {
 		
 		if(!reader.hasNext()) return false;
 		
-		if(reader.read().type != OPEN_PAREN) {
+		if(reader.read().type != TokenType.OPEN_PAREN) {
 			reader.reset(mark);
 			return false;
 		}
@@ -29,12 +26,13 @@ public class ExpressionListFiller {
 		boolean comma = false;
 		while(true) {
 			
-			if(reader.peek().type == CLOS_PAREN) {
+			if(reader.peekWhiteless().type == TokenType.CLOS_PAREN) {
+				reader.skipNonWhitespace();
 				reader.skip(); // skip the ')'
 				break;
 			}
 			if(comma) {
-				if(reader.read().type != COMMA) {
+				if(reader.readWhiteless().type != TokenType.COMMA) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected comma between arguments of a function call");
 				}

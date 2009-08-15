@@ -1,16 +1,12 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_PAREN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.FOR_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.IN_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -20,8 +16,8 @@ public class ForeachParser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type == FOR_KW) {
-			if(reader.read().type != OPEN_PAREN) {
+		if(reader.read().type == TokenType.FOR_KW) {
+			if(reader.read().type != TokenType.OPEN_PAREN) {
 				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 					"Expected opening parenthesis after for");
 			}
@@ -32,7 +28,7 @@ public class ForeachParser {
 				return null;
 			}
 			
-			if(reader.read().type != IN_KW) {
+			if(reader.read().type != TokenType.IN_KW) {
 				reader.reset(mark);
 				return null;
 			}
@@ -43,7 +39,7 @@ public class ForeachParser {
 						"Expected expression after 'in' keyword in a foreach");
 			}
 			
-			if(reader.read().type != CLOS_PAREN) {
+			if(reader.read().type != TokenType.CLOS_PAREN) {
 				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 					"Expected closing parenthesis at the end of a foreach");
 			}

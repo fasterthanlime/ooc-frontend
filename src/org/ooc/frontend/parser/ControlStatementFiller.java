@@ -1,13 +1,11 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_BRACK;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_BRACK;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -18,13 +16,13 @@ public class ControlStatementFiller {
 			throws IOException {
 		
 		boolean hasBrack = false;
-		if(reader.peek().type == OPEN_BRACK) {
+		if(reader.peek().type == TokenType.OPEN_BRACK) {
 			reader.skip();
 			hasBrack = true;
 		}
 		
 		if(hasBrack) {
-			while(reader.hasNext() && reader.peek().type != CLOS_BRACK) {
+			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 				Line line = LineParser.parse(sReader, reader);
 				if(line == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),

@@ -1,8 +1,5 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.LINESEP;
-import static org.ooc.frontend.model.tokens.Token.TokenType.SL_COMMENT;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.ControlStatement;
@@ -11,6 +8,7 @@ import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.Statement;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -22,12 +20,12 @@ public class LineParser {
 		
 		reader.skipNonWhitespace();
 		
-		if(reader.peek().type == SL_COMMENT) {
+		if(reader.peek().type == TokenType.SL_COMMENT) {
 			Token t = reader.read();
 			return new SingleLineComment(t.get(sReader));
 		}
 		
-		while(reader.peek().type == LINESEP) reader.skip();
+		while(reader.peek().type == TokenType.LINESEP) reader.skip();
 		
 		if(!reader.hasNext()) {
 			reader.reset(mark);
@@ -42,7 +40,7 @@ public class LineParser {
 		
 		if(!(statement instanceof ControlStatement)) {
 			Token next = reader.read();
-			if(next.type != LINESEP && next.type != SL_COMMENT) {
+			if(next.type != TokenType.LINESEP && next.type != TokenType.SL_COMMENT) {
 				throw new CompilationFailedError(sReader.getLocation(next.start),
 						"Missing semi-colon at the end of a line (got a "+next.type+" instead)");
 			}

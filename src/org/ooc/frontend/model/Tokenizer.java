@@ -136,6 +136,8 @@ public class Tokenizer {
 				if(c2 == '\\') {
 					reader.read();
 					tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_BACKSLASH));
+				} else if(c2 == '\n') {
+					reader.read(); // Just skip both of'em (line continuation)
 				} else {
 					tokens.add(new Token(location.getIndex(), 1, TokenType.BACKSLASH));
 				}

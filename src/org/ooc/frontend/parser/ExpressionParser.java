@@ -1,26 +1,5 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.ASSIGN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.AS_KW;
-import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_PAREN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.CLOS_SQUAR;
-import static org.ooc.frontend.model.tokens.Token.TokenType.DOUBLE_DOT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.EQUALS;
-import static org.ooc.frontend.model.tokens.Token.TokenType.EXCL;
-import static org.ooc.frontend.model.tokens.Token.TokenType.GT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.GTE;
-import static org.ooc.frontend.model.tokens.Token.TokenType.LT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.LTE;
-import static org.ooc.frontend.model.tokens.Token.TokenType.MINUS;
-import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
-import static org.ooc.frontend.model.tokens.Token.TokenType.NOT_EQ;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_PAREN;
-import static org.ooc.frontend.model.tokens.Token.TokenType.OPEN_SQUAR;
-import static org.ooc.frontend.model.tokens.Token.TokenType.PERCENT;
-import static org.ooc.frontend.model.tokens.Token.TokenType.PLUS;
-import static org.ooc.frontend.model.tokens.Token.TokenType.SLASH;
-import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
-
 import java.io.IOException;
 
 import org.ooc.frontend.model.Access;
@@ -48,6 +27,7 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.Compare.CompareType;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -57,7 +37,7 @@ public class ExpressionParser {
 		
 		int mark = reader.mark();
 		
-		if(reader.peek().type == EXCL) {
+		if(reader.peek().type == TokenType.EXCL) {
 			reader.skip();
 			Expression inner = ExpressionParser.parse(sReader, reader);
 			if(inner == null) {
@@ -76,7 +56,7 @@ public class ExpressionParser {
 			
 			Token t = reader.peek();
 			
-			if(t.type == NAME) {
+			if(t.type == TokenType.NAME) {
 				
 				FunctionCall call = FunctionCallParser.parse(sReader, reader);
 				if(call != null) {
@@ -92,7 +72,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == DOUBLE_DOT) {
+			if(t.type == TokenType.DOUBLE_DOT) {
 				
 				reader.skip();
 				Expression upper = ExpressionParser.parse(sReader, reader);
@@ -105,7 +85,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == OPEN_SQUAR) {
+			if(t.type == TokenType.OPEN_SQUAR) {
 
 				reader.skip();
 				Expression index = ExpressionParser.parse(sReader, reader);
@@ -113,7 +93,7 @@ public class ExpressionParser {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected expression for the index of an array access");
 				}
-				if(reader.read().type != CLOS_SQUAR) {
+				if(reader.read().type != TokenType.CLOS_SQUAR) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 						"Expected closing bracket to end array access, got "+reader.prev().type+" instead.");
 				}
@@ -122,7 +102,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == ASSIGN) {
+			if(t.type == TokenType.ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -139,10 +119,12 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == PLUS || t.type == STAR
-					|| t.type == MINUS || t.type == SLASH || t.type == PERCENT
-					|| t.type == GT || t.type == LT || t.type == GTE || t.type == LTE
-					|| t.type == EQUALS || t.type == NOT_EQ) {
+			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
+					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH
+					|| t.type == TokenType.PERCENT || t.type == TokenType.GT
+					|| t.type == TokenType.LT || t.type == TokenType.GTE
+					|| t.type == TokenType.LTE || t.type == TokenType.EQUALS
+					|| t.type == TokenType.NOT_EQ) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -170,7 +152,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == AS_KW) {
+			if(t.type == TokenType.AS_KW) {
 				
 				reader.skip();
 				Type type = TypeParser.parse(sReader, reader);
@@ -197,7 +179,7 @@ public class ExpressionParser {
 		
 		int parenNumber = 0;
 		Token t = reader.peek();
-		while(t.type == OPEN_PAREN) {
+		while(t.type == TokenType.OPEN_PAREN) {
 			reader.skip();
 			parenNumber++;
 			t = reader.peek();
@@ -221,7 +203,7 @@ public class ExpressionParser {
 		}
 		
 		while(parenNumber > 0) {
-			if(reader.read().type != CLOS_PAREN) {
+			if(reader.read().type != TokenType.CLOS_PAREN) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 					"Missing closing parenthesis.");
 			}

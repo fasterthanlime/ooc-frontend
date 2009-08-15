@@ -1,7 +1,5 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.LINESEP;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -10,7 +8,9 @@ import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.VariableDecl;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
+import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -23,8 +23,9 @@ public class ModuleParser {
 		
 		while(reader.hasNext()) {
 
-			if(reader.peek().type == LINESEP) {
-				reader.skip(); continue;
+			if(reader.peek().type == TokenType.LINESEP) {
+				reader.skip();
+				continue;
 			}
 			
 			Declaration declaration = DeclarationParser.parse(sReader, reader);
@@ -42,8 +43,9 @@ public class ModuleParser {
 			// TODO store comments somewhere..
 			if(CommentParser.parse(sReader, reader) != null) continue;
 			
-			throw new CompilationFailedError(sReader.getLocation(reader.prev().start + reader.prev().length),
-					"Expected declaration, include, or import in source unit, but got "+reader.prev().type);
+			Token errToken = reader.peek();
+			throw new CompilationFailedError(sReader.getLocation(errToken.start + errToken.length),
+					"Expected declaration, include, or import in source unit, but got "+errToken.type);
 			
 		}
 		

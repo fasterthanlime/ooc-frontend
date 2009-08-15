@@ -1,8 +1,5 @@
 package org.ooc.frontend.parser;
 
-import static org.ooc.frontend.model.tokens.Token.TokenType.NAME;
-import static org.ooc.frontend.model.tokens.Token.TokenType.STAR;
-
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
@@ -30,11 +27,11 @@ public class TypeParser {
 			} else break;
 		}
 			
-		if(reader.peek().type == NAME) {
+		if(reader.peek().type == TokenType.NAME) {
 			name += reader.read().get(sReader);
 		}
 		
-		while(reader.peek().type == STAR) {
+		while(reader.peek().type == TokenType.STAR) {
 			pointerLevel++;
 			reader.skip();
 		}
