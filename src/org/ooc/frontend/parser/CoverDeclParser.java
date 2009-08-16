@@ -16,7 +16,6 @@ import org.ubi.SourceReader;
 public class CoverDeclParser {
 
 	public static CoverDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
-
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
@@ -99,7 +98,6 @@ public class CoverDeclParser {
 		
 		reader.reset(mark);
 		return null;
-		
 	}
 	
 }

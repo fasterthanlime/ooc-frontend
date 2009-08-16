@@ -7,7 +7,7 @@ time: extern func (TimeT)
 random: func (max : Int) -> Int {
 	
 	srand(time(null))
-	return (rand + 1) % max
+	return (rand() + 1) % max
 	
 }
 

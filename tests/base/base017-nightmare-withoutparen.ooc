@@ -16,6 +16,6 @@ Thinga: class {
 main: func {
 
 	thinga = new Thinga() : Thinga
-	new Thinga() getThis getThis() getThis getThis() thingo()
+	new Thinga() getThis() getThis() getThis() getThis() thingo()
 
 }

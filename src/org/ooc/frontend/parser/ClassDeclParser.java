@@ -15,7 +15,6 @@ import org.ubi.SourceReader;
 public class ClassDeclParser {
 
 	public static ClassDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
-
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
@@ -91,15 +90,12 @@ public class ClassDeclParser {
 			
 			}
 			reader.skip();
-			
-			System.out.println("Finished reading classDecl");
 			return classDecl;
 			
 		}
 		
 		reader.reset(mark);
 		return null;
-		
 	}
 	
 }

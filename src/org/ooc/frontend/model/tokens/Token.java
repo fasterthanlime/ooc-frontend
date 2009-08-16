@@ -68,34 +68,34 @@ public class Token {
 		LINESEP, // ;
 		
 		PLUS, // +
-		PLUS_EQ, // +=
+		PLUS_ASSIGN, // +=
 		MINUS, // -
-		MINUS_EQ, // -=
+		MINUS_ASSIGN, // -=
 		STAR, // *
-		STAR_EQ, // *=
+		STAR_ASSIGN, // *=
 		SLASH, // /
-		SLASH_EQ, // /=
+		SLASH_ASSIGN, // /=
 		
 		PERCENT, // %
-		EXCL, // !
-		NOT_EQ, // !=
+		BANG, // !
+		NOT_EQUALS, // !=
 		QUEST, // ?
 		
 		ANTISLASH, // \
 		
-		GT, // >
-		LT, // <
-		GTE, // >=
-		LTE, // <=
+		GREATERTHAN, // >
+		LESSTHAN, // <
+		GREATERTHAN_EQUALS, // >=
+		LESSTHAN_EQUALS, // <=
 		ASSIGN, // =
 		DECL_ASSIGN, // :=
 		EQUALS, // ==
 		
-		L_AND, // && (logical and)
-		L_OR, // || (logical or)
+		LOGICAL_AND, // && (logical and)
+		LOGICAL_OR, // || (logical or)
 		
-		B_AND, // & (binary and)
-		B_OR, // | (binary or)
+		BINARY_AND, // & (binary and)
+		BINARY_OR, // | (binary or)
 		
 		CHAR_LIT, // 'c'
 		STRING_LIT, // "blah\n"

@@ -38,7 +38,7 @@ public class ExpressionParser {
 		
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.EXCL) {
+		if(reader.peek().type == TokenType.BANG) {
 			reader.skip();
 			Expression inner = ExpressionParser.parse(sReader, reader);
 			if(inner == null) {
@@ -126,10 +126,10 @@ public class ExpressionParser {
 			
 			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
 					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH
-					|| t.type == TokenType.PERCENT || t.type == TokenType.GT
-					|| t.type == TokenType.LT || t.type == TokenType.GTE
-					|| t.type == TokenType.LTE || t.type == TokenType.EQUALS
-					|| t.type == TokenType.NOT_EQ) {
+					|| t.type == TokenType.PERCENT || t.type == TokenType.GREATERTHAN
+					|| t.type == TokenType.LESSTHAN || t.type == TokenType.GREATERTHAN_EQUALS
+					|| t.type == TokenType.LESSTHAN_EQUALS || t.type == TokenType.EQUALS
+					|| t.type == TokenType.NOT_EQUALS) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -143,12 +143,12 @@ public class ExpressionParser {
 					case MINUS: expr = new Sub(expr, rvalue); break;
 					case SLASH: expr = new Div(expr, rvalue); break;
 					case PERCENT: expr = new Mod(expr, rvalue); break;
-					case GT: expr = new Compare(expr, rvalue, CompareType.GREATER); break;
-					case GTE: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL); break;
-					case LT: expr = new Compare(expr, rvalue, CompareType.LESSER); break;
-					case LTE: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
+					case GREATERTHAN: expr = new Compare(expr, rvalue, CompareType.GREATER); break;
+					case GREATERTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL); break;
+					case LESSTHAN: expr = new Compare(expr, rvalue, CompareType.LESSER); break;
+					case LESSTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
 					case EQUALS: expr = new Compare(expr, rvalue, CompareType.EQUAL); break;
-					case NOT_EQ: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL); break;
+					case NOT_EQUALS: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
