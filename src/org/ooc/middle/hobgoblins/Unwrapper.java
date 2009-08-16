@@ -41,7 +41,7 @@ public class Unwrapper implements Hobgoblin {
 		Nosy<MustBeUnwrapped> nosy = new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
 
 			@Override
-			public boolean take(MustBeUnwrapped node, Stack<Node> stack) {
+			public boolean take(MustBeUnwrapped node, Stack<Node> stack) throws IOException {
 				
 				if(node.unwrap(stack)) {
 					running = true;

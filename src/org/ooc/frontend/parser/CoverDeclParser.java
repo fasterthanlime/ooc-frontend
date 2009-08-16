@@ -61,12 +61,16 @@ public class CoverDeclParser {
 			}
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
-			
+
+				if(reader.peek().type == TokenType.LINESEP || reader.peek().type == TokenType.SL_COMMENT) {
+					reader.skip(); continue;
+				}
+				
 				VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 				if(varDecl != null) {
 					if(reader.read().type != TokenType.LINESEP) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-							"Expected semi-colon after variable declaration in class declaration");
+							"Expected semi-colon after variable declaration in cover declaration");
 					}
 					if(fromType != null) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
@@ -84,7 +88,7 @@ public class CoverDeclParser {
 				}
 				
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Expected variable declaration or function declaration in a class declaration");
+						"Expected variable declaration or function declaration in a cover declaration, but got "+reader.peek().length);
 			
 			}
 			reader.skip();

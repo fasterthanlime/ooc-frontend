@@ -1,5 +1,6 @@
 package org.ooc.frontend.model.interfaces;
 
+import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.model.Node;
@@ -26,6 +27,12 @@ import org.ooc.frontend.model.Node;
  */
 public interface MustBeUnwrapped {
 	
-	public boolean unwrap(Stack<Node> stack);
+	/**
+	 * 
+	 * @param stack
+	 * @return true if should run everything once again, false otherwise
+	 * @throws IOException
+	 */
+	public boolean unwrap(Stack<Node> stack) throws IOException;
 	
 }

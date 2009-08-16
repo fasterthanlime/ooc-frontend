@@ -82,25 +82,32 @@ public class Type extends Node {
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
 		if(oldie == ref) {
 			ref = (Declaration) kiddo;
 			return true;
 		}
 		
 		return false;
-		
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		
 		if(obj instanceof Type) {
 			Type type = (Type) obj;
 			return name.equals(type.name) && pointerLevel == type.getPointerLevel();
 		}
 		return super.equals(obj);
+	}
+
+	public Type getGroundType() {
+		if(ref instanceof CoverDecl) {
+			Type ground = ((CoverDecl) ref).getFromType().getGroundType();
+			Type groundLevelled = new Type(ground.name, pointerLevel);
+			groundLevelled.setRef(ground.getRef());
+			return groundLevelled;
+		}
 		
+		return this;
 	}
 	
 }

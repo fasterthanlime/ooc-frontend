@@ -7,19 +7,20 @@ import org.ooc.frontend.Visitor;
 public class CoverDecl extends TypeDecl {
 
 	private OocDocComment comment;
+	private Type type;
 	private Type fromType;
 	
 	public CoverDecl(String name, Type fromType) {
 		super(name);
 		this.fromType = fromType;
+		this.type = new Type(name);
+		this.type.setRef(this);
 	}
 
 	@Override
 	public Type getType() {
-		if(fromType == null) {
-			return new Type(name);
-		}
-		return fromType;
+		assert (type.getName().equals(name));
+		return type;
 	}
 	
 	public Type getFromType() {
@@ -52,12 +53,17 @@ public class CoverDecl extends TypeDecl {
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		if(fromType != null) { fromType.accept(visitor); }
+		type.accept(visitor);
 		variables.accept(visitor);
 		functions.accept(visitor);
 	}
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
+		if(oldie == type) {
+			type = (Type) kiddo;
+			return true;
+		}
 		
 		if(oldie == fromType) {
 			fromType = (Type) kiddo;
@@ -65,7 +71,11 @@ public class CoverDecl extends TypeDecl {
 		}
 		
 		return false;
-		
+	}
+
+	public void absorb(CoverDecl node) {
+		assert(variables.isEmpty());
+		this.functions.addAll(node.functions);
 	}
 
 }

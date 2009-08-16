@@ -1,27 +1,21 @@
-include stdio, stdlib;
-extern func printf(String, ...);
-extern func sqrt(Float);
+sqrt: extern func (Float);
 
-cover String from char*;
-cover Float from float;
-cover Point3f {
+Point3f: cover {
 
-	Float x;
-	Float y;
-	Float z;
+	x, y, z: Float
 
-	func length -> Float {
+	length: func -> Float {
 		return sqrt(x * x + y * y + z * z);
 	}
 
 }
 
-func main() {
+main: func {
 
-	Point3f point;
-	point.x = 3.0;
-	point.y = 1.2;
-	point.z = 5.5;
-	printf("Point (%f, %f, %f), length = %f\n", point.x, point.y, point.z, point.length());
+	point : Point3f
+	point x = 3.0;
+	point y = 1.2;
+	point z = 5.5;
+	printf("Point (%f, %f, %f), length = %f\n", point x, point y, point z, point length());
 
 }

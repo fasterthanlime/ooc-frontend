@@ -5,14 +5,15 @@ import java.io.IOException;
 import org.ooc.frontend.model.Module;
 import org.ooc.middle.hobgoblins.AccessChecker;
 import org.ooc.middle.hobgoblins.CaseEnforcer;
+import org.ooc.middle.hobgoblins.CoverMerger;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
 import org.ooc.middle.hobgoblins.MemberHandler;
 import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.ReturnHandler;
 import org.ooc.middle.hobgoblins.SuffixConflictAnnihilator;
 import org.ooc.middle.hobgoblins.SuperResolver;
 import org.ooc.middle.hobgoblins.TypeResolver;
 import org.ooc.middle.hobgoblins.Unwrapper;
-import org.ooc.middle.hobgoblins.ReturnHandler;
 
 /**
  * The Tinkerer(TM) handles all the work that there's to be done
@@ -39,6 +40,7 @@ public class Tinkerer implements Hobgoblin {
 		new MemberHandler().process(module);
 		
 		new TypeResolver().process(module);
+		new CoverMerger().process(module);
 		new ModularAccessResolver().process(module);
 		
 		new AccessChecker().process(module);

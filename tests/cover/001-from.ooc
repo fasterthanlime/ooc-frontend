@@ -1,11 +1,8 @@
-include stdio;
-extern func printf(String, ...);
-cover String from char*;
-cover Int from int;
+Number: cover from int
 
-func main() {
+main: func {
 
-	Int i = 42;
-	printf("The answer is %d\n", i);
+	i := 42 as Number
+	printf("The answer is %d\n", i)
 
 }

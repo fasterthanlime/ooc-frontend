@@ -20,7 +20,7 @@ cover Point3f {
 
 }
 
-func main() {
+main: func {
 
 	Point3f point = new Point3f(3.0, 1.2, 5.5);
 	printf("Point (%f, %f, %f), length = %f\n", point.x, point.y, point.z, point.length());
