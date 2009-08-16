@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.Assignment.Mode;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
@@ -46,8 +45,16 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			return name;
 		}
 		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
 		public Expression getExpression() {
 			return expression;
+		}
+		
+		public void setExpression(Expression expression) {
+			this.expression = expression;
 		}
 		
 		@Override
@@ -213,7 +220,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			if(atom.getExpression() == null) continue;
 			classDecl.getInitializer().getBody().add(
 				new Line(
-					new Assignment(Mode.REGULAR,
+					new Assignment(
 						new MemberAccess(atom.getName()), atom.getExpression()
 					)
 				)

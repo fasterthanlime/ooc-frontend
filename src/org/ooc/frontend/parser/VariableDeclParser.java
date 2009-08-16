@@ -72,6 +72,18 @@ public class VariableDeclParser {
 			return null;
 		}
 		
+		if(atoms.size() == 1 && atoms.get(0).getExpression() == null) {
+			if(reader.peek().type == TokenType.ASSIGN) {
+				reader.skip();
+				Expression expr = ExpressionParser.parse(sReader, reader);
+				if(expr == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"Expected expression as an initializer to a variable declaration.");
+				}
+				atoms.get(0).setExpression(expr);
+			}
+		}
+		
 		VariableDecl decl = new VariableDecl(type, isConst, isStatic, isExtern);
 		decl.getAtoms().addAll(atoms);
 		return decl;

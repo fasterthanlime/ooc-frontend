@@ -18,6 +18,10 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 	private Access lvalue;
 	private Expression rvalue;	
 	
+	public Assignment(Access lvalue, Expression rvalue) {
+		this(Mode.REGULAR, lvalue, rvalue);
+	}
+	
 	public Assignment(Mode mode, Access lvalue, Expression rvalue) {
 		this.mode = mode;
 		this.lvalue = lvalue;

@@ -228,6 +228,10 @@ public class CommandLine {
 		command.add("-o");
 		command.add(module.getSimpleName());
 		command.add(new File(params.distLocation, "libs/" + Target.guessHost().toString() + "/libgc.a").getPath());
+		for(String dynamicLib: params.dynamicLibs) {
+			command.add("-l");
+			command.add(dynamicLib);
+		}
 		
 		StringBuilder commandLine = new StringBuilder();
 		for(String arg: command) {

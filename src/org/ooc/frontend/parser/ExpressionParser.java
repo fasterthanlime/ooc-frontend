@@ -116,7 +116,7 @@ public class ExpressionParser {
 						"Attempting to assign to a constant, e.g. "+expr);
 				}
 				if(t.type == TokenType.ASSIGN) {
-					expr = new Assignment(Mode.REGULAR, (Access) expr, rvalue);
+					expr = new Assignment((Access) expr, rvalue);
 				} else if(t.type == TokenType.DECL_ASSIGN) {
 					expr = new Assignment(Mode.DECLARATION, (Access) expr, rvalue);
 				}

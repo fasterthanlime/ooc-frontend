@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.Assignment.Mode;
 import org.ubi.CompilationFailedError;
 
 public class MemberAssignArgument extends MemberArgument {
@@ -24,13 +23,13 @@ public class MemberAssignArgument extends MemberArgument {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 		
-		int classIndex = Node.find(ClassDecl.class, hierarchy);
-		if(classIndex == -1) {
-			throw new CompilationFailedError(null, "Member-assign argument outside a class definition!");
+		int typeIndex = Node.find(TypeDecl.class, hierarchy);
+		if(typeIndex == -1) {
+			throw new CompilationFailedError(null, "Member-assign argument outside a type definition!");
 		}
 		
-		ClassDecl classDecl = (ClassDecl) hierarchy.get(classIndex);
-		VariableDecl decl = classDecl.getVariable(name);
+		TypeDecl typeDecl = (TypeDecl) hierarchy.get(typeIndex);
+		VariableDecl decl = typeDecl.getVariable(name);
 		if(decl == null) {
 			throw new CompilationFailedError(null, "Member-assign argument named '"+name+"" +
 					"' doesn't correspond to any real member variable.");
@@ -43,11 +42,11 @@ public class MemberAssignArgument extends MemberArgument {
 		}
 		
 		FunctionDecl funcDecl = (FunctionDecl) hierarchy.get(funcIndex);
-		funcDecl.getBody().add(0, new Line(new Assignment(Mode.REGULAR,
-				new MemberAccess(new VariableAccess("this"), name),
+		funcDecl.getBody().add(0, new Line(new Assignment(
+				new MemberAccess(name),
 				new VariableAccess(name))));
 		
-		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), decl.getName()));
+		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name));
 		
 		return false;
 		

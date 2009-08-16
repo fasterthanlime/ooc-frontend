@@ -1,28 +1,18 @@
-include stdio, stdlib;
-extern func printf(String, ...);
-extern func sqrt(Float);
+sqrt: extern func (Float);
 
-cover String from char*;
-cover Float from float;
-cover Point3f {
+Point3f: cover {
 
-	Float x, y, z;
+	x, y, z: Float
 
-	func new(Float x, Float y, Float z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	func length -> Float {
-		return sqrt(x * x + y * y + z * z)
-	}
+	new: func (=x, =y, =z)
+	length: func -> Float sqrt(squaredLength())
+	squaredLength: func -> Float (x * x + y * y + z * z)
 
 }
 
 main: func {
 
-	Point3f point = new Point3f(3.0, 1.2, 5.5);
-	printf("Point (%f, %f, %f), length = %f\n", point.x, point.y, point.z, point.length());
+	point := new Point3f(3.0, 1.2, 5.5)
+	printf("Point (%f, %f, %f), length = %f\n", point x, point y, point z, point length());
 
 }

@@ -453,7 +453,11 @@ public class CGenerator extends Generator implements Visitor {
 			memberAccess.getExpression().accept(this);
 			current.append(')');
 		}
-		current.append("->");
+		if(typeDecl instanceof ClassDecl) {
+			current.append("->");
+		} else {
+			current.append('.');
+		}
 		current.append(memberAccess.getName());
 		
 	}
@@ -990,13 +994,33 @@ public class CGenerator extends Generator implements Visitor {
 		
 		Type fromType = cover.getFromType();
 		if(fromType == null) {
-			throw new UnsupportedOperationException("Doesn't support compound covers yet.");
+			current.append("typedef struct _");
+			current.append(cover.getName());
+			current.append(' ');
+			current.append(cover.getName());
+			current.append(';');
+			current.newLine();
+			current.newLine();
+			
+			current.append("struct _");
+			current.append(cover.getName());
+			current.append(' ');
+			openBlock();
+			for(VariableDecl decl: cover.getVariables()) {
+				current.newLine();
+				decl.accept(this);
+				current.append(';');
+			}
+			closeBlock();
+			current.append(';');
+			current.newLine();
+		} else {
+			current.append("typedef ");
+			writeSpacedType(fromType);
+			current.append(cover.getName());
+			current.append(';');
+			current.newLine();
 		}
-		current.append("typedef ");
-		writeSpacedType(fromType);
-		current.append(cover.getName());
-		current.append(';');
-		current.newLine();
 		
 		for(FunctionDecl decl: cover.getFunctions()) {
 			decl.accept(this);
