@@ -26,7 +26,6 @@ public class Tokenizer {
 				break;
 			}
 			
-			//int mark = reader.mark();
 			FileLocation location = reader.getLocation();
 			
 			char c = reader.peek();
@@ -126,7 +125,13 @@ public class Tokenizer {
 			
 			if(c == ':') {
 				reader.read();
-				tokens.add(new Token(location.getIndex(), 1, TokenType.COLON));
+				char c2 = reader.peek();
+				if(c2 == '=') {
+					reader.read();
+					tokens.add(new Token(location.getIndex(), 2, TokenType.DECL_ASSIGN));
+				} else {
+					tokens.add(new Token(location.getIndex(), 1, TokenType.COLON));
+				}
 				continue;
 			}
 			

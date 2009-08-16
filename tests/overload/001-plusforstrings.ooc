@@ -1,4 +1,4 @@
-+: func (left, right: String) {
+operator + func (left, right: String) {
 	String copy = GC_malloc(length + rvalue.length + 1)
 	memcpy(copy, this, length)
 	memcpy(copy as Pointer + length, rvalue, rvalue.length + 1) // copy the final '\0'

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.Assignment.Mode;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
@@ -212,7 +213,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			if(atom.getExpression() == null) continue;
 			classDecl.getInitializer().getBody().add(
 				new Line(
-					new Assignment(
+					new Assignment(Mode.REGULAR,
 						new MemberAccess(atom.getName()), atom.getExpression()
 					)
 				)

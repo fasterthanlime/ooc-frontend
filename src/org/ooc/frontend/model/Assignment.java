@@ -1,15 +1,25 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
+import org.ubi.CompilationFailedError;
 
-public class Assignment extends Expression {
+public class Assignment extends Expression implements MustBeUnwrapped {
 
-	private Access lvalue;
-	private Expression rvalue;
+	public static enum Mode {
+		REGULAR,
+		DECLARATION,
+	}
 	
-	public Assignment(Access lvalue, Expression rvalue) {
+	private Mode mode;
+	private Access lvalue;
+	private Expression rvalue;	
+	
+	public Assignment(Mode mode, Access lvalue, Expression rvalue) {
+		this.mode = mode;
 		this.lvalue = lvalue;
 		this.rvalue = rvalue;
 	}
@@ -20,6 +30,10 @@ public class Assignment extends Expression {
 	
 	public Expression getRvalue() {
 		return rvalue;
+	}
+	
+	public Mode getMode() {
+		return mode;
 	}
 
 	@Override
@@ -53,6 +67,24 @@ public class Assignment extends Expression {
 		
 		if(oldie == rvalue) {
 			rvalue = (Expression) kiddo;
+			return true;
+		}
+		
+		return false;
+		
+	}
+
+	@Override
+	public boolean unwrap(Stack<Node> stack) {
+		
+		if(mode == Mode.DECLARATION) {
+			if(lvalue instanceof VariableAccess) {
+				VariableAccess varAcc = (VariableAccess) lvalue;
+				stack.peek().replace(this, new VariableDeclFromExpr(varAcc.getName(), rvalue));
+			} else {
+				throw new CompilationFailedError(null, "Decl-assign to a "
+						+lvalue.getClass().getSimpleName()+" where it should be a VariableAccess");
+			}
 			return true;
 		}
 		

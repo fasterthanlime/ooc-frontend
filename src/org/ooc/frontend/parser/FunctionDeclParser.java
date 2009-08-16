@@ -2,7 +2,6 @@ package org.ooc.frontend.parser;
 
 import java.io.IOException;
 
-import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.OocDocComment;
@@ -95,12 +94,13 @@ public class FunctionDeclParser {
 								"Expected comma between arguments of a function definition");
 					}
 				} else {
-					Argument arg = ArgumentParser.parse(sReader, reader, isExtern);
-					if(arg == null) {
+					//Argument arg = ArgumentParser.parse(sReader, reader, isExtern);
+					if(!ArgumentParser.fill(sReader, reader, isExtern, functionDecl.getArguments())) {
+					//if(arg == null) {
 						throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 								"Expected variable declaration as an argument of a function definition");
 					}
-					functionDecl.getArguments().add(arg);
+					//functionDecl.getArguments().add(arg);
 				}
 				comma = !comma;
 				

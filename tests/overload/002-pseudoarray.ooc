@@ -1,0 +1,14 @@
+Negate: class {	
+
+}
+
+operator [] func (negate: Negate, index: Int) -> Int {
+	-index;
+}
+
+main: func {
+	negate = new : Negate
+	for (i: Int in 0..10) {
+		printf("Negate of %d is %d\n", i, negate[i])
+	}
+}

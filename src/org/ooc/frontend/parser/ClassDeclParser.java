@@ -42,8 +42,6 @@ public class ClassDeclParser {
 		
 		if(reader.readWhiteless().type == TokenType.CLASS_KW) {
 		
-			System.out.println("Trying to parse a class named "+name);
-			
 			String superName = "";
 			if(reader.peek().type == TokenType.FROM_KW) {
 				reader.skip();

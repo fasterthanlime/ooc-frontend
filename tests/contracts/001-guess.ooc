@@ -1,20 +1,22 @@
-extern func scanf(String, ...)
+sizeof: extern func (Pointer) -> SizeT
 
-func main {
+main: func {
 
-	Int number;
-	while true {
-		printf("Give me a number between 0 and 100\n")
-		scanf("%d", &number)
-		check(number)
+	number : Int
+	while (true) {
+		println("Give me a number between 0 and 100 (42 exits)\n")
+		scanf("%d", @number)
+		if(check(number)) break
 	}
+	println("You got 42 =)")
 
 }
 
-func check(Int number) -> Bool {
+check: func (number: Int) -> Bool {
 
-	require (0 <= number <= 100)
-	return (number == 42)
+	require 0 <= number < 100
+	
+	return number == 42
 
 }
 
@@ -23,6 +25,6 @@ func rand -> Int {
 	srand(ctime(null))
 	return rand % 100;
 
-	ensure
+	ensure 0 <= returned < 100
 
 }

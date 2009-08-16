@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.Assignment.Mode;
 import org.ubi.CompilationFailedError;
 
 public class MemberAssignArgument extends MemberArgument {
@@ -42,7 +43,8 @@ public class MemberAssignArgument extends MemberArgument {
 		}
 		
 		FunctionDecl funcDecl = (FunctionDecl) hierarchy.get(funcIndex);
-		funcDecl.getBody().add(0, new Line(new Assignment(new MemberAccess(new VariableAccess("this"), name),
+		funcDecl.getBody().add(0, new Line(new Assignment(Mode.REGULAR,
+				new MemberAccess(new VariableAccess("this"), name),
 				new VariableAccess(name))));
 		
 		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), decl.getName()));

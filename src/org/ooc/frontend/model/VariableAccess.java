@@ -38,10 +38,6 @@ public class VariableAccess extends Access implements MustResolveAccess {
 			return ref.getType();
 		}
 		return null;
-		/*
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()
-				+" to "+variable+" has its type yet unresolved.");
-		*/
 	}
 	
 	@Override

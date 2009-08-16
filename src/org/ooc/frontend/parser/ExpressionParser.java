@@ -24,6 +24,7 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableAccess;
+import org.ooc.frontend.model.Assignment.Mode;
 import org.ooc.frontend.model.Compare.CompareType;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
@@ -102,7 +103,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(t.type == TokenType.ASSIGN) {
+			if(t.type == TokenType.ASSIGN || t.type == TokenType.DECL_ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -114,7 +115,11 @@ public class ExpressionParser {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Attempting to assign to a constant, e.g. "+expr);
 				}
-				expr = new Assignment((Access) expr, rvalue);
+				if(t.type == TokenType.ASSIGN) {
+					expr = new Assignment(Mode.REGULAR, (Access) expr, rvalue);
+				} else if(t.type == TokenType.DECL_ASSIGN) {
+					expr = new Assignment(Mode.DECLARATION, (Access) expr, rvalue);
+				}
 				continue;
 				
 			}

@@ -1,7 +1,2 @@
-include stdio;
-extern func printf(String, ...);
-cover String from char*;
-cover Int from int;
-
-func message -> String "koolaid\n";
-func main printf message;
+message: func -> String "koolaid";
+main: func println(message);

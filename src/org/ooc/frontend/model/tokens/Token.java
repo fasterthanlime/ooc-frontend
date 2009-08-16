@@ -88,6 +88,7 @@ public class Token {
 		GTE, // >=
 		LTE, // <=
 		ASSIGN, // =
+		DECL_ASSIGN, // :=
 		EQUALS, // ==
 		
 		L_AND, // && (logical and)
