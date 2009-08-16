@@ -89,20 +89,6 @@ public class VariableAccess extends Access implements MustResolveAccess {
 						return false;
 					}
 				}
-				
-				for(FunctionDecl decl: res.funcs.get((Node) node)) {
-					if(decl.getName().equals(variable) && (decl.getArguments().isEmpty()
-							|| (decl.getArguments().size() == 1
-									&& decl.getArguments().getLast() instanceof VarArg))) {
-						FunctionCall call = new FunctionCall(variable, "");
-						call.setImpl(decl);
-						if(!mainStack.peek().replace(VariableAccess.this, call)) {
-							throw new Error("Couldn't replace a VariableAccess with a FunctionCall!");
-						}
-						return false;
-					}
-				}
-				
 				return true;
 				
 			}
@@ -114,21 +100,10 @@ public class VariableAccess extends Access implements MustResolveAccess {
 				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 				VariableDecl varDecl = typeDecl.getVariable(variable);
 				if(varDecl != null) {
-					VariableAccess thisAccess = new VariableAccess("this");
-					MemberAccess membAccess = new MemberAccess(thisAccess, variable);
+					MemberAccess membAccess = new MemberAccess(variable);
 					membAccess.setRef(varDecl);
 					if(!mainStack.peek().replace(this, membAccess)) {
 						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
-					}
-					return true;
-				}
-				FunctionDecl funcDecl = typeDecl.getNoargFunction(variable);
-				if(funcDecl != null) {
-					VariableAccess thisAccess = new VariableAccess("this");
-					MemberCall membCall = new MemberCall(thisAccess, variable, "");
-					membCall.setImpl(funcDecl);
-					if(!mainStack.peek().replace(this, membCall)) {
-						throw new Error("Couldn't replace a VariableAccess with a MemberCall! Stack = "+mainStack);
 					}
 					return true;
 				}
@@ -136,7 +111,8 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		}
 
 		if(fatal && ref == null) {
-			throw new CompilationFailedError(null, "Can't resolve variable access to '"+variable+"'. Stack = "+mainStack);
+			throw new CompilationFailedError(null, "Can't resolve variable access to '"
+					+variable+"'. Stack = "+mainStack);
 		}
 		
 		return ref == null;

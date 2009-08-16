@@ -61,7 +61,6 @@ public class MemberAccess extends VariableAccess {
 	@Override
 	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal)
 			throws IOException {
-		
 		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
@@ -73,36 +72,17 @@ public class MemberAccess extends VariableAccess {
 		}
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
-			throw new Error("Trying to access to a member of not a ClassDecl, but a "
+			throw new Error("Trying to access to a member of not a TypeDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
 
 		TypeDecl typeDecl = (TypeDecl) decl;
-		
-		VariableDecl varDecl = typeDecl.getVariable(variable);
-		if(varDecl == null) {
-			FunctionDecl funcDecl = typeDecl.getNoargFunction(variable);
-			if(funcDecl != null && (funcDecl.getArguments().isEmpty()
-					|| funcDecl.getArguments().getLast() instanceof VarArg
-					|| funcDecl.isMember() && (funcDecl.getArguments().size() == 1
-							|| funcDecl.getArguments().getBeforeLast() instanceof VarArg))) {
-				MemberCall membCall = new MemberCall(expression, variable, "");
-				membCall.setImpl(funcDecl);
-				if(!stack.peek().replace(this, membCall)) {
-					throw new Error("Couldn't replace a MemberAccess with a MemberCall in a "
-							+stack.peek().getClass().getSimpleName());
-				}
-				return false;
-			}
-		}
-		ref = varDecl;
+		ref = typeDecl.getVariable(variable);
 		
 		if(fatal && ref == null) {
 			throw new CompilationFailedError(null, "Can't resolve access to member "+expression.getType()+"."+variable);
 		}
-		
 		return ref != null;
-		
 	}
 
 }
