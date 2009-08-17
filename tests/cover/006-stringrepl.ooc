@@ -1,34 +1,31 @@
-include stdio, memory, string, gc/gc;
+include memory, string
 
-extern func printf(String, ...);
-extern func strdup(String) -> String;
-extern func strlen(String) -> Int;
-extern func GC_malloc(Int) -> void*;
-extern func memcpy(...) -> void*;
+//strlen: extern func (String) -> SizeT
 
-cover Int from int;
-cover Char from char;
-cover String from Char* {
+String: cover from Char* {
 	
-	func replace(Char oldie, Char kiddo) -> String {
-		String copy = clone;
-		for(Int i: 0..length) {
-			if (copy[i] == oldie) copy[i] = kiddo;
+	replace: func (oldie, kiddo: Char) -> String {
+		copy := clone()
+		for(i: Int in 0..this length()) {
+			if (copy[i] == oldie) copy[i] = kiddo
 		}
-		return copy;
+		return copy
 	}
 
-	func length ->Int strlen(this);
-	func clone -> String {
-		String copy = GC_malloc(length);
-		memcpy(copy, this, length);
-		return copy;
+	//length: func -> Int strlen(this)
+	
+	clone: func -> String {
+		//length = this length() : Int
+		length := this length()
+		copy := GC_malloc(length) as String
+		memcpy(copy, this, length)
+		return copy
 	}
 
 }
 
-func main {
+main: func {
 
-	printf("doogy-di-doo is not %s\n", "doogie-die-doo".replace('d', 'b'));
+	printf("doogy-di-doo is not %s\n", "doogie-die-doo" replace('d', 'b'))
 
 }

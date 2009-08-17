@@ -96,7 +96,7 @@ public class MemberCall extends FunctionCall {
 				+typeDeclaration.getInstanceType()+"."+name+getArgsRepr()+".";
 			String guess = guessCorrectName(typeDeclaration);
 			if(guess != null) {
-				message += " Did you mean "+guess+" ?";
+				message += " Did you mean "+typeDeclaration.getInstanceType()+"."+guess+" ?";
 			} else {
 				System.out.println("No guess!");
 			}

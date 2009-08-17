@@ -100,7 +100,9 @@ public class Type extends Node {
 	}
 
 	public Type getGroundType() {
+		System.out.println("For type "+name+" ref is a "+(ref == null ?  "null" : ref.getClass().getName()));
 		if(ref instanceof CoverDecl) {
+			System.out.println("Going down from "+((CoverDecl) ref).getInstanceType());
 			Type ground = ((CoverDecl) ref).getFromType().getGroundType();
 			Type groundLevelled = new Type(ground.name, pointerLevel);
 			groundLevelled.setRef(ground.getRef());

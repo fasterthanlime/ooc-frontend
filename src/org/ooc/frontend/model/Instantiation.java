@@ -35,13 +35,14 @@ public class Instantiation extends FunctionCall {
 			guessName(stack);
 		}
 		
-		for(ClassDecl decl: res.classes) {
+		for(TypeDecl decl: res.types) {
 			if(!decl.getName().equals(name)) continue;
 			
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
-				int numArgs = func.getArguments().size() - 1;
+				int numArgs = func.getArguments().size();
+				if(decl instanceof ClassDecl) numArgs--; // ignore the 'this' 
 				if(numArgs == arguments.size()
 					|| ((!func.getArguments().isEmpty() && func.getArguments().getLast() instanceof VarArg)
 					&& (numArgs <= arguments.size()))) {
@@ -52,7 +53,8 @@ public class Instantiation extends FunctionCall {
 		}
 		
 		if(fatal && impl == null) {
-			throw new CompilationFailedError(null, "Couldn't find a constructor in "+name+" for arguments "+getArgsRepr());
+			throw new CompilationFailedError(null, "Couldn't find a constructor in "
+					+name+" for arguments "+getArgsRepr());
 		}
 		
 		return impl != null;

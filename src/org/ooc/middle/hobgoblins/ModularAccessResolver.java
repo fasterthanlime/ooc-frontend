@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
-import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
 import org.ooc.middle.Hobgoblin;
@@ -17,13 +17,13 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class ModularAccessResolver implements Hobgoblin {
 
-	private static final int MAX = 1024;
+	private static final int MAX = 10;
 	boolean running;
 	boolean fatal = false;
 	
 	public MultiMap<Node, VariableDecl> vars;
 	public MultiMap<Node, FunctionDecl> funcs;
-	public List<ClassDecl> classes;
+	public List<TypeDecl> types;
 	
 	@Override
 	public void process(Module module) throws IOException {
@@ -37,7 +37,6 @@ public class ModularAccessResolver implements Hobgoblin {
 				
 				if(!node.isResolved()) {
 					if(node.resolveAccess(stack, ModularAccessResolver.this, fatal)) {
-						// resolveAccess returned true, means we must do one more run
 						running = true;
 					}
 				}
@@ -66,7 +65,7 @@ public class ModularAccessResolver implements Hobgoblin {
 	private void getInfos(Module module) throws IOException {
 		vars = module.getDeclarationsMap(VariableDecl.class);
 		funcs = module.getDeclarationsMap(FunctionDecl.class);
-		classes = module.getDeclarationsList(ClassDecl.class);
+		types = module.getDeclarationsList(TypeDecl.class);
 	}
 	
 }

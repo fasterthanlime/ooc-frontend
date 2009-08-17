@@ -111,8 +111,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 				}
 				throw new CompilationFailedError(null, message);
 			}
-			
-			//if(!tryVarDecl(mainStack)) return false;
 			return false;
 		}
 		

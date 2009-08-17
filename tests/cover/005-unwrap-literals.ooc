@@ -1,10 +1,6 @@
-include stdio;
-extern func printf(String, ...);
+Int: cover from int {
 
-cover String from char*;
-cover Int from int {
-
-	func max(Int other) -> Int {
+	max: func (other: Int) -> Int {
 		if(this > other) return this;
 		return other;
 	}
@@ -13,6 +9,6 @@ cover Int from int {
 
 main: func {
 
-	printf("The greatest of 24 and 42 is %d\n", 24.max(42));
+	printf("The greatest of 24 and 42 is %d\n", 24 max(42));
 
 }

@@ -19,6 +19,12 @@ public class VariableDeclFromExpr extends VariableDecl {
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
 		atoms.accept(visitor);
+		if(getType() != null) getType().accept(visitor);
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+" of type "+getType()+" : "+getName();
 	}
 	
 }

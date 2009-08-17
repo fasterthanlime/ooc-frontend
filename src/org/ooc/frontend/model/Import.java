@@ -52,4 +52,9 @@ public class Import extends Node {
 		return name.replace('.', File.separatorChar) + ".ooc";
 	}
 	
+	@Override
+	public String toString() {
+		return super.toString()+" : "+name;
+	}
+	
 }

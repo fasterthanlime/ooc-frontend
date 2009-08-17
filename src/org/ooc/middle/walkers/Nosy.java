@@ -3,6 +3,7 @@ package org.ooc.middle.walkers;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.ArrayAccess;
@@ -31,6 +32,7 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
@@ -42,7 +44,6 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -60,6 +61,8 @@ public class Nosy<T> implements Visitor {
 	private Class<T> clazz;
 	private Opportunist<T> oppo;
 	private boolean running = true;
+	private boolean debug = false;
+	private TabbedWriter writer = new TabbedWriter(System.out);
 	
 	public static <T> Nosy<T> get(Class<T> clazz, Opportunist<T> oppo) {
 		return new Nosy<T>(clazz, oppo);
@@ -74,6 +77,18 @@ public class Nosy<T> implements Visitor {
 	public void visit(Node node) throws IOException {
 
 		if(!running) return; // if not running, do nothing
+
+		if(debug) { 
+			writer.newLine();
+			writer.append("<"+node);
+			if(node.hasChildren()) {
+				writer.append(">");
+				writer.tab();
+			} else {
+				writer.append("/>");
+			}
+
+		}
 		
 		if(node.hasChildren()) {
 			stack.push(node);
@@ -85,14 +100,26 @@ public class Nosy<T> implements Visitor {
 		
 		if(clazz.isInstance(node)) {
 			if(!oppo.take(clazz.cast(node), stack)) {
+				System.out.print(" [[[ Stopped on "+node+" ]]] ");
 				running = false; // aborted. (D-Nied. Denied).
 			}
+		}
+
+		if(debug && node.hasChildren()) {
+			writer.untab();
+			writer.newLine();
+			writer.append("</"+node+">");
 		}
 		
 	}
 	
 	public Nosy<T> start() {
 		running = true;
+		return this;
+	}
+	
+	public Nosy<T> setDebug(boolean debug) {
+		this.debug = debug;
 		return this;
 	}
 	

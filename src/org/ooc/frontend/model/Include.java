@@ -34,4 +34,9 @@ public class Include extends Node {
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return super.toString()+" : "+include;
+	}
+	
 }

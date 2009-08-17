@@ -16,8 +16,13 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	protected VariableDecl ref;
 	
 	public VariableAccess(String variable) {
-		super();
 		this.variable = variable;
+	}
+
+	public VariableAccess(VariableDecl varDecl) {
+		assert(varDecl.atoms.size() == 1);
+		this.variable = varDecl.getName();
+		ref = varDecl;
 	}
 
 	public String getName() {
@@ -74,6 +79,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
 				Iterable<VariableDecl> vars = res.vars.get((Node) node);
+				System.out.println("Should resolve '"+variable+"', got vars "+vars/*+", stack = "+stack*/);
 				for(VariableDecl decl: vars) {
 					if(decl.hasAtom(variable)) {
 						if(decl.isMember()) {
@@ -117,6 +123,11 @@ public class VariableAccess extends Access implements MustResolveAccess {
 		
 		return ref == null;
 		
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+" : "+variable;
 	}
 
 }

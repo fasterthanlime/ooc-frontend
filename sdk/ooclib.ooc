@@ -1,9 +1,15 @@
 include stdlib, stdio, stdint, stdbool, memory, gc/gc
 
+strlen: extern func (String) -> SizeT
+
 Char: cover from char
-String: cover from Char*
-Pointer: cover from void*
+String: cover from Char* {
+	
+	length: func -> Int strlen(this)
+	
+}
 Int: cover from int
+Pointer: cover from void*
 UInt: cover from unsigned int
 Float: cover from float
 Double: cover from double
@@ -16,6 +22,7 @@ Void: cover from void
 SizeT: cover from size_t
 Octet: cover from uint8_t
 
+memcpy: extern func (Pointer, Pointer, SizeT)
 scanf: extern func (String, ...)
 printf: extern func (String, ...)
 sprintf: extern func (String, String, ...)

@@ -1,3 +1,5 @@
+include math
+
 sqrt: extern func (Float);
 
 Point3f: cover {

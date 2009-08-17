@@ -156,4 +156,9 @@ public class Module extends Node implements Scope {
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		return super.toString()+" : "+name;
+	}
+	
 }

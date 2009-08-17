@@ -3,7 +3,7 @@ package org.ooc.middle;
 import java.io.IOException;
 
 import org.ooc.frontend.model.Module;
-import org.ooc.middle.hobgoblins.AccessChecker;
+import org.ooc.middle.hobgoblins.Checker;
 import org.ooc.middle.hobgoblins.CaseEnforcer;
 import org.ooc.middle.hobgoblins.CoverMerger;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
@@ -37,13 +37,13 @@ public class Tinkerer implements Hobgoblin {
 		
 		new DefaultConstructorGiver().process(module);
 		new Unwrapper().process(module);
+		new CoverMerger().process(module);
 		new MemberHandler().process(module);
 		
 		new TypeResolver().process(module);
-		new CoverMerger().process(module);
 		new ModularAccessResolver().process(module);
 		
-		new AccessChecker().process(module);
+		new Checker().process(module);
 		new SuffixConflictAnnihilator().process(module);
 		
 	}

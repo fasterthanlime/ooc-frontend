@@ -117,7 +117,8 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
 	@Override
 	public String toString() {
-		return nodes.toString();
+		//return nodes.toString();
+		return getClass().getSimpleName();
 	}
 
 	public void addAll(NodeList<T> list) {

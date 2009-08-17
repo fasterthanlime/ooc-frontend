@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
@@ -159,7 +160,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		type.accept(visitor);
+		if(getType() != null) getType().accept(visitor);
 		atoms.accept(visitor);
 	}
 
@@ -244,7 +245,13 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	@Override
 	public String toString() {
-		return type+": "+atoms.toString();
+		String repr = type+": ";
+		Iterator<VariableDeclAtom> iter = atoms.iterator();
+		while(iter.hasNext()) {
+			repr += iter.next().getName();
+			if(iter.hasNext()) repr += ", ";
+		}
+		return repr;
 	}
 	
 }

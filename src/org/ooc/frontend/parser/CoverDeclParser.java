@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.OocDocComment;
+import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.tokens.Token;
@@ -82,6 +83,8 @@ public class CoverDeclParser {
 				
 				FunctionDecl funcDecl = FunctionDeclParser.parse(sReader,reader);
 				if(funcDecl != null) {
+					funcDecl.setTypeDecl(coverDecl);
+					funcDecl.getArguments().add(0, new RegularArgument(coverDecl.getInstanceType(), "this", false));
 					coverDecl.getFunctions().add(funcDecl);
 					continue;
 				}

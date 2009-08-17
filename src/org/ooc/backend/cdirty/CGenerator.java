@@ -478,6 +478,8 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(VariableDecl variableDecl) throws IOException {
 
+		System.out.println("Writing variable decl "+variableDecl);
+		
 		if(variableDecl.isExtern()) return;
 		writeSpacedType(variableDecl.getType());
 		
@@ -498,6 +500,8 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(FunctionDecl functionDecl) throws IOException {
 		
 		if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
+			
+			System.out.println("Writing function "+functionDecl.getProtoRepr());
 		
 			current = hw;
 			current.newLine();
@@ -991,35 +995,40 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(CoverDecl cover) throws IOException {
 		current = hw;
-		
-		Type fromType = cover.getFromType();
-		if(fromType == null) {
-			current.append("typedef struct _");
-			current.append(cover.getName());
-			current.append(' ');
-			current.append(cover.getName());
-			current.append(';');
-			current.newLine();
-			current.newLine();
-			
-			current.append("struct _");
-			current.append(cover.getName());
-			current.append(' ');
-			openBlock();
-			for(VariableDecl decl: cover.getVariables()) {
-				current.newLine();
-				decl.accept(this);
+
+		// addons only add functions to an already imported cover, so
+		// we don't need to struct/typedef' it again, it would confuse
+		// the C compiler
+		if(!cover.isAddon()) {
+			Type fromType = cover.getFromType();
+			if(fromType == null) {
+				current.append("typedef struct _");
+				current.append(cover.getName());
+				current.append(' ');
+				current.append(cover.getName());
 				current.append(';');
+				current.newLine();
+				current.newLine();
+				
+				current.append("struct _");
+				current.append(cover.getName());
+				current.append(' ');
+				openBlock();
+				for(VariableDecl decl: cover.getVariables()) {
+					current.newLine();
+					decl.accept(this);
+					current.append(';');
+				}
+				closeBlock();
+				current.append(';');
+				current.newLine();
+			} else {
+				current.append("typedef ");
+				writeSpacedType(fromType);
+				current.append(cover.getName());
+				current.append(';');
+				current.newLine();
 			}
-			closeBlock();
-			current.append(';');
-			current.newLine();
-		} else {
-			current.append("typedef ");
-			writeSpacedType(fromType);
-			current.append(cover.getName());
-			current.append(';');
-			current.newLine();
 		}
 		
 		for(FunctionDecl decl: cover.getFunctions()) {

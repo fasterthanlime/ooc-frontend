@@ -30,7 +30,7 @@ import org.ooc.middle.walkers.Opportunist;
  * 
  * Of course if you build a language from ooc, you probably want to put default
  * covers in a file you'll import in every source file of your language.
- * (e.g. like OocLib.ooc in ooc up to 0.2.1)
+ * (e.g. like ooclib.ooc for ooc)
  * 
  * @author Amos Wenger
  */
@@ -62,15 +62,17 @@ public class TypeResolver implements Hobgoblin {
 			
 		});
 		
-		declNosy.visit(module);
 		for(Import imp: module.getImports()) {
 			declNosy.visit(imp.getModule());
 		}
+		declNosy.visit(module);
 		
 		new Nosy<Type>(Type.class, new Opportunist<Type>() {
 			
 			@Override
 			public boolean take(Type node, Stack<Node> stack) throws IOException {
+				
+				System.out.print(" [[[ Should resolve "+node+" in "+stack+" ]]] ");
 				
 				if(node.getRef() != null) return true; // already resolved
 				
@@ -119,7 +121,7 @@ public class TypeResolver implements Hobgoblin {
 				}
 			}
 			
-		}).visit(module);
+		}).setDebug(true).visit(module);
 		
 	}
 
