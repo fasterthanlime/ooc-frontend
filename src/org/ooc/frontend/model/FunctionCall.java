@@ -9,7 +9,7 @@ import java.util.Stack;
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
@@ -94,7 +94,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res, final boolean fatal) throws IOException {
+	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
 
 		if (name.equals("this")) resolveConstructorCall(mainStack, false);
 		else if (name.equals("super")) resolveConstructorCall(mainStack, true);
@@ -118,7 +118,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 		
 	}
 
-	private String guessCorrectName(final Stack<Node> mainStack, final ModularAccessResolver res) {
+	private String guessCorrectName(final Stack<Node> mainStack, final Resolver res) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
@@ -167,7 +167,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 	}
 	
 	private void resolveRegular(final Stack<Node> mainStack,
-			final ModularAccessResolver res, final boolean fatal)
+			final Resolver res, final boolean fatal)
 			throws IOException {
 		
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
@@ -178,7 +178,7 @@ public class FunctionCall extends Access implements MustResolveAccess {
 						impl = decl;
 						if(decl.isMember()) {
 							VariableAccess thisAccess = new VariableAccess("this");
-							thisAccess.resolveAccess(mainStack, res, fatal);
+							thisAccess.resolve(mainStack, res, fatal);
 							MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
 							memberCall.setImpl(decl);
 							mainStack.peek().replace(FunctionCall.this, memberCall);

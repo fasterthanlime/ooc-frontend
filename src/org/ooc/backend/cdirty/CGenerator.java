@@ -105,15 +105,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(hName);
 		current.newLine();
 		current.newLine();
-		
-		for(Node node: module.getBody()) {
-			if(!(node instanceof ClassDecl)) continue;
-			ClassDecl classDecl = (ClassDecl) node;
-			writeStructTypedef(classDecl.getName());
-			writeStructTypedef(classDecl.getName()+"Class");
-		}
-		current.newLine();
-		
+
 		// FIXME of course this is a dirty hack because this devbranch
 		// is missing the whole fancy cmdline frontend with sdk search etc.
 		current.append("#include <mango/mangoobject.h>\n");
@@ -123,6 +115,18 @@ public class CGenerator extends Generator implements Visitor {
 			current.append(".h>");
 			current.newLine();
 		}
+		
+		for(Node node: module.getBody()) {
+			if(node instanceof ClassDecl) {
+				ClassDecl classDecl = (ClassDecl) node;
+				writeStructTypedef(classDecl.getName());
+				writeStructTypedef(classDecl.getName()+"Class");
+			} else if(node instanceof CoverDecl) {
+				writeCoverTypedef((CoverDecl) node);
+			}
+		}
+		current.newLine();
+
 		for(Import imp: module.getImports()) {
 			current.append("#include \"");
 			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
@@ -997,8 +1001,30 @@ public class CGenerator extends Generator implements Visitor {
 		current = hw;
 
 		// addons only add functions to an already imported cover, so
-		// we don't need to struct/typedef' it again, it would confuse
-		// the C compiler
+		// we don't need to struct it again, it would confuse the C compiler
+		if(!cover.isAddon() && cover.getFromType() == null) {
+			current.append("struct _");
+			current.append(cover.getName());
+			current.append(' ');
+			openBlock();
+			for(VariableDecl decl: cover.getVariables()) {
+				current.newLine();
+				decl.accept(this);
+				current.append(';');
+			}
+			closeBlock();
+			current.append(';');
+			current.newLine();
+		}
+		
+		for(FunctionDecl decl: cover.getFunctions()) {
+			decl.accept(this);
+			current.newLine();
+		}
+	}
+
+	private void writeCoverTypedef(CoverDecl cover) throws IOException {
+		
 		if(!cover.isAddon()) {
 			Type fromType = cover.getFromType();
 			if(fromType == null) {
@@ -1009,19 +1035,6 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(';');
 				current.newLine();
 				current.newLine();
-				
-				current.append("struct _");
-				current.append(cover.getName());
-				current.append(' ');
-				openBlock();
-				for(VariableDecl decl: cover.getVariables()) {
-					current.newLine();
-					decl.accept(this);
-					current.append(';');
-				}
-				closeBlock();
-				current.append(';');
-				current.newLine();
 			} else {
 				current.append("typedef ");
 				writeSpacedType(fromType);
@@ -1029,10 +1042,6 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(';');
 				current.newLine();
 			}
-		}
-		
-		for(FunctionDecl decl: cover.getFunctions()) {
-			decl.accept(this);
 		}
 	}
 	

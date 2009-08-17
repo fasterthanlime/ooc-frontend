@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
 public class MemberAccess extends VariableAccess {
@@ -59,7 +59,7 @@ public class MemberAccess extends VariableAccess {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal)
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		Type exprType = expression.getType();
 		if(exprType == null) {

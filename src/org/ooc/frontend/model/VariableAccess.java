@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustResolveAccess;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
@@ -73,7 +73,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 	}
 
 	@Override
-	public boolean resolveAccess(final Stack<Node> mainStack, final ModularAccessResolver res, final boolean fatal) throws IOException {
+	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
 
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
@@ -84,7 +84,7 @@ public class VariableAccess extends Access implements MustResolveAccess {
 					if(decl.hasAtom(variable)) {
 						if(decl.isMember()) {
 							VariableAccess thisAccess = new VariableAccess("this");
-							thisAccess.resolveAccess(mainStack, res, fatal);
+							thisAccess.resolve(mainStack, res, fatal);
 							MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
 							membAcc.setRef(decl);
 							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {

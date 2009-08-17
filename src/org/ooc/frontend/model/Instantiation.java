@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
 public class Instantiation extends FunctionCall {
@@ -29,7 +29,7 @@ public class Instantiation extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> stack, ModularAccessResolver res, boolean fatal) throws IOException {
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
 		
 		if(name.isEmpty()) {
 			guessName(stack);

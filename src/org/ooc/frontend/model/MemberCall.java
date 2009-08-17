@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
-import org.ooc.middle.hobgoblins.ModularAccessResolver;
+import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
 public class MemberCall extends FunctionCall {
@@ -61,7 +61,7 @@ public class MemberCall extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolveAccess(Stack<Node> mainStack, ModularAccessResolver res, final boolean fatal) throws IOException {
+	public boolean resolve(Stack<Node> mainStack, Resolver res, final boolean fatal) throws IOException {
 
 		
 		Type exprType = expression.getType();
