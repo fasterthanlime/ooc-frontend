@@ -8,13 +8,13 @@ import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.interfaces.MustResolveAccess;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
 
-public class FunctionCall extends Access implements MustResolveAccess {
+public class FunctionCall extends Access implements MustBeResolved {
 
 	protected String name;
 	protected String suffix;
@@ -170,25 +170,26 @@ public class FunctionCall extends Access implements MustResolveAccess {
 			final Resolver res, final boolean fatal)
 			throws IOException {
 		
-		Miner.mine(Scope.class, new Opportunist<Scope>() {
-			public boolean take(Scope node, Stack<Node> stack) throws IOException {
-				
-				for(FunctionDecl decl: res.funcs.get((Node) node)) {
-					if(matches(decl)) {
-						impl = decl;
-						if(decl.isMember()) {
-							VariableAccess thisAccess = new VariableAccess("this");
-							thisAccess.resolve(mainStack, res, fatal);
-							MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
-							memberCall.setImpl(decl);
-							mainStack.peek().replace(FunctionCall.this, memberCall);
+		int index = Node.find(TypeDecl.class, mainStack);
+		if(index != -1) {
+			TypeDecl decl = (TypeDecl) mainStack.get(index);
+			impl = decl.getFunction(this);
+		}
+		
+		if(impl == null) {
+			Miner.mine(Scope.class, new Opportunist<Scope>() {
+				public boolean take(Scope node, Stack<Node> stack) throws IOException {
+					
+					for(FunctionDecl decl: res.funcs.get((Node) node)) {
+						if(matches(decl)) {
+							impl = decl;
+							return false;
 						}
-						return false;
 					}
+					return true;
 				}
-				return true;
-			}
-		}, mainStack);
+			}, mainStack);
+		}
 		
 		if(impl == null) {
 			// Still null? Try top-level funcs in dependencies.
@@ -197,10 +198,20 @@ public class FunctionCall extends Access implements MustResolveAccess {
 			searchIn(root, done);
 		}
 		
+		if(impl != null) {
+			if(impl.isMember()) {
+				VariableAccess thisAccess = new VariableAccess("this");
+				thisAccess.resolve(mainStack, res, fatal);
+				MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
+				memberCall.setImpl(impl);
+				mainStack.peek().replace(FunctionCall.this, memberCall);
+			}
+		}
+		
 	}
 	
+	// FIXME must simplify
 	private void searchIn(Module module, Set<Module> done) {
-		
 		done.add(module);
 		for(Node node: module.getBody()) {
 			if(node instanceof FunctionDecl) {
@@ -217,7 +228,6 @@ public class FunctionCall extends Access implements MustResolveAccess {
 				searchIn(imp.getModule(), done);
 			}
 		}
-		
 	}
 
 	public boolean matches(FunctionDecl decl) {

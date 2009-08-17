@@ -47,6 +47,7 @@ public class CoverDecl extends TypeDecl {
 		return functions;
 	}
 	
+	@Override
 	public FunctionDecl getFunction(FunctionCall call) {
 		for(FunctionDecl decl: functions) {
 			if(call.matches(decl)) return decl;

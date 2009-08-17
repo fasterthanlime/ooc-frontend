@@ -1,10 +1,13 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.middle.hobgoblins.Resolver;
 
-public class Type extends Node {
+public class Type extends Node implements MustBeResolved {
 
 	private String name;
 	private int pointerLevel;
@@ -98,18 +101,39 @@ public class Type extends Node {
 		}
 		return super.equals(obj);
 	}
-
-	public Type getGroundType() {
-		System.out.println("For type "+name+" ref is a "+(ref == null ?  "null" : ref.getClass().getName()));
-		if(ref instanceof CoverDecl) {
-			System.out.println("Going down from "+((CoverDecl) ref).getInstanceType());
-			Type ground = ((CoverDecl) ref).getFromType().getGroundType();
-			Type groundLevelled = new Type(ground.name, pointerLevel);
-			groundLevelled.setRef(ground.getRef());
-			return groundLevelled;
+	
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
+		
+		System.out.print(" [[[ Should resolve "+this+" in "+stack+" ]]] ");
+		
+		if(getRef() != null) return true; // already resolved
+		
+		for(TypeDecl decl: res.types) {
+			if(decl.getName().equals(name)) {
+				setRef(decl);
+				break;
+			}
 		}
 		
-		return this;
+		/* The magnificent This (with a capital T) hack. */ /*
+		if(stackElement instanceof ClassDecl && getName().equals("This")) {
+			ClassDecl classDecl = (ClassDecl) stackElement;
+			setName(classDecl.getName());
+			setRef(classDecl);
+			return true; // we're done here.
+		}*/
+		
+		if(getRef() == null) {
+			throw new Error("Couldn't resolve type "+getName());
+		}
+		
+		return false;
+		
+	}
+	
+	@Override
+	public boolean isResolved() {
+		return getRef() != null;
 	}
 	
 }

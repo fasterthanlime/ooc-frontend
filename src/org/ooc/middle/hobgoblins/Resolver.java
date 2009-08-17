@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
+import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
-import org.ooc.frontend.model.interfaces.MustResolveAccess;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
@@ -30,10 +31,9 @@ public class Resolver implements Hobgoblin {
 		
 		getInfos(module);
 		
-		Nosy<MustResolveAccess> nosy = Nosy.get(
-				MustResolveAccess.class, new Opportunist<MustResolveAccess>() {
+		Nosy<MustBeResolved> nosy = Nosy.get(MustBeResolved.class, new Opportunist<MustBeResolved>() {
 			@Override
-			public boolean take(MustResolveAccess node, Stack<Node> stack) throws IOException {
+			public boolean take(MustBeResolved node, Stack<Node> stack) throws IOException {
 				
 				if(!node.isResolved()) {
 					if(node.resolve(stack, Resolver.this, fatal)) {
@@ -66,6 +66,33 @@ public class Resolver implements Hobgoblin {
 		vars = module.getDeclarationsMap(VariableDecl.class);
 		funcs = module.getDeclarationsMap(FunctionDecl.class);
 		types = module.getDeclarationsList(TypeDecl.class);
+		addBuiltins(types);
+	}
+	
+	private void addBuiltins(List<TypeDecl> decls) {
+		// TODO This should probably not be hardcoded. Or should it? Think of meta.
+		decls.add(new BuiltinType("void"));
+		decls.add(new BuiltinType("short"));
+		decls.add(new BuiltinType("int"));
+		decls.add(new BuiltinType("unsigned int"));
+		decls.add(new BuiltinType("long"));
+		decls.add(new BuiltinType("long long"));
+		decls.add(new BuiltinType("long double"));
+		decls.add(new BuiltinType("float"));
+		decls.add(new BuiltinType("double"));
+		decls.add(new BuiltinType("char"));
+		decls.add(new BuiltinType("Tuple")); // FIXME that's a tough one.
+		
+		decls.add(new BuiltinType("int8_t"));
+		decls.add(new BuiltinType("int16_t"));
+		decls.add(new BuiltinType("int32_t"));
+		
+		decls.add(new BuiltinType("uint8_t"));
+		decls.add(new BuiltinType("uint16_t"));
+		decls.add(new BuiltinType("uint32_t"));
+		
+		decls.add(new BuiltinType("size_t"));
+		decls.add(new BuiltinType("time_t"));
 	}
 	
 }

@@ -1,7 +1,5 @@
 include memory, string
 
-//strlen: extern func (String) -> SizeT
-
 String: cover from Char* {
 	
 	replace: func (oldie, kiddo: Char) -> String {
@@ -15,8 +13,8 @@ String: cover from Char* {
 	//length: func -> Int strlen(this)
 	
 	clone: func -> String {
-		//length = this length() : Int
-		length := this length()
+		//length := this length()
+		length := length()
 		copy := GC_malloc(length) as String
 		memcpy(copy, this, length)
 		return copy

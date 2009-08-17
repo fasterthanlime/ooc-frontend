@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.interfaces.MustResolveAccess;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
 import org.ubi.CompilationFailedError;
 
-public class VariableAccess extends Access implements MustResolveAccess {
+public class VariableAccess extends Access implements MustBeResolved {
 
 	protected String variable;
 	protected VariableDecl ref;

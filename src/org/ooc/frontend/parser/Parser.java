@@ -39,7 +39,6 @@ public class Parser {
 		String fullName = path.substring(0, path.lastIndexOf('.'))
 			.replace(File.separatorChar, '.').replace('/', '.');
 		Module module = ModuleParser.parse(fullName, file, sReader, new TokenReader(tokens), this);
-		//new XStream().toXML(unit, new FileWriter("tree.xml"));
 		return module;
 		
 	}

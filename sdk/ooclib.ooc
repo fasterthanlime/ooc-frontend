@@ -1,4 +1,4 @@
-include stdlib, stdio, stdint, stdbool, memory, gc/gc
+include stdlib, stdio, stdint, stdbool, memory, gc/gc, string
 
 strlen: extern func (String) -> SizeT
 

@@ -4,9 +4,10 @@ import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
 
-public class BuiltinType extends Declaration {
+public class BuiltinType extends TypeDecl {
 
 	private Type type;
+	static NodeList<FunctionDecl> EMPTY = new NodeList<FunctionDecl>();
 	
 	public BuiltinType(String name) {
 		super(name);
@@ -35,6 +36,11 @@ public class BuiltinType extends Declaration {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
+	}
+
+	@Override
+	public NodeList<FunctionDecl> getFunctionsRecursive() {
+		return EMPTY;
 	}
 
 }
