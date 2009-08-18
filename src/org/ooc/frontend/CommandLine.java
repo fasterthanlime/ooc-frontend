@@ -126,7 +126,7 @@ public class CommandLine {
         			
         		} else if(option.equals("run") || option.equals("r")) {
         			
-        			//run = true;
+        			params.run = true;
         			
         		} else if(option.equals("V") || option.equals("-version") || option.equals("version")) {
         			
@@ -238,7 +238,10 @@ public class CommandLine {
 			commandLine.append(arg);
 			commandLine.append(' ');
 		}
-		System.out.println(commandLine.toString());
+		
+		if(params.verbose) {
+			System.out.println(commandLine.toString());
+		}
 		
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(command);
@@ -246,6 +249,13 @@ public class CommandLine {
 		Process process = builder.start();
 		ProcessUtils.redirectIO(process);
 		process.waitFor();
+		
+		if(params.run) {
+			builder.command("./"+module.getSimpleName());
+			process = builder.start();
+			ProcessUtils.redirectIO(process);
+			process.waitFor();
+		}
 		
 	}
 

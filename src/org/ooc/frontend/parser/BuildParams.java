@@ -23,6 +23,7 @@ public class BuildParams {
 	public boolean debug = false;
 	public boolean verbose = false;
 	public boolean shout = false;
+	public boolean run = false;
 	
 	public Backend backend = BackendFactory.getBackend("gcc");
 	

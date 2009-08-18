@@ -115,6 +115,13 @@ public class CGenerator extends Generator implements Visitor {
 			current.append(".h>");
 			current.newLine();
 		}
+		current.newLine();
+		for(Import imp: module.getImports()) {
+			current.append("#include \"");
+			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
+			current.append(".h\"");
+			current.newLine();
+		}
 		
 		current.newLine();
 		for(Node node: module.getBody()) {
@@ -125,14 +132,6 @@ public class CGenerator extends Generator implements Visitor {
 			} else if(node instanceof CoverDecl) {
 				writeCoverTypedef((CoverDecl) node);
 			}
-		}
-
-		current.newLine();
-		for(Import imp: module.getImports()) {
-			current.append("#include \"");
-			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
-			current.append(".h\"");
-			current.newLine();
 		}
 		
 		current = cw;

@@ -54,7 +54,7 @@ strerror: extern func (Int) -> String
 
 safe_malloc: func (size: SizeT) -> ReturnValue {
 	
-	mem = GC_malloc(size) : Pointer
+	mem = malloc(size) : Pointer
 	if(!mem) {
 		return new ReturnValue(new Exception("OutOfMemoryException", strerror(errno)), null)
 	}
@@ -83,7 +83,7 @@ try_alloc_safe: func (size: SizeT) {
 
 try_alloc_unsafe: func (size: SizeT) {
 	
-	block = GC_malloc(size) : String
+	block = malloc(size) : String
 	//free(block)
 	
 }

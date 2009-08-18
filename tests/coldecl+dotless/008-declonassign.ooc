@@ -12,5 +12,5 @@ main: func {
 	printf("1 + 2 = %d\n", add(a, b))
 	
 	dog := new Dog
-	dog bark
+	dog bark()
 }
