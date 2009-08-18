@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.model.FunctionCall;
+import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -50,10 +52,23 @@ public class Checker implements Hobgoblin {
 							node.getClass().getSimpleName()+" "+node.getName()
 							+" hasn't been resolved :(");
 				}
-				System.out.print(" [[[ "+node+" has been resolved ]]]");
 				return true;
 			}
-		}).setDebug(true).visit(module);
+		}).visit(module);
+		
+		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
+			@Override
+			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
+				if(node.isConstructor()) {
+					if(Node.find(TypeDecl.class, stack) == -1) {
+						throw new CompilationFailedError(null,
+							"Declaration of a function named 'new' outside a class is forbidden!" +
+							" Functions named 'new' are only used as constructors in classes.");
+					}
+				}
+				return true;
+			}
+		}).visit(module);
 		
 	}
 

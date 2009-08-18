@@ -9,7 +9,7 @@ IntContainer: class {
 	value: Int
 
 	new: func(=value) {
-		print
+		print()
 	}
 
 	print: func {

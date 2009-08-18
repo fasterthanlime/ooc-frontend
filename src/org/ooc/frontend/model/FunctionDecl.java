@@ -31,7 +31,7 @@ public class FunctionDecl extends Declaration implements Scope {
 		this.isAbstract = isAbstract;
 		this.isExtern = isExtern;
 		this.body = new NodeList<Line>();
-		this.returnType = new Type("void");
+		this.returnType = name.equals("main") ? IntLiteral.type : new Type("void");
 		this.arguments = new NodeList<Argument>();
 		
 	}

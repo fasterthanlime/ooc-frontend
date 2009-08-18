@@ -10,7 +10,7 @@ IntContainer: class {
 
 	new: func(.value) {
 		this value = value
-		print
+		print()
 	}
 
 	print: func {

@@ -18,7 +18,7 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class Resolver implements Hobgoblin {
 
-	private static final int MAX = 10;
+	private static final int MAX = 1;
 	boolean running;
 	boolean fatal = false;
 	

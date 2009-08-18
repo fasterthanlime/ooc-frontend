@@ -79,7 +79,6 @@ public class VariableAccess extends Access implements MustBeResolved {
 			public boolean take(Scope node, Stack<Node> stack) throws IOException {
 				
 				Iterable<VariableDecl> vars = res.vars.get((Node) node);
-				System.out.println("Should resolve '"+variable+"', got vars "+vars/*+", stack = "+stack*/);
 				for(VariableDecl decl: vars) {
 					if(decl.hasAtom(variable)) {
 						if(decl.isMember()) {

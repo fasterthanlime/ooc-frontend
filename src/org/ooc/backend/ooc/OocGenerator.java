@@ -420,7 +420,7 @@ public class OocGenerator extends Generator implements Visitor {
 		}
 		w.append(" {");
 		
-		if(node.getVariables().isEmpty() && node.getFunctions().isEmpty()) {
+		if(!node.hasVariables() && !node.hasFunctions()) {
 			w.append('}');
 			w.newLine();
 			w.newLine();

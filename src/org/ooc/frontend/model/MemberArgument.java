@@ -29,22 +29,23 @@ public class MemberArgument extends Argument {
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {}
 	
+	// FIXME too much similar code with MemberAssignArgument. Share it somehow.
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 		
-		int classIndex = Node.find(ClassDecl.class, hierarchy);
-		if(classIndex == -1) {
+		int typeIndex = Node.find(TypeDecl.class, hierarchy);
+		if(typeIndex == -1) {
 			throw new CompilationFailedError(null, "Member argument outside a class definition!");
 		}
 		
-		ClassDecl classDecl = (ClassDecl) hierarchy.get(classIndex);
-		VariableDecl decl = classDecl.getVariable(name);
+		TypeDecl typeDecl = (TypeDecl) hierarchy.get(typeIndex);
+		VariableDecl decl = typeDecl.getVariable(name);
 		if(decl == null) {
 			throw new CompilationFailedError(null, "Member argument named '"+name+"" +
 					"' doesn't correspond to any real member variable.");
 		}
 
-		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), decl.getName()));
+		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name));
 		
 		return false;
 		

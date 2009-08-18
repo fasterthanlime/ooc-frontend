@@ -104,36 +104,33 @@ public class Type extends Node implements MustBeResolved {
 	
 	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
 		
-		System.out.print(" [[[ Should resolve "+this+" in "+stack+" ]]] ");
-		
-		if(getRef() != null) return true; // already resolved
-		
 		for(TypeDecl decl: res.types) {
 			if(decl.getName().equals(name)) {
-				setRef(decl);
+				ref = decl;
 				break;
 			}
 		}
+
+		if(ref == null && name.equals("This")) {
+			int index = Node.find(TypeDecl.class, stack);
+			if(index != -1) {
+				TypeDecl typeDecl = (TypeDecl) stack.get(index);
+				name = typeDecl.getName();
+				ref = typeDecl;
+			}
+		}
 		
-		/* The magnificent This (with a capital T) hack. */ /*
-		if(stackElement instanceof ClassDecl && getName().equals("This")) {
-			ClassDecl classDecl = (ClassDecl) stackElement;
-			setName(classDecl.getName());
-			setRef(classDecl);
-			return true; // we're done here.
-		}*/
-		
-		if(getRef() == null) {
+		if(ref == null && fatal) {
 			throw new Error("Couldn't resolve type "+getName());
 		}
 		
-		return false;
+		return isResolved();
 		
 	}
 	
 	@Override
 	public boolean isResolved() {
-		return getRef() != null;
+		return ref != null;
 	}
 	
 }

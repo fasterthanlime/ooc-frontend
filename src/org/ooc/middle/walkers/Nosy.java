@@ -100,7 +100,6 @@ public class Nosy<T> implements Visitor {
 		
 		if(clazz.isInstance(node)) {
 			if(!oppo.take(clazz.cast(node), stack)) {
-				System.out.print(" [[[ Stopped on "+node+" ]]] ");
 				running = false; // aborted. (D-Nied. Denied).
 			}
 		}

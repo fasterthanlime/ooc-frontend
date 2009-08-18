@@ -55,13 +55,17 @@ public class ReturnHandler implements Hobgoblin {
 			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
 				
 				if(node.getReturnType().isVoid()) return true;
+				if(node.isConstructor()) return true;
 				if(node.isExtern() || node.isAbstract()) return true;
 				
 				if(node.getBody().isEmpty()) {
 					if(node.getName().equals("main")) {
 						node.getBody().add(new Line(new ValuedReturn(new IntLiteral(0, Format.DEC))));
-					} else throw new CompilationFailedError(null,
-							"Returning nothing in non-void function "+node.getProtoRepr());
+					} else {
+						throw new CompilationFailedError(null,
+								"Returning nothing in non-void function "+node.getProtoRepr());
+					}
+					
 				}
 				
 				Line line = node.getBody().getLast();

@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+
 public abstract class TypeDecl extends Declaration {
 
 	protected NodeList<VariableDecl> variables;
@@ -18,12 +19,42 @@ public abstract class TypeDecl extends Declaration {
 		return instanceType;
 	}
 	
-	public NodeList<VariableDecl> getVariables() {
+	public boolean hasVariables() {
+		return !variables.isEmpty();
+	}
+	
+	public boolean hasFunctions() {
+		return !functions.isEmpty();
+	}
+	
+	public Iterable<VariableDecl> getVariables() {
 		return variables;
 	}
 	
-	public NodeList<FunctionDecl> getFunctions() {
+	public void addVariable(VariableDecl decl) {
+		decl.setTypeDecl(this);
+		
+		variables.add(decl);
+	}
+	
+	public Iterable<FunctionDecl> getFunctions() {
 		return functions;
+	}
+	
+	public void addFunction(FunctionDecl decl) {
+		decl.setTypeDecl(this);
+		
+		if(!decl.isStatic()) {
+			if(decl.isConstructor()) {
+				decl.setFinal(true);
+				decl.setReturnType(getInstanceType());
+			}
+			// FIXME this is ugly.
+			if(!decl.isConstructor() || !(this instanceof CoverDecl)) {
+				decl.getArguments().add(0, new RegularArgument(getInstanceType(), "this"));
+			}
+		}
+		functions.add(decl);
 	}
 	
 	public abstract NodeList<FunctionDecl> getFunctionsRecursive();

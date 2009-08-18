@@ -7,7 +7,6 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
-import org.ooc.frontend.model.Type;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -33,8 +32,7 @@ public class DefaultConstructorGiver implements Hobgoblin {
 				
 				if(!hasNew) {
 					FunctionDecl con = new FunctionDecl("new", "", false, false, false, false);
-					con.setReturnType(new Type(node.getName()));
-					node.getFunctions().add(con);
+					node.addFunction(con);
 				}
 				
 				return true;

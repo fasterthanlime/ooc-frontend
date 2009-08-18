@@ -6,7 +6,9 @@ Point3f: cover {
 
 	x, y, z: Float
 
-	new: func (=x, =y, =z)
+	new: func (.x, .y, .z) -> This {
+		return [x, y, z] as Point3f
+	}
 	length: func -> Float sqrt(squaredLength())
 	squaredLength: func -> Float (x * x + y * y + z * z)
 

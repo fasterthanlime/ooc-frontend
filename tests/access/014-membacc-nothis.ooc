@@ -1,6 +1,6 @@
 main: func {
 
-	new Dog("Dogbert") print
+	new Dog("Dogbert") print()
 
 }
 

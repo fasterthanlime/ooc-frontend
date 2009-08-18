@@ -22,6 +22,7 @@ Void: cover from void
 SizeT: cover from size_t
 Octet: cover from uint8_t
 
+sizeof: extern func (...) -> SizeT
 memcpy: extern func (Pointer, Pointer, SizeT)
 scanf: extern func (String, ...)
 printf: extern func (String, ...)

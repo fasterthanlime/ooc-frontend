@@ -22,6 +22,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 		this.superName = "";
 		this.initializer = new FunctionDecl("initialize", "", false, false, false, false);
 		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
+		this.initializer.setTypeDecl(this);
 		this.superRef = null;
 	}
 	

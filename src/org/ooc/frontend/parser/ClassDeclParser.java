@@ -75,13 +75,13 @@ public class ClassDeclParser {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
-					classDecl.getVariables().add(varDecl);
+					classDecl.addVariable(varDecl);
 					continue;
 				}
 				
 				FunctionDecl funcDecl = FunctionDeclParser.parse(sReader,reader);
 				if(funcDecl != null) {
-					classDecl.getFunctions().add(funcDecl);
+					classDecl.addFunction(funcDecl);
 					continue;
 				}
 				

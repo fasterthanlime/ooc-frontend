@@ -337,7 +337,7 @@ public class CGenerator extends Generator implements Visitor {
 
 		switch(numberLiteral.getFormat()) {
 			case HEX:
-			case BIN: // C has no binary literals, write it has hex
+			case BIN: // C has no binary literals, write it as hex
 				current.append("0x");
 				current.append(Long.toHexString(numberLiteral.getValue()));
 				break;
@@ -482,8 +482,6 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(VariableDecl variableDecl) throws IOException {
 
-		System.out.println("Writing variable decl "+variableDecl);
-		
 		if(variableDecl.isExtern()) return;
 		writeSpacedType(variableDecl.getType());
 		
@@ -505,8 +503,6 @@ public class CGenerator extends Generator implements Visitor {
 		
 		if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
 			
-			System.out.println("Writing function "+functionDecl.getProtoRepr());
-		
 			current = hw;
 			current.newLine();
 			writeFuncPrototype(functionDecl);

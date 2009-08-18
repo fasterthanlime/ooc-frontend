@@ -31,9 +31,7 @@ public class Instantiation extends FunctionCall {
 	@Override
 	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
 		
-		if(name.isEmpty()) {
-			guessName(stack);
-		}
+		if(name.isEmpty()) guessName(stack);
 		
 		for(TypeDecl decl: res.types) {
 			if(!decl.getName().equals(name)) continue;
@@ -42,7 +40,7 @@ public class Instantiation extends FunctionCall {
 				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
 				int numArgs = func.getArguments().size();
-				if(decl instanceof ClassDecl) numArgs--; // ignore the 'this' 
+				if(decl instanceof ClassDecl) numArgs--; // ignore the 'this'
 				if(numArgs == arguments.size()
 					|| ((!func.getArguments().isEmpty() && func.getArguments().getLast() instanceof VarArg)
 					&& (numArgs <= arguments.size()))) {
@@ -57,7 +55,7 @@ public class Instantiation extends FunctionCall {
 					+name+" for arguments "+getArgsRepr());
 		}
 		
-		return impl != null;
+		return impl == null;
 		
 	}
 
