@@ -3,13 +3,14 @@ package org.ooc.middle.hobgoblins;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionDecl;
-import org.ooc.frontend.model.Line;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.IntLiteral;
-import org.ooc.frontend.model.Return;
+import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.middle.Hobgoblin;
@@ -55,7 +56,7 @@ public class ReturnHandler implements Hobgoblin {
 			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
 				
 				if(node.getReturnType().isVoid()) return true;
-				if(node.isConstructor()) return true;
+				if(node.isConstructor() && Node.find(ClassDecl.class, stack) != -1) return true;
 				if(node.isExtern() || node.isAbstract()) return true;
 				
 				if(node.getBody().isEmpty()) {
