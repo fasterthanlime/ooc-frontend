@@ -2,18 +2,20 @@
 <project default="create_run_jar" name="Create Runnable Jar for Project ooc-frontend">
 	<!-- set global properties for this build -->
 	<property name="build" location="build/javac-classes"/>
+	<property name="bin" location="bin"/>
 
 	<target name="init">
 		<!-- Create the time stamp -->
 		<tstamp/>
 		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${build}"/>
+		<mkdir dir="${bin}"/>
 	</target>
 
 	<target name="compile" depends="init"
 			description="compile the source " >
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac destdir="${build}" debug="on" debuglevel="lines,vars,source">
+		<javac destdir="${build}" debug="true">
 			<src path="../ubi/src"/>
 			<src path="../ooc/src"/>
 			<src path="src"/>
