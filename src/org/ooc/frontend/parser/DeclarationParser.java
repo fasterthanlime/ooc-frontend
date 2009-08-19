@@ -6,6 +6,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.FunctionDecl;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ubi.SourceReader;
@@ -17,6 +18,9 @@ public class DeclarationParser {
 		
 		VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 		if(varDecl != null) return varDecl;
+		
+		OpDecl opDecl = OpDeclParser.parse(sReader, reader);
+		if(opDecl != null) return opDecl;
 		
 		FunctionDecl funcDecl = FunctionDeclParser.parse(sReader, reader);
 		if(funcDecl != null) return funcDecl;

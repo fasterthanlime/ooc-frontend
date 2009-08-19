@@ -92,6 +92,21 @@ public class Type extends Node implements MustBeResolved {
 		return sb.toString();
 		
 	}
+	
+	public String getMangledName() {
+		
+		if(pointerLevel == 0) {
+			return name;
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(name);
+		for(int i = 0; i < pointerLevel + referenceLevel; i++) {
+			sb.append("__star");
+		}
+		return sb.toString();
+		
+	}
 
 	public boolean isVoid() {
 		return (name.equals("void") || name.equals("Void")) && (getPointerLevel() == 0);

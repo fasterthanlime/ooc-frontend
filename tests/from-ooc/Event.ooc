@@ -1,1 +1,0 @@
-../../../ooc/sdk/event/Event.ooc

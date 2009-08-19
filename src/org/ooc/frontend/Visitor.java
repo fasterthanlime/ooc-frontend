@@ -38,6 +38,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -123,5 +124,7 @@ public interface Visitor {
 
 	public void visit(AddressOf addressOf) throws IOException;
 	public void visit(Dereference dereference) throws IOException;
+
+	public void visit(OpDecl opDecl) throws IOException;
 	
 }

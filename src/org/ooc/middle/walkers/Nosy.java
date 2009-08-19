@@ -41,6 +41,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -372,6 +373,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Dereference dereference) throws IOException {
 		visit((Node) dereference);
+	}
+
+	@Override
+	public void visit(OpDecl opDecl) throws IOException {
+		visit((Node) opDecl);
 	}
 	
 }

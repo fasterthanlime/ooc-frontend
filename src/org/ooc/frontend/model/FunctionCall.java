@@ -28,6 +28,11 @@ public class FunctionCall extends Access implements MustBeResolved {
 		this.impl = null;
 	}
 	
+	public FunctionCall(FunctionDecl func) {
+		this(func.getName(), func.getSuffix());
+		setImpl(func);
+	}
+
 	public void setImpl(FunctionDecl impl) {
 		this.impl = impl;
 	}

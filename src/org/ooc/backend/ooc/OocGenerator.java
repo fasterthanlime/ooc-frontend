@@ -47,6 +47,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -568,6 +569,12 @@ public class OocGenerator extends Generator implements Visitor {
 	public void visit(Dereference dereference) throws IOException {
 		dereference.getExpression().accept(this);
 		w.append('@');
+	}
+
+	@Override
+	public void visit(OpDecl opDecl) throws IOException {
+		w.append("operator ").append(opDecl.getOpString()).append(" ");
+		opDecl.getFunc().accept(this);
 	}
 	
 }

@@ -28,6 +28,8 @@ public class Token {
 		CONTINUE_KW, // continue keyword
 		FALLTHR_KW, // fallthrough keyword
 		
+		OPERATOR_KW,
+		
 		IF_KW,
 		ELSE_KW,
 		FOR_KW,

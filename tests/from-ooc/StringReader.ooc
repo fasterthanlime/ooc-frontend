@@ -1,1 +1,0 @@
-../../../ooc/sdk/io/StringReader.ooc

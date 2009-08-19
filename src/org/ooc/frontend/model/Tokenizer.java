@@ -55,7 +55,8 @@ public class Tokenizer {
 		new Name("true", TokenType.TRUE),
 		new Name("false", TokenType.FALSE),
 		new Name("null", TokenType.NULL),
-		new Name("extern", TokenType.EXTERN_KW),
+		new Name("extern", TokenType.EXTERN_KW),		
+		new Name("operator", TokenType.OPERATOR_KW),
 		//TODO I'm not sure if those three should be keywords.
 		//They are remains from C and can be parsed as NAMEs
 		new Name("unsigned", TokenType.UNSIGNED),

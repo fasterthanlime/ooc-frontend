@@ -1,18 +1,13 @@
-include stdio;
-cover String from char*;
-extern func printf(String, ...);
-
-class Sayer {
+Sayer: class {
 	
-	func say {
-		printf("Hi, I'm a Sayer, just sayin'...\n");
+	say: func {
+		printf("Hi, I'm a Sayer, just sayin'...\n")
 	}
 	
 }
 
-func main {
+main: func {
 	
-	Sayer s = new Sayer();
-	s.say();
+	new Sayer say()
 	
 }

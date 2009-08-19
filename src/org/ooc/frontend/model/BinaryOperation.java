@@ -10,8 +10,8 @@ import org.ooc.frontend.Visitor;
  */
 public abstract class BinaryOperation extends Expression {
 
-	private Expression left;
-	private Expression right;
+	protected Expression left;
+	protected Expression right;
 	
 	public BinaryOperation(Expression left, Expression right) {
 		this.left = left;

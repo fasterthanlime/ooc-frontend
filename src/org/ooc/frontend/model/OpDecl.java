@@ -1,23 +1,44 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.ooc.frontend.Visitor;
 
 public class OpDecl extends Declaration {
 
-	public OpDecl(String name) {
-		super(name);
-	}
-
 	public enum OpType {
-		SQUARE_BRACKETS,
-		SQUARE_BRACKETS_ASSIGN,
+		ADD,
+		SUB,
+		MUL,
+		DIV,
+		EQUALS,
+		INDEXING,
+		INDEXED_ASSIGN,
 	}
 	
+	private OpType opType;
+	private FunctionDecl func;
+	
+	public OpDecl(OpType opType, FunctionDecl func) {
+		super("Operator "+opType);
+		this.opType = opType;
+		this.func = func;
+		String name = "__OP_"+opType;
+		Iterator<Argument> iter = func.getArguments().iterator();
+		while(iter.hasNext()) {
+			name += "_" + iter.next().getType().getMangledName();
+		}
+		func.setName(name);
+	}
+
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		// TODO Auto-generated method stub
+		if(oldie == func) {
+			func = (FunctionDecl) kiddo;
+			return true;
+		}
+		
 		return false;
 	}
 
@@ -25,21 +46,54 @@ public class OpDecl extends Declaration {
 	public Type getType() {
 		return new Type("Operator");
 	}
+	
+	public OpType getOpType() {
+		return opType;
+	}
+	
+	public FunctionDecl getFunc() {
+		return func;
+	}
 
 	@Override
 	public void accept(Visitor visitor) throws IOException {
-		// TODO check if it should really not be visited
+		visitor.visit(this);
 	}
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		
+		func.accept(visitor);
 	}
 
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
+	}
+
+	public String getOpString() {
+		switch(opType) {
+		case ADD:
+			return "+";
+		case DIV:
+			return "/";
+		case EQUALS:
+			return "==";
+		case INDEXED_ASSIGN:
+			return "[]=";
+		case INDEXING:
+			return "[]";
+		case MUL:
+			return "*";
+		case SUB:
+			return "-";
+		default:
+			return "?operator?"; // bah
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "operator "+getOpString()+" "+func.getArgsRepr();
 	}
 
 }

@@ -48,6 +48,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
 import org.ooc.frontend.model.NullLiteral;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
@@ -1161,6 +1162,11 @@ public class CGenerator extends Generator implements Visitor {
 		current.append("(*");
 		dereference.getExpression().accept(this);
 		current.append(')');
+	}
+
+	@Override
+	public void visit(OpDecl opDecl) throws IOException {
+		opDecl.getFunc().accept(this);
 	}
 
 }

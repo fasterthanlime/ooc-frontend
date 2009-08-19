@@ -8,6 +8,7 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
@@ -25,6 +26,7 @@ public class Resolver implements Hobgoblin {
 	public MultiMap<Node, VariableDecl> vars;
 	public MultiMap<Node, FunctionDecl> funcs;
 	public List<TypeDecl> types;
+	public List<OpDecl> ops;
 	
 	@Override
 	public void process(Module module) throws IOException {
@@ -67,6 +69,7 @@ public class Resolver implements Hobgoblin {
 		funcs = module.getDeclarationsMap(FunctionDecl.class);
 		types = module.getDeclarationsList(TypeDecl.class);
 		addBuiltins(types);
+		ops = module.getDeclarationsList(OpDecl.class);
 	}
 	
 	private void addBuiltins(List<TypeDecl> decls) {

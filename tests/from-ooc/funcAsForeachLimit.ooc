@@ -1,1 +1,0 @@
-../../../ooc/tests/torture/funcAsForeachLimit.ooc
