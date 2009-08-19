@@ -1,13 +1,14 @@
 package org.ooc.libs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.ooc.outputting.FileUtils;
 
 public class DistLocator {
 
-	public static File locate() {
+	public static File locate() throws IOException {
 		
 		String classPath = System.getProperty("java.class.path");
 		
@@ -17,7 +18,7 @@ public class DistLocator {
 			String base = "";
 			for(int i = 0; i < 8; i++) {
 				base += "../";
-				File distribLocation = new File(token, base);
+				File distribLocation = new File(token, base).getCanonicalFile();
 				File idFile = FileUtils.resolveRedundancies(new File(distribLocation, "sdk/ooc_sdk_id"));
 				if(idFile.exists()) {
 					return FileUtils.resolveRedundancies(distribLocation);
