@@ -2,13 +2,66 @@ package org.ooc.libs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.ooc.compiler.ReadEnv;
 import org.ooc.outputting.FileUtils;
 
 public class DistLocator {
 
 	public static File locate() {
+		
+		try {
+		
+			File location;
+			
+			Properties env = ReadEnv.getEnvVars();
+			Object envDist = env.get("OOC_DIST");
+			if(envDist != null) {
+				return new File(envDist.toString());
+			}
+			
+			location = tryUnderscore(env);
+			if(location != null) return location;
+			
+			location = tryClassPath();
+			if(location != null) return location;
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
+
+	/**
+	 * Assume we're launched as GCJ-compiled executable, and
+	 * try to get our path from the "_" environment variable, which seems to
+	 * be set by bash under Gentoo and by MSYS 1.0.11/whatever under MinGW/WinXP
+	 * @throws IOException 
+	 */
+	private static File tryUnderscore(Properties env) throws IOException {
+		
+		Object underscore = env.get("_");
+		if(underscore != null) {
+			File file = new File(underscore.toString().trim());
+			if(file.getPath().endsWith("ooc") || file.getPath().endsWith("ooc.exe")) {
+				String canonicalPath = file.getCanonicalPath();
+				return new File(canonicalPath).getParentFile().getParentFile();
+			}
+		}
+		return null;
+		
+	}
+
+	/** 
+	 * Assume we're launched with java -jar bin/ooc.jar or
+	 * java -classpath path/to/ooc/build/classes/ org.ooc.frontend.CommandLine
+	 * and try to find ourselves in the classpath.
+	 */
+	private static File tryClassPath() {
 		
 		String classPath = System.getProperty("java.class.path");
 		
@@ -16,7 +69,7 @@ public class DistLocator {
 		while(st.hasMoreTokens()) {
 			String token = st.nextToken();
 			String base = "";
-			for(int i = 0; i < 8; i++) {
+			for(int i = 0; i < 8; i++) { // brute force. works for the .class and the .jar methods
 				base += "../";
 				try {
 					File distribLocation = new File(token, base).getCanonicalFile();
@@ -29,7 +82,6 @@ public class DistLocator {
 		}
 		
 		return null;
-		
 	}
 	
 }
