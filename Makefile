@@ -1,14 +1,15 @@
-.PHONY: all clean
+.PHONY: all clean jar
 MAIN_CLASS="org.ooc.frontend.CommandLine"
 
 all: prepare dynamic
 
-static:
+jar:
 	ant
+
+static: jar
 	cd utils/ && gcj -static-libgcj -g -O3 -Dooc.version="`cat version.txt`, built on `date +%F\ %R:%S`" `find build/ -name "*.class"` --main=${MAIN_CLASS} -o ../bin/ooc
 
-dynamic:
-	ant
+dynamic: jar
 	cd utils/ && gcj -g -O3 -Dooc.version="`cat version.txt`, built on `date +%F\ %R:%S`" `find build/ -name "*.class"` --main=${MAIN_CLASS} -o ../bin/ooc
 
 strip:

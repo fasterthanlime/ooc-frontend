@@ -8,7 +8,7 @@ import org.ooc.outputting.FileUtils;
 
 public class DistLocator {
 
-	public static File locate() throws IOException {
+	public static File locate() {
 		
 		String classPath = System.getProperty("java.class.path");
 		
@@ -18,11 +18,13 @@ public class DistLocator {
 			String base = "";
 			for(int i = 0; i < 8; i++) {
 				base += "../";
-				File distribLocation = new File(token, base).getCanonicalFile();
-				File idFile = FileUtils.resolveRedundancies(new File(distribLocation, "sdk/ooc_sdk_id"));
-				if(idFile.exists()) {
-					return FileUtils.resolveRedundancies(distribLocation);
-				}
+				try {
+					File distribLocation = new File(token, base).getCanonicalFile();
+					File idFile = FileUtils.resolveRedundancies(new File(distribLocation, "sdk/ooc_sdk_id"));
+					if(idFile.exists()) {
+						return FileUtils.resolveRedundancies(distribLocation);
+					}
+				} catch(IOException e) {}
 			}
 		}
 		
