@@ -218,5 +218,9 @@ public class FunctionDecl extends Declaration implements Scope {
 	public boolean sameProto(FunctionDecl decl2) {
 		return name.equals(decl2.getName()) && (suffix.equals(decl2.getSuffix()));
 	}
+
+	public boolean isEntryPoint() {
+		return name.equals("main");
+	}
 	
 }

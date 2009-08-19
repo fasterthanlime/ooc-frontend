@@ -166,7 +166,6 @@ public class FunctionCall extends Access implements MustBeResolved {
 			if(decl.isConstructor()) {
 				if(matchesArgs(decl)) {
 					impl = decl;
-					System.out.println("Resolved constructor call, proto = "+getProtoRepr());
 					return;
 				}
 			}

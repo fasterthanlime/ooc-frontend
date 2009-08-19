@@ -50,7 +50,7 @@ public abstract class TypeDecl extends Declaration {
 				decl.setReturnType(getInstanceType());
 			}
 			// FIXME this is ugly.
-			if(!decl.isConstructor() || !(this instanceof CoverDecl)) {
+			if(!decl.isStatic() && (!decl.isConstructor() || !(this instanceof CoverDecl))) {
 				decl.getArguments().add(0, new RegularArgument(getInstanceType(), "this"));
 			}
 		}

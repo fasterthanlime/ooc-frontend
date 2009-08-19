@@ -15,6 +15,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 	private ClassDecl superRef;
 
 	private FunctionDecl initializer;
+	private FunctionDecl staticInitializer;
 	
 	public ClassDecl(String name, boolean isAbstract) {
 		super(name);
@@ -23,6 +24,9 @@ public class ClassDecl extends TypeDecl implements Scope {
 		this.initializer = new FunctionDecl("initialize", "", false, false, false, false);
 		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
 		this.initializer.setTypeDecl(this);
+		this.staticInitializer = new FunctionDecl("static_initialize", "", false, false, false, false);
+		this.staticInitializer.setStatic(true);
+		this.staticInitializer.setTypeDecl(this);
 		this.superRef = null;
 	}
 	
@@ -44,6 +48,10 @@ public class ClassDecl extends TypeDecl implements Scope {
 	
 	public FunctionDecl getInitializer() {
 		return initializer;
+	}
+	
+	public FunctionDecl getStaticInitializer() {
+		return staticInitializer;
 	}
 	
 	public boolean isAbstract() {
@@ -106,6 +114,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 		variables.accept(visitor);
 		functions.accept(visitor);
 		initializer.accept(visitor);
+		staticInitializer.accept(visitor);
 		instanceType.accept(visitor);
 	}
 	

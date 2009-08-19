@@ -182,7 +182,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	private boolean unwrapToVarAcc(Stack<Node> hierarchy) throws Error {
 
 		if(hierarchy.peek() instanceof Line
-		|| hierarchy.peek() instanceof ControlStatement
+		|| hierarchy.peek() instanceof Foreach
 		|| hierarchy.get(hierarchy.size() - 2) instanceof Module
 		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
 		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDecl
@@ -220,13 +220,19 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		for(VariableDeclAtom atom: atoms) {
 
 			if(atom.getExpression() == null) continue;
-			classDecl.getInitializer().getBody().add(
-				new Line(
-					new Assignment(
-						new MemberAccess(atom.getName()), atom.getExpression()
-					)
+			VariableAccess access = isStatic ?
+					new VariableAccess(typeDecl.getType().getName())
+					: new VariableAccess("this");
+			Line line = new Line(
+				new Assignment(
+					new MemberAccess(access, atom.getName()), atom.getExpression()
 				)
 			);
+			if(isStatic) {
+				classDecl.getStaticInitializer().getBody().add(line);
+			} else {
+				classDecl.getInitializer().getBody().add(line);
+			}
 			atom.expression = null;
 		
 		}

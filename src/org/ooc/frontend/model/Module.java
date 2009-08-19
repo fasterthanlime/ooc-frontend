@@ -14,6 +14,7 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class Module extends Node implements Scope {
 
+	private String underName;
 	private String fullName;
 	private String name;
 	private NodeList<Include> includes;
@@ -28,6 +29,7 @@ public class Module extends Node implements Scope {
 		int index = fullName.lastIndexOf('.');
 		if(index == -1) name = fullName;
 		else name = fullName.substring(index + 1);
+		this.underName = fullName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		this.includes = new NodeList<Include>();
 		this.imports = new NodeList<Import>();
@@ -159,6 +161,14 @@ public class Module extends Node implements Scope {
 	@Override
 	public String toString() {
 		return super.toString()+" : "+name;
+	}
+	
+	public String getUnderName() {
+		return underName;
+	}
+
+	public String getLoadFuncName() {
+		return underName + "_load";
 	}
 	
 }
