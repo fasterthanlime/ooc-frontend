@@ -14,6 +14,7 @@ public class TypeParser {
 		int pointerLevel = 0;
 		int referenceLevel = 0;
 		
+		//TODO add more type checking
 		while(reader.hasNext()) {
 			Token t = reader.peek();
 			if(t.type == TokenType.UNSIGNED) {
@@ -25,6 +26,9 @@ public class TypeParser {
 			} else if(t.type == TokenType.LONG) {
 				reader.skip();
 				name += "long ";
+			} else if(t.type == TokenType.STRUCT) {
+				reader.skip();
+				name += "struct ";
 			} else break;
 		}
 			

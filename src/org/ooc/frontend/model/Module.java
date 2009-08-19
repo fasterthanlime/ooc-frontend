@@ -21,6 +21,7 @@ public class Module extends Node implements Scope {
 	private NodeList<Import> imports;
 	private NodeList<Node> body;
 	private String fileName;
+	private FunctionDecl loadFunc;
 	
 	public Module(String fullName) {
 		
@@ -29,11 +30,13 @@ public class Module extends Node implements Scope {
 		int index = fullName.lastIndexOf('.');
 		if(index == -1) name = fullName;
 		else name = fullName.substring(index + 1);
-		this.underName = fullName.replaceAll("[^a-zA-Z0-9_]", "_");
+		this.underName = "_"+fullName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		this.includes = new NodeList<Include>();
 		this.imports = new NodeList<Import>();
 		this.body = new NodeList<Node>();
+		
+		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, false);
 		
 		if(!fullName.endsWith("ooclib"))
 			imports.add(new Import("ooclib"));
@@ -168,7 +171,11 @@ public class Module extends Node implements Scope {
 	}
 
 	public String getLoadFuncName() {
-		return underName + "_load";
+		return loadFunc.getName();
+	}
+	
+	public FunctionDecl getLoadFunc() {
+		return loadFunc;
 	}
 	
 }

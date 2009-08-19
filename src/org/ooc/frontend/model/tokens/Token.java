@@ -120,6 +120,7 @@ public class Token {
 		UNSIGNED,
 		SIGNED,
 		LONG,
+		STRUCT,
 	
 	}
 	
