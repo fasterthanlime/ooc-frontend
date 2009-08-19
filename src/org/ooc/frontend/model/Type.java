@@ -6,11 +6,13 @@ import java.util.Stack;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.middle.hobgoblins.Resolver;
+import org.ubi.CompilationFailedError;
 
 public class Type extends Node implements MustBeResolved {
 
 	private String name;
 	private int pointerLevel;
+	private int referenceLevel;
 	private Declaration ref;
 	
 	public Type(String name) {
@@ -18,8 +20,13 @@ public class Type extends Node implements MustBeResolved {
 	}
 	
 	public Type(String name, int pointerLevel) {
+		this(name, pointerLevel, 0);
+	}
+	
+	public Type(String name, int pointerLevel, int referenceLevel) {
 		this.name = name;
 		this.pointerLevel = pointerLevel;
+		this.referenceLevel = referenceLevel;
 	}
 
 	public String getName() {
@@ -36,6 +43,14 @@ public class Type extends Node implements MustBeResolved {
 
 	public int getPointerLevel() {
 		return pointerLevel;
+	}
+	
+	public void setReferenceLevel(int referenceLevel) {
+		this.referenceLevel = referenceLevel;
+	}
+	
+	public int getReferenceLevel() {
+		return referenceLevel;
 	}
 	
 	public Declaration getRef() {
@@ -70,6 +85,9 @@ public class Type extends Node implements MustBeResolved {
 		sb.append(name);
 		for(int i = 0; i < pointerLevel; i++) {
 			sb.append('*');
+		}
+		for(int i = 0; i < referenceLevel; i++) {
+			sb.append('@');
 		}
 		return sb.toString();
 		
@@ -113,15 +131,16 @@ public class Type extends Node implements MustBeResolved {
 
 		if(ref == null && name.equals("This")) {
 			int index = Node.find(TypeDecl.class, stack);
-			if(index != -1) {
-				TypeDecl typeDecl = (TypeDecl) stack.get(index);
-				name = typeDecl.getName();
-				ref = typeDecl;
+			if(index == -1) {
+				throw new CompilationFailedError(null, "Using 'This' outside a type definition. Wtf?");
 			}
+			TypeDecl typeDecl = (TypeDecl) stack.get(index);
+			name = typeDecl.getName();
+			ref = typeDecl;
 		}
 		
 		if(ref == null && fatal) {
-			throw new Error("Couldn't resolve type "+getName());
+			throw new CompilationFailedError(null, "Couldn't resolve type "+getName());
 		}
 		
 		return isResolved();

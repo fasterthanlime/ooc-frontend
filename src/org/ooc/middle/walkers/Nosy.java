@@ -6,6 +6,7 @@ import java.util.Stack;
 import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
+import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
@@ -16,6 +17,7 @@ import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
+import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
@@ -360,6 +362,16 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Cast cast) throws IOException {
 		visit((Node) cast);
+	}
+
+	@Override
+	public void visit(AddressOf addressOf) throws IOException {
+		visit((Node) addressOf);
+	}
+
+	@Override
+	public void visit(Dereference dereference) throws IOException {
+		visit((Node) dereference);
 	}
 	
 }

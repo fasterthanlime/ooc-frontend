@@ -12,6 +12,7 @@ public class TypeParser {
 		
 		String name = "";
 		int pointerLevel = 0;
+		int referenceLevel = 0;
 		
 		while(reader.hasNext()) {
 			Token t = reader.peek();
@@ -36,8 +37,13 @@ public class TypeParser {
 			reader.skip();
 		}
 		
+		while(reader.peek().type == TokenType.AT) {
+			referenceLevel++;
+			reader.skip();
+		}
+		
 		if(!name.isEmpty()) {
-			return new Type(name.trim(), pointerLevel);
+			return new Type(name.trim(), pointerLevel, referenceLevel);
 		}
 		return null;
 		

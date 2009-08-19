@@ -12,6 +12,10 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 	public static enum Mode {
 		REGULAR,
 		DECLARATION,
+		ADD,
+		SUB,
+		DIV,
+		MUL,
 	}
 	
 	private Mode mode;
@@ -93,6 +97,25 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 		}
 		
 		return false;
+		
+	}
+
+	public String getSymbol() {
+		
+		switch(mode) {
+			case ADD:
+				return "+=";
+			case DECLARATION:
+				return ":=";
+			case DIV:
+				return "/=";
+			case MUL:
+				return "*=";
+			case SUB:
+				return "-=";
+			default:
+				return "=";
+		}
 		
 	}
 	

@@ -1,8 +1,10 @@
 main: func {
 
 	number := 32
-	add(&number, 3)
-	printf("The answer is %d", number)
+	printf("number = %d\n", number)
+	printf("adding 3\n")
+	add(number&, 3)
+	printf("number = %d\n", number)
 
 }
 

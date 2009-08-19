@@ -8,7 +8,6 @@ public class OpDecl extends Declaration {
 
 	public OpDecl(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	public enum OpType {

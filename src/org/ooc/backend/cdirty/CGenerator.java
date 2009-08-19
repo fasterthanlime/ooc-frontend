@@ -9,6 +9,7 @@ import org.ooc.backend.Generator;
 import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
+import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
@@ -22,6 +23,7 @@ import org.ooc.frontend.model.Comment;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
+import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
@@ -60,6 +62,7 @@ import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.While;
+import org.ooc.frontend.model.Assignment.Mode;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
@@ -299,20 +302,19 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Parenthesis parenthesis) throws IOException {
-
 		current.append('(');
 		parenthesis.getExpression().accept(this);
 		current.append(')');
-		
 	}
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
-
+		assert(assignment.getMode() != Mode.DECLARATION);
 		assignment.getLvalue().accept(this);
-		current.append(" = ");
+		current.append(' ');
+		current.append(assignment.getSymbol());
+		current.append(' ');
 		assignment.getRvalue().accept(this);
-		
 	}
 
 	@Override
@@ -461,13 +463,23 @@ public class CGenerator extends Generator implements Visitor {
 		} else {
 			current.append('.');
 		}
-		current.append(memberAccess.getName());
+		visit((VariableAccess) memberAccess);
 		
 	}
 	
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
+		int refLevel = variableAccess.getRef().getType().getReferenceLevel();
+		if(refLevel > 0) {
+			current.append('(');
+			for(int i = 0; i < refLevel; i++) {
+				current.append('*');
+			}
+		}
 		current.append(variableAccess.getName());
+		if(refLevel > 0) {
+			current.append(')');
+		}
 	}
 
 	@Override
@@ -1084,7 +1096,8 @@ public class CGenerator extends Generator implements Visitor {
 			current.append('*');
 		}
 		
-		for(int i = 0; i < type.getPointerLevel(); i++) {
+		int level = type.getPointerLevel() + type.getReferenceLevel();
+		for(int i = 0; i < level; i++) {
 			current.append('*');
 		}
 	}
@@ -1134,6 +1147,20 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(") ");
 		cast.getExpression().accept(this);
 		current.append(")");
+	}
+
+	@Override
+	public void visit(AddressOf addressOf) throws IOException {
+		current.append("&(");
+		addressOf.getExpression().accept(this);
+		current.append(')');
+	}
+
+	@Override
+	public void visit(Dereference dereference) throws IOException {
+		current.append("(*");
+		dereference.getExpression().accept(this);
+		current.append(')');
 	}
 
 }

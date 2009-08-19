@@ -82,10 +82,16 @@ public class Instantiation extends FunctionCall {
 			VariableDeclAtom vda = (VariableDeclAtom) stack.peek();
 			if(vda.getExpression() == this) {
 				VariableDecl vd = (VariableDecl) stack.get(Node.find(VariableDecl.class, stack));
+				if(vd.getType() == null) {
+					throw new CompilationFailedError(null, "On est dans la merdeuh. Couldn't guess type of 'new'"
+							+stack.peek().getClass().getSimpleName()+")");
+				}
 				name = vd.getType().getName();
 			}
+		} else if(stack.peek() instanceof Cast) {
+			name = ((Cast) stack.peek()).getType().getName();
 		} else {
-			throw new Error("Couldn't guess type of 'new' (btw, we're in a "
+			throw new CompilationFailedError(null, "Couldn't guess type of 'new' (btw, we're in a "
 					+stack.peek().getClass().getSimpleName()+")");
 		}
 		

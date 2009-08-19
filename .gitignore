@@ -1,4 +1,5 @@
 *.class
 *.gen
-bin/
+bin/*
+build/
 ooc_tmp

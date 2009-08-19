@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import org.ooc.frontend.model.Access;
 import org.ooc.frontend.model.Add;
+import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Cast;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.Declaration;
+import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
@@ -124,12 +126,26 @@ public class ExpressionParser {
 				
 			}
 			
+			if(t.type == TokenType.AMPERSAND) {
+				reader.skip();
+				expr = new AddressOf(expr);
+				continue;
+			}
+			
+			if(t.type == TokenType.AT) {
+				reader.skip();
+				expr = new Dereference(expr);
+				continue;
+			}
+			
 			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
 					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH
 					|| t.type == TokenType.PERCENT || t.type == TokenType.GREATERTHAN
 					|| t.type == TokenType.LESSTHAN || t.type == TokenType.GREATERTHAN_EQUALS
 					|| t.type == TokenType.LESSTHAN_EQUALS || t.type == TokenType.EQUALS
-					|| t.type == TokenType.NOT_EQUALS) {
+					|| t.type == TokenType.NOT_EQUALS || t.type == TokenType.PLUS_ASSIGN
+					|| t.type == TokenType.MINUS_ASSIGN || t.type == TokenType.STAR_ASSIGN
+					|| t.type == TokenType.SLASH_ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -149,6 +165,14 @@ public class ExpressionParser {
 					case LESSTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
 					case EQUALS: expr = new Compare(expr, rvalue, CompareType.EQUAL); break;
 					case NOT_EQUALS: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL); break;
+					case PLUS_ASSIGN:  ensureAccess(expr);
+						expr = new Assignment(Mode.ADD, (Access) expr, rvalue); break;
+					case MINUS_ASSIGN: ensureAccess(expr);
+						expr = new Assignment(Mode.SUB, (Access) expr, rvalue); break;
+					case STAR_ASSIGN:  ensureAccess(expr);
+						expr = new Assignment(Mode.MUL, (Access) expr, rvalue); break;
+					case SLASH_ASSIGN: ensureAccess(expr);
+					expr = new Assignment(Mode.DIV, (Access) expr, rvalue); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
@@ -178,6 +202,14 @@ public class ExpressionParser {
 		
 	}
 	
+	private static void ensureAccess(Expression expr) {
+
+		if(!(expr instanceof Access)) {
+			throw new CompilationFailedError(null, "Trying to assign to a constant :/");
+		}
+		
+	}
+
 	private static Expression parseFlat(SourceReader sReader, TokenReader reader) throws IOException {
 		
 		int mark = reader.mark();

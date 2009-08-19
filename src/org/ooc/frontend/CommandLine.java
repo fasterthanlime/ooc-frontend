@@ -190,15 +190,18 @@ public class CommandLine {
 	}
 	
 	private void parse(String fileName) throws InterruptedException, IOException {
-		long tt1 = System.nanoTime();
 		params.outPath.mkdirs();
+		long tt1 = System.nanoTime();
 		Module module = new Parser(params).parse(fileName);
 		translate(module, new HashSet<Module>());
-		compile(module);
 		long tt2 = System.nanoTime();
+		compile(module);
+		long tt3 = System.nanoTime();
 
 		if(timing)
-			System.out.printf("Took %.2f ms.\n", Float.valueOf((tt2 - tt1) / 1000000.0f));
+			System.out.printf("Took %.2f ms for ooc, and %.2f for gcc\n",
+					Float.valueOf((tt2 - tt1) / 1000000.0f),
+					Float.valueOf((tt3 - tt2) / 1000000.0f));
 	}
 
 	private void translate(Module module, Set<Module> done) throws IOException {

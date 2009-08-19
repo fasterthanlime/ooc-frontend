@@ -94,7 +94,7 @@ public class Token {
 		LOGICAL_AND, // && (logical and)
 		LOGICAL_OR, // || (logical or)
 		
-		BINARY_AND, // & (binary and)
+		AMPERSAND, // & (binary and)
 		BINARY_OR, // | (binary or)
 		
 		CHAR_LIT, // 'c'

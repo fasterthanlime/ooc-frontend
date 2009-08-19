@@ -4,6 +4,12 @@ Funky: class {
 		printf("Created a Funky =)\n")
 	}
 
+	/*
+	getOne: static func -> This {
+		new This
+	}
+	*/
+
 }
 
 main: func {
@@ -13,4 +19,8 @@ main: func {
 	f3 = new : Funky // VariableDeclAssigned
 	f4 : Funky
 	f4 = new // Assignment
+	f5 := new Funky
+	f6 := new as Funky // mwahahaha.
+	//f7 := Funky getOne
+	
 }

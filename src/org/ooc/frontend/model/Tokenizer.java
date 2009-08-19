@@ -120,7 +120,7 @@ public class Tokenizer {
 		new CharTuple('~', TokenType.TILDE),
 		new CharTuple(':', TokenType.COLON, '=', TokenType.DECL_ASSIGN),
 		new CharTuple('!', TokenType.BANG, '=', TokenType.NOT_EQUALS),
-		new CharTuple('&', TokenType.BINARY_AND, '&', TokenType.LOGICAL_AND),
+		new CharTuple('&', TokenType.AMPERSAND, '&', TokenType.LOGICAL_AND),
 		new CharTuple('|', TokenType.BINARY_OR, '|', TokenType.LOGICAL_OR),
 		new CharTuple('?', TokenType.QUEST),
 		new CharTuple('#', TokenType.HASH),

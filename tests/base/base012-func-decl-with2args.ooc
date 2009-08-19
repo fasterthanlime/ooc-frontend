@@ -4,7 +4,7 @@ main: func {
 
 }
 
-say: func (name: String, msg: String) {
+say: func (name, msg: String) {
 
 	printf("%s says: %s\n", name, msg)
 

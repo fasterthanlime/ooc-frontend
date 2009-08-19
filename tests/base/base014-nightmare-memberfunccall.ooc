@@ -3,12 +3,12 @@ Thinga: class {
 	count: Int
 
 	getThis : func -> This {
-		this count = this count + 1
-		return this
+		count += 1
+		this
 	}
 
 	thingo: func {
-		printf("Thingo bingo =) count = %d\n", this count)
+		printf("Thingo bingo =) count = %d\n", count)
 	}
 
 }

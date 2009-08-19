@@ -9,6 +9,7 @@ import org.ooc.backend.Generator;
 import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
+import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
@@ -21,6 +22,7 @@ import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
+import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
@@ -38,6 +40,7 @@ import org.ooc.frontend.model.MemberArgument;
 import org.ooc.frontend.model.MemberAssignArgument;
 import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
+import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
@@ -49,7 +52,6 @@ import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.SingleLineComment;
-import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -177,7 +179,9 @@ public class OocGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(Assignment assignment) throws IOException {
 		assignment.getLvalue().accept(this);
-		w.append(" = ");
+		w.append(' ');
+		w.append(assignment.getSymbol());
+		w.append(' ');
 		assignment.getRvalue().accept(this);
 	}
 
@@ -552,6 +556,18 @@ public class OocGenerator extends Generator implements Visitor {
 		cast.getExpression().accept(this);
 		w.append(" as ");
 		cast.getType().accept(this);
+	}
+
+	@Override
+	public void visit(AddressOf addressOf) throws IOException {
+		addressOf.getExpression().accept(this);
+		w.append('&');
+	}
+
+	@Override
+	public void visit(Dereference dereference) throws IOException {
+		dereference.getExpression().accept(this);
+		w.append('@');
 	}
 	
 }
