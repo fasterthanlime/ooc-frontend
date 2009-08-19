@@ -23,7 +23,7 @@ public class OpDeclParser {
 		Token token = reader.read();
 		if(token.type == TokenType.PLUS) {
 			type = OpType.ADD;
-		} if(token.type == TokenType.OPEN_SQUAR) {
+		} else if(token.type == TokenType.OPEN_SQUAR) {
 			if(reader.peek().type == TokenType.CLOS_SQUAR) {
 				reader.skip();
 				if(reader.peek().type == TokenType.ASSIGN) {
@@ -40,7 +40,7 @@ public class OpDeclParser {
 			throw new CompilationFailedError(null, "Trying to overload unknown operator "+token.type);
 		}
 		
-		FunctionDecl decl = FunctionDeclParser.parse(sReader, reader);
+		FunctionDecl decl = FunctionDeclParser.parse(sReader, reader, true);
 		if(decl == null) {
 			throw new CompilationFailedError(null, "Expected function after operator overloading of "+type);
 		}

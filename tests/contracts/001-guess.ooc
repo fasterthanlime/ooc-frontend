@@ -14,7 +14,7 @@ main: func {
 
 check: func (number: Int) -> Bool {
 
-	require 0 <= number < 100
+	require(0 <= number < 100)
 	
 	return number == 42
 
@@ -25,6 +25,6 @@ func rand -> Int {
 	srand(ctime(null))
 	return rand % 100;
 
-	ensure 0 <= returned < 100
+	ensure(0 <= returned < 100)
 
 }

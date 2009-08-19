@@ -15,6 +15,10 @@ import org.ubi.SourceReader;
 public class FunctionDeclParser {
 
 	public static FunctionDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
+		return parse(sReader, reader, false);
+	}
+	
+	public static FunctionDecl parse(SourceReader sReader, TokenReader reader, boolean skipFunc) throws IOException {
 
 		int mark = reader.mark();
 		
@@ -60,7 +64,9 @@ public class FunctionDeclParser {
 			kw = reader.peek();
 		}
 		
-		if(reader.read().type != TokenType.FUNC_KW) {
+		if(reader.peek().type == TokenType.FUNC_KW) {
+			reader.skip();
+		} else if(!skipFunc) {
 			reader.reset(mark);
 			return null;
 		}

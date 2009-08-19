@@ -1,8 +1,16 @@
-operator + func (left, right: String) -> String {
+operator + (left, right: String) -> String {
 	copy := GC_malloc(left length() + right length() + 1) as String
 	memcpy(copy, left, left length())
 	memcpy(copy as Char* + left length(), right, right length() + 1) // copy the final '\0'
 	copy
+}
+
+operator + (left: Int, right: String) -> String {
+	left repr() + right
+}
+
+operator + (left: String, right: Int) -> String {
+	left + right repr()
 }
 
 Int: cover from int {
@@ -17,6 +25,6 @@ Int: cover from int {
 
 main: func {
 
-	println ("The answer is " + 42 repr())
+	println ("The answer is " + 42 + ", bitches =D")
 
 }

@@ -2,7 +2,7 @@ Negate: class {
 
 }
 
-operator [] func (negate: Negate, index: Int) -> Int {
+operator [] (negate: Negate, index: Int) -> Int {
 	0 - index;
 }
 
