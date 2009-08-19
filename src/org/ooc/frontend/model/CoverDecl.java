@@ -26,6 +26,7 @@ public class CoverDecl extends TypeDecl {
 	public CoverDecl(String name, Type fromType) {
 		super(name);
 		this.fromType = fromType;
+		this.fromType.setRef(new BuiltinType(fromType));
 		this.type = new Type(name);
 		this.type.setRef(this);
 		this.base = null;

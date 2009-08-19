@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class ClassDecl extends TypeDecl implements Scope {
 
-	private static Type type = new Type("Class");
+	//private static Type type = new Type("Class");
 	
 	private boolean isAbstract;
 	
@@ -87,7 +87,8 @@ public class ClassDecl extends TypeDecl implements Scope {
 
 	@Override
 	public Type getType() {
-		return type;
+		//return type;
+		return getInstanceType();
 	}
 	
 	@Override

@@ -13,7 +13,7 @@ import org.ubi.CompilationFailedError;
 public class VariableAccess extends Access implements MustBeResolved {
 
 	protected String variable;
-	protected VariableDecl ref;
+	protected Declaration ref;
 	
 	public VariableAccess(String variable) {
 		this.variable = variable;
@@ -29,7 +29,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 		return variable;
 	}
 	
-	public VariableDecl getRef() {
+	public Declaration getRef() {
 		return ref;
 	}
 	
@@ -111,6 +111,15 @@ public class VariableAccess extends Access implements MustBeResolved {
 						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
 					}
 					return true;
+				}
+			}
+		}
+		
+		if(ref == null) {
+			for(TypeDecl decl: res.types) {
+				if(decl.getName().equals(variable)) {
+					ref = decl;
+					System.out.println("Got a corresponding type name "+variable+" !");
 				}
 			}
 		}

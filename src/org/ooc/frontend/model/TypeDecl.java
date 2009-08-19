@@ -68,6 +68,8 @@ public abstract class TypeDecl extends Declaration {
 	}
 
 	public VariableDecl getVariable(String name) {
+		System.out.println("Should get variable "+name+" of "+this+", variables = "+variables.getNodes());
+		
 		for(VariableDecl decl: variables) {
 			if(decl.hasAtom(name)) return decl;
 		}
@@ -82,6 +84,10 @@ public abstract class TypeDecl extends Declaration {
 		
 		return null;
 	}
-
+	
+	@Override
+	public TypeDecl getTypeDecl() {
+		return this;
+	}
 
 }

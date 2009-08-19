@@ -112,6 +112,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		this.type = type;
 	}
 	
+	@Override
 	public TypeDecl getTypeDecl() {
 		return typeDecl;
 	}

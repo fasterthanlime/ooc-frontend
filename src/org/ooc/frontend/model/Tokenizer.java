@@ -308,6 +308,9 @@ public class Tokenizer {
 			
 		}
 		
+		// funnily enough, C compilers were famously bugging because of that.
+		tokens.add(new Token(reader.mark(), 0, TokenType.LINESEP));
+		
 		return tokens;
 	}
 	

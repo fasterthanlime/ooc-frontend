@@ -27,6 +27,7 @@ public class FunctionDecl extends Declaration implements Scope {
 		super(name);
 		this.suffix = suffix;
 		this.isFinal = isFinal;
+		// TODO check if that's alright
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
 		this.isExtern = isExtern;
@@ -84,6 +85,7 @@ public class FunctionDecl extends Declaration implements Scope {
 		this.isExtern = isExtern;
 	}
 	
+	@Override
 	public TypeDecl getTypeDecl() {
 		return typeDecl;
 	}
@@ -158,7 +160,7 @@ public class FunctionDecl extends Declaration implements Scope {
 		StringBuilder sB = new StringBuilder();
 		sB.append('(');
 		Iterator<Argument> iter = arguments.iterator();
-		if(isMember()) iter.next();
+		if(isMember() && !isStatic() && iter.hasNext()) iter.next();
 		while(iter.hasNext()) {
 			Argument arg = iter.next();
 			if(arg instanceof VarArg) sB.append("...");

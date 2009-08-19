@@ -49,8 +49,8 @@ public class Checker implements Hobgoblin {
 			public boolean take(Type node, Stack<Node> stack) throws IOException {
 				if(node.getRef() == null) {
 					throw new CompilationFailedError(null,
-							node.getClass().getSimpleName()+" "+node.getName()
-							+" hasn't been resolved :(");
+							node.getClass().getSimpleName()+" "+node
+							+" hasn't been resolved :(, stack = "+stack);
 				}
 				return true;
 			}

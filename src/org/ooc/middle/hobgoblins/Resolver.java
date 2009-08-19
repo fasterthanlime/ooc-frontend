@@ -76,15 +76,22 @@ public class Resolver implements Hobgoblin {
 		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(new BuiltinType("void"));
 		decls.add(new BuiltinType("short"));
-		decls.add(new BuiltinType("int"));
+		decls.add(new BuiltinType("unsigned short"));
+		decls.add(new BuiltinType("int"));		
 		decls.add(new BuiltinType("unsigned int"));
 		decls.add(new BuiltinType("long"));
+		decls.add(new BuiltinType("unsigned long"));
 		decls.add(new BuiltinType("long long"));
+		decls.add(new BuiltinType("unsigned long long"));
 		decls.add(new BuiltinType("long double"));
+		decls.add(new BuiltinType("unsigned long double"));
 		decls.add(new BuiltinType("float"));
 		decls.add(new BuiltinType("double"));
 		decls.add(new BuiltinType("char"));
-		decls.add(new BuiltinType("Tuple")); // FIXME that's a tough one.
+		decls.add(new BuiltinType("unsigned char"));
+		decls.add(new BuiltinType("signed char"));
+		
+		decls.add(new BuiltinType("bool"));
 		
 		decls.add(new BuiltinType("int8_t"));
 		decls.add(new BuiltinType("int16_t"));

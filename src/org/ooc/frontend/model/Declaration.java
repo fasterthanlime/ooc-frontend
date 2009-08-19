@@ -16,6 +16,8 @@ public abstract class Declaration extends Expression {
 		this.name = name;
 	}
 	
+	public abstract TypeDecl getTypeDecl();
+	
 	@Override
 	public String toString() {
 		return super.toString() + ": " + name;

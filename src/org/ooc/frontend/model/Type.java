@@ -158,7 +158,7 @@ public class Type extends Node implements MustBeResolved {
 			throw new CompilationFailedError(null, "Couldn't resolve type "+getName());
 		}
 		
-		return isResolved();
+		return ref == null;
 		
 	}
 	

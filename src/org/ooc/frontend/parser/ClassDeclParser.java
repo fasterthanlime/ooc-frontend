@@ -65,7 +65,8 @@ public class ClassDeclParser {
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 			
-				if(reader.peek().type == TokenType.LINESEP || reader.peek().type == TokenType.SL_COMMENT) {
+				if(reader.peek().type == TokenType.LINESEP || reader.peek().type == TokenType.SL_COMMENT
+						 || reader.peek().type == TokenType.ML_COMMENT) {
 					reader.skip(); continue;
 				}
 				

@@ -33,11 +33,12 @@ public class Instantiation extends FunctionCall {
 		
 		if(name.isEmpty()) guessName(stack);
 		
-		for(TypeDecl decl: res.types) {
+		for(TypeDecl decl: res.types) {			
 			if(!decl.getName().equals(name)) continue;
 			
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
+				System.out.println("Reviewing "+func.getProtoRepr());
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
 				int numArgs = func.getArguments().size();
 				if(decl instanceof ClassDecl) numArgs--; // ignore the 'this'

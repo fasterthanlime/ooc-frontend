@@ -71,9 +71,9 @@ public class CoverDeclParser {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected semi-colon after variable declaration in cover declaration");
 					}
-					if(fromType != null) {
+					if(fromType != null && !varDecl.isExtern()) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-							"You can't add member variables to a Cover which already has a base type (in this case, "
+							"You can't add non-extern member variables to a Cover which already has a base type (in this case, "
 								+fromType.getName()+")");
 					}
 					coverDecl.addVariable(varDecl);

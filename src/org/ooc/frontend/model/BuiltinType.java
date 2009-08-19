@@ -15,6 +15,10 @@ public class BuiltinType extends TypeDecl {
 		type.setRef(this);
 	}
 
+	public BuiltinType(Type fromType) {
+		this(fromType.getName());
+	}
+
 	@Override
 	public Type getType() {
 		return type ;

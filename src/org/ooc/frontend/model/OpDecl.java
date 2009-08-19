@@ -95,5 +95,10 @@ public class OpDecl extends Declaration {
 	public String toString() {
 		return "operator "+getOpString()+" "+func.getArgsRepr();
 	}
+	
+	@Override
+	public TypeDecl getTypeDecl() {
+		throw new Error("getting type decl of an "+getClass().getSimpleName()+", wtf?");
+	}
 
 }

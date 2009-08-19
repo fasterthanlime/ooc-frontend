@@ -7,6 +7,7 @@ import org.ooc.frontend.Visitor;
 
 public class BoolLiteral extends Literal {
 
+	public static Type type = new Type("Bool");
 	private boolean value;
 	
 	public BoolLiteral(boolean value) {
@@ -23,7 +24,7 @@ public class BoolLiteral extends Literal {
 
 	@Override
 	public Type getType() {
-		return new Type("Bool");
+		return type;
 	}
 	
 	@Override

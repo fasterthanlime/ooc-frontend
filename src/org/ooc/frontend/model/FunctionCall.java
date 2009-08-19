@@ -111,12 +111,9 @@ public class FunctionCall extends Access implements MustBeResolved {
 				String guess = guessCorrectName(mainStack, res);
 				if(guess != null) {
 					message += " Did you mean "+guess+" ?";
-				} else {
-					System.out.println("No guess!");
 				}
 				throw new CompilationFailedError(null, message);
 			}
-			return false;
 		}
 		
 		return impl == null;
@@ -146,22 +143,28 @@ public class FunctionCall extends Access implements MustBeResolved {
 
 	private void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) {
 		
-		int classIndex = Node.find(ClassDecl.class, mainStack);
-		if(classIndex == -1) {
+		int typeIndex = Node.find(TypeDecl.class, mainStack);
+		if(typeIndex == -1) {
 			throw new CompilationFailedError(null, (isSuper ? "super" : "this")
 					+getArgsRepr()+" call outside a class declaration, doesn't make sense.");
 		}
-		ClassDecl classDecl = (ClassDecl) mainStack.get(classIndex);
+		TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 		if(isSuper) {
+			if(!(typeDecl instanceof ClassDecl)) {
+				throw new CompilationFailedError(null, "super"+getArgsRepr()+" call in type def "
+						+typeDecl.getName()+" which is not a class! wtf?");
+			}
+			ClassDecl classDecl = ((ClassDecl) typeDecl);
 			if(classDecl.getSuperRef() == null) {
 				throw new CompilationFailedError(null, "super"+getArgsRepr()+" call in class "
-						+classDecl.getName()+" which has no super-class!");
+						+typeDecl.getName()+" which has no super-class!");
 			}
-			classDecl = classDecl.getSuperRef();
+			typeDecl = classDecl.getSuperRef();
 		}
 		
-		for(FunctionDecl decl: classDecl.getFunctions()) {
-			if(decl.getName().equals("new")) {
+		for(FunctionDecl decl: typeDecl.getFunctions()) {
+			System.out.println("Reviewing "+decl.getProtoRepr());
+			if(decl.isConstructor()) {
 				if(matchesArgs(decl)) {
 					impl = decl;
 					return;
@@ -244,7 +247,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 	public boolean matchesArgs(FunctionDecl decl) {
 		
 		int numArgs = decl.getArguments().size();
-		if(decl.isMember()) numArgs--;
+		if(decl.isMember() && !decl.isStatic()) numArgs--;
 		
 		if(numArgs == arguments.size()
 			|| ((numArgs > 0 && decl.getArguments().getLast() instanceof VarArg)

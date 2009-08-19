@@ -16,8 +16,10 @@ Double: cover from double
 LDouble: cover from long double
 Short: cover from short
 Long: cover from long
+ULong: cover from unsigned long
 LLong: cover from long long
 Void: cover from void
+Bool: cover from bool
 //cover Func?
 SizeT: cover from size_t
 Octet: cover from uint8_t
@@ -34,8 +36,18 @@ println: func ~empty {
 	printf("\n")
 }
 
+// should be private
 GC_malloc: extern func (size: SizeT) -> Pointer
 GC_realloc: extern func (ptr: Pointer, size: SizeT) -> Pointer
-GC_calloc: func ~ (nmemb: SizeT, size: SizeT) -> Pointer {
-	return GC_malloc(nmemb * size)
+
+gc_malloc: func (size: SizeT) -> Pointer {
+	GC_malloc(size)
+}
+
+gc_realloc: func (ptr: Pointer, size: SizeT) -> Pointer {
+	GC_realloc(ptr, size)
+}
+
+gc_calloc: func (nmemb: SizeT, size: SizeT) -> Pointer {
+	GC_malloc(nmemb * size)
 }

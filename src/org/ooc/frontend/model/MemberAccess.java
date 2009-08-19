@@ -70,6 +70,8 @@ public class MemberAccess extends VariableAccess {
 			}
 			return true;
 		}
+		System.out.println("Trying to access "+exprType+"."+variable);
+		
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
 			throw new Error("Trying to access to a member of not a TypeDecl, but a "
@@ -80,7 +82,8 @@ public class MemberAccess extends VariableAccess {
 		ref = typeDecl.getVariable(variable);
 		
 		if(fatal && ref == null) {
-			throw new CompilationFailedError(null, "Can't resolve access to member "+expression.getType()+"."+variable);
+			throw new CompilationFailedError(null, "Can't resolve access to member "
+					+exprType+"."+variable);
 		}
 		return ref != null;
 	}
