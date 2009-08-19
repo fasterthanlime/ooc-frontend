@@ -21,10 +21,10 @@ IntArray: class {
 
 // [], []=, +, -, *, /, as, ==, !, ~
 
-operator []  func(array: IntArray, index: Int) -> Int \
+operator []  (array: IntArray, index: Int) -> Int \
 	array get(index)
 	
-operator []= func(array: IntArray, index: Int, value: Int) \
+operator []= (array: IntArray, index: Int, value: Int) \
 	array set(index, value)
 
 main: func {
