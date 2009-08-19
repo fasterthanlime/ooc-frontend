@@ -29,6 +29,9 @@ public class TypeParser {
 			} else if(t.type == TokenType.STRUCT) {
 				reader.skip();
 				name += "struct ";
+			} else if(t.type == TokenType.UNION) {
+				reader.skip();
+				name += "union ";
 			} else break;
 		}
 			

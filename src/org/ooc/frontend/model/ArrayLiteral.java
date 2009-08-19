@@ -7,9 +7,10 @@ import org.ooc.frontend.Visitor;
 public class ArrayLiteral extends Literal {
 
 	private Type type = new Type("Pointer");
+	private NodeList<Expression> elements;
 	
 	public ArrayLiteral() {
-		
+		elements = new NodeList<Expression>();
 	}
 	
 	@Override
@@ -26,23 +27,25 @@ public class ArrayLiteral extends Literal {
 	public Type getType() {
 		return type;
 	}
+	
+	public NodeList<Expression> getElements() {
+		return elements;
+	}
 
 	@Override
 	public void accept(Visitor visitor) throws IOException {
-		// TODO Auto-generated method stub
-
+		visitor.visit(this);
 	}
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		// TODO Auto-generated method stub
-
+		type.accept(visitor);
+		elements.accept(visitor);
 	}
 
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

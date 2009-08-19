@@ -62,6 +62,7 @@ public class Tokenizer {
 		new Name("unsigned", TokenType.UNSIGNED),
 		new Name("signed", TokenType.SIGNED),
 		new Name("long", TokenType.LONG),
+		new Name("union", TokenType.UNION),
 		new Name("struct", TokenType.STRUCT),
 	};
 	

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
+import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
@@ -86,6 +87,7 @@ public interface Visitor {
 	public void visit(RangeLiteral rangeLiteral) throws IOException;
 	public void visit(BoolLiteral boolLiteral) throws IOException;
 	public void visit(CharLiteral charLiteral) throws IOException;
+	public void visit(ArrayLiteral arrayLiteral) throws IOException;
 	
 	public void visit(Line line) throws IOException;
 

@@ -121,6 +121,7 @@ public class Token {
 		SIGNED,
 		LONG,
 		STRUCT,
+		UNION,
 	
 	}
 	
