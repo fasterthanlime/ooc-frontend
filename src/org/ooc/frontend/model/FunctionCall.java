@@ -163,10 +163,10 @@ public class FunctionCall extends Access implements MustBeResolved {
 		}
 		
 		for(FunctionDecl decl: typeDecl.getFunctions()) {
-			System.out.println("Reviewing "+decl.getProtoRepr());
 			if(decl.isConstructor()) {
 				if(matchesArgs(decl)) {
 					impl = decl;
+					System.out.println("Resolved constructor call, proto = "+getProtoRepr());
 					return;
 				}
 			}
@@ -247,7 +247,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 	public boolean matchesArgs(FunctionDecl decl) {
 		
 		int numArgs = decl.getArguments().size();
-		if(decl.isMember() && !decl.isStatic()) numArgs--;
+		if(decl.isMember() && !decl.isConstructor()) numArgs--;
 		
 		if(numArgs == arguments.size()
 			|| ((numArgs > 0 && decl.getArguments().getLast() instanceof VarArg)

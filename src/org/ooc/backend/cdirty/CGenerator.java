@@ -121,9 +121,9 @@ public class CGenerator extends Generator implements Visitor {
 		}
 		current.newLine();
 		for(Import imp: module.getImports()) {
-			current.append("#include \"");
+			current.append("#include <");
 			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
-			current.append(".h\"");
+			current.append(".h>");
 			current.newLine();
 		}
 		
@@ -241,7 +241,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 		
 		current.append('(');
-		if(functionCall.isConstructorCall()) {
+		if(functionCall.isConstructorCall() && functionCall.getImpl().getTypeDecl() instanceof ClassDecl) {
 			current.append('(');
 			decl.getTypeDecl().getInstanceType().accept(this);
 			current.append(')');

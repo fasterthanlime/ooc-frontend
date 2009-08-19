@@ -225,6 +225,8 @@ public class CommandLine {
 		command.add("-std=c99");
 		command.add("-I");
 		command.add(new File(params.distLocation, "libs/headers/").getPath());
+		command.add("-I");
+		command.add(params.outPath.getPath());
 		// FIXME ooh hardcoded, that is bad.
 		command.add(new File(params.distLocation, "libs/universal/mango/mangoobject.c").getPath());
 		addDeps(command, module, new HashSet<Module>());

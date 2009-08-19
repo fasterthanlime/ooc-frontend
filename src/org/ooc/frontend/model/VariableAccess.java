@@ -119,7 +119,6 @@ public class VariableAccess extends Access implements MustBeResolved {
 			for(TypeDecl decl: res.types) {
 				if(decl.getName().equals(variable)) {
 					ref = decl;
-					System.out.println("Got a corresponding type name "+variable+" !");
 				}
 			}
 		}

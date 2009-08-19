@@ -27,6 +27,11 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 			@Override
 			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
 				
+				String name = node.getName();
+				if(node.getTypeDecl() != null) {
+					name = node.getTypeDecl().toString() + "." + name;
+				}
+				
 				if(node.isMember()) {
 					HashSet<String> set = classFuncNames.get(node.getTypeDecl());
 					if(set == null) {
@@ -35,12 +40,12 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 					}
 					if(!set.add(node.getName()+"_"+node.getSuffix())) {
 						throw new CompilationFailedError(null,
-								"Conflicting function names "+node.getName()+", add suffix to one of them!");
+								"Conflicting function names "+name+", add suffix to one of them!");
 					}
 				} else {
 					if(!funcNames.add(node.getName()+"_"+node.getSuffix())) {
 						throw new CompilationFailedError(null,
-								"Conflicting function names "+node.getName()+", add suffix to one of them!");
+								"Conflicting function names "+name+", add suffix to one of them!");
 					}
 				}
 				

@@ -63,17 +63,13 @@ public abstract class TypeDecl extends Declaration {
 		for(FunctionDecl decl: functions) {
 			if(call.matches(decl)) return decl;
 		}
-		
 		return null;
 	}
 
 	public VariableDecl getVariable(String name) {
-		System.out.println("Should get variable "+name+" of "+this+", variables = "+variables.getNodes());
-		
 		for(VariableDecl decl: variables) {
 			if(decl.hasAtom(name)) return decl;
 		}
-		
 		return null;
 	}
 	

@@ -70,7 +70,6 @@ public class MemberAccess extends VariableAccess {
 			}
 			return true;
 		}
-		System.out.println("Trying to access "+exprType+"."+variable);
 		
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
