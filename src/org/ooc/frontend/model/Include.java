@@ -13,14 +13,19 @@ public class Include extends Node {
 		PATHY,
 	}
 	
+	public static class Define {
+		public String name;
+		public String value;
+	}
+	
 	protected String include;
 	protected Mode mode;
-	protected final List<String> defines;
+	protected final List<Define> defines;
 
 	public Include(String include, Mode mode) {
 		this.include = include;
 		this.mode = mode;
-		this.defines = new ArrayList<String>();
+		this.defines = new ArrayList<Define>();
 	}
 	
 	public Mode getMode() {
@@ -31,7 +36,7 @@ public class Include extends Node {
 		return include;
 	}
 	
-	public List<String> getDefines() {
+	public List<Define> getDefines() {
 		return defines;
 	}
 	

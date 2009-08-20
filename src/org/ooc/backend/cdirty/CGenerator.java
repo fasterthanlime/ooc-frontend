@@ -65,6 +65,7 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.Assignment.Mode;
+import org.ooc.frontend.model.Include.Define;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ubi.SourceReader;
@@ -115,10 +116,7 @@ public class CGenerator extends Generator implements Visitor {
 		// is missing the whole fancy cmdline frontend with sdk search etc.
 		current.append("#include <mango/mangoobject.h>\n");
 		for(Include include: module.getIncludes()) {
-			current.append("#include <");
-			current.append(include.getPath());
-			current.append(".h>");
-			current.newLine();
+			writeInclude(include);
 		}
 		current.newLine();
 		for(Import imp: module.getImports()) {
@@ -163,6 +161,17 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 		current.newLine();
 		
+	}
+
+	private void writeInclude(Include include) throws IOException {
+		for(Define define: include.getDefines()) {
+			current.newLine().append("#define ").append(define.name);
+			if(define.value != null) current.append(' ').append(define.value);
+		}
+		current.newLine().append("#include <").append(include.getPath()).append(".h>").newLine();
+		for(Define define: include.getDefines()) {
+			current.append("#undef ").append(define.name).append(' ').newLine();
+		}
 	}
 
 	@Override
