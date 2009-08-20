@@ -40,6 +40,7 @@ public class VariableDeclParser {
 			atoms.add(new VariableDeclAtom(name, expr));
 			if(reader.peek().type != TokenType.COMMA) break;
 			reader.skip();
+			reader.skipWorthless();
 		}
 		
 		if(reader.read().type != TokenType.COLON) {

@@ -94,6 +94,13 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		return false;
 	}
 	
+	public VariableDeclAtom getAtom(String name) {
+		for(VariableDeclAtom atom: atoms) {
+			if(atom.name.equals(name)) return atom;
+		}
+		return null;
+	}
+	
 	public NodeList<VariableDeclAtom> getAtoms() {
 		return atoms;
 	}

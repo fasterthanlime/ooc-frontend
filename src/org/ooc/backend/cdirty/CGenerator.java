@@ -496,7 +496,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append('*');
 			}
 		}
-		current.append(variableAccess.getRef().getExternName());
+		current.append(variableAccess.getRef().getExternName(variableAccess));
 		if(refLevel > 0) {
 			current.append(')');
 		}

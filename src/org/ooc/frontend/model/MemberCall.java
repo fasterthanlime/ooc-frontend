@@ -77,7 +77,7 @@ public class MemberCall extends FunctionCall {
 			if(fatal) {
 				throw new CompilationFailedError(null, "Calling member function "
 						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
-						+" which type hasn't been ref'd yet");
+						+" which type hasn't been ref'd yet, e.g. "+expression);
 			}
 			return true;
 		}

@@ -33,6 +33,11 @@ public abstract class Declaration extends Expression {
 		return externName;
 	}
 	
+	public String getExternName(VariableAccess variableAccess) {
+		if(externName == null || externName.isEmpty()) return variableAccess.getName();
+		return externName;
+	}
+	
 	public void setExternName(String externName) {
 		this.externName = externName;
 	}

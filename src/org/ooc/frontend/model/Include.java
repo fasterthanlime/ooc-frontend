@@ -1,6 +1,8 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.ooc.frontend.Visitor;
 
@@ -11,12 +13,14 @@ public class Include extends Node {
 		PATHY,
 	}
 	
-	private String include;
-	private Mode mode;
+	protected String include;
+	protected Mode mode;
+	protected final List<String> defines;
 
 	public Include(String include, Mode mode) {
 		this.include = include;
 		this.mode = mode;
+		this.defines = new ArrayList<String>();
 	}
 	
 	public Mode getMode() {
@@ -25,6 +29,10 @@ public class Include extends Node {
 	
 	public String getPath() {
 		return include;
+	}
+	
+	public List<String> getDefines() {
+		return defines;
 	}
 	
 	@Override

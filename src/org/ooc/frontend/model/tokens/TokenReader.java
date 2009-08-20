@@ -12,8 +12,8 @@ public class TokenReader extends ListReader<Token> {
 
 	public boolean skipWhitespace() {
 		boolean result = false;
-		while(list.get(index).type == TokenType.LINESEP) {
-			index++;
+		while(peek().type == TokenType.LINESEP) {
+			skip();
 			result = true;
 		}
 		return result;
@@ -21,10 +21,10 @@ public class TokenReader extends ListReader<Token> {
 	
 	public boolean skipWorthless() {
 		boolean result = false;
-		while(list.get(index).type == TokenType.LINESEP
-				|| list.get(index).type == TokenType.SL_COMMENT
-				|| list.get(index).type == TokenType.ML_COMMENT) {
-			index++;
+		while(peek().type == TokenType.LINESEP
+				|| peek().type == TokenType.SL_COMMENT
+				|| peek().type == TokenType.ML_COMMENT) {
+			skip();
 			result = true;
 		}
 		return result;

@@ -215,7 +215,8 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.SLASH_ASSIGN));
 				} else if(c2 == '/') {
 					reader.readLine();
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.SL_COMMENT));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark()
+							- location.getIndex() - 2, TokenType.SL_COMMENT));
 				} else if(c2 == '*') {
 					reader.read();
 					char c3 = reader.peek();
@@ -256,7 +257,8 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty hexadecimal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.HEX_INT));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark()
+							- location.getIndex() - 2, TokenType.HEX_INT));
 					continue;
 				} else if(c2 == 'c') {
 					reader.read();
@@ -264,7 +266,8 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty octal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.OCT_INT));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark()
+							- location.getIndex() - 2, TokenType.OCT_INT));
 					continue;
 				} else if(c2 == 'b') {
 					reader.read();
@@ -272,7 +275,8 @@ public class Tokenizer {
 					if(lit.isEmpty()) {
 						throw new CompilationFailedError(location, "Empty binary number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark() - location.getIndex() - 2, TokenType.BIN_INT));
+					tokens.add(new Token(location.getIndex() + 2, reader.mark()
+							- location.getIndex() - 2, TokenType.BIN_INT));
 					continue;
 				}
 			}
@@ -310,7 +314,6 @@ public class Tokenizer {
 			
 		}
 		
-		// funnily enough, C compilers were famously bugging because of that.
 		tokens.add(new Token(reader.mark(), 0, TokenType.LINESEP));
 		
 		return tokens;

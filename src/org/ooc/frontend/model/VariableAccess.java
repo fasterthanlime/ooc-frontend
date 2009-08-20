@@ -103,6 +103,10 @@ public class VariableAccess extends Access implements MustBeResolved {
 			int typeIndex = Node.find(TypeDecl.class, mainStack);
 			if(typeIndex != -1) {
 				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
+				if(variable.equals("This")) {
+					ref = typeDecl;
+					return true;
+				}
 				VariableDecl varDecl = typeDecl.getVariable(variable);
 				if(varDecl != null) {
 					MemberAccess membAccess = new MemberAccess(variable);
@@ -114,7 +118,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 				}
 			}
 		}
-		
+
 		if(ref == null) {
 			for(TypeDecl decl: res.types) {
 				if(decl.getName().equals(variable)) {
