@@ -246,7 +246,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 	public boolean matchesArgs(FunctionDecl decl) {
 		
 		int numArgs = decl.getArguments().size();
-		if(decl.isMember() && !decl.isConstructor()) numArgs--;
+		if(decl.isMember() && !decl.isConstructor() && !decl.isStatic()) numArgs--;
 		
 		if(numArgs == arguments.size()
 			|| ((numArgs > 0 && decl.getArguments().getLast() instanceof VarArg)

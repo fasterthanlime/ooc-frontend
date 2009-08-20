@@ -289,8 +289,10 @@ public class CGenerator extends Generator implements Visitor {
 			typeDecl.getInstanceType().accept(this);
 			current.append(") ");
 		}
-		memberCall.getExpression().accept(this);
-		if(!memberCall.getArguments().isEmpty()) current.append(", ");
+		if(!memberCall.getImpl().isStatic()) {
+			memberCall.getExpression().accept(this);
+			if(!memberCall.getArguments().isEmpty()) current.append(", ");
+		}
 		writeExprList(memberCall.getArguments());
 		
 		current.append(')');
