@@ -7,7 +7,7 @@ import org.ooc.frontend.Visitor;
 public class VariableDeclFromExpr extends VariableDecl {
 
 	public VariableDeclFromExpr(String name, Expression expression) {
-		super(null, false, false, false);
+		super(null, false, false);
 		atoms.add(new VariableDeclAtom(name, expression));
 	}
 

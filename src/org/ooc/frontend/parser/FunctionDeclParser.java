@@ -42,7 +42,7 @@ public class FunctionDeclParser {
 		boolean isAbstract = false;
 		boolean isStatic = false;
 		boolean isFinal = false;
-		boolean isExtern = false;
+		String externName = null;
 		
 		Token kw = reader.peek();
 		while(kw.type == TokenType.ABSTRACT_KW
@@ -51,13 +51,11 @@ public class FunctionDeclParser {
 		   || kw.type == TokenType.EXTERN_KW
 		   ) {
 			
-			reader.skip();
-			
 			switch(kw.type) {
-			case ABSTRACT_KW: isAbstract = true; break;
-			case STATIC_KW: isStatic = true; break;
-			case FINAL_KW: isFinal = true; break;
-			case EXTERN_KW: isExtern = true; break;
+			case ABSTRACT_KW: reader.skip(); isAbstract = true; break;
+			case STATIC_KW: reader.skip(); isStatic = true; break;
+			case FINAL_KW: reader.skip(); isFinal = true; break;
+			case EXTERN_KW: externName = ExternParser.parse(sReader, reader); break;
 			default:
 			}
 			
@@ -82,7 +80,7 @@ public class FunctionDeclParser {
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(
-				name, suffix, isFinal, isStatic, isAbstract, isExtern);
+				name, suffix, isFinal, isStatic, isAbstract, externName);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == TokenType.OPEN_PAREN) {
@@ -101,7 +99,7 @@ public class FunctionDeclParser {
 					}
 				} else {
 					//Argument arg = ArgumentParser.parse(sReader, reader, isExtern);
-					if(!ArgumentParser.fill(sReader, reader, isExtern, functionDecl.getArguments())) {
+					if(!ArgumentParser.fill(sReader, reader, functionDecl.isExtern(), functionDecl.getArguments())) {
 					//if(arg == null) {
 						throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 								"Expected variable declaration as an argument of a function definition");

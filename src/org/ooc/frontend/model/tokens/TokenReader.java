@@ -10,10 +10,24 @@ public class TokenReader extends ListReader<Token> {
 		super(list);
 	}
 
-	public void skipNonWhitespace() {
+	public boolean skipWhitespace() {
+		boolean result = false;
 		while(list.get(index).type == TokenType.LINESEP) {
 			index++;
+			result = true;
 		}
+		return result;
+	}
+	
+	public boolean skipWorthless() {
+		boolean result = false;
+		while(list.get(index).type == TokenType.LINESEP
+				|| list.get(index).type == TokenType.SL_COMMENT
+				|| list.get(index).type == TokenType.ML_COMMENT) {
+			index++;
+			result = true;
+		}
+		return result;
 	}
 	
 	public Token peekWhiteless() {
@@ -25,7 +39,7 @@ public class TokenReader extends ListReader<Token> {
 	}
 	
 	public Token readWhiteless() {
-		skipNonWhitespace();
+		skipWhitespace();
 		return list.get(index++);
 	}
 	

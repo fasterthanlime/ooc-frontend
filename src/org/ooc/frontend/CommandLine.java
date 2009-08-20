@@ -17,7 +17,9 @@ import org.ooc.compiler.Help;
 import org.ooc.compiler.ProcessUtils;
 import org.ooc.compiler.libraries.Target;
 import org.ooc.frontend.model.Import;
+import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
 import org.ooc.middle.Tinkerer;
@@ -217,6 +219,13 @@ public class CommandLine {
 
 	private void compile(Module module) throws Error,
 			IOException, InterruptedException {
+		
+		for(Include inc: module.getIncludes()) {
+			if(inc.getMode() == Mode.LOCAL) {
+				FileUtils.copy(new File(inc.getPath() + ".h"),
+						new File(params.outPath, inc.getPath() + ".h"));
+			}
+		}
 		
 		List<String> command = new ArrayList<String>();
 		

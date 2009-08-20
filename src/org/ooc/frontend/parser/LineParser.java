@@ -18,7 +18,7 @@ public class LineParser {
 
 		int mark = reader.mark();
 		
-		reader.skipNonWhitespace();
+		reader.skipWhitespace();
 		
 		if(reader.peek().type == TokenType.SL_COMMENT) {
 			Token t = reader.read();

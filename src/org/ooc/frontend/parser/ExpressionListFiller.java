@@ -32,7 +32,7 @@ public class ExpressionListFiller {
 		while(true) {
 			
 			if(reader.peekWhiteless().type == closing) {
-				reader.skipNonWhitespace();
+				reader.skipWhitespace();
 				reader.skip(); // skip the ')'
 				break;
 			}
@@ -42,7 +42,7 @@ public class ExpressionListFiller {
 							"Expected comma between arguments of a function call");
 				}
 			} else {
-				reader.skipNonWhitespace();
+				reader.skipWhitespace();
 				Expression expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),

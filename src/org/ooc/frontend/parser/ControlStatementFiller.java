@@ -22,11 +22,8 @@ public class ControlStatementFiller {
 		}
 		
 		if(hasBrack) {
-			brackContent: while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
-				while(reader.peek().type == TokenType.LINESEP) {
-					reader.read();
-					continue brackContent;
-				}
+			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
+				if(reader.skipWorthless()) continue;
 				
 				Line line = LineParser.parse(sReader, reader);
 				if(line == null) {

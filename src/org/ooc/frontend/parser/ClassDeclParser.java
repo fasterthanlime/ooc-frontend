@@ -65,10 +65,7 @@ public class ClassDeclParser {
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 			
-				if(reader.peek().type == TokenType.LINESEP || reader.peek().type == TokenType.SL_COMMENT
-						 || reader.peek().type == TokenType.ML_COMMENT) {
-					reader.skip(); continue;
-				}
+				if(reader.skipWorthless()) continue;
 				
 				VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 				if(varDecl != null) {
@@ -83,6 +80,11 @@ public class ClassDeclParser {
 				FunctionDecl funcDecl = FunctionDeclParser.parse(sReader,reader);
 				if(funcDecl != null) {
 					classDecl.addFunction(funcDecl);
+					continue;
+				}
+				
+				if(reader.peek().type == TokenType.OOCDOC) {
+					reader.read();
 					continue;
 				}
 				

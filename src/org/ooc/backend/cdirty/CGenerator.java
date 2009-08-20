@@ -494,7 +494,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append('*');
 			}
 		}
-		current.append(variableAccess.getName());
+		current.append(variableAccess.getRef().getExternName());
 		if(refLevel > 0) {
 			current.append(')');
 		}
@@ -1085,7 +1085,7 @@ public class CGenerator extends Generator implements Visitor {
 
 		// addons only add functions to an already imported cover, so
 		// we don't need to struct it again, it would confuse the C compiler
-		if(!cover.isAddon() && cover.getFromType() == null) {
+		if(!cover.isAddon() && !cover.isExtern() && cover.getFromType() == null) {
 			current.append("struct _");
 			current.append(cover.getName());
 			current.append(' ');
@@ -1108,7 +1108,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	private void writeCoverTypedef(CoverDecl cover) throws IOException {
 		
-		if(!cover.isAddon()) {
+		if(!cover.isAddon() && !cover.isExtern()) {
 			Type fromType = cover.getFromType();
 			if(fromType == null) {
 				current.append("typedef struct _");

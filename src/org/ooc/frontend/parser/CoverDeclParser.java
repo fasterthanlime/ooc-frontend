@@ -35,6 +35,8 @@ public class CoverDeclParser {
 			}
 		}
 		
+		String externName = ExternParser.parse(sReader, reader);
+		
 		if(reader.read().type == TokenType.COVER_KW) {
 			
 			Type fromType = null;
@@ -48,6 +50,7 @@ public class CoverDeclParser {
 			}
 			
 			CoverDecl coverDecl = new CoverDecl(name, fromType);
+			coverDecl.setExternName(externName);
 			if(comment != null) coverDecl.setComment(comment);
 			
 			Token t2 = reader.read();
@@ -87,7 +90,8 @@ public class CoverDeclParser {
 				}
 				
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
-						"Expected variable declaration or function declaration in a cover declaration, but got "+reader.peek().length);
+						"Expected variable declaration or function declaration in a cover declaration, but got "
+						+reader.peek().type);
 			
 			}
 			reader.skip();

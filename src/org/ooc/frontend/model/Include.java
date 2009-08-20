@@ -6,10 +6,21 @@ import org.ooc.frontend.Visitor;
 
 public class Include extends Node {
 
+	public static enum Mode {
+		LOCAL,
+		PATHY,
+	}
+	
 	private String include;
+	private Mode mode;
 
-	public Include(String include) {
+	public Include(String include, Mode mode) {
 		this.include = include;
+		this.mode = mode;
+	}
+	
+	public Mode getMode() {
+		return mode;
 	}
 	
 	public String getPath() {

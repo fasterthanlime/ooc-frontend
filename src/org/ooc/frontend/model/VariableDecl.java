@@ -62,23 +62,22 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		public String toString() {
 			return super.toString()+": "+name;
 		}
+
 	}
 	
 	protected boolean isConst;
 	protected boolean isStatic;
-	protected boolean isExtern;
 	
 	protected Type type;
 	protected TypeDecl typeDecl;
 	
 	protected NodeList<VariableDeclAtom> atoms;
 	
-	public VariableDecl(Type type, boolean isConst, boolean isStatic, boolean isExtern) {
+	public VariableDecl(Type type, boolean isConst, boolean isStatic) {
 		super(null);
 		this.type = type;
 		this.isConst = isConst;
 		this.isStatic = isStatic;
-		this.isExtern = isExtern;
 		this.atoms = new NodeList<VariableDeclAtom>();
 	}
 	
@@ -139,14 +138,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	public void setStatic(boolean isStatic) {
 		this.isStatic = isStatic;
-	}
-	
-	public void setExtern(boolean isExtern) {
-		this.isExtern = isExtern;
-	}
-	
-	public boolean isExtern() {
-		return isExtern;
 	}
 	
 	@Override
@@ -259,6 +250,10 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			if(iter.hasNext()) repr += ", ";
 		}
 		return repr;
+	}
+
+	public boolean shouldBeLowerCase() {
+		return externName == null || !externName.isEmpty();
 	}
 	
 }

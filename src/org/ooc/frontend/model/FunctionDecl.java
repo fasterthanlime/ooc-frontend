@@ -12,7 +12,6 @@ public class FunctionDecl extends Declaration implements Scope {
 	private boolean isFinal;
 	private boolean isStatic;
 	private boolean isAbstract;
-	private boolean isExtern;
 	
 	private TypeDecl typeDecl;
 
@@ -23,14 +22,18 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	public FunctionDecl(String name, String suffix,
 			boolean isFinal, boolean isStatic, boolean isAbstract, boolean isExtern) {
+		this(name, suffix, isFinal, isStatic, isAbstract, isExtern ? "" : null);
+	}
+	
+	public FunctionDecl(String name, String suffix,
+			boolean isFinal, boolean isStatic, boolean isAbstract, String externName) {
 		
-		super(name);
+		super(name, externName);
 		this.suffix = suffix;
 		this.isFinal = isFinal;
 		// TODO check if that's alright
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
-		this.isExtern = isExtern;
 		this.body = new NodeList<Line>();
 		this.returnType = name.equals("main") ? IntLiteral.type : new Type("void");
 		this.arguments = new NodeList<Argument>();
@@ -75,14 +78,6 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	public void setFinal(boolean isFinal) {
 		this.isFinal = isFinal;
-	}
-	
-	public boolean isExtern() {
-		return isExtern;
-	}
-	
-	public void setExtern(boolean isExtern) {
-		this.isExtern = isExtern;
 	}
 	
 	@Override
@@ -196,7 +191,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	public void writeFullName(Appendable dst) throws IOException {
 		
 		if(isMember()) {
-			dst.append(typeDecl.getName()).append('_');
+			dst.append(typeDecl.getExternName()).append('_');
 		}
 		writeSuffixedName(dst);
 		
@@ -204,7 +199,7 @@ public class FunctionDecl extends Declaration implements Scope {
 
 	public void writeSuffixedName(Appendable dst) throws IOException {
 		
-		dst.append(name);
+		dst.append(getExternName());
 		if(!suffix.isEmpty()) {
 			dst.append('_').append(suffix);
 		}

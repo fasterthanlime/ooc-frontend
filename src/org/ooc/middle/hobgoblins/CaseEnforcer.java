@@ -34,7 +34,8 @@ public class CaseEnforcer implements Hobgoblin {
 					VariableDecl varDecl = (VariableDecl) node;
 					for(VariableDeclAtom atom: varDecl.getAtoms()) {
 						if(atom.getName().isEmpty()) continue;
-						if(Character.isUpperCase(atom.getName().charAt(0)) && !varDecl.isConst()&& !varDecl.isExtern()) {
+						if(Character.isUpperCase(atom.getName().charAt(0)) && !varDecl.isConst()
+								&& varDecl.shouldBeLowerCase()) {
 							throw new CompilationFailedError(null,
 									"Upper-case variable name '"+atom.getName()+": "+node.getType()
 									+"'. Variables should always begin with a lowercase letter, e.g. camelCase");
