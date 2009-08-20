@@ -10,15 +10,20 @@ import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
 public class ExpressionListFiller {
-
+	
 	public static boolean fill(SourceReader sReader, TokenReader reader,
 			NodeList<Expression> list) throws IOException {
+		return fill(sReader, reader, list, TokenType.OPEN_PAREN, TokenType.CLOS_PAREN);
+	}
+
+	public static boolean fill(SourceReader sReader, TokenReader reader,
+			NodeList<Expression> list, TokenType opening, TokenType closing) throws IOException {
 
 		int mark = reader.mark();
 		
 		if(!reader.hasNext()) return false;
 		
-		if(reader.read().type != TokenType.OPEN_PAREN) {
+		if(reader.read().type != opening) {
 			reader.reset(mark);
 			return false;
 		}
@@ -26,7 +31,7 @@ public class ExpressionListFiller {
 		boolean comma = false;
 		while(true) {
 			
-			if(reader.peekWhiteless().type == TokenType.CLOS_PAREN) {
+			if(reader.peekWhiteless().type == closing) {
 				reader.skipNonWhitespace();
 				reader.skip(); // skip the ')'
 				break;

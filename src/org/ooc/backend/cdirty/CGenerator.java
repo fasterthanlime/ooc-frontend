@@ -12,6 +12,7 @@ import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
+import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
@@ -1246,6 +1247,17 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(Import import1) throws IOException {
 		
+	}
+	
+	@Override
+	public void visit(ArrayLiteral arrayLiteral) throws IOException {
+		current.append('{');
+		Iterator<Expression> iter = arrayLiteral.getElements().iterator();
+		while(iter.hasNext()) {
+			iter.next().accept(this);
+			if(iter.hasNext()) current.append(", ");
+		}
+		current.append('}');
 	}
 
 }

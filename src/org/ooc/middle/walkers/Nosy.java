@@ -8,6 +8,7 @@ import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
+import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
@@ -378,6 +379,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(OpDecl opDecl) throws IOException {
 		visit((Node) opDecl);
+	}
+
+	@Override
+	public void visit(ArrayLiteral arrayLiteral) throws IOException {
+		visit((Node) arrayLiteral);
 	}
 	
 }

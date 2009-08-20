@@ -45,6 +45,7 @@ public class LineParser {
 						"Missing semi-colon at the end of a line (got a "+next.type+" instead)");
 			}
 		}
+		
 		return new Line(statement);
 		
 	}

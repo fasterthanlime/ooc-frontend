@@ -2,6 +2,7 @@ package org.ooc.frontend.parser;
 
 import java.io.IOException;
 
+import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.FloatLiteral;
@@ -54,6 +55,16 @@ public class LiteralParser {
 			return new BoolLiteral(false);
 		if(t.type == TokenType.NULL)
 			return new NullLiteral();
+		if(t.type == TokenType.OPEN_SQUAR) {
+			ArrayLiteral arrayLiteral = new ArrayLiteral();
+			reader.rewind();
+			if(!ExpressionListFiller.fill(sReader, reader, arrayLiteral.getElements(),
+					TokenType.OPEN_SQUAR, TokenType.CLOS_SQUAR)) {
+				throw new CompilationFailedError(null, "Malformed array literal");
+			}
+			return arrayLiteral;
+		}
+			
 		
 		reader.reset(mark);
 		return null;
