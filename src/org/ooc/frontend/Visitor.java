@@ -48,6 +48,7 @@ import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
@@ -93,6 +94,7 @@ public interface Visitor {
 
 	public void visit(Include include) throws IOException;
 	public void visit(Import import1) throws IOException;
+	public void visit(Use use) throws IOException;
 
 	public void visit(If if1) throws IOException;
 	public void visit(While while1) throws IOException;

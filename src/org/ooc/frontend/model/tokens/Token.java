@@ -22,6 +22,7 @@ public class Token {
 		
 		INCLUDE_KW, // include keyword
 		IMPORT_KW, // import keyword
+		USE_KW, // use keyword
 		EXTERN_KW, // extern keyword
 		
 		BREAK_KW, // break keyword

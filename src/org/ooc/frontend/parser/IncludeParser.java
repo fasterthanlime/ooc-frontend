@@ -18,9 +18,7 @@ public class IncludeParser {
 
 	public static boolean parse(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
 
-		if(reader.peek().type != TokenType.INCLUDE_KW) {
-			return false;
-		}
+		if(reader.peek().type != TokenType.INCLUDE_KW) return false;
 		reader.skip();
 		
 		StringBuilder sb = new StringBuilder();
@@ -37,18 +35,14 @@ public class IncludeParser {
 				addInclude(includes, sb.toString(), defines);
 				sb.setLength(0);
 				defines.clear();
-			} else if(t.type == TokenType.NAME) {
+			} else if(t.type == TokenType.NAME || t.type == TokenType.SLASH
+					|| t.type == TokenType.DOT || t.type == TokenType.DOUBLE_DOT) {
 				sb.append(t.get(sReader));
-			} else if(t.type == TokenType.SLASH) {
-				sb.append('/');
-			} else if(t.type == TokenType.DOT) {
-				sb.append('.');
-			} else if(t.type == TokenType.DOUBLE_DOT) {
-				sb.append("..");
 			} else if(t.type == TokenType.BINARY_OR) {
 				readDefines(sReader, reader, defines);
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(t.start), "Unexpected token "+t.type);
+				throw new CompilationFailedError(sReader.getLocation(t.start),
+						"Unexpected token "+t.type+" while reading an include");
 			}
 			
 		}

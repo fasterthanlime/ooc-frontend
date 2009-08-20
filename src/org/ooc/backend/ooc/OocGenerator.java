@@ -57,6 +57,7 @@ import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
@@ -587,6 +588,11 @@ public class OocGenerator extends Generator implements Visitor {
 			if(iter.hasNext()) w.append(", ");
 		}
 		w.append(']');
+	}
+
+	@Override
+	public void visit(Use use) throws IOException {
+		w.newLine().append("use ").append(use.getName());
 	}
 	
 }

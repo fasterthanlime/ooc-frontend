@@ -11,7 +11,6 @@ import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
 
-
 public class Module extends Node implements Scope {
 
 	private String underName;
@@ -19,6 +18,7 @@ public class Module extends Node implements Scope {
 	private String name;
 	private NodeList<Include> includes;
 	private NodeList<Import> imports;
+	private NodeList<Use> uses;
 	private NodeList<Node> body;
 	private String fileName;
 	private FunctionDecl loadFunc;
@@ -34,6 +34,7 @@ public class Module extends Node implements Scope {
 		
 		this.includes = new NodeList<Include>();
 		this.imports = new NodeList<Import>();
+		this.uses = new NodeList<Use>();
 		this.body = new NodeList<Node>();
 		
 		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, false);
@@ -69,6 +70,10 @@ public class Module extends Node implements Scope {
 	
 	public NodeList<Import> getImports() {
 		return imports;
+	}
+	
+	public NodeList<Use> getUses() {
+		return uses;
 	}
 	
 	public NodeList<Node> getBody() {

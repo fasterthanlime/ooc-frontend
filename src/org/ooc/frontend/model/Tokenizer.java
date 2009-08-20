@@ -39,6 +39,7 @@ public class Tokenizer {
 		new Name("static", TokenType.STATIC_KW),
 		new Name("include", TokenType.INCLUDE_KW),
 		new Name("import", TokenType.IMPORT_KW),
+		new Name("use", TokenType.USE_KW),
 		new Name("break", TokenType.BREAK_KW),
 		new Name("continue", TokenType.CONTINUE_KW),
 		new Name("fallthrough", TokenType.FALLTHR_KW),

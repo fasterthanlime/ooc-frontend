@@ -40,6 +40,7 @@ public class ModuleParser {
 			
 			if(IncludeParser.parse(sReader, reader, module.getIncludes())) continue;
 			if(ImportParser.parse(sReader, reader, module.getImports())) continue;
+			if(UseParser.parse(sReader, reader, module.getUses())) continue;
 			// TODO store comments somewhere..
 			if(CommentParser.parse(sReader, reader) != null) continue;
 			
