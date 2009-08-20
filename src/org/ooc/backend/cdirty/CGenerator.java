@@ -288,18 +288,17 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(MemberCall memberCall) throws IOException {
 		
-		current.append(memberCall.getImpl().getTypeDecl().getName());
-		current.append('_');
-		current.append(memberCall.getName());
+		FunctionDecl impl = memberCall.getImpl();
+		impl.writeFullName(current);
 		current.append('(');
 		
-		TypeDecl typeDecl = memberCall.getImpl().getTypeDecl();
+		TypeDecl typeDecl = impl.getTypeDecl();
 		if(!typeDecl.getInstanceType().equals(memberCall.getExpression().getType())) {
 			current.append('(');
 			typeDecl.getInstanceType().accept(this);
 			current.append(") ");
 		}
-		if(!memberCall.getImpl().isStatic()) {
+		if(!impl.isStatic()) {
 			memberCall.getExpression().accept(this);
 			if(!memberCall.getArguments().isEmpty()) current.append(", ");
 		}

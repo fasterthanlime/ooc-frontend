@@ -9,6 +9,7 @@ import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.TypeDecl;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -17,7 +18,7 @@ import org.ubi.CompilationFailedError;
 public class SuffixConflictAnnihilator implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 
 		final HashSet<String> funcNames = new HashSet<String>();
 		final HashMap<TypeDecl, HashSet<String>> classFuncNames

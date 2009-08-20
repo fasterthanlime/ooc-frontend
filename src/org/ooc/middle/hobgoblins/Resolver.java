@@ -12,6 +12,7 @@ import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
@@ -27,10 +28,12 @@ public class Resolver implements Hobgoblin {
 	public MultiMap<Node, FunctionDecl> funcs;
 	public List<TypeDecl> types;
 	public List<OpDecl> ops;
+	public BuildParams params;
 	
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 		
+		this.params = params;
 		getInfos(module);
 		
 		Nosy<MustBeResolved> nosy = Nosy.get(MustBeResolved.class, new Opportunist<MustBeResolved>() {

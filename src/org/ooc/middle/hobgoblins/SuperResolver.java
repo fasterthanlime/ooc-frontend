@@ -7,6 +7,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -14,7 +15,7 @@ import org.ooc.middle.walkers.Opportunist;
 public class SuperResolver implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 		
 		final List<ClassDecl> classes = module.getDeclarationsList(ClassDecl.class);
 		

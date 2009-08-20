@@ -208,7 +208,7 @@ public class CommandLine {
 
 	private void translate(Module module, Set<Module> done) throws IOException {
 		done.add(module);
-		new Tinkerer().process(module);
+		new Tinkerer().process(module, params);
 		new CGenerator(params.outPath, module).generate();
 		for(Import imp: module.getImports()) {
 			if(!done.contains(imp.getModule())) {

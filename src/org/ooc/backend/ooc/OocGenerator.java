@@ -592,7 +592,7 @@ public class OocGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Use use) throws IOException {
-		w.newLine().append("use ").append(use.getName());
+		w.newLine().append("use ").append(use.getIdentifier());
 	}
 	
 }

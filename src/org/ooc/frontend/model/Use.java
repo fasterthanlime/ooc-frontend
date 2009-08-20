@@ -1,23 +1,29 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.parser.UseDefParser;
+import org.ooc.middle.UseDef;
+import org.ooc.middle.hobgoblins.Resolver;
 
-public class Use extends Node {
+public class Use extends Node implements MustBeResolved {
 
-	protected String name;
+	protected String identifier;
+	protected UseDef useDef;
 	
 	public Use(String name) {
-		this.name = name;
+		this.identifier = name;
 	}
 	
-	public String getName() {
-		return name;
+	public String getIdentifier() {
+		return identifier;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setIdentifier(String name) {
+		this.identifier = name;
 	}
 
 	@Override
@@ -36,6 +42,18 @@ public class Use extends Node {
 	@Override
 	public boolean hasChildren() {
 		return false;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return useDef != null;
+	}
+
+	@Override
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+			throws IOException {
+		useDef = UseDefParser.parse(identifier, res.params);
+		return useDef == null;
 	}
 
 }

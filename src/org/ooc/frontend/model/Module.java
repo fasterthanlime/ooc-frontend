@@ -94,6 +94,7 @@ public class Module extends Node implements Scope {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		includes.accept(visitor);
 		imports.accept(visitor);
+		uses.accept(visitor);
 		body.accept(visitor);
 	}
 	

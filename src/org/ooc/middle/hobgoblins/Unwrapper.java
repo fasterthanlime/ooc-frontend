@@ -6,6 +6,7 @@ import java.util.Stack;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -36,7 +37,7 @@ public class Unwrapper implements Hobgoblin {
 	boolean running;
 	
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 
 		Nosy<MustBeUnwrapped> nosy = new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
 

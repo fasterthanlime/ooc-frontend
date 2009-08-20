@@ -3,6 +3,7 @@ package org.ooc.middle;
 import java.io.IOException;
 
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.hobgoblins.CaseEnforcer;
 import org.ooc.middle.hobgoblins.Checker;
 import org.ooc.middle.hobgoblins.CoverMerger;
@@ -26,22 +27,21 @@ import org.ooc.middle.hobgoblins.Unwrapper;
 public class Tinkerer implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 
-		new CaseEnforcer().process(module);
+		new CaseEnforcer().process(module, params);
 		
-		new SuperResolver().process(module);
+		new SuperResolver().process(module, params);
 		
-		new DefaultConstructorGiver().process(module);
-		new Unwrapper().process(module);
-		//new MemberHandler().process(module);
-		new CoverMerger().process(module);
+		new DefaultConstructorGiver().process(module, params);
+		new Unwrapper().process(module, params);
+		new CoverMerger().process(module, params);
 		
-		new Resolver().process(module);
+		new Resolver().process(module, params);
 		
-		new Checker().process(module);
-		new SuffixConflictAnnihilator().process(module);
-		new ReturnHandler().process(module);
+		new Checker().process(module, params);
+		new SuffixConflictAnnihilator().process(module, params);
+		new ReturnHandler().process(module, params);
 		
 	}
 

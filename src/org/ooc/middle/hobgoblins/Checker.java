@@ -10,6 +10,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableAccess;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -18,7 +19,7 @@ import org.ubi.CompilationFailedError;
 public class Checker implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 
 		Nosy.get(VariableAccess.class, new Opportunist<VariableAccess>() {
 			@Override

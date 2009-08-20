@@ -13,6 +13,7 @@ import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.IntLiteral.Format;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -32,7 +33,7 @@ import org.ubi.CompilationFailedError;
 public class ReturnHandler implements Hobgoblin {
 
 	@Override
-	public void process(Module module) throws IOException {
+	public void process(Module module, BuildParams params) throws IOException {
 
 		Nosy.get(ValuedReturn.class, new Opportunist<ValuedReturn>() {
 

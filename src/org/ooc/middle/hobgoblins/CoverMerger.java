@@ -7,6 +7,7 @@ import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -14,7 +15,7 @@ import org.ooc.middle.walkers.Opportunist;
 public class CoverMerger implements Hobgoblin {
 
 	@Override
-	public void process(final Module module) throws IOException {
+	public void process(final Module module, BuildParams params) throws IOException {
 		
 		Nosy.get(CoverDecl.class, new Opportunist<CoverDecl>() {
 			@Override
