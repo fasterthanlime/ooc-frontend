@@ -22,6 +22,7 @@ public class Module extends Node implements Scope {
 	protected NodeList<Node> body;
 	protected String fileName;
 	protected FunctionDecl loadFunc;
+	private boolean isMain;
 	
 	public Module(String fullName) {
 		
@@ -37,7 +38,8 @@ public class Module extends Node implements Scope {
 		this.uses = new NodeList<Use>();
 		this.body = new NodeList<Node>();
 		
-		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, false);
+		// set it as extern, so it won't get written implicitly
+		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, true);
 		
 		if(!fullName.endsWith("ooclib"))
 			imports.add(new Import("ooclib"));
@@ -96,6 +98,7 @@ public class Module extends Node implements Scope {
 		imports.accept(visitor);
 		uses.accept(visitor);
 		body.accept(visitor);
+		loadFunc.accept(visitor);
 	}
 	
 	public <T extends Declaration> MultiMap<Node, T> getDeclarationsMap(final Class<T> clazz) throws IOException {
@@ -182,6 +185,14 @@ public class Module extends Node implements Scope {
 	
 	public FunctionDecl getLoadFunc() {
 		return loadFunc;
+	}
+
+	public boolean isMain() {
+		return isMain;
+	}
+	
+	public void setMain(boolean isMain) {
+		this.isMain = isMain;
 	}
 	
 }

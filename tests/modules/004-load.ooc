@@ -1,1 +1,1 @@
-printf ("Hello, world!")
+println ("Hello, world!")

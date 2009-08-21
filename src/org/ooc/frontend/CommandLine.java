@@ -174,6 +174,9 @@ public class CommandLine {
         			return;
         		}
         		module = arg;
+        		if(!module.toLowerCase().endsWith(".ooc")) {
+        			module += ".ooc";
+        		}
         	}
 		}
 		
@@ -197,6 +200,7 @@ public class CommandLine {
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
 		Module module = new Parser(params).parse(fileName);
+		module.setMain(true);
 		translate(module, new HashSet<Module>());
 		long tt2 = System.nanoTime();
 		compile(module);

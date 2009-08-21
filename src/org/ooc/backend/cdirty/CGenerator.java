@@ -151,7 +151,8 @@ public class CGenerator extends Generator implements Visitor {
 		current = cw;
 		module.acceptChildren(this);
 		
-		writeInitializeModuleFunc(module);
+		writeInitializeModuleFunc();
+		if(module.isMain()) writeDefaultMain();
 		
 		current = hw;
 		current.newLine();
@@ -160,6 +161,24 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(hName);
 		current.newLine();
 		current.newLine();
+		
+	}
+
+	private void writeDefaultMain() throws IOException {
+		
+		boolean got = false;
+		for(Node node: module.getBody()) {
+			if(!(node instanceof FunctionDecl)) break;
+			FunctionDecl decl = (FunctionDecl) node;
+			if(decl.isEntryPoint()) got = true;
+		}
+		if(!got) {
+			current.newLine().append("int main()");
+			openBlock();
+			current.newLine().append(module.getLoadFuncName()).append("();");
+			closeBlock();
+			current.newLine().newLine();
+		}
 		
 	}
 
@@ -707,7 +726,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(" *this)");
 	}
 	
-	protected void writeInitializeModuleFunc(Module module) throws IOException {
+	protected void writeInitializeModuleFunc() throws IOException {
 
 		current = hw;
 		current.newLine().append("void ").append(module.getLoadFuncName()).append("();");
@@ -726,6 +745,9 @@ public class CGenerator extends Generator implements Visitor {
 				current.newLine().append(classDecl.getInstanceType().getMangledName());
 				current.append("_static_initialize();");
 			}
+		}
+		for(Node node: module.getLoadFunc().getBody()) {
+			node.accept(this);
 		}
 		for(Import imp: module.getImports()) {
 			current.newLine().append(imp.getModule().getLoadFuncName()).append("();");
