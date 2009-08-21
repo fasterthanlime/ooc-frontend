@@ -5,9 +5,9 @@ import java.io.Writer;
 
 public class TabbedWriter implements Appendable {
 
-	private Appendable appendable;
-	private int tabLevel;
-	private String tab = "\t";
+	protected Appendable appendable;
+	protected int tabLevel;
+	protected String tab = "\t";
 
 	public TabbedWriter(Appendable appendable) {
 		this.appendable = appendable;

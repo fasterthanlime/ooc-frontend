@@ -17,8 +17,8 @@ public class OpDecl extends Declaration {
 		INDEXED_ASSIGN,
 	}
 	
-	private OpType opType;
-	private FunctionDecl func;
+	protected OpType opType;
+	protected FunctionDecl func;
 	
 	public OpDecl(OpType opType, FunctionDecl func) {
 		super("Operator "+opType);

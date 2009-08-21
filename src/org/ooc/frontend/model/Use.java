@@ -25,6 +25,10 @@ public class Use extends Node implements MustBeResolved {
 	public void setIdentifier(String name) {
 		this.identifier = name;
 	}
+	
+	public UseDef getUseDef() {
+		return useDef;
+	}
 
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {

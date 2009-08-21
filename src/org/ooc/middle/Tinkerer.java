@@ -19,7 +19,7 @@ import org.ooc.middle.hobgoblins.Unwrapper;
  * between parsing and generating, e.g.
  *  - Resolving symbols (functions, variables)
  *  - Ensuring encapsulation isn't violated (e.g. unauthorized access
- *  to private members)
+ *  to protected members)
  *  - Huh.. other things, I guess, see all classes in this package 
  * 
  * @author Amos Wenger

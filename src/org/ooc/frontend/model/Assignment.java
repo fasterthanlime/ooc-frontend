@@ -18,9 +18,9 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 		MUL,
 	}
 	
-	private Mode mode;
-	private Access lvalue;
-	private Expression rvalue;	
+	protected Mode mode;
+	protected Access lvalue;
+	protected Expression rvalue;	
 	
 	public Assignment(Access lvalue, Expression rvalue) {
 		this(Mode.REGULAR, lvalue, rvalue);

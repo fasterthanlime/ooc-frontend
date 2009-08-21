@@ -8,7 +8,7 @@ import java.io.Reader;
 
 public class WhitelessComparator {
 
-	private static class WhitelessReader {
+	protected static class WhitelessReader {
 		
 		Reader reader;
 

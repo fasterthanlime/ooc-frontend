@@ -138,16 +138,14 @@ public class FunctionDeclParser {
 		}
 	
 		while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
-			if(reader.peek().type == TokenType.LINESEP) {
-				reader.skip(); continue;
-			}
+			reader.skipWhitespace();
 		
 			Line line = LineParser.parse(sReader, reader);
 			if(line == null && reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
 						"Expected statement in function body. Found "+reader.peek().type+" instead.");
 			}
-			functionDecl.getBody().add(line);
+			if(line != null) functionDecl.getBody().add(line);
 		}
 		reader.skip();
 		

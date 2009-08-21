@@ -105,22 +105,20 @@ public class FunctionCall extends Access implements MustBeResolved {
 		else if (name.equals("super")) resolveConstructorCall(mainStack, true);
 		else resolveRegular(mainStack, res, fatal);
 		
-		if(impl == null) {
-			if(fatal) {
-				String message = "Couldn't resolve call to function "+name+getArgsRepr()+".";
-				String guess = guessCorrectName(mainStack, res);
-				if(guess != null) {
-					message += " Did you mean "+guess+" ?";
-				}
-				throw new CompilationFailedError(null, message);
+		if(impl == null && fatal) {
+			String message = "Couldn't resolve call to function "+name+getArgsRepr()+".";
+			String guess = guessCorrectName(mainStack, res);
+			if(guess != null) {
+				message += " Did you mean "+guess+" ?";
 			}
+			throw new CompilationFailedError(null, message);
 		}
 		
 		return impl == null;
 		
 	}
 
-	private String guessCorrectName(final Stack<Node> mainStack, final Resolver res) {
+	protected String guessCorrectName(final Stack<Node> mainStack, final Resolver res) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
@@ -141,7 +139,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 
-	private void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) {
+	protected void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) {
 		
 		int typeIndex = Node.find(TypeDecl.class, mainStack);
 		if(typeIndex == -1) {
@@ -173,7 +171,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 	
-	private void resolveRegular(final Stack<Node> mainStack,
+	protected void resolveRegular(final Stack<Node> mainStack,
 			final Resolver res, final boolean fatal)
 			throws IOException {
 		
@@ -218,7 +216,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 	}
 	
 	// FIXME must simplify
-	private void searchIn(Module module, Set<Module> done) {
+	protected void searchIn(Module module, Set<Module> done) {
 		done.add(module);
 		for(Node node: module.getBody()) {
 			if(node instanceof FunctionDecl) {

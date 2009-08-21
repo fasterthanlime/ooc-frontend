@@ -72,7 +72,7 @@ public class Instantiation extends FunctionCall {
 	 * accept(new); // guessed: new Blah()
 	 * </code>
 	 */
-	private boolean guessName(Stack<Node> stack) throws Error {
+	protected boolean guessName(Stack<Node> stack) throws Error {
 		
 		if(stack.peek() instanceof Assignment) {
 			Assignment ass = (Assignment) stack.peek();

@@ -9,7 +9,7 @@ import org.ubi.CompilationFailedError;
 
 public class MemberAccess extends VariableAccess {
 	
-	private Expression expression;
+	protected Expression expression;
 
 	public MemberAccess(String variable) {
 		this(new VariableAccess("this"), variable);
@@ -70,13 +70,18 @@ public class MemberAccess extends VariableAccess {
 			}
 			return true;
 		}
+
+		//System.out.println("==========================");
+		//System.out.println("Should resolve variable access "+expression+"."+variable);
+		//System.out.println("exprType = "+exprType);
+		//System.out.println("exprType ref = "+exprType.getRef());
 		
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
 			throw new Error("Trying to access to a member of not a TypeDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
-
+		
 		TypeDecl typeDecl = (TypeDecl) decl;
 		ref = typeDecl.getVariable(variable);
 		

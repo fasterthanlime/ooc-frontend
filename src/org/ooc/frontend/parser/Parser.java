@@ -16,8 +16,8 @@ import org.ubi.SourceReader;
 public class Parser {
 
 	// unit.fullName -> unit
-	private final Map<String, Module> cache = new HashMap<String, Module>();
-	private BuildParams params;
+	protected final Map<String, Module> cache = new HashMap<String, Module>();
+	protected BuildParams params;
 	
 	public Parser(BuildParams params) {
 		this.params = params;

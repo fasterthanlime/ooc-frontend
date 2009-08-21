@@ -3,6 +3,7 @@ package org.ooc.frontend;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,7 @@ import org.ooc.compiler.libraries.Target;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
@@ -38,8 +40,8 @@ public class CommandLine {
 	
 	}
 	
-	private BuildParams params = new BuildParams();
-	private boolean timing = false;
+	protected BuildParams params = new BuildParams();
+	protected boolean timing = false;
 	
 	public CommandLine(String[] args) throws InterruptedException, IOException {
 		
@@ -191,7 +193,7 @@ public class CommandLine {
 		
 	}
 	
-	private void parse(String fileName) throws InterruptedException, IOException {
+	protected void parse(String fileName) throws InterruptedException, IOException {
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
 		Module module = new Parser(params).parse(fileName);
@@ -206,7 +208,7 @@ public class CommandLine {
 					Float.valueOf((tt3 - tt2) / 1000000.0f));
 	}
 
-	private void translate(Module module, Set<Module> done) throws IOException {
+	protected void translate(Module module, Set<Module> done) throws IOException {
 		done.add(module);
 		new Tinkerer().process(module, params);
 		new CGenerator(params.outPath, module).generate();
@@ -217,7 +219,7 @@ public class CommandLine {
 		}
 	}
 
-	private void compile(Module module) throws Error,
+	protected void compile(Module module) throws Error,
 			IOException, InterruptedException {
 		
 		for(Include inc: module.getIncludes()) {
@@ -246,6 +248,7 @@ public class CommandLine {
 			command.add("-l");
 			command.add(dynamicLib);
 		}
+		command.addAll(getAllLibsFromUses(module));
 		
 		StringBuilder commandLine = new StringBuilder();
 		for(String arg: command) {
@@ -273,7 +276,33 @@ public class CommandLine {
 		
 	}
 
-	private File findGCC() throws Error {
+	protected Collection<String> getAllLibsFromUses(Module module) {
+
+		Set<String> list = new HashSet<String>();
+		Set<Module> done = new HashSet<Module>();
+		getAllLibsFromUses(module, list, done);
+		return list;
+		
+	}
+
+	protected void getAllLibsFromUses(Module module, Set<String> list, Set<Module> done) {
+
+		if(done.contains(module)) return;
+		done.add(module);
+		
+		for(Use use: module.getUses()) {
+			for(String lib: use.getUseDef().getLibs()) {
+				if(!list.contains(lib)) list.add(lib);
+			}
+		}
+		
+		for(Import imp: module.getImports()) {
+			getAllLibsFromUses(imp.getModule(), list, done);
+		}
+		
+	}
+
+	protected File findGCC() throws Error {
 		
 		File gccFile = ShellUtils.findExecutable("gcc");
 		if(gccFile == null) {
@@ -286,7 +315,7 @@ public class CommandLine {
 		
 	}
 
-	private void addDeps(List<String> command, Module module, Set<Module> done) {
+	protected void addDeps(List<String> command, Module module, Set<Module> done) {
 		
 		done.add(module);
 		command.add(new File(params.outPath, module.getPath(".c")).getPath());

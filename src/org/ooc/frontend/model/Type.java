@@ -10,10 +10,10 @@ import org.ubi.CompilationFailedError;
 
 public class Type extends Node implements MustBeResolved {
 
-	private String name;
-	private int pointerLevel;
-	private int referenceLevel;
-	private Declaration ref;
+	protected String name;
+	protected int pointerLevel;
+	protected int referenceLevel;
+	protected Declaration ref;
 	
 	public Type(String name) {
 		this(name, 0);

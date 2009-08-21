@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class Block extends Statement {
 
-	private final NodeList<Line> body;
+	protected final NodeList<Line> body;
 	
 	public Block() {
 		body = new NodeList<Line>();

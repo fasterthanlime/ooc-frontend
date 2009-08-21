@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class Line extends Node {
 
-	private Statement statement;
+	protected Statement statement;
 
 	public Line(Statement statement) {
 		if(statement == null) {

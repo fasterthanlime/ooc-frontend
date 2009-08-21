@@ -50,8 +50,6 @@ public class Token {
 		FALSE,
 		NULL,
 		
-		SL_COMMENT, // single-line comment
-		ML_COMMENT, // multi-line comment
 		OOCDOC, // oodoc comment
 		
 		REFERENCE, // @functionName

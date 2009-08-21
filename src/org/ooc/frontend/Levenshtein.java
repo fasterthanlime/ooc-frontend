@@ -10,7 +10,7 @@ public class Levenshtein {
 	// Get minimum of three values
 	// ****************************
 
-	private static int min(int a, int b, int c) {
+	protected static int min(int a, int b, int c) {
 		int mi;
 
 		mi = a;

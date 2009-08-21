@@ -42,7 +42,7 @@ public class DistLocator {
 	 * be set by bash under Gentoo and by MSYS 1.0.11/whatever under MinGW/WinXP
 	 * @throws IOException 
 	 */
-	private static File tryUnderscore(Properties env) throws IOException {
+	protected static File tryUnderscore(Properties env) throws IOException {
 		
 		Object underscore = env.get("_");
 		if(underscore != null) {
@@ -61,7 +61,7 @@ public class DistLocator {
 	 * java -classpath path/to/ooc/build/classes/ org.ooc.frontend.CommandLine
 	 * and try to find ourselves in the classpath.
 	 */
-	private static File tryClassPath() {
+	protected static File tryClassPath() {
 		
 		String classPath = System.getProperty("java.class.path");
 		

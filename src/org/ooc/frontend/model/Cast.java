@@ -6,8 +6,8 @@ import org.ooc.frontend.Visitor;
 
 public class Cast extends Expression {
 
-	private Expression expression;
-	private Type type;
+	protected Expression expression;
+	protected Type type;
 	
 	public Cast(Expression expression, Type targetType) {
 		this.expression = expression;

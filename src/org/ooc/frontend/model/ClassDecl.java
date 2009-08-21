@@ -6,16 +6,16 @@ import org.ooc.frontend.Visitor;
 
 public class ClassDecl extends TypeDecl implements Scope {
 
-	//private static Type type = new Type("Class");
+	//protected static Type type = new Type("Class");
 	
-	private boolean isAbstract;
+	protected boolean isAbstract;
 	
-	private OocDocComment comment;
-	private String superName;
-	private ClassDecl superRef;
+	protected OocDocComment comment;
+	protected String superName;
+	protected ClassDecl superRef;
 
-	private FunctionDecl initializer;
-	private FunctionDecl staticInitializer;
+	protected FunctionDecl initializer;
+	protected FunctionDecl staticInitializer;
 	
 	public ClassDecl(String name, boolean isAbstract) {
 		super(name);
@@ -77,7 +77,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 		return allFuncs;
 	}
 	
-	private void getFunctionsRecursive(NodeList<FunctionDecl> allFuncs) {
+	protected void getFunctionsRecursive(NodeList<FunctionDecl> allFuncs) {
 		for(FunctionDecl decl: functions) {
 			boolean already = false;
 			for(FunctionDecl decl2: allFuncs) {

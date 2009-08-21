@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class CharLiteral extends Literal {
 
-	private char value;
+	protected char value;
 	public static Type type = new Type("Char");
 	
 	public CharLiteral(char value) {

@@ -7,18 +7,18 @@ import org.ooc.frontend.Visitor;
 
 public class FunctionDecl extends Declaration implements Scope {
 
-	private OocDocComment comment;
+	protected OocDocComment comment;
 	
-	private boolean isFinal;
-	private boolean isStatic;
-	private boolean isAbstract;
+	protected boolean isFinal;
+	protected boolean isStatic;
+	protected boolean isAbstract;
 	
-	private TypeDecl typeDecl;
+	protected TypeDecl typeDecl;
 
-	private String suffix;
-	private final NodeList<Line> body;
-	private Type returnType;
-	private final NodeList<Argument> arguments;
+	protected String suffix;
+	protected final NodeList<Line> body;
+	protected Type returnType;
+	protected final NodeList<Argument> arguments;
 	
 	public FunctionDecl(String name, String suffix,
 			boolean isFinal, boolean isStatic, boolean isAbstract, boolean isExtern) {

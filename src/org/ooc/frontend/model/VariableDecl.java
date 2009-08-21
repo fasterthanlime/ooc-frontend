@@ -12,6 +12,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	public static class VariableDeclAtom extends Node {
 		String name;
 		Expression expression;
+		Assignment assign;
 		
 		public VariableDeclAtom(String name, Expression expression) {
 			this.name = name;
@@ -107,7 +108,10 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	@Override
 	public void setName(String name) {
-		throw new UnsupportedOperationException("Can't setName on a VariableDeclaration, because it has several atoms, so we don't know which one to adjust: e.g. it doesn't make sense.");
+		throw new UnsupportedOperationException(
+				"Can't setName on a VariableDeclaration, because it has" +
+				" several atoms, so we don't know which one to adjust," +
+				" e.g. it doesn't make sense.");
 	}
 	
 	public Type getType() {
@@ -166,9 +170,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	@Override
 	public boolean unwrap(Stack<Node> hierarchy) {
 
-		int index = Node.find(ClassDecl.class, hierarchy);
-		if(index != -1) {
-			unwrapToClassInitializers(hierarchy, (ClassDecl) hierarchy.get(index));
+		if(hierarchy.get(hierarchy.size() - 2) instanceof ClassDecl) {
+			unwrapToClassInitializers(hierarchy, (ClassDecl) hierarchy.get(hierarchy.size() - 2));
 			return false;
 		}
 		
@@ -177,7 +180,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean unwrapToVarAcc(Stack<Node> hierarchy) throws Error {
+	protected boolean unwrapToVarAcc(Stack<Node> hierarchy) throws Error {
 
 		if(hierarchy.peek() instanceof Line
 		|| hierarchy.peek() instanceof Foreach
@@ -213,7 +216,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		
 	}
 
-	private void unwrapToClassInitializers(Stack<Node> hierarchy, ClassDecl classDecl) {		
+	protected void unwrapToClassInitializers(Stack<Node> hierarchy, ClassDecl classDecl) {		
 		
 		for(VariableDeclAtom atom: atoms) {
 
@@ -221,11 +224,11 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			VariableAccess access = isStatic ?
 					new VariableAccess(typeDecl.getType().getName())
 					: new VariableAccess("this");
-			Line line = new Line(
-				new Assignment(
-					new MemberAccess(access, atom.getName()), atom.getExpression()
-				)
+			Assignment assign = new Assignment(
+				new MemberAccess(access, atom.getName()), atom.getExpression()
 			);
+			atom.assign = assign;
+			Line line = new Line(assign);
 			if(isStatic) {
 				classDecl.getStaticInitializer().getBody().add(line);
 			} else {

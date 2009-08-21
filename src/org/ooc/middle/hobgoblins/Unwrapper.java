@@ -33,7 +33,7 @@ import org.ooc.middle.walkers.Opportunist;
  */
 public class Unwrapper implements Hobgoblin {
 
-	private static final int MAX = 1024;
+	protected static final int MAX = 1024;
 	boolean running;
 	
 	@Override

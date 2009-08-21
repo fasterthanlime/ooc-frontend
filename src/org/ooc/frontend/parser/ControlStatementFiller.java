@@ -23,7 +23,7 @@ public class ControlStatementFiller {
 		
 		if(hasBrack) {
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
-				if(reader.skipWorthless()) continue;
+				if(reader.skipWhitespace()) continue;
 				
 				Line line = LineParser.parse(sReader, reader);
 				if(line == null) {

@@ -7,6 +7,7 @@ import java.util.List;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableDecl;
+import org.ooc.frontend.model.VariableDeclFromExpr;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
@@ -36,11 +37,19 @@ public class VariableDeclParser {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Expected expression as an initializer to a variable declaration.");
 				}
+			} else if(reader.peek().type == TokenType.DECL_ASSIGN) {
+				reader.skip();
+				expr = ExpressionParser.parse(sReader, reader);
+				if(expr == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+							"Expected expression as an initializer to a variable declaration.");
+				}
+				return new VariableDeclFromExpr(name, expr);
 			}
 			atoms.add(new VariableDeclAtom(name, expr));
 			if(reader.peek().type != TokenType.COMMA) break;
 			reader.skip();
-			reader.skipWorthless();
+			reader.skipWhitespace();
 		}
 		
 		if(reader.read().type != TokenType.COLON) {

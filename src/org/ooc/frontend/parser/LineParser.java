@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.Line;
-import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.Statement;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
@@ -19,11 +18,6 @@ public class LineParser {
 		int mark = reader.mark();
 		
 		reader.skipWhitespace();
-		
-		if(reader.peek().type == TokenType.SL_COMMENT) {
-			Token t = reader.read();
-			return new SingleLineComment(t.get(sReader));
-		}
 		
 		while(reader.peek().type == TokenType.LINESEP) reader.skip();
 		
@@ -40,7 +34,7 @@ public class LineParser {
 		
 		if(!(statement instanceof ControlStatement)) {
 			Token next = reader.read();
-			if(next.type != TokenType.LINESEP && next.type != TokenType.SL_COMMENT) {
+			if(next.type != TokenType.LINESEP) {
 				throw new CompilationFailedError(sReader.getLocation(next.start),
 						"Missing semi-colon at the end of a line (got a "+next.type+" instead)");
 			}

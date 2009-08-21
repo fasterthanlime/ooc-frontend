@@ -50,7 +50,7 @@ public class ArgumentParser {
 		
 	}
 
-	private static boolean tryMember(SourceReader sReader, TokenReader reader,
+	protected static boolean tryMember(SourceReader sReader, TokenReader reader,
 			NodeList<Argument> args, Token token)
 			throws CompilationFailedError, EOFException {
 		
@@ -65,7 +65,7 @@ public class ArgumentParser {
 		return true;
 	}
 
-	private static boolean tryAssign(SourceReader sReader, TokenReader reader,
+	protected static boolean tryAssign(SourceReader sReader, TokenReader reader,
 			NodeList<Argument> args, Token token)
 			throws CompilationFailedError, EOFException {
 		
@@ -79,7 +79,7 @@ public class ArgumentParser {
 		return true;
 	}
 
-	private static boolean tryRegular(SourceReader sReader, TokenReader reader,
+	protected static boolean tryRegular(SourceReader sReader, TokenReader reader,
 			NodeList<Argument> args, int mark, Token t)
 			throws CompilationFailedError, EOFException {
 		

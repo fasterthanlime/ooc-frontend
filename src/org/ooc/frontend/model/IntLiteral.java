@@ -13,8 +13,8 @@ public class IntLiteral extends Literal {
 		BIN,
 	}
 	
-	private long value;
-	private Format format;
+	protected long value;
+	protected Format format;
 	public static Type type = new Type("Int");
 	
 	public IntLiteral(long value, Format format) {

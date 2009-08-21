@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class FloatLiteral extends Literal {
 
-	private double value;
+	protected double value;
 	public static Type type = new Type("Float");
 
 	public FloatLiteral(double value) {

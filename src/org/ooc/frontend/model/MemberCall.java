@@ -10,7 +10,7 @@ import org.ubi.CompilationFailedError;
 
 public class MemberCall extends FunctionCall {
 
-	private Expression expression;
+	protected Expression expression;
 
 	public MemberCall(Expression expression, String name, String suffix) {
 		super(name, suffix);
@@ -107,7 +107,7 @@ public class MemberCall extends FunctionCall {
 		
 	}
 	
-	private String guessCorrectName(final TypeDecl typeDeclaration) {
+	protected String guessCorrectName(final TypeDecl typeDeclaration) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;

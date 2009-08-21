@@ -13,11 +13,56 @@ public class UseDef {
 	protected String identifier;
 	protected String name = "";
 	protected String description = "";
-	protected List<Requirement> requirements;
+	final protected List<Requirement> requirements;
+	final protected List<String> pkgs;
+	final protected List<String> libs;
 	
 	public UseDef(String identifier) {
 		this.identifier = identifier;
 		this.requirements = new ArrayList<Requirement>();
+		this.pkgs = new ArrayList<String>();
+		this.libs = new ArrayList<String>();
+	}
+	
+	public String getIdentifier() {
+		return identifier;
+	}
+	
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public List<Requirement> getRequirements() {
+		return requirements;
+	}
+	
+	public List<String> getPkgs() {
+		return pkgs;
+	}
+	
+	public List<String> getLibs() {
+		return libs;
+	}
+	
+	@Override
+	public String toString() {
+		return "Name: "+name+", Description: "+description+", Pkgs: "+pkgs+", Libs: "+libs;
 	}
 	
 }

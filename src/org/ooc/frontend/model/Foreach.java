@@ -6,8 +6,8 @@ import org.ooc.frontend.Visitor;
 
 public class Foreach extends ControlStatement {
 
-	private VariableDecl variable;
-	private Expression collection; // must be of type Range or Iterable
+	protected VariableDecl variable;
+	protected Expression collection; // must be of type Range or Iterable
 	
 	public Foreach(VariableDecl variable, Expression collection) {
 		this.variable = variable;

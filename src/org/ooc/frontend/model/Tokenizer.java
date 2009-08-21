@@ -15,7 +15,7 @@ import org.ubi.SyntaxError;
 
 public class Tokenizer {
 
-	private static class Name {
+	protected static class Name {
 		String name;
 		TokenType tokenType;
 		
@@ -25,7 +25,7 @@ public class Tokenizer {
 		}
 	}
 	
-	private static Name[] names = new Name[] {
+	protected static Name[] names = new Name[] {
 		new Name("class", TokenType.CLASS_KW),
 		new Name("cover", TokenType.COVER_KW),
 		new Name("func", TokenType.FUNC_KW),
@@ -67,15 +67,15 @@ public class Tokenizer {
 		new Name("struct", TokenType.STRUCT),
 	};
 	
-	private static class CharTuple {
-		private char first;
-		private TokenType firstType;
+	protected static class CharTuple {
+		protected char first;
+		protected TokenType firstType;
 		
-		private char second;
-		private TokenType secondType;
+		protected char second;
+		protected TokenType secondType;
 		
-		private char third;
-		private TokenType thirdType;
+		protected char third;
+		protected TokenType thirdType;
 		
 		public CharTuple(char first, TokenType firstType) {
 			this(first, firstType, '\0', null);
@@ -110,7 +110,7 @@ public class Tokenizer {
 		}
 	}
 	
-	private CharTuple[] chars = new CharTuple[] {
+	protected CharTuple[] chars = new CharTuple[] {
 		new CharTuple('{', TokenType.OPEN_BRACK),
 		new CharTuple('}', TokenType.CLOS_BRACK),
 		new CharTuple('(', TokenType.OPEN_PAREN),
@@ -216,18 +216,16 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.SLASH_ASSIGN));
 				} else if(c2 == '/') {
 					reader.readLine();
-					tokens.add(new Token(location.getIndex() + 2, reader.mark()
-							- location.getIndex() - 2, TokenType.SL_COMMENT));
 				} else if(c2 == '*') {
 					reader.read();
 					char c3 = reader.peek();
-					TokenType type = TokenType.ML_COMMENT;
 					if(c3 == '*') {
 						reader.read();
-						type = TokenType.OOCDOC;
+						reader.readUntil(new String[] {"*/"}, true);
+						tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.OOCDOC));
+					} else {
+						reader.readUntil(new String[] {"*/"}, true);
 					}
-					reader.readUntil(new String[] {"*/"}, true);
-					tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), type));
 				} else {
 					tokens.add(new Token(location.getIndex(), 1, TokenType.SLASH));
 				}

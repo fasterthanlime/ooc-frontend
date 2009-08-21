@@ -51,7 +51,7 @@ public class IncludeParser {
 		
 	}
 
-	private static void readDefines(SourceReader sReader, TokenReader reader,
+	protected static void readDefines(SourceReader sReader, TokenReader reader,
 			List<Define> defines) throws CompilationFailedError {
 		if(reader.read().type != TokenType.OPEN_PAREN) {
 			throw new CompilationFailedError(null, "Expected opening parenthesis to begin include defines, but got "
@@ -79,7 +79,7 @@ public class IncludeParser {
 		}
 	}
 
-	private static void addInclude(NodeList<Include> includes, String contentParam, List<Define> defines) {
+	protected static void addInclude(NodeList<Include> includes, String contentParam, List<Define> defines) {
 		String content = contentParam;
 		Mode mode = Mode.PATHY;
 		if(content.startsWith("./")) {

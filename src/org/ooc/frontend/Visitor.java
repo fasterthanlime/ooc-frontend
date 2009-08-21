@@ -7,6 +7,7 @@ import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BinaryCombination;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
@@ -34,7 +35,6 @@ import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -44,7 +44,6 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -69,9 +68,6 @@ public interface Visitor {
 	public void visit(Mod mod) throws IOException;
 	public void visit(Compare compare) throws IOException;
 	
-	public void visit(MultiLineComment comment) throws IOException;
-	public void visit(SingleLineComment slComment) throws IOException;
-
 	public void visit(FunctionCall functionCall) throws IOException;
 	public void visit(MemberCall memberCall) throws IOException;
 	public void visit(Instantiation inst) throws IOException;
@@ -130,5 +126,7 @@ public interface Visitor {
 	public void visit(Dereference dereference) throws IOException;
 
 	public void visit(OpDecl opDecl) throws IOException;
+
+	public void visit(BinaryCombination binaryCombination) throws IOException;
 	
 }

@@ -20,7 +20,7 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class Resolver implements Hobgoblin {
 
-	private static final int MAX = 1;
+	protected static final int MAX = 1;
 	boolean running;
 	boolean fatal = false;
 	
@@ -67,7 +67,7 @@ public class Resolver implements Hobgoblin {
 		
 	}
 
-	private void getInfos(Module module) throws IOException {
+	protected void getInfos(Module module) throws IOException {
 		vars = module.getDeclarationsMap(VariableDecl.class);
 		funcs = module.getDeclarationsMap(FunctionDecl.class);
 		types = module.getDeclarationsList(TypeDecl.class);
@@ -75,7 +75,7 @@ public class Resolver implements Hobgoblin {
 		ops = module.getDeclarationsList(OpDecl.class);
 	}
 	
-	private void addBuiltins(List<TypeDecl> decls) {
+	protected void addBuiltins(List<TypeDecl> decls) {
 		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(new BuiltinType("void"));
 		decls.add(new BuiltinType("short"));

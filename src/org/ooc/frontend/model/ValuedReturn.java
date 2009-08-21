@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class ValuedReturn extends Return {
 
-	private Expression expression;
+	protected Expression expression;
 
 	public ValuedReturn(Expression expression) {
 		this.expression = expression;

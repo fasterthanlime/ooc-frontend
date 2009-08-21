@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class Not extends Expression {
 
-	private Expression expression;
+	protected Expression expression;
 	
 	public Not(Expression expression) {
 		this.expression = expression;

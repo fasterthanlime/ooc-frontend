@@ -19,17 +19,6 @@ public class TokenReader extends ListReader<Token> {
 		return result;
 	}
 	
-	public boolean skipWorthless() {
-		boolean result = false;
-		while(peek().type == TokenType.LINESEP
-				|| peek().type == TokenType.SL_COMMENT
-				|| peek().type == TokenType.ML_COMMENT) {
-			skip();
-			result = true;
-		}
-		return result;
-	}
-	
 	public Token peekWhiteless() {
 		int index2 = index;
 		while(list.get(index2).type == TokenType.LINESEP) {

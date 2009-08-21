@@ -1,8 +1,11 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.middle.hobgoblins.Resolver;
 
 /**
  * Covers can be defined several times, allowing to add functions, e.g.
@@ -16,19 +19,16 @@ import org.ooc.frontend.Visitor;
  * 
  * @author Amos Wenger
  */
-public class CoverDecl extends TypeDecl {
+public class CoverDecl extends TypeDecl implements MustBeResolved {
 
-	private OocDocComment comment;
-	private Type type;
-	private Type fromType;
-	private CoverDecl base;
+	protected OocDocComment comment;
+	protected Type type;
+	protected Type fromType;
+	protected CoverDecl base;
 	
 	public CoverDecl(String name, Type fromType) {
 		super(name);
 		this.fromType = fromType;
-		if(fromType != null) {
-			this.fromType.setRef(new BuiltinType(fromType));
-		}
 		this.type = new Type(name);
 		this.type.setRef(this);
 		this.base = null;
@@ -84,7 +84,7 @@ public class CoverDecl extends TypeDecl {
 
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		if(fromType != null) { fromType.accept(visitor); }
+		if(fromType != null) fromType.accept(visitor);
 		type.accept(visitor);
 		variables.accept(visitor);
 		functions.accept(visitor);
@@ -108,6 +108,38 @@ public class CoverDecl extends TypeDecl {
 	public void absorb(CoverDecl node) {
 		assert(variables.isEmpty());
 		base = node;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return (fromType == null || fromType.getRef() != null);
+	}
+
+	/**
+	 * There's a trick about CoverDecl.
+	 * If the fromType is defined somewhere (e.g. if it's another cover),
+	 * then it must be ref'd correctly.
+	 * If it's not, then a {@link BuiltinType} must be created
+	 * so that it's considered 'resolved' (e.g. it's somewhere in C)
+	 */
+	@Override
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+			throws IOException {
+
+		if(fromType == null) return false;
+
+		for(TypeDecl decl: res.types) {
+			if(decl.getName().equals(fromType.getName())) {
+				fromType.setRef(decl);
+			}
+		}
+		
+		if(fromType.getRef() == null) {
+			fromType.setRef(new BuiltinType(fromType));
+		}
+		
+		return fromType.getRef() == null;
+		
 	}
 
 }

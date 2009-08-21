@@ -7,6 +7,7 @@ import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BinaryCombination;
 import org.ooc.frontend.model.Cast;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.Declaration;
@@ -15,6 +16,7 @@ import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.Instantiation;
+import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Literal;
 import org.ooc.frontend.model.MemberAccess;
 import org.ooc.frontend.model.MemberCall;
@@ -27,7 +29,9 @@ import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.Assignment.Mode;
+import org.ooc.frontend.model.BinaryCombination.BinaryComp;
 import org.ooc.frontend.model.Compare.CompareType;
+import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ooc.frontend.model.tokens.Token.TokenType;
@@ -48,6 +52,16 @@ public class ExpressionParser {
 				return null;
 			}
 			return new Not(inner);
+		}
+		
+		if(reader.peek().type == TokenType.MINUS) {
+			reader.skip();
+			Expression inner = ExpressionParser.parse(sReader, reader);
+			if(inner == null) {
+				reader.reset(mark);
+				return null;
+			}
+			return new Sub(new IntLiteral(0, Format.DEC), inner);
 		}
 		
 		Expression expr = parseFlat(sReader, reader);
@@ -145,7 +159,8 @@ public class ExpressionParser {
 					|| t.type == TokenType.LESSTHAN_EQUALS || t.type == TokenType.EQUALS
 					|| t.type == TokenType.NOT_EQUALS || t.type == TokenType.PLUS_ASSIGN
 					|| t.type == TokenType.MINUS_ASSIGN || t.type == TokenType.STAR_ASSIGN
-					|| t.type == TokenType.SLASH_ASSIGN) {
+					|| t.type == TokenType.SLASH_ASSIGN || t.type == TokenType.LOGICAL_OR
+					|| t.type == TokenType.LOGICAL_AND) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -172,7 +187,9 @@ public class ExpressionParser {
 					case STAR_ASSIGN:  ensureAccess(expr);
 						expr = new Assignment(Mode.MUL, (Access) expr, rvalue); break;
 					case SLASH_ASSIGN: ensureAccess(expr);
-					expr = new Assignment(Mode.DIV, (Access) expr, rvalue); break;
+						expr = new Assignment(Mode.DIV, (Access) expr, rvalue); break;
+					case LOGICAL_OR:  expr = new BinaryCombination(BinaryComp.OR,  expr, rvalue); break;
+					case LOGICAL_AND: expr = new BinaryCombination(BinaryComp.AND, expr, rvalue); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}
@@ -202,7 +219,7 @@ public class ExpressionParser {
 		
 	}
 	
-	private static void ensureAccess(Expression expr) {
+	protected static void ensureAccess(Expression expr) {
 
 		if(!(expr instanceof Access)) {
 			throw new CompilationFailedError(null, "Trying to assign to a constant :/");
@@ -210,7 +227,7 @@ public class ExpressionParser {
 		
 	}
 
-	private static Expression parseFlat(SourceReader sReader, TokenReader reader) throws IOException {
+	protected static Expression parseFlat(SourceReader sReader, TokenReader reader) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -252,7 +269,7 @@ public class ExpressionParser {
 		
 	}
 	
-	private static Expression parseFlatNoparen(SourceReader sReader, TokenReader reader) throws IOException {
+	protected static Expression parseFlatNoparen(SourceReader sReader, TokenReader reader) throws IOException {
 		
 		int mark = reader.mark();
 		

@@ -10,6 +10,7 @@ import org.ooc.frontend.model.AddressOf;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BinaryCombination;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
@@ -37,7 +38,6 @@ import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -47,7 +47,6 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -63,11 +62,11 @@ import org.ooc.frontend.parser.TypeArgument;
 public class Nosy<T> implements Visitor {
 
 	public final Stack<Node> stack;
-	private Class<T> clazz;
-	private Opportunist<T> oppo;
-	private boolean running = true;
-	private boolean debug = false;
-	private TabbedWriter writer = new TabbedWriter(System.out);
+	protected Class<T> clazz;
+	protected Opportunist<T> oppo;
+	protected boolean running = true;
+	protected boolean debug = false;
+	protected TabbedWriter writer = new TabbedWriter(System.out);
 	
 	public static <T> Nosy<T> get(Class<T> clazz, Opportunist<T> oppo) {
 		return new Nosy<T>(clazz, oppo);
@@ -155,11 +154,6 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Not not) throws IOException {
 		visit((Node) not);		
-	}
-
-	@Override
-	public void visit(MultiLineComment comment) throws IOException {
-		visit((Node) comment);		
 	}
 
 	@Override
@@ -348,11 +342,6 @@ public class Nosy<T> implements Visitor {
 	}
 
 	@Override
-	public void visit(SingleLineComment slComment) throws IOException {
-		visit((Node) slComment);
-	}
-
-	@Override
 	public void visit(Compare compare) throws IOException {
 		visit((Node) compare);
 	}
@@ -390,6 +379,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Use use) throws IOException {
 		visit((Node) use);
+	}
+
+	@Override
+	public void visit(BinaryCombination binaryCombination) throws IOException {
+		visit((Node) binaryCombination);
 	}
 	
 }

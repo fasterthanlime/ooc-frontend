@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class BuiltinType extends TypeDecl {
 
-	private Type type;
+	protected Type type;
 	static NodeList<FunctionDecl> EMPTY = new NodeList<FunctionDecl>();
 	
 	public BuiltinType(String name) {
@@ -46,5 +46,5 @@ public class BuiltinType extends TypeDecl {
 	public NodeList<FunctionDecl> getFunctionsRecursive() {
 		return EMPTY;
 	}
-
+	
 }

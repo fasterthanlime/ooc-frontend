@@ -6,8 +6,8 @@ import org.ooc.frontend.Visitor;
 
 public class ArrayLiteral extends Literal {
 
-	private Type type = new Type("Pointer");
-	private NodeList<Expression> elements;
+	protected Type type = new Type("Pointer");
+	protected NodeList<Expression> elements;
 	
 	public ArrayLiteral() {
 		elements = new NodeList<Expression>();

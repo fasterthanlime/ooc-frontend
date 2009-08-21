@@ -11,8 +11,8 @@ import org.ubi.CompilationFailedError;
 
 public class ArrayAccess extends Access implements MustBeResolved {
 
-	private Expression variable;
-	private Expression index;
+	protected Expression variable;
+	protected Expression index;
 
 	public ArrayAccess(Expression variable, Expression index) {
 		this.variable = variable;
@@ -96,7 +96,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	private boolean tryIndexedAssign(OpDecl op, Stack<Node> stack, int assignIndex) {
+	protected boolean tryIndexedAssign(OpDecl op, Stack<Node> stack, int assignIndex) {
 		
 		if(op.getOpType() != OpType.INDEXED_ASSIGN) return false;
 		
@@ -128,7 +128,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	private boolean tryIndexing(OpDecl op, Stack<Node> stack) {
+	protected boolean tryIndexing(OpDecl op, Stack<Node> stack) {
 		
 		if(op.getOpType() != OpType.INDEXING) return false;
 		

@@ -65,7 +65,7 @@ public class ClassDeclParser {
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 			
-				if(reader.skipWorthless()) continue;
+				if(reader.skipWhitespace()) continue;
 				
 				VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 				if(varDecl != null) {

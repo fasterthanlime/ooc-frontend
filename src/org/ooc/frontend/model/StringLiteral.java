@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class StringLiteral extends Literal {
 
-	private String value;
+	protected String value;
 	public static Type type = new Type("String");
 	
 	public StringLiteral(String value) {

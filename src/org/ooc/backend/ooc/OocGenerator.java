@@ -14,6 +14,7 @@ import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BinaryCombination;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
@@ -43,7 +44,6 @@ import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -53,7 +53,6 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -70,7 +69,7 @@ import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator implements Visitor {
 
-	private TabbedWriter w;
+	protected TabbedWriter w;
 
 	public OocGenerator(File outPath, Module module) throws IOException {
 		super(outPath, module);
@@ -128,11 +127,6 @@ public class OocGenerator extends Generator implements Visitor {
 	public void visit(Not not) throws IOException {
 		w.append("!");
 		not.getExpression().accept(this);
-	}
-
-	@Override
-	public void visit(MultiLineComment comment) throws IOException {
-		// ignore for now
 	}
 
 	@Override
@@ -528,12 +522,6 @@ public class OocGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(SingleLineComment slComment) throws IOException {
-		w.append("//");
-		w.append(slComment.getContent());
-	}
-
-	@Override
 	public void visit(Compare compare) throws IOException {
 
 		compare.getLeft().accept(this);
@@ -593,6 +581,13 @@ public class OocGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(Use use) throws IOException {
 		w.newLine().append("use ").append(use.getIdentifier());
+	}
+
+	@Override
+	public void visit(BinaryCombination binaryCombination) throws IOException {
+		binaryCombination.getLeft().accept(this);
+		w.append(' ').append(binaryCombination.getOpString()).append(' ');
+		binaryCombination.getRight().accept(this);
 	}
 	
 }

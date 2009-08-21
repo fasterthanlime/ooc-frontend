@@ -9,7 +9,7 @@ import org.ooc.frontend.Visitor;
 
 public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
-	private final List<T> nodes;
+	protected final List<T> nodes;
 	
 	public NodeList() {
 		nodes = new ArrayList<T>();
@@ -117,7 +117,6 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
 	@Override
 	public String toString() {
-		//return nodes.toString();
 		return getClass().getSimpleName();
 	}
 

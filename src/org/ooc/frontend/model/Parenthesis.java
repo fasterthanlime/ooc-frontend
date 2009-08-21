@@ -6,7 +6,7 @@ import org.ooc.frontend.Visitor;
 
 public class Parenthesis extends Expression {
 
-	private Expression expression;
+	protected Expression expression;
 
 	public Parenthesis(Expression expression) {
 		this.expression = expression;

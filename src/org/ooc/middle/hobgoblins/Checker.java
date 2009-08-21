@@ -27,7 +27,7 @@ public class Checker implements Hobgoblin {
 				if(node.getRef() == null) {
 					throw new CompilationFailedError(null,
 							node.getClass().getSimpleName()+" to "+node.getName()
-							+" hasn't been resolved :(");
+							+" hasn't been resolved :( Stack = "+stack);
 				}
 				return true;
 			}

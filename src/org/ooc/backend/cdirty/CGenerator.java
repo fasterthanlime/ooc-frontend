@@ -14,6 +14,7 @@ import org.ooc.frontend.model.Argument;
 import org.ooc.frontend.model.ArrayAccess;
 import org.ooc.frontend.model.ArrayLiteral;
 import org.ooc.frontend.model.Assignment;
+import org.ooc.frontend.model.BinaryCombination;
 import org.ooc.frontend.model.Block;
 import org.ooc.frontend.model.BoolLiteral;
 import org.ooc.frontend.model.BuiltinType;
@@ -44,7 +45,6 @@ import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Mul;
-import org.ooc.frontend.model.MultiLineComment;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Not;
@@ -54,7 +54,6 @@ import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.RegularArgument;
 import org.ooc.frontend.model.Return;
-import org.ooc.frontend.model.SingleLineComment;
 import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -73,9 +72,9 @@ import org.ubi.SourceReader;
 
 public class CGenerator extends Generator implements Visitor {
 
-	private TabbedWriter hw;
-	private TabbedWriter cw;
-	private TabbedWriter current;
+	protected TabbedWriter hw;
+	protected TabbedWriter cw;
+	protected TabbedWriter current;
 
 	public CGenerator(File outPath, Module module) throws IOException {
 		super(outPath, module);
@@ -164,7 +163,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeInclude(Include include) throws IOException {
+	protected void writeInclude(Include include) throws IOException {
 		for(Define define: include.getDefines()) {
 			current.newLine().append("#define ").append(define.name);
 			if(define.value != null) current.append(' ').append(define.value);
@@ -233,12 +232,6 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(MultiLineComment comment) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void visit(FunctionCall functionCall) throws IOException {
 
 		FunctionDecl decl = functionCall.getImpl();
@@ -270,7 +263,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeExprList(NodeList<Expression> args) throws IOException {
+	protected void writeExprList(NodeList<Expression> args) throws IOException {
 		boolean isFirst = true;
 
 		for(Expression expr: args) {
@@ -571,7 +564,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeFuncPrototype(FunctionDecl functionDecl) throws IOException {
+	protected void writeFuncPrototype(FunctionDecl functionDecl) throws IOException {
 		
 		writeSpacedType(functionDecl.getReturnType());
 		functionDecl.writeFullName(current);
@@ -620,7 +613,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 	
-	private void writeMemberFuncPrototype(String className,
+	protected void writeMemberFuncPrototype(String className,
 			FunctionDecl decl) throws IOException {
 		
 		writeSpacedType(decl.getReturnType());
@@ -629,11 +622,11 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeFuncArgs(FunctionDecl decl) throws IOException {
+	protected void writeFuncArgs(FunctionDecl decl) throws IOException {
 		writeFuncArgs(decl, false);
 	}
 	
-	private void writeFuncArgs(FunctionDecl decl, boolean skipFirst) throws IOException {
+	protected void writeFuncArgs(FunctionDecl decl, boolean skipFirst) throws IOException {
 		
 		current.append('(');
 		Iterator<Argument> iter = decl.getArguments().iterator();
@@ -648,7 +641,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 	
-	private void writeTypelessFuncArgs(FunctionDecl decl)
+	protected void writeTypelessFuncArgs(FunctionDecl decl)
 	throws IOException {
 
 		current.append('(');
@@ -661,7 +654,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	}
 
-	private void writeStaticFuncs(ClassDecl classDecl, String className)
+	protected void writeStaticFuncs(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		for(FunctionDecl decl: classDecl.getFunctions()) {
@@ -677,7 +670,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 	}
 
-	private void writeInstanceVirtualFuncs(ClassDecl classDecl, String className)
+	protected void writeInstanceVirtualFuncs(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		for(FunctionDecl decl: classDecl.getFunctions()) {
@@ -700,7 +693,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 	}
 	
-	private void writeBuiltinClassFuncName(String className, String returnType, String name)
+	protected void writeBuiltinClassFuncName(String className, String returnType, String name)
 		throws IOException {
 		current.newLine();
 		current.append("static ");
@@ -714,7 +707,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(" *this)");
 	}
 	
-	private void writeInitializeModuleFunc(Module module) throws IOException {
+	protected void writeInitializeModuleFunc(Module module) throws IOException {
 
 		current = hw;
 		current.newLine().append("void ").append(module.getLoadFuncName()).append("();");
@@ -743,7 +736,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeInitializeClassFunc(ClassDecl classDecl, String className)
+	protected void writeInitializeClassFunc(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		writeBuiltinClassFuncName(className, "void", "initialize");
@@ -777,7 +770,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeDestroyFunc(ClassDecl classDecl, String className)
+	protected void writeDestroyFunc(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		current.newLine();
@@ -799,13 +792,13 @@ public class CGenerator extends Generator implements Visitor {
 		closeSpacedBlock();
 	}
 
-	private void closeSpacedBlock() throws IOException {
+	protected void closeSpacedBlock() throws IOException {
 		closeBlock();
 		current.newLine();
 		current.newLine();
 	}
 
-	private void writeInstanceImplFuncs(ClassDecl classDecl, String className)
+	protected void writeInstanceImplFuncs(ClassDecl classDecl, String className)
 			throws IOException {
 		
 		/* Non-static (ie. instance) functions */
@@ -868,7 +861,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 	}
 
-	private void writeClassGettingFunction(ClassDecl classDecl) throws IOException {
+	protected void writeClassGettingFunction(ClassDecl classDecl) throws IOException {
 		
 		current.append("const MangoClass *");
 		current.append(classDecl.getName());
@@ -887,7 +880,7 @@ public class CGenerator extends Generator implements Visitor {
 		closeSpacedBlock();
 	}
 
-	private void writeFuncPointers(ClassDecl currentClass, ClassDecl coreClass) throws IOException {
+	protected void writeFuncPointers(ClassDecl currentClass, ClassDecl coreClass) throws IOException {
 		
 		openBlock();
 		
@@ -936,7 +929,7 @@ public class CGenerator extends Generator implements Visitor {
 		if(coreClass != currentClass) current.append(',');
 	}
 
-	private void writeMemberFuncPrototypes(ClassDecl classDecl, String className)
+	protected void writeMemberFuncPrototypes(ClassDecl classDecl, String className)
 			throws IOException {
 		current.newLine();
 		current.append("const MangoClass *");
@@ -969,12 +962,12 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 	}
 
-	private void writeSpacedType(Type type) throws IOException {
+	protected void writeSpacedType(Type type) throws IOException {
 		type.accept(this);
 		if(type.isFlat()) current.append(' ');
 	}
 
-	private Iterator<Argument> writeFuncPointer(FunctionDecl decl)
+	protected Iterator<Argument> writeFuncPointer(FunctionDecl decl)
 			throws IOException {
 		decl.getReturnType().accept(this);
 		current.append(" (*");
@@ -990,7 +983,7 @@ public class CGenerator extends Generator implements Visitor {
 		return iter;
 	}
 	
-	private void writeClassStruct(ClassDecl classDecl, String className)
+	protected void writeClassStruct(ClassDecl classDecl, String className)
 		throws IOException {
 		current.newLine();
 		current.append("struct _");
@@ -1020,7 +1013,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 	}
 
-	private void writeObjectStruct(ClassDecl classDecl, String className)
+	protected void writeObjectStruct(ClassDecl classDecl, String className)
 			throws IOException {
 		current.newLine();
 		current.append("struct _");
@@ -1054,7 +1047,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 	}
 
-	private void writeStructTypedef(String structName) throws IOException {
+	protected void writeStructTypedef(String structName) throws IOException {
 		current.append("typedef struct _");
 		current.append(structName);
 		current.append(" ");
@@ -1063,24 +1056,24 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 	}
 
-	private void closeBlock() throws IOException {
+	protected void closeBlock() throws IOException {
 		current.untab();
 		current.newLine();
 		current.append("}");
 	}
 
-	private void openBlock() throws IOException {
+	protected void openBlock() throws IOException {
 		current.newLine();
 		current.append('{');
 		current.tab();
 	}
 	
-	private void openSpacedBlock() throws IOException {
+	protected void openSpacedBlock() throws IOException {
 		openBlock();
 		current.newLine();
 	}
 
-	private void writeDesignatedInit(String contract, String implementation)
+	protected void writeDesignatedInit(String contract, String implementation)
 			throws IOException {
 		current.newLine();
 		current.append('.');
@@ -1117,7 +1110,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 	}
 
-	private void writeCoverTypedef(CoverDecl cover) throws IOException {
+	protected void writeCoverTypedef(CoverDecl cover) throws IOException {
 		
 		if(!cover.isAddon() && !cover.isExtern()) {
 			Type fromType = cover.getFromType();
@@ -1212,12 +1205,6 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(SingleLineComment slComment) throws IOException {
-		current.append(" // ");
-		current.append(slComment.getContent().trim());
-	}
-
-	@Override
 	public void visit(FloatLiteral floatLiteral) throws IOException {
 		current.append(Double.toString(floatLiteral.getValue()));
 	}
@@ -1274,6 +1261,13 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(Use use) throws IOException {
 		
+	}
+
+	@Override
+	public void visit(BinaryCombination binaryCombination) throws IOException {
+		binaryCombination.getLeft().accept(this);
+		current.append(' ').append(binaryCombination.getOpString()).append(' ');
+		binaryCombination.getRight().accept(this);
 	}
 
 }

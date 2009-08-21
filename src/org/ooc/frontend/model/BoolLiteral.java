@@ -8,7 +8,7 @@ import org.ooc.frontend.Visitor;
 public class BoolLiteral extends Literal {
 
 	public static Type type = new Type("Bool");
-	private boolean value;
+	protected boolean value;
 	
 	public BoolLiteral(boolean value) {
 		this.value = value;

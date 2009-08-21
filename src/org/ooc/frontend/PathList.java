@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class PathList {
 	
-	private HashMap<String, File> paths;
+	protected HashMap<String, File> paths;
 	
 	/**
 	 * Default constructor

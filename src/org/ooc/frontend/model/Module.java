@@ -13,15 +13,15 @@ import org.ooc.middle.walkers.Opportunist;
 
 public class Module extends Node implements Scope {
 
-	private String underName;
-	private String fullName;
-	private String name;
-	private NodeList<Include> includes;
-	private NodeList<Import> imports;
-	private NodeList<Use> uses;
-	private NodeList<Node> body;
-	private String fileName;
-	private FunctionDecl loadFunc;
+	protected String underName;
+	protected String fullName;
+	protected String name;
+	protected NodeList<Include> includes;
+	protected NodeList<Import> imports;
+	protected NodeList<Use> uses;
+	protected NodeList<Node> body;
+	protected String fileName;
+	protected FunctionDecl loadFunc;
 	
 	public Module(String fullName) {
 		
@@ -109,7 +109,7 @@ public class Module extends Node implements Scope {
 		
 	}
 
-	private <T extends Declaration> void getDeclarationsMap(final Class<T> clazz,
+	protected <T extends Declaration> void getDeclarationsMap(final Class<T> clazz,
 			final MultiMap<Node, T> decls) throws IOException {
 		
 		new Nosy<T> (clazz, new Opportunist<T>() {
@@ -142,7 +142,7 @@ public class Module extends Node implements Scope {
 		
 	}
 
-	private <T extends Declaration> void getDeclarationsList(final Class<T> clazz,
+	protected <T extends Declaration> void getDeclarationsList(final Class<T> clazz,
 			final List<T> decls) throws IOException {
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	

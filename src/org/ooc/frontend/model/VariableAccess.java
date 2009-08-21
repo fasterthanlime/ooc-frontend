@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.middle.hobgoblins.Resolver;
@@ -74,30 +75,32 @@ public class VariableAccess extends Access implements MustBeResolved {
 
 	@Override
 	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
-
-		Miner.mine(Scope.class, new Opportunist<Scope>() {
-			public boolean take(Scope node, Stack<Node> stack) throws IOException {
-				
-				Iterable<VariableDecl> vars = res.vars.get((Node) node);
-				for(VariableDecl decl: vars) {
-					if(decl.hasAtom(variable)) {
-						if(decl.isMember()) {
-							VariableAccess thisAccess = new VariableAccess("this");
-							thisAccess.resolve(mainStack, res, fatal);
-							MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
-							membAcc.setRef(decl);
-							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
-								throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
+		
+		if(ref == null) {
+			Miner.mine(Scope.class, new Opportunist<Scope>() {
+				public boolean take(Scope node, Stack<Node> stack) throws IOException {
+					
+					Iterable<VariableDecl> vars = res.vars.get((Node) node);
+					for(VariableDecl decl: vars) {
+						if(decl.hasAtom(variable)) {
+							if(decl.isMember()) {
+								VariableAccess thisAccess = new VariableAccess("this");
+								thisAccess.resolve(mainStack, res, fatal);
+								MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
+								membAcc.setRef(decl);
+								if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
+									throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
+								}
 							}
+							setRef(decl);
+							return false;
 						}
-						setRef(decl);
-						return false;
 					}
+					return true;
+					
 				}
-				return true;
-				
-			}
-		}, mainStack);
+			}, mainStack);
+		}
 		
 		if(ref == null) {
 			int typeIndex = Node.find(TypeDecl.class, mainStack);
@@ -126,13 +129,50 @@ public class VariableAccess extends Access implements MustBeResolved {
 				}
 			}
 		}
+		
+		/*
+		if(ref == null && variable.equals("this")) {
+			int funcIndex = Node.find(FunctionDecl.class, mainStack);
+			int index = Node.find(ClassDecl.class, mainStack);
+			System.out.println("funcIndex = "+funcIndex+", index = "+index);
+			if(funcIndex == -1 && index != -1) {
+				ClassDecl classDecl = (ClassDecl) mainStack.get(index);
+				ref = new VariableDecl(classDecl.getInstanceType(), false, false);
+			}
+		}
+		*/
 
 		if(fatal && ref == null) {
-			throw new CompilationFailedError(null, "Can't resolve variable access to '"
-					+variable+"'. Stack = "+mainStack);
+			String message = "Couldn't resolve access to variable "+variable;
+			String guess = guessCorrectName(mainStack, res);
+			if(guess != null) {
+				message += " Did you mean "+guess+" ?";
+			}
+			throw new CompilationFailedError(null, message+", stack = "+mainStack);
 		}
 		
 		return ref == null;
+		
+	}
+
+	private String guessCorrectName(Stack<Node> mainStack, Resolver res) {
+		
+		int bestDistance = Integer.MAX_VALUE;
+		String bestMatch = null;
+		
+		for(int i = mainStack.size() - 1; i >= 0; i--) {
+			if(!(mainStack.get(i) instanceof Scope)) continue;
+			
+			for(VariableDecl decl: res.vars.get(mainStack.get(i))) {
+				int distance = Levenshtein.distance(variable, decl.getName());
+				if(distance < bestDistance) {
+					bestDistance = distance;
+					bestMatch = decl.getName();
+				}
+			}
+		}
+		
+		return bestMatch;
 		
 	}
 
