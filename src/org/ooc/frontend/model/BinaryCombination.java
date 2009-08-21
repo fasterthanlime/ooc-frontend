@@ -7,8 +7,10 @@ import org.ooc.frontend.Visitor;
 public class BinaryCombination extends BinaryOperation {
 
 	public static enum BinaryComp {
-		OR,
-		AND,
+		LOGICAL_OR,
+		LOGICAL_AND,
+		BINARY_OR,
+		BINARY_AND,
 	}
 	
 	protected BinaryComp comp;
@@ -20,7 +22,10 @@ public class BinaryCombination extends BinaryOperation {
 
 	@Override
 	public Type getType() {
-		return BoolLiteral.type;
+		if(comp == BinaryComp.LOGICAL_OR || comp == BinaryComp.LOGICAL_AND) {
+			return BoolLiteral.type;
+		}
+		return left.getType();
 	}
 	
 	public BinaryComp getComp() {
@@ -38,8 +43,10 @@ public class BinaryCombination extends BinaryOperation {
 
 	public String getOpString() {
 		switch(comp) {
-		case OR: return "||";
-		default: return "&&";
+		case LOGICAL_OR: return "||";
+		case LOGICAL_AND: return "&&";
+		case BINARY_OR: return "|";
+		case BINARY_AND: default: return "&";
 		}
 	}
 

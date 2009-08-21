@@ -38,7 +38,7 @@ public class IncludeParser {
 			} else if(t.type == TokenType.NAME || t.type == TokenType.SLASH
 					|| t.type == TokenType.DOT || t.type == TokenType.DOUBLE_DOT) {
 				sb.append(t.get(sReader));
-			} else if(t.type == TokenType.BINARY_OR) {
+			} else if(t.type == TokenType.PIPE) {
 				readDefines(sReader, reader, defines);
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(t.start),

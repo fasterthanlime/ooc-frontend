@@ -159,8 +159,9 @@ public class ExpressionParser {
 					|| t.type == TokenType.LESSTHAN_EQUALS || t.type == TokenType.EQUALS
 					|| t.type == TokenType.NOT_EQUALS || t.type == TokenType.PLUS_ASSIGN
 					|| t.type == TokenType.MINUS_ASSIGN || t.type == TokenType.STAR_ASSIGN
-					|| t.type == TokenType.SLASH_ASSIGN || t.type == TokenType.LOGICAL_OR
-					|| t.type == TokenType.LOGICAL_AND) {
+					|| t.type == TokenType.SLASH_ASSIGN || t.type == TokenType.DOUBLE_PIPE
+					|| t.type == TokenType.DOUBLE_AMPERSAND || t.type == TokenType.PIPE
+					|| t.type == TokenType.AMPERSAND) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -188,8 +189,10 @@ public class ExpressionParser {
 						expr = new Assignment(Mode.MUL, (Access) expr, rvalue); break;
 					case SLASH_ASSIGN: ensureAccess(expr);
 						expr = new Assignment(Mode.DIV, (Access) expr, rvalue); break;
-					case LOGICAL_OR:  expr = new BinaryCombination(BinaryComp.OR,  expr, rvalue); break;
-					case LOGICAL_AND: expr = new BinaryCombination(BinaryComp.AND, expr, rvalue); break;
+					case PIPE: expr = new BinaryCombination(BinaryComp.BINARY_OR, expr, rvalue); break;
+					case AMPERSAND: expr = new BinaryCombination(BinaryComp.BINARY_AND, expr, rvalue); break;
+					case DOUBLE_PIPE:  expr = new BinaryCombination(BinaryComp.LOGICAL_OR,  expr, rvalue); break;
+					case DOUBLE_AMPERSAND: expr = new BinaryCombination(BinaryComp.LOGICAL_AND, expr, rvalue); break;
 					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
 							"Unknown binary operation yet");
 				}

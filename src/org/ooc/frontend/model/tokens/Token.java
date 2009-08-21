@@ -92,11 +92,11 @@ public class Token {
 		DECL_ASSIGN, // :=
 		EQUALS, // ==
 		
-		LOGICAL_AND, // && (logical and)
-		LOGICAL_OR, // || (logical or)
+		DOUBLE_AMPERSAND, // && (logical and)
+		DOUBLE_PIPE, // || (et non pas double pipe..)
 		
 		AMPERSAND, // & (binary and)
-		BINARY_OR, // | (binary or)
+		PIPE, // | (binary or)
 		
 		CHAR_LIT, // 'c'
 		STRING_LIT, // "blah\n"
