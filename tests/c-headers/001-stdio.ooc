@@ -1,4 +1,5 @@
 include stdio
+printf: extern func (String, ...)
 
 func main {
 
