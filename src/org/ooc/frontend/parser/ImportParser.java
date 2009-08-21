@@ -32,7 +32,7 @@ public class ImportParser {
 			if(t.type == TokenType.COMMA) {
 				imports.add(new Import(sb.toString()));
 				sb.setLength(0);
-			} else if(t.type == TokenType.NAME) {
+			} else if(t.type == TokenType.NAME || t.type == TokenType.MINUS) {
 				sb.append(t.get(sReader));
 			} else if(t.type == TokenType.DOT) {
 				if(t.type == TokenType.STAR) {

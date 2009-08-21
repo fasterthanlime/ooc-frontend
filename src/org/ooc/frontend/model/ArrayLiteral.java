@@ -1,10 +1,13 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.middle.hobgoblins.Resolver;
 
-public class ArrayLiteral extends Literal {
+public class ArrayLiteral extends Literal implements MustBeResolved {
 
 	protected Type type = new Type("Pointer");
 	protected NodeList<Expression> elements;
@@ -46,6 +49,21 @@ public class ArrayLiteral extends Literal {
 	@Override
 	public boolean hasChildren() {
 		return true;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return false;
+	}
+
+	@Override
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+			throws IOException {
+		
+		
+		
+		return false;
+		
 	}
 
 }

@@ -168,7 +168,7 @@ public class CGenerator extends Generator implements Visitor {
 			current.newLine().append("#define ").append(define.name);
 			if(define.value != null) current.append(' ').append(define.value);
 		}
-		current.newLine().append("#include <").append(include.getPath()).append(".h>").newLine();
+		current.newLine().append("#include <").append(include.getPath()).append(".h>");
 		for(Define define: include.getDefines()) {
 			current.append("#undef ").append(define.name).append(' ').newLine();
 		}
