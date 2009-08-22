@@ -39,6 +39,7 @@ public class FunctionDeclParser {
 			}
 		}
 		
+		boolean isProto = false;
 		boolean isAbstract = false;
 		boolean isStatic = false;
 		boolean isFinal = false;
@@ -49,12 +50,14 @@ public class FunctionDeclParser {
 		   || kw.type == TokenType.STATIC_KW
 		   || kw.type == TokenType.FINAL_KW
 		   || kw.type == TokenType.EXTERN_KW
+		   || kw.type == TokenType.PROTO_KW
 		   ) {
 			
 			switch(kw.type) {
 			case ABSTRACT_KW: reader.skip(); isAbstract = true; break;
 			case STATIC_KW: reader.skip(); isStatic = true; break;
 			case FINAL_KW: reader.skip(); isFinal = true; break;
+			case PROTO_KW: reader.skip(); isProto = true; break;
 			case EXTERN_KW: externName = ExternParser.parse(sReader, reader); break;
 			default:
 			}
@@ -81,6 +84,7 @@ public class FunctionDeclParser {
 		
 		FunctionDecl functionDecl = new FunctionDecl(
 				name, suffix, isFinal, isStatic, isAbstract, externName);
+		functionDecl.setProto(isProto);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		if(reader.peek().type == TokenType.OPEN_PAREN) {

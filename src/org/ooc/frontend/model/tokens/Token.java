@@ -24,6 +24,7 @@ public class Token {
 		IMPORT_KW, // import keyword
 		USE_KW, // use keyword
 		EXTERN_KW, // extern keyword
+		PROTO_KW, // proto keyword
 		
 		BREAK_KW, // break keyword
 		CONTINUE_KW, // continue keyword

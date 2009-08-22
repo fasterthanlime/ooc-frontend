@@ -96,6 +96,10 @@ public class CommandLine {
         			
         			params.libPath.add(arg.substring(arg.indexOf('=') + 1));
         			
+        		} else if(option.startsWith("c")) {
+        			
+        			params.link = false;
+        			
         		} else if(option.startsWith("L")) {
         			
         			params.libPath.add(arg.substring(2));
@@ -103,10 +107,6 @@ public class CommandLine {
         		} else if(option.startsWith("l")) {
         			
         			params.dynamicLibs.add(arg.substring(2));
-        			
-        		} else if(option.startsWith("freeargs")) {
-        			
-        			//ignoreUnknownArgs = true;
         			
         		} else if(option.equals("noclean")) {
         			
@@ -236,7 +236,8 @@ public class CommandLine {
 		List<String> command = new ArrayList<String>();
 		
 		command.add(findGCC().getPath());
-		
+	
+		if(params.debug) command.add("-g");
 		command.add("-std=c99");
 		command.add("-I");
 		command.add(new File(params.distLocation, "libs/headers/").getPath());
@@ -245,14 +246,19 @@ public class CommandLine {
 		// FIXME ooh hardcoded, that is bad.
 		command.add(new File(params.distLocation, "libs/universal/mango/mangoobject.c").getPath());
 		addDeps(command, module, new HashSet<Module>());
-		command.add("-o");
-		command.add(module.getSimpleName());
-		command.add(new File(params.distLocation, "libs/" + Target.guessHost().toString() + "/libgc.a").getPath());
 		for(String dynamicLib: params.dynamicLibs) {
 			command.add("-l");
 			command.add(dynamicLib);
 		}
-		command.addAll(getAllLibsFromUses(module));
+		if(params.link) {
+			command.add("-o");
+			command.add(module.getSimpleName());
+			command.addAll(getAllLibsFromUses(module));
+			command.add(new File(params.distLocation, "libs/"
+					+ Target.guessHost().toString() + "/libgc.a").getPath());
+		} else {
+			command.add("-c");
+		}
 		
 		StringBuilder commandLine = new StringBuilder();
 		for(String arg: command) {
@@ -269,9 +275,9 @@ public class CommandLine {
 		
 		Process process = builder.start();
 		ProcessUtils.redirectIO(process);
-		process.waitFor();
+		int code = process.waitFor();
 		
-		if(params.run) {
+		if(code == 0 && params.run) {
 			builder.command("./"+module.getSimpleName());
 			process = builder.start();
 			ProcessUtils.redirectIO(process);

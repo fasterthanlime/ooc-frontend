@@ -168,9 +168,11 @@ public class CGenerator extends Generator implements Visitor {
 		
 		boolean got = false;
 		for(Node node: module.getBody()) {
-			if(!(node instanceof FunctionDecl)) break;
+			if(!(node instanceof FunctionDecl)) continue;
 			FunctionDecl decl = (FunctionDecl) node;
-			if(decl.isEntryPoint()) got = true;
+			if(decl.isEntryPoint()) {
+				got = true;
+			}
 		}
 		if(!got) {
 			current.newLine().append("int main()");
@@ -189,7 +191,7 @@ public class CGenerator extends Generator implements Visitor {
 		}
 		current.newLine().append("#include <").append(include.getPath()).append(".h>");
 		for(Define define: include.getDefines()) {
-			current.append("#undef ").append(define.name).append(' ').newLine();
+			current.newLine().append("#undef ").append(define.name).append(' ');
 		}
 	}
 
@@ -558,7 +560,14 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(FunctionDecl functionDecl) throws IOException {
 		
-		if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
+		if(functionDecl.isProto()) {
+			
+			current = hw;
+			current.newLine().append("extern ");
+			writeFuncPrototype(functionDecl);
+			current.append(';');
+			
+		} else if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
 			
 			current = hw;
 			current.newLine();

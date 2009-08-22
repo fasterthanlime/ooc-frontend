@@ -56,7 +56,8 @@ public class Tokenizer {
 		new Name("true", TokenType.TRUE),
 		new Name("false", TokenType.FALSE),
 		new Name("null", TokenType.NULL),
-		new Name("extern", TokenType.EXTERN_KW),		
+		new Name("extern", TokenType.EXTERN_KW),
+		new Name("proto", TokenType.PROTO_KW),
 		new Name("operator", TokenType.OPERATOR_KW),
 		//TODO I'm not sure if those three should be keywords.
 		//They are remains from C and can be parsed as NAMEs
@@ -297,8 +298,8 @@ public class Tokenizer {
 				continue;
 			}
 			
-			String name = reader.readName();
-			if(!name.isEmpty()) {
+			if(reader.skipName()) {
+				String name = reader.getSlice(location.getIndex(), reader.mark() - location.getIndex());
 				for(Name candidate: names) {
 					if(candidate.name.equals(name)) {
 						tokens.add(new Token(location.getIndex(), name.length(), candidate.tokenType));

@@ -25,7 +25,7 @@ public class Parser {
 
 	public Module parse(String path) throws IOException {
 
-		if(params.debug)
+		if(params.verbose)
 			System.out.println("Parsing "+path);
 		
 		File file = params.sourcePath.getFile(path);

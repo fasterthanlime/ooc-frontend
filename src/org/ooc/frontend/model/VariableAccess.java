@@ -13,21 +13,21 @@ import org.ubi.CompilationFailedError;
 
 public class VariableAccess extends Access implements MustBeResolved {
 
-	protected String variable;
+	protected String name;
 	protected Declaration ref;
 	
 	public VariableAccess(String variable) {
-		this.variable = variable;
+		this.name = variable;
 	}
 
 	public VariableAccess(VariableDecl varDecl) {
 		assert(varDecl.atoms.size() == 1);
-		this.variable = varDecl.getName();
+		this.name = varDecl.getName();
 		ref = varDecl;
 	}
 
 	public String getName() {
-		return variable;
+		return name;
 	}
 	
 	public Declaration getRef() {
@@ -81,21 +81,30 @@ public class VariableAccess extends Access implements MustBeResolved {
 				public boolean take(Scope node, Stack<Node> stack) throws IOException {
 					
 					Iterable<VariableDecl> vars = res.vars.get((Node) node);
-					for(VariableDecl decl: vars) {
-						if(decl.hasAtom(variable)) {
-							if(decl.isMember()) {
+					for(VariableDecl var: vars) {
+						if(var.hasAtom(name)) {
+							if(var.isMember()) {
 								VariableAccess thisAccess = new VariableAccess("this");
 								thisAccess.resolve(mainStack, res, fatal);
-								MemberAccess membAcc =  new MemberAccess(thisAccess, variable);
-								membAcc.setRef(decl);
+								MemberAccess membAcc =  new MemberAccess(thisAccess, name);
+								membAcc.setRef(var);
 								if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
 									throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
 								}
 							}
-							setRef(decl);
+							ref = var;
 							return false;
 						}
 					}
+					
+					Iterable<FunctionDecl> funcs = res.funcs.get((Node) node);
+					for(FunctionDecl func: funcs) {
+						if(func.getName().equals(name)) {
+							ref = func;
+							return false;
+						}
+					}
+					
 					return true;
 					
 				}
@@ -106,13 +115,13 @@ public class VariableAccess extends Access implements MustBeResolved {
 			int typeIndex = Node.find(TypeDecl.class, mainStack);
 			if(typeIndex != -1) {
 				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
-				if(variable.equals("This")) {
+				if(name.equals("This")) {
 					ref = typeDecl;
 					return true;
 				}
-				VariableDecl varDecl = typeDecl.getVariable(variable);
+				VariableDecl varDecl = typeDecl.getVariable(name);
 				if(varDecl != null) {
-					MemberAccess membAccess = new MemberAccess(variable);
+					MemberAccess membAccess = new MemberAccess(name);
 					membAccess.setRef(varDecl);
 					if(!mainStack.peek().replace(this, membAccess)) {
 						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
@@ -124,26 +133,14 @@ public class VariableAccess extends Access implements MustBeResolved {
 
 		if(ref == null) {
 			for(TypeDecl decl: res.types) {
-				if(decl.getName().equals(variable)) {
+				if(decl.getName().equals(name)) {
 					ref = decl;
 				}
 			}
 		}
-		
-		/*
-		if(ref == null && variable.equals("this")) {
-			int funcIndex = Node.find(FunctionDecl.class, mainStack);
-			int index = Node.find(ClassDecl.class, mainStack);
-			System.out.println("funcIndex = "+funcIndex+", index = "+index);
-			if(funcIndex == -1 && index != -1) {
-				ClassDecl classDecl = (ClassDecl) mainStack.get(index);
-				ref = new VariableDecl(classDecl.getInstanceType(), false, false);
-			}
-		}
-		*/
 
 		if(fatal && ref == null) {
-			String message = "Couldn't resolve access to variable "+variable;
+			String message = "Couldn't resolve access to variable "+name;
 			String guess = guessCorrectName(mainStack, res);
 			if(guess != null) {
 				message += " Did you mean "+guess+" ?";
@@ -164,7 +161,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 			if(!(mainStack.get(i) instanceof Scope)) continue;
 			
 			for(VariableDecl decl: res.vars.get(mainStack.get(i))) {
-				int distance = Levenshtein.distance(variable, decl.getName());
+				int distance = Levenshtein.distance(name, decl.getName());
 				if(distance < bestDistance) {
 					bestDistance = distance;
 					bestMatch = decl.getName();
@@ -178,7 +175,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+" : "+variable;
+		return getClass().getSimpleName()+" : "+name;
 	}
 
 }

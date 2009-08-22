@@ -65,7 +65,7 @@ public class MemberAccess extends VariableAccess {
 		if(exprType == null) {
 			if(fatal) {
 				throw new CompilationFailedError(null, "Accessing member "
-						+variable+" in an expression "+expression.getClass().getSimpleName()
+						+name+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been resolved yet!");
 			}
 			return true;
@@ -83,11 +83,11 @@ public class MemberAccess extends VariableAccess {
 		}
 		
 		TypeDecl typeDecl = (TypeDecl) decl;
-		ref = typeDecl.getVariable(variable);
+		ref = typeDecl.getVariable(name);
 		
 		if(fatal && ref == null) {
 			throw new CompilationFailedError(null, "Can't resolve access to member "
-					+exprType+"."+variable);
+					+exprType+"."+name);
 		}
 		return ref != null;
 	}
