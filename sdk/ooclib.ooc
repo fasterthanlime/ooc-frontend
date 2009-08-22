@@ -19,6 +19,7 @@ String: cover from Char* {
 	length: func -> Int strlen(this)
 	
 }
+
 Int: cover from int
 Pointer: cover from void*
 UInt: cover from unsigned int
@@ -47,18 +48,8 @@ println: func ~empty {
 	printf("\n")
 }
 
-// should be private
-GC_malloc: extern func (size: SizeT) -> Pointer
-GC_realloc: extern func (ptr: Pointer, size: SizeT) -> Pointer
-
-gc_malloc: func (size: SizeT) -> Pointer {
-	GC_malloc(size)
-}
-
-gc_realloc: func (ptr: Pointer, size: SizeT) -> Pointer {
-	GC_realloc(ptr, size)
-}
-
+gc_malloc: extern(GC_malloc) func (size: SizeT) -> Pointer
+gc_realloc: extern(GC_realloc) func (ptr: Pointer, size: SizeT) -> Pointer
 gc_calloc: func (nmemb: SizeT, size: SizeT) -> Pointer {
-	GC_malloc(nmemb * size)
+	gc_malloc(nmemb * size)
 }

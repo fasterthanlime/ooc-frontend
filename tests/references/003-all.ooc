@@ -6,14 +6,14 @@ IntContainer: class {
 	pointer : Int*
 	
 	new: func {
-		pointer = GC_malloc(sizeof(Int))
+		pointer = gc_malloc(sizeof(Int))
 	}
 }
 
 main: func {
 
 	// regular pointer to int (allocate memory for the int)
-	pointer := GC_malloc(sizeof(Int)) as Int*
+	pointer := gc_malloc(sizeof(Int)) as Int*
 	pointer@ = 32
 	printValue(pointer@)
 	printPointer(pointer) // print expects a pointer: alright
