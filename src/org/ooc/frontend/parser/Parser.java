@@ -15,7 +15,7 @@ import org.ubi.SourceReader;
 
 public class Parser {
 
-	// unit.fullName -> unit
+	// path -> module
 	protected final Map<String, Module> cache = new HashMap<String, Module>();
 	protected BuildParams params;
 	
@@ -36,10 +36,11 @@ public class Parser {
 		
 		SourceReader sReader = SourceReader.getReaderFromFile(file);
 		List<Token> tokens = new Tokenizer().parse(sReader);
+		
 		String fullName = path.substring(0, path.lastIndexOf('.'))
 			.replace(File.separatorChar, '.').replace('/', '.');
-		Module module = ModuleParser.parse(fullName, file, sReader, new TokenReader(tokens), this);
-		return module;
+		
+		return ModuleParser.parse(fullName, file, sReader, new TokenReader(tokens), this);
 		
 	}
 	

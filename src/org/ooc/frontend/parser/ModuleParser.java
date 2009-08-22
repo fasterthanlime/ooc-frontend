@@ -20,6 +20,7 @@ public class ModuleParser {
 			TokenReader reader, Parser parser) throws IOException {
 		
 		Module module = new Module(fullName);
+		parser.getCache().put(module.getFullName(), module);
 		
 		while(reader.hasNext()) {
 
@@ -53,8 +54,7 @@ public class ModuleParser {
 					"Expected declaration, include, or import in source unit, but got "+errToken.type);
 			
 		}
-		
-		parser.getCache().put(module.getFullName(), module);
+
 		for(Import imp: module.getImports()) {
 			Module cached = parser.getCache().get(imp.getPath());
 			if(cached == null) {
