@@ -2,6 +2,8 @@ package org.ooc.frontend.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Import;
@@ -16,11 +18,14 @@ import org.ubi.SourceReader;
 
 public class ModuleParser {
 
+	// path -> module
+	protected final static Map<String, Module> cache = new HashMap<String, Module>();
+	
 	public static Module parse(String fullName, File file, SourceReader sReader,
 			TokenReader reader, Parser parser) throws IOException {
 		
 		Module module = new Module(fullName);
-		parser.getCache().put(module.getFullName(), module);
+		cache.put(module.getFullName(), module);
 		
 		while(reader.hasNext()) {
 
@@ -56,16 +61,20 @@ public class ModuleParser {
 		}
 
 		for(Import imp: module.getImports()) {
-			Module cached = parser.getCache().get(imp.getPath());
+			Module cached = cache.get(imp.getPath());
 			if(cached == null) {
 				cached = parser.parse(imp.getPath());
-				parser.getCache().put(imp.getPath(), cached);
+				cache.put(imp.getPath(), cached);
 			}
 			imp.setModule(cached);
 		}
 		
 		return module;
 		
+	}
+	
+	public static void clearCache() {
+		cache.clear();
 	}
 	
 }

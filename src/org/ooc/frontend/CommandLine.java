@@ -46,6 +46,8 @@ public class CommandLine {
 	public CommandLine(String[] args) throws InterruptedException, IOException {
 		
 		String module = "";
+		List<String> additionals = new ArrayList<String>();
+		List<String> nasms = new ArrayList<String>();
 		
 		for(String arg: args) {
 			if(arg.startsWith("-")) {
@@ -169,13 +171,20 @@ public class CommandLine {
         		}
         	} else {
         		if(!module.isEmpty()) {
-        			System.err.println("You can't specify multiple .ooc files at command line."
+        			if(arg.toLowerCase().endsWith(".s")) {
+        				nasms.add(arg);
+        			} else if(!arg.toLowerCase().endsWith(".ooc")) {
+            			additionals.add(arg);
+            		} else {
+            			System.err.println("You can't specify multiple .ooc files at command line."
         					+"\nDependencies are resolved automatically, so just specify your main file");
-        			return;
-        		}
-        		module = arg;
-        		if(!module.toLowerCase().endsWith(".ooc")) {
-        			module += ".ooc";
+            			return;
+            		}
+        		} else {
+        			module = arg;
+        			if(!arg.toLowerCase().endsWith(".ooc")) {
+        				module += ".ooc";
+        			}
         		}
         	}
 		}
@@ -185,10 +194,14 @@ public class CommandLine {
 			return;
 		}
 		
+		if(!nasms.isEmpty()) {
+			compileNasms(nasms, additionals);
+		}
+		
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
 		params.sourcePath.add(params.distLocation + File.separator + "sdk");
 		
-		parse(module);
+		parse(module, additionals);
 		
 		if(params.clean) {
 			FileUtils.deleteRecursive(params.outPath);
@@ -196,14 +209,52 @@ public class CommandLine {
 		
 	}
 	
-	protected void parse(String fileName) throws InterruptedException, IOException {
+	private void compileNasms(List<String> nasms, Collection<String> additionals) throws IOException, InterruptedException {
+		
+		boolean has = false;
+		
+		List<String> command = new ArrayList<String>();
+		command.add(findExec("nasm").getPath());
+		command.add("-f");
+		command.add("elf");
+		for(String nasm: nasms) {
+			if(nasm.endsWith(".s")) {
+				command.add(nasm);
+				has = true;
+			}
+		}
+		
+		if(has) {
+			ProcessBuilder builder = new ProcessBuilder(command);
+			Process process = builder.start();
+			ProcessUtils.redirectIO(process);
+			int code = process.waitFor();
+			if(code != 0) {
+				System.err.println("nasm failed, aborting compilation process");
+				System.exit(code);
+			}
+			
+			for(String nasm: nasms) {
+				if(nasm.endsWith(".s")) {
+					additionals.add(nasm.substring(0, nasm.length() - 1) + "o");
+				} else {
+					additionals.add(nasm);
+				}
+			}
+		} else {
+			additionals.addAll(nasms);
+		}
+		
+	}
+
+	protected void parse(String fileName, List<String> additionals) throws InterruptedException, IOException {
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
 		Module module = new Parser(params).parse(fileName);
 		module.setMain(true);
 		translate(module, new HashSet<Module>());
 		long tt2 = System.nanoTime();
-		compile(module);
+		compile(module, additionals);
 		long tt3 = System.nanoTime();
 
 		if(timing)
@@ -223,7 +274,7 @@ public class CommandLine {
 		}
 	}
 
-	protected void compile(Module module) throws Error,
+	protected void compile(Module module, List<String> additionals) throws Error,
 			IOException, InterruptedException {
 		
 		for(Include inc: module.getIncludes()) {
@@ -235,7 +286,7 @@ public class CommandLine {
 		
 		List<String> command = new ArrayList<String>();
 		
-		command.add(findGCC().getPath());
+		command.add(findExec("gcc").getPath());
 	
 		if(params.debug) command.add("-g");
 		command.add("-std=c99");
@@ -250,6 +301,8 @@ public class CommandLine {
 			command.add("-l");
 			command.add(dynamicLib);
 		}
+		command.addAll(additionals);
+		
 		if(params.link) {
 			command.add("-o");
 			command.add(module.getSimpleName());
@@ -276,8 +329,12 @@ public class CommandLine {
 		Process process = builder.start();
 		ProcessUtils.redirectIO(process);
 		int code = process.waitFor();
+		if(code != 0) {
+			System.err.println("gcc failed, aborting compilation process");
+			System.exit(code);
+		}
 		
-		if(code == 0 && params.run) {
+		if(params.run) {
 			builder.command("./"+module.getSimpleName());
 			process = builder.start();
 			ProcessUtils.redirectIO(process);
@@ -286,7 +343,7 @@ public class CommandLine {
 		
 	}
 
-	protected Collection<String> getAllLibsFromUses(Module module) {
+	protected Collection<String> getAllLibsFromUses(Module module) throws IOException, InterruptedException {
 
 		Set<String> list = new HashSet<String>();
 		Set<Module> done = new HashSet<Module>();
@@ -295,15 +352,13 @@ public class CommandLine {
 		
 	}
 
-	protected void getAllLibsFromUses(Module module, Set<String> list, Set<Module> done) {
+	protected void getAllLibsFromUses(Module module, Set<String> list, Set<Module> done) throws IOException, InterruptedException {
 
 		if(done.contains(module)) return;
 		done.add(module);
 		
 		for(Use use: module.getUses()) {
-			for(String lib: use.getUseDef().getLibs()) {
-				if(!list.contains(lib)) list.add(lib);
-			}
+			compileNasms(use.getUseDef().getLibs(), list);
 		}
 		
 		for(Import imp: module.getImports()) {
@@ -312,16 +367,16 @@ public class CommandLine {
 		
 	}
 
-	protected File findGCC() throws Error {
+	protected File findExec(String name) throws Error {
 		
-		File gccFile = ShellUtils.findExecutable("gcc");
-		if(gccFile == null) {
-			gccFile = ShellUtils.findExecutable("gcc.exe");
+		File execFile = ShellUtils.findExecutable(name);
+		if(execFile == null) {
+			execFile = ShellUtils.findExecutable(name+".exe");
 		}
-		if(gccFile == null) {
-			throw new Error("GCC not found :/");
+		if(execFile == null) {
+			throw new Error(name+" not found :/");
 		}
-		return gccFile;
+		return execFile;
 		
 	}
 

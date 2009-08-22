@@ -71,6 +71,17 @@ public class Checker implements Hobgoblin {
 			}
 		}).visit(module);
 		
+		Nosy.get(Node.class, new Opportunist<Node>() {
+			@Override
+			public boolean take(Node node, Stack<Node> stack) throws IOException {
+				if(node.startToken == null) {
+					throw new CompilationFailedError(null,
+						"Null startToken for a "+node.getClass().getSimpleName());
+				}
+				return true;
+			}
+		});//.visit(module);
+		
 	}
 
 }

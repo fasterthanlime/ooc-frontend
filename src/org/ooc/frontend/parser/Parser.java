@@ -2,9 +2,7 @@ package org.ooc.frontend.parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Tokenizer;
@@ -14,9 +12,7 @@ import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
 public class Parser {
-
-	// path -> module
-	protected final Map<String, Module> cache = new HashMap<String, Module>();
+	
 	protected BuildParams params;
 	
 	public Parser(BuildParams params) {
@@ -42,10 +38,6 @@ public class Parser {
 		
 		return ModuleParser.parse(fullName, file, sReader, new TokenReader(tokens), this);
 		
-	}
-	
-	public Map<String, Module> getCache() {
-		return cache;
 	}
 		
 }

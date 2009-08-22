@@ -6,15 +6,11 @@ import org.ooc.frontend.model.tokens.Token;
 
 public abstract class Node implements Visitable {
 
-	protected Token startToken;
+	public Token startToken;
 	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
-	}
-	
-	public Token getStartToken() {
-		return startToken;
 	}
 	
 	/** TODO find a better home for this function? Sucks that you can't add function to Stack<? extends Node> */
