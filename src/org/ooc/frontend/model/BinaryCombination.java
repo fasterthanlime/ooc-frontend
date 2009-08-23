@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class BinaryCombination extends BinaryOperation {
 
@@ -15,8 +16,8 @@ public class BinaryCombination extends BinaryOperation {
 	
 	protected BinaryComp comp;
 	
-	public BinaryCombination(BinaryComp comp, Expression left, Expression right) {
-		super(left, right);
+	public BinaryCombination(BinaryComp comp, Expression left, Expression right, Token token) {
+		super(left, right, token);
 		this.comp = comp;
 	}
 

@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.parser.UseDefParser;
 import org.ooc.middle.UseDef;
 import org.ooc.middle.hobgoblins.Resolver;
@@ -14,7 +15,8 @@ public class Use extends Node implements MustBeResolved {
 	protected String identifier;
 	protected UseDef useDef;
 	
-	public Use(String name) {
+	public Use(String name, Token startToken) {
+		super(startToken);
 		this.identifier = name;
 	}
 	

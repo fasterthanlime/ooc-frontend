@@ -3,17 +3,21 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 
 public class NullLiteral extends Literal {
 
-	public NullLiteral() {
+	public static Type type = new Type("Void", 1, Token.defaultToken);
+	
+	public NullLiteral(Token startToken) {
+		super(startToken);
 		// blahbedi blah, blahbidi blah, eeky eeky, ooogoozooooooooo :(
 	}
 	
 	@Override
 	public Type getType() {
-		return new Type("Void", 1);
+		return type;
 	}
 	
 	@Override

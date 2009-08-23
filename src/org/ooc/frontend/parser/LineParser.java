@@ -35,7 +35,7 @@ public class LineParser {
 		if(!(statement instanceof ControlStatement)) {
 			Token next = reader.read();
 			if(next.type != TokenType.LINESEP) {
-				throw new CompilationFailedError(sReader.getLocation(next.start),
+				throw new CompilationFailedError(sReader.getLocation(next),
 						"Missing semi-colon at the end of a line (got a "+next.type+" instead)");
 			}
 		}

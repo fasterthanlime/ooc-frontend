@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Dereference extends Access {
 
 	Type type;
 	Expression expression;
 	
-	public Dereference(Expression expression) {
+	public Dereference(Expression expression, Token startToken) {
+		super(startToken);
 		setExpression(expression);
 	}
 
@@ -37,7 +39,7 @@ public class Dereference extends Access {
 					}
 				}
 				//System.out.println("Pointer level - 1, was "+exprType+", ref = "+ref);
-				type = new Type(exprType.getName(), exprType.getPointerLevel() - 1);
+				type = new Type(exprType.getName(), exprType.getPointerLevel() - 1, exprType.startToken);
 				type.setRef(exprType.getRef());
 				//System.out.println("New type ref = "+type.getRef());
 			}

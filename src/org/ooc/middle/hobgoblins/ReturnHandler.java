@@ -62,7 +62,8 @@ public class ReturnHandler implements Hobgoblin {
 				
 				if(node.getBody().isEmpty()) {
 					if(node.getName().equals("main")) {
-						node.getBody().add(new Line(new ValuedReturn(new IntLiteral(0, Format.DEC))));
+						node.getBody().add(new Line(new ValuedReturn(
+								new IntLiteral(0, Format.DEC, node.startToken), node.startToken)));
 					} else {
 						throw new CompilationFailedError(null,
 								"Returning nothing in non-void function "+node.getProtoRepr());
@@ -73,11 +74,14 @@ public class ReturnHandler implements Hobgoblin {
 				Line line = node.getBody().getLast();
 				if(!(line.getStatement() instanceof Return)) {
 					if(node.getName().equals("main")) {
-						node.getBody().add(new Line(new ValuedReturn(new IntLiteral(0, Format.DEC))));
+						node.getBody().add(new Line(new ValuedReturn(
+								new IntLiteral(0, Format.DEC, node.startToken), node.startToken)));
 					} else if(line.getStatement() instanceof Expression) {
-						line.setStatement(new ValuedReturn((Expression) line.getStatement()));
+						line.setStatement(new ValuedReturn((Expression) line.getStatement(),
+								line.getStatement().startToken));
 					} else {
-						throw new CompilationFailedError(null, "No return at the end of non-void function "+node.getProtoRepr());
+						throw new CompilationFailedError(null,
+								"No return at the end of non-void function "+node.getProtoRepr());
 					}
 				}
 				return true;

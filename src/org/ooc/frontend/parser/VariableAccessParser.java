@@ -11,10 +11,10 @@ public class VariableAccessParser {
 	public static VariableAccess parse(SourceReader sReader, TokenReader reader) {
 		int mark = reader.mark();
 		
-		Token t = reader.peek();
-		if(t.type == TokenType.NAME || t.type == TokenType.THIS_KW) {
+		Token token = reader.peek();
+		if(token.type == TokenType.NAME || token.type == TokenType.THIS_KW) {
 			reader.skip();
-			return new VariableAccess(t.get(sReader));
+			return new VariableAccess(token.get(sReader), token);
 		}
 		
 		reader.reset(mark);

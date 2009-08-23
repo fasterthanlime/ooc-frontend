@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Include extends Node {
 
@@ -22,7 +23,8 @@ public class Include extends Node {
 	protected Mode mode;
 	protected final List<Define> defines;
 
-	public Include(String include, Mode mode) {
+	public Include(String include, Mode mode, Token startToken) {
+		super(startToken);
 		this.include = include;
 		this.mode = mode;
 		this.defines = new ArrayList<Define>();

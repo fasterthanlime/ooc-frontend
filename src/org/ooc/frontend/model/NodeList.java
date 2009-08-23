@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
 	protected final List<T> nodes;
 	
-	public NodeList() {
+	public NodeList(Token startToken) {
+		super(startToken);
 		nodes = new ArrayList<T>();
 	}
 

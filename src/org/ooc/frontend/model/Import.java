@@ -4,13 +4,15 @@ import java.io.File;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Import extends Node {
 
 	protected String name;
 	protected Module module;
 
-	public Import(String name) {
+	public Import(String name, Token defaultToken) {
+		super(defaultToken);
 		this.name = name;
 	}
 	

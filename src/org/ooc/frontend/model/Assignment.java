@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
+import org.ooc.frontend.model.tokens.Token;
 import org.ubi.CompilationFailedError;
 
 public class Assignment extends Expression implements MustBeUnwrapped {
@@ -22,11 +23,12 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 	protected Access lvalue;
 	protected Expression rvalue;	
 	
-	public Assignment(Access lvalue, Expression rvalue) {
-		this(Mode.REGULAR, lvalue, rvalue);
+	public Assignment(Access lvalue, Expression rvalue, Token startToken) {
+		this(Mode.REGULAR, lvalue, rvalue, startToken);
 	}
 	
-	public Assignment(Mode mode, Access lvalue, Expression rvalue) {
+	public Assignment(Mode mode, Access lvalue, Expression rvalue, Token startToken) {
+		super(startToken);
 		this.mode = mode;
 		this.lvalue = lvalue;
 		this.rvalue = rvalue;
@@ -88,7 +90,7 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 		if(mode == Mode.DECLARATION) {
 			if(lvalue instanceof VariableAccess) {
 				VariableAccess varAcc = (VariableAccess) lvalue;
-				stack.peek().replace(this, new VariableDeclFromExpr(varAcc.getName(), rvalue));
+				stack.peek().replace(this, new VariableDeclFromExpr(varAcc.getName(), rvalue, startToken));
 			} else {
 				throw new CompilationFailedError(null, "Decl-assign to a "
 						+lvalue.getClass().getSimpleName()+" where it should be a VariableAccess");

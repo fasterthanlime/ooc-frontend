@@ -1,15 +1,18 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.model.tokens.Token;
+
 public abstract class Declaration extends Expression {
 
 	protected String name;
 	protected String externName;
 	
-	public Declaration(String name) {
-		this(name, null);
+	public Declaration(String name, Token startToken) {
+		this(name, null, startToken);
 	}
 	
-	public Declaration(String name, String externName) {
+	public Declaration(String name, String externName, Token startToken) {
+		super(startToken);
 		this.name = name;
 		this.externName = externName;
 	}

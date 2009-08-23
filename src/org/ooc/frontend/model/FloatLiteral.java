@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class FloatLiteral extends Literal {
 
 	protected double value;
-	public static Type type = new Type("Float");
+	public static Type type = new Type("Float", Token.defaultToken);
 
-	public FloatLiteral(double value) {
+	public FloatLiteral(double value, Token startToken) {
+		super(startToken);
 		this.value = value;
 	}
 

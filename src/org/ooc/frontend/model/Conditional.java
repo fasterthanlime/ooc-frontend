@@ -3,13 +3,14 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public abstract class Conditional extends ControlStatement {
 
 	protected Expression condition;
 
-	public Conditional(Expression condition) {
-		super();
+	public Conditional(Expression condition, Token startToken) {
+		super(startToken);
 		this.condition = condition;
 	}
 	

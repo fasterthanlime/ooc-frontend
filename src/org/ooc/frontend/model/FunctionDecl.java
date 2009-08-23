@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class FunctionDecl extends Declaration implements Scope {
 
+	public static Type type = new Type("Func", Token.defaultToken);
+	
 	protected OocDocComment comment;
 	
 	protected boolean isFinal;
@@ -21,23 +24,23 @@ public class FunctionDecl extends Declaration implements Scope {
 	protected Type returnType;
 	protected final NodeList<Argument> arguments;
 	
-	public FunctionDecl(String name, String suffix,
-			boolean isFinal, boolean isStatic, boolean isAbstract, boolean isExtern) {
-		this(name, suffix, isFinal, isStatic, isAbstract, isExtern ? "" : null);
+	public FunctionDecl(String name, String suffix, boolean isFinal,
+			boolean isStatic, boolean isAbstract, boolean isExtern, Token startToken) {
+		this(name, suffix, isFinal, isStatic, isAbstract, isExtern ? "" : null, startToken);
 	}
 	
-	public FunctionDecl(String name, String suffix,
-			boolean isFinal, boolean isStatic, boolean isAbstract, String externName) {
+	public FunctionDecl(String name, String suffix, boolean isFinal,
+			boolean isStatic, boolean isAbstract, String externName, Token startToken) {
 		
-		super(name, externName);
+		super(name, externName, startToken);
 		this.suffix = suffix;
 		this.isFinal = isFinal;
 		// TODO check if that's alright
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
-		this.body = new NodeList<Line>();
-		this.returnType = name.equals("main") ? IntLiteral.type : new Type("void");
-		this.arguments = new NodeList<Argument>();
+		this.body = new NodeList<Line>(startToken);
+		this.returnType = name.equals("main") ? IntLiteral.type : new Type("Void", Token.defaultToken);
+		this.arguments = new NodeList<Argument>(startToken);
 		
 	}
 	
@@ -123,7 +126,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	@Override
 	public Type getType() {
-		return new Type("Func");
+		return type;
 	}
 	
 	@Override

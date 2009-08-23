@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
@@ -12,13 +13,13 @@ public class MemberCall extends FunctionCall {
 
 	protected Expression expression;
 
-	public MemberCall(Expression expression, String name, String suffix) {
-		super(name, suffix);
+	public MemberCall(Expression expression, String name, String suffix, Token startToken) {
+		super(name, suffix, startToken);
 		this.expression = expression;
 	}
 	
-	public MemberCall(Expression expression, FunctionCall call) {
-		super(call.name, call.suffix);
+	public MemberCall(Expression expression, FunctionCall call, Token startToken) {
+		super(call.name, call.suffix, startToken);
 		this.expression = expression;
 		arguments.addAll(call.getArguments());
 	}

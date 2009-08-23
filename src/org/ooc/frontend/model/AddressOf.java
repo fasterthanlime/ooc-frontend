@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class AddressOf extends Access {
 
 	Type type;
 	Expression expression;
 	
-	public AddressOf(Expression expression) {
+	public AddressOf(Expression expression, Token startToken) {
+		super(startToken);
 		setExpression(expression);
 	}
 
@@ -28,7 +30,7 @@ public class AddressOf extends Access {
 		if(type == null) {
 			Type exprType = expression.getType();
 			if(exprType != null) {
-				this.type = new Type(exprType.getName(), exprType.getPointerLevel() + 1);
+				this.type = new Type(exprType.getName(), exprType.getPointerLevel() + 1, exprType.startToken);
 			}
 		}
 		return type;

@@ -44,24 +44,25 @@ public class ExpressionParser {
 		
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.BANG) {
+		Token firstToken = reader.peek();
+		if(firstToken.type == TokenType.BANG) {
 			reader.skip();
 			Expression inner = ExpressionParser.parse(sReader, reader);
 			if(inner == null) {
 				reader.reset(mark);
 				return null;
 			}
-			return new Not(inner);
+			return new Not(inner, firstToken);
 		}
 		
-		if(reader.peek().type == TokenType.MINUS) {
+		if(firstToken.type == TokenType.MINUS) {
 			reader.skip();
 			Expression inner = ExpressionParser.parse(sReader, reader);
 			if(inner == null) {
 				reader.reset(mark);
 				return null;
 			}
-			return new Sub(new IntLiteral(0, Format.DEC), inner);
+			return new Sub(new IntLiteral(0, Format.DEC, firstToken), inner, firstToken);
 		}
 		
 		Expression expr = parseFlat(sReader, reader);
@@ -71,145 +72,145 @@ public class ExpressionParser {
 		
 		while(reader.hasNext()) {
 			
-			Token t = reader.peek();
+			Token token = reader.peek();
 			
-			if(t.type == TokenType.NAME) {
+			if(token.type == TokenType.NAME) {
 				
 				FunctionCall call = FunctionCallParser.parse(sReader, reader);
 				if(call != null) {
-					expr = new MemberCall(expr, call);
+					expr = new MemberCall(expr, call, token);
 					continue;
 				}
 				
 				VariableAccess varAccess = VariableAccessParser.parse(sReader, reader);
 				if(varAccess != null) {
-					expr = new MemberAccess(expr, varAccess);
+					expr = new MemberAccess(expr, varAccess, token);
 					continue;
 				}
 				
 			}
 			
-			if(t.type == TokenType.DOUBLE_DOT) {
+			if(token.type == TokenType.DOUBLE_DOT) {
 				
 				reader.skip();
 				Expression upper = ExpressionParser.parse(sReader, reader);
 				if(upper == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 							"Expected expression for the upper part of a range literal");
 				}
 				// this is so beautiful it makes me wanna cry
-				expr = new RangeLiteral(expr, upper);
+				expr = new RangeLiteral(expr, upper, expr.startToken);
 				
 			}
 			
-			if(t.type == TokenType.OPEN_SQUAR) {
+			if(token.type == TokenType.OPEN_SQUAR) {
 
 				reader.skip();
 				Expression index = ExpressionParser.parse(sReader, reader);
 				if(index == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected expression for the index of an array access");
 				}
 				if(reader.read().type != TokenType.CLOS_SQUAR) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 						"Expected closing bracket to end array access, got "+reader.prev().type+" instead.");
 				}
-				expr = new ArrayAccess(expr, index);
+				expr = new ArrayAccess(expr, index, token);
 				continue;
 				
 			}
 			
-			if(t.type == TokenType.ASSIGN || t.type == TokenType.DECL_ASSIGN) {
+			if(token.type == TokenType.ASSIGN || token.type == TokenType.DECL_ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
 				if(rvalue == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected expression after '='.");
 				}
 				if(!(expr instanceof Access)) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Attempting to assign to a constant, e.g. "+expr);
 				}
-				if(t.type == TokenType.ASSIGN) {
-					expr = new Assignment((Access) expr, rvalue);
-				} else if(t.type == TokenType.DECL_ASSIGN) {
-					expr = new Assignment(Mode.DECLARATION, (Access) expr, rvalue);
+				if(token.type == TokenType.ASSIGN) {
+					expr = new Assignment((Access) expr, rvalue, token);
+				} else if(token.type == TokenType.DECL_ASSIGN) {
+					expr = new Assignment(Mode.DECLARATION, (Access) expr, rvalue, token);
 				}
 				continue;
 				
 			}
 			
-			if(t.type == TokenType.AMPERSAND) {
+			if(token.type == TokenType.AMPERSAND) {
 				reader.skip();
-				expr = new AddressOf(expr);
+				expr = new AddressOf(expr, token);
 				continue;
 			}
 			
-			if(t.type == TokenType.AT) {
+			if(token.type == TokenType.AT) {
 				reader.skip();
-				expr = new Dereference(expr);
+				expr = new Dereference(expr, token);
 				continue;
 			}
 			
-			if(t.type == TokenType.PLUS || t.type == TokenType.STAR
-					|| t.type == TokenType.MINUS || t.type == TokenType.SLASH
-					|| t.type == TokenType.PERCENT || t.type == TokenType.GREATERTHAN
-					|| t.type == TokenType.LESSTHAN || t.type == TokenType.GREATERTHAN_EQUALS
-					|| t.type == TokenType.LESSTHAN_EQUALS || t.type == TokenType.EQUALS
-					|| t.type == TokenType.NOT_EQUALS || t.type == TokenType.PLUS_ASSIGN
-					|| t.type == TokenType.MINUS_ASSIGN || t.type == TokenType.STAR_ASSIGN
-					|| t.type == TokenType.SLASH_ASSIGN || t.type == TokenType.DOUBLE_PIPE
-					|| t.type == TokenType.DOUBLE_AMPERSAND || t.type == TokenType.PIPE
-					|| t.type == TokenType.AMPERSAND) {
+			if(token.type == TokenType.PLUS || token.type == TokenType.STAR
+					|| token.type == TokenType.MINUS || token.type == TokenType.SLASH
+					|| token.type == TokenType.PERCENT || token.type == TokenType.GREATERTHAN
+					|| token.type == TokenType.LESSTHAN || token.type == TokenType.GREATERTHAN_EQUALS
+					|| token.type == TokenType.LESSTHAN_EQUALS || token.type == TokenType.EQUALS
+					|| token.type == TokenType.NOT_EQUALS || token.type == TokenType.PLUS_ASSIGN
+					|| token.type == TokenType.MINUS_ASSIGN || token.type == TokenType.STAR_ASSIGN
+					|| token.type == TokenType.SLASH_ASSIGN || token.type == TokenType.DOUBLE_PIPE
+					|| token.type == TokenType.DOUBLE_AMPERSAND || token.type == TokenType.PIPE
+					|| token.type == TokenType.AMPERSAND) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
 				if(rvalue == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected rvalue after binary operator");
 				}
-				switch(t.type) {
-					case PLUS:  expr = new Add(expr, rvalue); break;
-					case STAR:  expr = new Mul(expr, rvalue); break;
-					case MINUS: expr = new Sub(expr, rvalue); break;
-					case SLASH: expr = new Div(expr, rvalue); break;
-					case PERCENT: expr = new Mod(expr, rvalue); break;
-					case GREATERTHAN: expr = new Compare(expr, rvalue, CompareType.GREATER); break;
-					case GREATERTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL); break;
-					case LESSTHAN: expr = new Compare(expr, rvalue, CompareType.LESSER); break;
-					case LESSTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL); break;
-					case EQUALS: expr = new Compare(expr, rvalue, CompareType.EQUAL); break;
-					case NOT_EQUALS: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL); break;
+				switch(token.type) {
+					case PLUS:  expr = new Add(expr, rvalue, token); break;
+					case STAR:  expr = new Mul(expr, rvalue, token); break;
+					case MINUS: expr = new Sub(expr, rvalue, token); break;
+					case SLASH: expr = new Div(expr, rvalue, token); break;
+					case PERCENT: expr = new Mod(expr, rvalue, token); break;
+					case GREATERTHAN: expr = new Compare(expr, rvalue, CompareType.GREATER, token); break;
+					case GREATERTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.GREATER_OR_EQUAL, token); break;
+					case LESSTHAN: expr = new Compare(expr, rvalue, CompareType.LESSER, token); break;
+					case LESSTHAN_EQUALS: expr = new Compare(expr, rvalue, CompareType.LESSER_OR_EQUAL, token); break;
+					case EQUALS: expr = new Compare(expr, rvalue, CompareType.EQUAL, token); break;
+					case NOT_EQUALS: expr = new Compare(expr, rvalue, CompareType.NOT_EQUAL, token); break;
 					case PLUS_ASSIGN:  ensureAccess(expr);
-						expr = new Assignment(Mode.ADD, (Access) expr, rvalue); break;
+						expr = new Assignment(Mode.ADD, (Access) expr, rvalue, token); break;
 					case MINUS_ASSIGN: ensureAccess(expr);
-						expr = new Assignment(Mode.SUB, (Access) expr, rvalue); break;
+						expr = new Assignment(Mode.SUB, (Access) expr, rvalue, token); break;
 					case STAR_ASSIGN:  ensureAccess(expr);
-						expr = new Assignment(Mode.MUL, (Access) expr, rvalue); break;
+						expr = new Assignment(Mode.MUL, (Access) expr, rvalue, token); break;
 					case SLASH_ASSIGN: ensureAccess(expr);
-						expr = new Assignment(Mode.DIV, (Access) expr, rvalue); break;
-					case PIPE: expr = new BinaryCombination(BinaryComp.BINARY_OR, expr, rvalue); break;
-					case AMPERSAND: expr = new BinaryCombination(BinaryComp.BINARY_AND, expr, rvalue); break;
-					case DOUBLE_PIPE:  expr = new BinaryCombination(BinaryComp.LOGICAL_OR,  expr, rvalue); break;
-					case DOUBLE_AMPERSAND: expr = new BinaryCombination(BinaryComp.LOGICAL_AND, expr, rvalue); break;
-					default: throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-							"Unknown binary operation yet");
+						expr = new Assignment(Mode.DIV, (Access) expr, rvalue, token); break;
+					case PIPE: expr = new BinaryCombination(BinaryComp.BINARY_OR, expr, rvalue, token); break;
+					case AMPERSAND: expr = new BinaryCombination(BinaryComp.BINARY_AND, expr, rvalue, token); break;
+					case DOUBLE_PIPE:  expr = new BinaryCombination(BinaryComp.LOGICAL_OR,  expr, rvalue, token); break;
+					case DOUBLE_AMPERSAND: expr = new BinaryCombination(BinaryComp.LOGICAL_AND, expr, rvalue, token); break;
+					default: throw new CompilationFailedError(sReader.getLocation(reader.prev()),
+							"Unknown binary operation yet "+token.type);
 				}
 				continue;
 				
 				
 			}
 			
-			if(t.type == TokenType.AS_KW) {
+			if(token.type == TokenType.AS_KW) {
 				
 				reader.skip();
 				Type type = TypeParser.parse(sReader, reader);
 				if(type == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected destination type after 'as' keyword (e.g. for casting)");
 				}
-				expr = new Cast(expr, type);
+				expr = new Cast(expr, type, token);
 				continue;
 				
 			}
@@ -252,7 +253,7 @@ public class ExpressionParser {
 		
 		if(expression == null) {
 			if(parenNumber > 0) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected expression in parenthesis");
 			}
 			reader.reset(mark);
@@ -261,10 +262,10 @@ public class ExpressionParser {
 		
 		while(parenNumber > 0) {
 			if(reader.read().type != TokenType.CLOS_PAREN) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Missing closing parenthesis.");
 			}
-			expression = new Parenthesis(expression);
+			expression = new Parenthesis(expression, expression.startToken);
 			parenNumber--;
 		}
 		

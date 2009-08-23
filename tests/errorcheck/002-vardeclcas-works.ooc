@@ -1,11 +1,6 @@
-include stdio;
-cover String from char*;
-cover Int from int;
-extern func printf(String, ...);
+main: func {
 
-func main {
-
-	Int i = 42;
-	printf("The answer is %d\n", i);
+	i = 42 : Int // error, int should be capitalized
+	printf("The answer is %d\n", i)
 
 }

@@ -27,13 +27,13 @@ public class FunctionCallParser {
 			reader.skip();
 			Token tSuff = reader.read();
 			if(tSuff.type != TokenType.NAME) {
-				throw new CompilationFailedError(sReader.getLocation(tSuff.start),
+				throw new CompilationFailedError(sReader.getLocation(tSuff),
 				"Expecting suffix after 'functionname~' !");
 			}
 			suffix = tSuff.get(sReader);
 		}
 
-		FunctionCall call = new FunctionCall(name, suffix);
+		FunctionCall call = new FunctionCall(name, suffix, tName);
 		
 		if(!ExpressionListFiller.fill(sReader, reader, call.getArguments())) {
 			reader.reset(mark);

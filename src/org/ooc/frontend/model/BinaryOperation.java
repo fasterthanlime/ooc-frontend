@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 /**
  * Binary in the sense that it has a left and a right operand (e.g. binary op,
@@ -13,7 +14,8 @@ public abstract class BinaryOperation extends Expression {
 	protected Expression left;
 	protected Expression right;
 	
-	public BinaryOperation(Expression left, Expression right) {
+	public BinaryOperation(Expression left, Expression right, Token startToken) {
+		super(startToken);
 		this.left = left;
 		this.right = right;
 	}

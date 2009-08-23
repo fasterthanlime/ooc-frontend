@@ -1,11 +1,14 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.OpDecl.OpType;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
@@ -14,7 +17,8 @@ public class ArrayAccess extends Access implements MustBeResolved {
 	protected Expression variable;
 	protected Expression index;
 
-	public ArrayAccess(Expression variable, Expression index) {
+	public ArrayAccess(Expression variable, Expression index, Token token) {
+		super(token);
 		this.variable = variable;
 		this.index = index;
 	}
@@ -96,7 +100,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	protected boolean tryIndexedAssign(OpDecl op, Stack<Node> stack, int assignIndex) {
+	protected boolean tryIndexedAssign(OpDecl op, Stack<Node> stack, int assignIndex) throws OocCompilationError, EOFException {
 		
 		if(op.getOpType() != OpType.INDEXED_ASSIGN) return false;
 		
@@ -107,19 +111,19 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		}
 		
 		if(op.getFunc().getArguments().size() != 3) {
-			throw new CompilationFailedError(null,
+			throw new OocCompilationError(op, stack,
 					"To overload the indexed assign operator, you need exactly three arguments, not "
 					+op.getFunc().getArgsRepr());
 		}
 		NodeList<Argument> args = op.getFunc().getArguments();
 		if(args.get(0).getType().equals(variable.getType())
 				&& args.get(1).getType().equals(index.getType())) {
-			FunctionCall call = new FunctionCall(op.getFunc());
+			FunctionCall call = new FunctionCall(op.getFunc(), startToken);
 			call.getArguments().add(variable);
 			call.getArguments().add(index);
 			call.getArguments().add(ass.getRvalue());
 			if(!stack.get(assignIndex - 1).replace(ass, call)) {
-				throw new CompilationFailedError(null, "Couldn't replace array-access-assign with a function call");
+				throw new OocCompilationError(this, stack, "Couldn't replace array-access-assign with a function call");
 			}
 			return true;
 		}
@@ -140,7 +144,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		NodeList<Argument> args = op.getFunc().getArguments();
 		if(args.get(0).getType().equals(variable.getType())
 				&& args.get(1).getType().equals(index.getType())) {
-			FunctionCall call = new FunctionCall(op.getFunc());
+			FunctionCall call = new FunctionCall(op.getFunc(), startToken);
 			call.getArguments().add(variable);
 			call.getArguments().add(index);
 			stack.peek().replace(this, call);

@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class VariableDeclFromExpr extends VariableDecl {
 
-	public VariableDeclFromExpr(String name, Expression expression) {
-		super(null, false, false);
-		atoms.add(new VariableDeclAtom(name, expression));
+	public VariableDeclFromExpr(String name, Expression expression, Token startToken) {
+		super(null, false, false, startToken);
+		atoms.add(new VariableDeclAtom(name, expression, startToken));
 	}
 
 	@Override

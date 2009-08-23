@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class ClassDecl extends TypeDecl implements Scope {
 
@@ -17,14 +18,14 @@ public class ClassDecl extends TypeDecl implements Scope {
 	protected FunctionDecl initializer;
 	protected FunctionDecl staticInitializer;
 	
-	public ClassDecl(String name, boolean isAbstract) {
-		super(name);
+	public ClassDecl(String name, boolean isAbstract, Token startToken) {
+		super(name, startToken);
 		this.isAbstract = isAbstract;
 		this.superName = "";
-		this.initializer = new FunctionDecl("initialize", "", false, false, false, false);
-		this.initializer.getArguments().add(new RegularArgument(instanceType, "this"));
+		this.initializer = new FunctionDecl("initialize", "", false, false, false, false, startToken);
+		this.initializer.getArguments().add(new RegularArgument(instanceType, "this", startToken));
 		this.initializer.setTypeDecl(this);
-		this.staticInitializer = new FunctionDecl("static_initialize", "", false, false, false, false);
+		this.staticInitializer = new FunctionDecl("static_initialize", "", false, false, false, false, startToken);
 		this.staticInitializer.setStatic(true);
 		this.staticInitializer.setTypeDecl(this);
 		this.superRef = null;
@@ -72,7 +73,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 	
 	@Override
 	public NodeList<FunctionDecl> getFunctionsRecursive() {
-		NodeList<FunctionDecl> allFuncs = new NodeList<FunctionDecl>();
+		NodeList<FunctionDecl> allFuncs = new NodeList<FunctionDecl>(startToken);
 		getFunctionsRecursive(allFuncs);
 		return allFuncs;
 	}

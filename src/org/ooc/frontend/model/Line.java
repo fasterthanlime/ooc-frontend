@@ -9,9 +9,7 @@ public class Line extends Node {
 	protected Statement statement;
 
 	public Line(Statement statement) {
-		if(statement == null) {
-			throw new Error("Who's giving me a null statement? Heck.");
-		}
+		super(statement.startToken);
 		this.statement = statement;
 	}
 	

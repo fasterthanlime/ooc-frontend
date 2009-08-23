@@ -15,7 +15,8 @@ public class OpDeclParser {
 
 	public static OpDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
 		
-		if(reader.peek().type != TokenType.OPERATOR_KW) return null;
+		Token startToken = reader.peek();
+		if(startToken.type != TokenType.OPERATOR_KW) return null;
 		reader.skip();
 		
 		OpType type;
@@ -45,7 +46,7 @@ public class OpDeclParser {
 			throw new CompilationFailedError(null, "Expected function after operator overloading of "+type);
 		}
 		
-		return new OpDecl(type, decl);
+		return new OpDecl(type, decl, startToken);
 		
 	}
 

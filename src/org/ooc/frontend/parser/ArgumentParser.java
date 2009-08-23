@@ -24,9 +24,11 @@ public class ArgumentParser {
 		
 		int mark = reader.mark();
 		
-		if(reader.peek().type == TokenType.TRIPLE_DOT) {
+		Token startToken = reader.peek();
+		if(startToken.type == TokenType.TRIPLE_DOT) {
 			reader.skip();
-			args.add(new VarArg());
+			VarArg varArg = new VarArg(startToken);
+			args.add(varArg);
 			return true;
 		}
 		
@@ -38,10 +40,11 @@ public class ArgumentParser {
 		if(isExtern) {
 			Type type = TypeParser.parse(sReader, reader);
 			if(type == null) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected argument type in extern func definition ':'");
 			}
-			args.add(new TypeArgument(type));
+			TypeArgument typeArg = new TypeArgument(type, type.startToken);
+			args.add(typeArg);
 			return true;
 		}
 				
@@ -58,10 +61,11 @@ public class ArgumentParser {
 		
 		Token t2 = reader.read();
 		if(t2.type != TokenType.NAME) {
-			throw new CompilationFailedError(sReader.getLocation(t2.start),
+			throw new CompilationFailedError(sReader.getLocation(t2),
 					"Expecting member variable name in member-assign-argument");
 		}
-		args.add(new MemberArgument(t2.get(sReader)));
+		MemberArgument arg = new MemberArgument(t2.get(sReader), token);
+		args.add(arg);
 		return true;
 	}
 
@@ -72,39 +76,45 @@ public class ArgumentParser {
 		if(token.type != TokenType.ASSIGN) return false;
 		Token t2 = reader.read();
 		if(t2.type != TokenType.NAME) {
-			throw new CompilationFailedError(sReader.getLocation(t2.start),
+			throw new CompilationFailedError(sReader.getLocation(t2),
 					"Expecting member variable name in member-assign-argument");
 		}
-		args.add(new MemberAssignArgument(t2.get(sReader)));
+		MemberAssignArgument arg = new MemberAssignArgument(t2.get(sReader), token);
+		args.add(arg);
 		return true;
 	}
 
 	protected static boolean tryRegular(SourceReader sReader, TokenReader reader,
-			NodeList<Argument> args, int mark, Token t)
+			NodeList<Argument> args, int mark, Token token)
 			throws CompilationFailedError, EOFException {
 		
-		if(t.type != TokenType.NAME) return false;
+		if(token.type != TokenType.NAME) return false;
 		
 		List<String> names = new ArrayList<String>();
-		names.add(t.get(sReader));
+		List<Token> tokens = new ArrayList<Token>();
+		names.add(token.get(sReader));
+		tokens.add(token);
 		while(reader.peek().type == TokenType.COMMA) {
 			reader.skip();
 			if(reader.peek().type != TokenType.NAME) {
 				reader.reset(mark);
 				return false;
 			}
-			names.add(reader.read().get(sReader));
+			Token subToken = reader.read();
+			names.add(subToken.get(sReader));
+			tokens.add(subToken);
 		}
 		
 		if(reader.peek().type == TokenType.COLON) {
 			reader.skip();
 			Type type = TypeParser.parse(sReader, reader);
 			if(type == null) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected argument type after its name and ':'");
 			}
-			for(String name: names) {
-				args.add(new RegularArgument(type, name));
+			for(int i = 0; i < names.size(); i++) {
+				RegularArgument regArg = new RegularArgument(type, names.get(i), tokens.get(i));
+				args.add(regArg);
 			}
 			return true;
 		}

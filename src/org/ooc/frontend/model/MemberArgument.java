@@ -4,16 +4,17 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 import org.ubi.CompilationFailedError;
 
 public class MemberArgument extends Argument {
 
-	public MemberArgument(String name) {
-		this(name, false);
+	public MemberArgument(String name, Token startToken) {
+		this(name, false, startToken);
 	}
 	
-	public MemberArgument(String name, boolean isConst) {
-		super(new Type(""), name, isConst);
+	public MemberArgument(String name, boolean isConst, Token startToken) {
+		super(new Type("", startToken), name, isConst, startToken);
 	}
 	
 	@Override
@@ -45,7 +46,7 @@ public class MemberArgument extends Argument {
 					"' doesn't correspond to any real member variable.");
 		}
 
-		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name));
+		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name, startToken));
 		
 		return false;
 		

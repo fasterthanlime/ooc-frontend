@@ -27,7 +27,7 @@ public class ControlStatementFiller {
 				
 				Line line = LineParser.parse(sReader, reader);
 				if(line == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected line inside of "+controlStatement.getClass().getSimpleName());
 				}
 				controlStatement.getBody().add(line);
@@ -36,7 +36,7 @@ public class ControlStatementFiller {
 		} else {
 			Line only = LineParser.parse(sReader, reader);
 			if(only == null) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 				"Expected line inside of bracket-less "+controlStatement.getClass().getSimpleName());
 			}
 			controlStatement.getBody().add(only);

@@ -11,10 +11,10 @@ public class CommentParser {
 
 	public static Visitable parse(SourceReader sReader, TokenReader reader) {
 		
-		Token t = reader.peek();
-		if(t.type == TokenType.OOCDOC) {
+		Token token = reader.peek();
+		if(token.type == TokenType.OOCDOC) {
 			reader.skip();
-			return new OocDocComment(t.get(sReader)); // FIXME lazy
+			return new OocDocComment(token.get(sReader), token); // FIXME add oocdoc tags parsing (me=lazy)
 		}
 		
 		return null;

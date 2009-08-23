@@ -217,6 +217,7 @@ public class Tokenizer {
 					tokens.add(new Token(location.getIndex(), 2, TokenType.SLASH_ASSIGN));
 				} else if(c2 == '/') {
 					reader.readLine();
+					tokens.add(new Token(location.getIndex(), 1, TokenType.LINESEP));
 				} else if(c2 == '*') {
 					reader.read();
 					char c3 = reader.peek();

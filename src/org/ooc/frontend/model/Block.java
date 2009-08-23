@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Block extends Statement {
 
 	protected final NodeList<Line> body;
 	
-	public Block() {
-		body = new NodeList<Line>();
+	public Block(Token startToken) {
+		super(startToken);
+		body = new NodeList<Line>(startToken);
 	}
 	
 	@Override

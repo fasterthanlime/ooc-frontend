@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Compare extends BinaryOperation {
 
@@ -17,8 +18,8 @@ public class Compare extends BinaryOperation {
 
 	protected CompareType compareType;
 	
-	public Compare(Expression left, Expression right, CompareType compareType) {
-		super(left, right);
+	public Compare(Expression left, Expression right, CompareType compareType, Token token) {
+		super(left, right, token);
 		this.compareType = compareType;
 	}
 	

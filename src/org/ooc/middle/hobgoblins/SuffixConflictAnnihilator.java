@@ -1,19 +1,20 @@
 package org.ooc.middle.hobgoblins;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
 import org.ooc.frontend.model.FunctionDecl;
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 public class SuffixConflictAnnihilator implements Hobgoblin {
 
@@ -40,13 +41,11 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 						classFuncNames.put(node.getTypeDecl(), set);
 					}
 					if(!set.add(node.getName()+"_"+node.getSuffix())) {
-						throw new CompilationFailedError(null,
-								"Conflicting function names "+name+", add suffix to one of them!");
+						throwError(node, stack, name);
 					}
 				} else {
 					if(!funcNames.add(node.getName()+"_"+node.getSuffix())) {
-						throw new CompilationFailedError(null,
-								"Conflicting function names "+name+", add suffix to one of them!");
+						throwError(node, stack, name);
 					}
 				}
 				
@@ -54,6 +53,15 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 				
 			}
 		}).visit(module);
+		
+	}
+
+	void throwError(FunctionDecl node, Stack<Node> stack, String name)
+			throws OocCompilationError, EOFException {
+		
+		throw new OocCompilationError(node, stack,
+				"Two functions have the same name '"+name
+					+"', add suffix to one of them! e.g. "+name+": func ~suffix "+node.getArgsRepr()+" -> ReturnType");
 		
 	}
 

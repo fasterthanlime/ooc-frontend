@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
@@ -15,15 +16,16 @@ public class Type extends Node implements MustBeResolved {
 	protected int referenceLevel;
 	protected Declaration ref;
 	
-	public Type(String name) {
-		this(name, 0);
+	public Type(String name, Token startToken) {
+		this(name, 0, startToken);
 	}
 	
-	public Type(String name, int pointerLevel) {
-		this(name, pointerLevel, 0);
+	public Type(String name, int pointerLevel, Token startToken) {
+		this(name, pointerLevel, 0, startToken);
 	}
 	
-	public Type(String name, int pointerLevel, int referenceLevel) {
+	public Type(String name, int pointerLevel, int referenceLevel, Token startToken) {
+		super(startToken);
 		this.name = name;
 		this.pointerLevel = pointerLevel;
 		this.referenceLevel = referenceLevel;

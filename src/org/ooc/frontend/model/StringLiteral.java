@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class StringLiteral extends Literal {
 
 	protected String value;
-	public static Type type = new Type("String");
+	public static Type type = new Type("String", Token.defaultToken);
 	
-	public StringLiteral(String value) {
+	public StringLiteral(String value, Token startToken) {
+		super(startToken);
 		this.value = value;
 	}
 	

@@ -19,33 +19,33 @@ public class ConditionalParser {
 		
 		int mark = reader.mark();
 		
-		Token token = reader.read();
-		if(token.type != TokenType.WHILE_KW && token.type != TokenType.IF_KW) {
+		Token startToken = reader.read();
+		if(startToken.type != TokenType.WHILE_KW && startToken.type != TokenType.IF_KW) {
 			reader.reset(mark);
 			return null;
 		}
 		
 		if(reader.read().type != TokenType.OPEN_PAREN) {
-			throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-				"Expected opening parenthesis after "+token.get(sReader));
+			throw new CompilationFailedError(sReader.getLocation(reader.prev()),
+				"Expected opening parenthesis after "+startToken.get(sReader));
 		}
 		
 		Expression condition = ExpressionParser.parse(sReader, reader);
 		if(condition == null) {
-			throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+			throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected expression as while condition");
 		}
 		
 		if(reader.read().type != TokenType.CLOS_PAREN) {
-			throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
-				"Expected closing parenthesis after expression of an "+token.get(sReader));
+			throw new CompilationFailedError(sReader.getLocation(reader.prev()),
+				"Expected closing parenthesis after expression of an "+startToken.get(sReader));
 		}
 		
 		Conditional statement;
-		if(token.type == TokenType.WHILE_KW) {
-			statement = new While(condition);
-		} else if(token.type == TokenType.IF_KW) {
-			statement = new If(condition);
+		if(startToken.type == TokenType.WHILE_KW) {
+			statement = new While(condition, startToken);
+		} else if(startToken.type == TokenType.IF_KW) {
+			statement = new If(condition, startToken);
 		} else {
 			reader.reset(mark);
 			return null;

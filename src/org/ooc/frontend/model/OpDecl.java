@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class OpDecl extends Declaration {
 
@@ -20,8 +21,8 @@ public class OpDecl extends Declaration {
 	protected OpType opType;
 	protected FunctionDecl func;
 	
-	public OpDecl(OpType opType, FunctionDecl func) {
-		super("Operator "+opType);
+	public OpDecl(OpType opType, FunctionDecl func, Token startToken) {
+		super("Operator "+opType, startToken);
 		this.opType = opType;
 		this.func = func;
 		String name = "__OP_"+opType;
@@ -44,7 +45,7 @@ public class OpDecl extends Declaration {
 
 	@Override
 	public Type getType() {
-		return new Type("Operator");
+		return new Type("Operator", Token.defaultToken);
 	}
 	
 	public OpType getOpType() {

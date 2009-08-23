@@ -3,14 +3,16 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class RangeLiteral extends Literal {
 
 	protected Expression lower;
 	protected Expression upper;
-	protected static Type type = new Type("Range");
+	protected static Type type = new Type("Range", Token.defaultToken);
 	
-	public RangeLiteral(Expression lower, Expression upper) {
+	public RangeLiteral(Expression lower, Expression upper, Token startToken) {
+		super(startToken);
 		this.lower = lower;
 		this.upper = upper;
 	}

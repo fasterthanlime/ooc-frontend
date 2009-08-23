@@ -3,12 +3,14 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Parenthesis extends Expression {
 
 	protected Expression expression;
 
-	public Parenthesis(Expression expression) {
+	public Parenthesis(Expression expression, Token startToken) {
+		super(startToken);
 		this.expression = expression;
 	}
 

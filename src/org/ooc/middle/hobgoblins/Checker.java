@@ -7,6 +7,7 @@ import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableAccess;
@@ -74,13 +75,14 @@ public class Checker implements Hobgoblin {
 		Nosy.get(Node.class, new Opportunist<Node>() {
 			@Override
 			public boolean take(Node node, Stack<Node> stack) throws IOException {
-				if(node.startToken == null) {
+				if(node.startToken == null && !(node instanceof NodeList<?>)) {
 					throw new CompilationFailedError(null,
-						"Null startToken for a "+node.getClass().getSimpleName());
+						"Null startToken for a "+node.getClass().getSimpleName()
+							+" = "+node+", stack = "+stack+"\nStack Trace: "+node.stackTrace);
 				}
 				return true;
 			}
-		});//.visit(module);
+		}).visit(module);
 		
 	}
 

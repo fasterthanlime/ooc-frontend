@@ -24,6 +24,7 @@ import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.Tinkerer;
 import org.ooc.outputting.FileUtils;
 
@@ -264,13 +265,18 @@ public class CommandLine {
 	}
 
 	protected void translate(Module module, Set<Module> done) throws IOException {
-		done.add(module);
-		new Tinkerer().process(module, params);
-		new CGenerator(params.outPath, module).generate();
-		for(Import imp: module.getImports()) {
-			if(!done.contains(imp.getModule())) {
-				translate(imp.getModule(), done);
+		try {
+			done.add(module);
+			new Tinkerer().process(module, params);
+			new CGenerator(params.outPath, module).generate();
+			for(Import imp: module.getImports()) {
+				if(!done.contains(imp.getModule())) {
+					translate(imp.getModule(), done);
+				}
 			}
+		} catch(OocCompilationError err) {
+			System.err.println(err);
+			System.exit(1);
 		}
 	}
 

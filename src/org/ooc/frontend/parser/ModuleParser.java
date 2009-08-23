@@ -24,7 +24,7 @@ public class ModuleParser {
 	public static Module parse(String fullName, File file, SourceReader sReader,
 			TokenReader reader, Parser parser) throws IOException {
 		
-		Module module = new Module(fullName);
+		Module module = new Module(fullName, sReader);
 		cache.put(module.getFullName(), module);
 		
 		while(reader.hasNext()) {
@@ -55,7 +55,7 @@ public class ModuleParser {
 			}
 			
 			Token errToken = reader.peek();
-			throw new CompilationFailedError(sReader.getLocation(errToken.start + errToken.length),
+			throw new CompilationFailedError(sReader.getLocation(errToken),
 					"Expected declaration, include, or import in source unit, but got "+errToken.type);
 			
 		}

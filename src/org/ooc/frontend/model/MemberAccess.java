@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
@@ -11,17 +12,17 @@ public class MemberAccess extends VariableAccess {
 	
 	protected Expression expression;
 
-	public MemberAccess(String variable) {
-		this(new VariableAccess("this"), variable);
+	public MemberAccess(String variable, Token startToken) {
+		this(new VariableAccess("this", startToken), variable, startToken);
 	}
 	
-	public MemberAccess(Expression expression, String variable) {
-		super(variable);
+	public MemberAccess(Expression expression, String variable, Token startToken) {
+		super(variable, startToken);
 		this.expression = expression;
 	}
 	
-	public MemberAccess(Expression expression, VariableAccess variableAccess) {
-		super(variableAccess.getName());
+	public MemberAccess(Expression expression, VariableAccess variableAccess, Token startToken) {
+		super(variableAccess.getName(), startToken);
 		this.expression = expression;
 	}
 

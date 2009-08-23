@@ -15,7 +15,8 @@ public class ImportParser {
 	public static boolean parse(SourceReader sReader, 
 			TokenReader reader, NodeList<Import> imports) throws EOFException {
 
-		if(reader.peek().type != TokenType.IMPORT_KW) {
+		Token startToken = reader.peek();
+		if(startToken.type != TokenType.IMPORT_KW) {
 			return false;
 		}
 		reader.skip();
@@ -24,24 +25,27 @@ public class ImportParser {
 		
 		while(true) {
 		
-			Token t = reader.read();
-			if(t.type == TokenType.LINESEP) {
-				imports.add(new Import(sb.toString()));
+			Token token = reader.read();
+			if(token.type == TokenType.LINESEP) {
+				Import imp = new Import(sb.toString(), startToken);
+				imports.add(imp);
 				break;
 			}
-			if(t.type == TokenType.COMMA) {
-				imports.add(new Import(sb.toString()));
+			if(token.type == TokenType.COMMA) {
+				Import imp = new Import(sb.toString(), startToken);
+				imports.add(imp);
 				sb.setLength(0);
-			} else if(t.type == TokenType.NAME || t.type == TokenType.MINUS) {
-				sb.append(t.get(sReader));
-			} else if(t.type == TokenType.DOT) {
-				if(t.type == TokenType.STAR) {
+				startToken = reader.peek();
+			} else if(token.type == TokenType.NAME || token.type == TokenType.MINUS) {
+				sb.append(token.get(sReader));
+			} else if(token.type == TokenType.DOT) {
+				if(token.type == TokenType.STAR) {
 					System.out.println("Encountered import blah.*");
 				}
 				sb.append('.');
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(t.start),
-						"Unexpected token "+t.type+" while reading an import");
+				throw new CompilationFailedError(sReader.getLocation(token),
+						"Unexpected token "+token.type+" while reading an import");
 			}
 			
 		}

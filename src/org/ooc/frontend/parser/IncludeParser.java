@@ -18,7 +18,8 @@ public class IncludeParser {
 
 	public static boolean parse(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
 
-		if(reader.peek().type != TokenType.INCLUDE_KW) return false;
+		Token startToken = reader.peek();
+		if(startToken.type != TokenType.INCLUDE_KW) return false;
 		reader.skip();
 		
 		StringBuilder sb = new StringBuilder();
@@ -26,23 +27,23 @@ public class IncludeParser {
 		
 		while(true) {
 		
-			Token t = reader.read();
-			if(t.type == TokenType.LINESEP) {
-				addInclude(includes, sb.toString(), defines);
+			Token token = reader.read();
+			if(token.type == TokenType.LINESEP) {
+				addInclude(includes, sb.toString(), defines, startToken);
 				break;
 			}
-			if(t.type == TokenType.COMMA) {
-				addInclude(includes, sb.toString(), defines);
+			if(token.type == TokenType.COMMA) {
+				addInclude(includes, sb.toString(), defines, startToken);
 				sb.setLength(0);
 				defines.clear();
-			} else if(t.type == TokenType.NAME || t.type == TokenType.SLASH
-					|| t.type == TokenType.DOT || t.type == TokenType.DOUBLE_DOT) {
-				sb.append(t.get(sReader));
-			} else if(t.type == TokenType.PIPE) {
+			} else if(token.type == TokenType.NAME || token.type == TokenType.SLASH
+					|| token.type == TokenType.DOT || token.type == TokenType.DOUBLE_DOT) {
+				sb.append(token.get(sReader));
+			} else if(token.type == TokenType.PIPE) {
 				readDefines(sReader, reader, defines);
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(t.start),
-						"Unexpected token "+t.type+" while reading an include");
+				throw new CompilationFailedError(sReader.getLocation(token),
+						"Unexpected token "+token.type+" while reading an include");
 			}
 			
 		}
@@ -79,7 +80,7 @@ public class IncludeParser {
 		}
 	}
 
-	protected static void addInclude(NodeList<Include> includes, String contentParam, List<Define> defines) {
+	protected static void addInclude(NodeList<Include> includes, String contentParam, List<Define> defines, Token startToken) {
 		String content = contentParam;
 		Mode mode = Mode.PATHY;
 		if(content.startsWith("./")) {
@@ -87,7 +88,7 @@ public class IncludeParser {
 			mode = Mode.LOCAL;
 		}
 
-		Include include = new Include(content, mode);
+		Include include = new Include(content, mode, startToken);
 		include.getDefines().addAll(defines);
 		includes.add(include);
 	}

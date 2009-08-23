@@ -6,7 +6,19 @@ import org.ooc.frontend.model.tokens.Token;
 
 public abstract class Node implements Visitable {
 
-	public Token startToken;
+	public final Token startToken;
+	public final String stackTrace;
+	
+	public Node(Token startToken) {
+		this.startToken = startToken;
+		String trace = "\n";
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for(StackTraceElement elem: stack) {
+			trace += "\tat "+elem.getClassName()+"("+elem.getFileName()+":"
+				+elem.getLineNumber()+") in "+elem.getMethodName()+"\n";
+		}
+		stackTrace = trace;
+	}
 	
 	@Override
 	public String toString() {

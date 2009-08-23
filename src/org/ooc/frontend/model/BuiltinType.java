@@ -3,15 +3,20 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class BuiltinType extends TypeDecl {
 
 	protected Type type;
-	static NodeList<FunctionDecl> EMPTY = new NodeList<FunctionDecl>();
+	static NodeList<FunctionDecl> EMPTY = new NodeList<FunctionDecl>(Token.defaultToken);
 	
 	public BuiltinType(String name) {
-		super(name);
-		type = new Type(name);
+		this(name, Token.defaultToken);
+	}
+	
+	public BuiltinType(String name, Token startToken) {
+		super(name, startToken);
+		type = new Type(name, startToken);
 		type.setRef(this);
 	}
 

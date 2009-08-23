@@ -3,12 +3,14 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class ValuedReturn extends Return {
 
 	protected Expression expression;
 
-	public ValuedReturn(Expression expression) {
+	public ValuedReturn(Expression expression, Token startToken) {
+		super(startToken);
 		this.expression = expression;
 	}
 	

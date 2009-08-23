@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.ValuedReturn;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.SourceReader;
@@ -15,10 +16,13 @@ public class ReturnParser {
 
 		int mark = reader.mark();
 		
-		if(reader.read().type == TokenType.RETURN_KW) {
+		Token startToken = reader.read();
+		if(startToken.type == TokenType.RETURN_KW) {
 			Expression expr = ExpressionParser.parse(sReader, reader);
-			if(expr == null) return new Return();
-			return new ValuedReturn(expr);
+			if(expr == null) {
+				return new Return(startToken);
+			}
+			return new ValuedReturn(expr, startToken);
 		}
 		
 		reader.reset(mark);

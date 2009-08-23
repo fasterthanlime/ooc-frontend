@@ -3,12 +3,14 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class OocDocComment extends Node {
 
 	private String content;
 
-	public OocDocComment(String content) {
+	public OocDocComment(String content, Token startToken) {
+		super(startToken);
 		this.content = content;
 	}
 	

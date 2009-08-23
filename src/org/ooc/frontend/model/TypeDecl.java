@@ -1,5 +1,7 @@
 package org.ooc.frontend.model;
 
+import org.ooc.frontend.model.tokens.Token;
+
 
 public abstract class TypeDecl extends Declaration {
 
@@ -7,11 +9,11 @@ public abstract class TypeDecl extends Declaration {
 	protected NodeList<FunctionDecl> functions;
 	protected Type instanceType;
 	
-	public TypeDecl(String name) {
-		super(name);
-		this.variables = new NodeList<VariableDecl>();
-		this.functions = new NodeList<FunctionDecl>();
-		this.instanceType = new Type(name);
+	public TypeDecl(String name, Token startToken) {
+		super(name, startToken);
+		this.variables = new NodeList<VariableDecl>(startToken);
+		this.functions = new NodeList<FunctionDecl>(startToken);
+		this.instanceType = new Type(name, startToken);
 		instanceType.setRef(this);
 	}
 	
@@ -51,7 +53,9 @@ public abstract class TypeDecl extends Declaration {
 			}
 			// FIXME this is ugly.
 			if(!decl.isStatic() && (!decl.isConstructor() || !(this instanceof CoverDecl))) {
-				decl.getArguments().add(0, new RegularArgument(getInstanceType(), "this"));
+				Token tok = decl.getArguments().isEmpty() ? startToken : decl.getArguments().getFirst().startToken;
+				decl.getArguments().add(0, new RegularArgument(getInstanceType(), "this",
+						tok));
 			}
 		}
 		functions.add(decl);

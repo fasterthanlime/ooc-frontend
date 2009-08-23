@@ -9,6 +9,7 @@ import java.util.Stack;
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
@@ -21,15 +22,16 @@ public class FunctionCall extends Access implements MustBeResolved {
 	protected final NodeList<Expression> arguments;
 	protected FunctionDecl impl;
 	
-	public FunctionCall(String name, String suffix) {
+	public FunctionCall(String name, String suffix, Token startToken) {
+		super(startToken);
 		this.name = name;
 		this.suffix = suffix;
-		this.arguments = new NodeList<Expression>();
+		this.arguments = new NodeList<Expression>(startToken);
 		this.impl = null;
 	}
 	
-	public FunctionCall(FunctionDecl func) {
-		this(func.getName(), func.getSuffix());
+	public FunctionCall(FunctionDecl func, Token startToken) {
+		this(func.getName(), func.getSuffix(), startToken);
 		setImpl(func);
 	}
 
@@ -205,9 +207,9 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 		if(impl != null) {
 			if(impl.isMember()) {
-				VariableAccess thisAccess = new VariableAccess("this");
+				VariableAccess thisAccess = new VariableAccess("this", startToken);
 				thisAccess.resolve(mainStack, res, fatal);
-				MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this);
+				MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this, startToken);
 				memberCall.setImpl(impl);
 				mainStack.peek().replace(FunctionCall.this, memberCall);
 			}

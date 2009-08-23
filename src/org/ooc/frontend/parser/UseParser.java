@@ -15,27 +15,28 @@ public class UseParser {
 	public static boolean parse(SourceReader sReader, TokenReader reader,
 			NodeList<Use> uses) throws EOFException, CompilationFailedError {
 		
-		if(reader.peek().type != TokenType.USE_KW) return false;
+		Token startToken = reader.peek();
+		if(startToken.type != TokenType.USE_KW) return false;
 		reader.skip();
 		
 		StringBuilder sb = new StringBuilder();
 		
 		while(true) {
 			
-			Token t = reader.read();
-			if(t.type == TokenType.LINESEP) {
-				uses.add(new Use(sb.toString()));
+			Token token = reader.read();
+			if(token.type == TokenType.LINESEP) {
+				uses.add(new Use(sb.toString(), startToken));
 				break;
 			}
-			if(t.type == TokenType.COMMA) {
-				uses.add(new Use(sb.toString()));
+			if(token.type == TokenType.COMMA) {
+				uses.add(new Use(sb.toString(), startToken));
 				sb.setLength(0);
-			} else if(t.type == TokenType.NAME || t.type == TokenType.MINUS 
-					|| t.type == TokenType.SLASH) {
-				sb.append(t.get(sReader));
+			} else if(token.type == TokenType.NAME || token.type == TokenType.MINUS 
+					|| token.type == TokenType.SLASH) {
+				sb.append(token.get(sReader));
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(t.start),
-						"Unexpected token "+t.type+" while reading use");
+				throw new CompilationFailedError(sReader.getLocation(token),
+						"Unexpected token "+token.type+" while reading use");
 			}
 			
 		}

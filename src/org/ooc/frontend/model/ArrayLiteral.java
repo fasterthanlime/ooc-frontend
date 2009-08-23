@@ -5,15 +5,17 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 
 public class ArrayLiteral extends Literal implements MustBeResolved {
 
-	protected Type type = new Type("Pointer");
+	protected Type type = new Type("Pointer", Token.defaultToken);
 	protected NodeList<Expression> elements;
 	
-	public ArrayLiteral() {
-		elements = new NodeList<Expression>();
+	public ArrayLiteral(Token startToken) {
+		super(startToken);
+		elements = new NodeList<Expression>(startToken);
 	}
 	
 	@Override

@@ -38,14 +38,14 @@ public class ExpressionListFiller {
 			}
 			if(comma) {
 				if(reader.readWhiteless().type != TokenType.COMMA) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected comma between arguments of a function call");
 				}
 			} else {
 				reader.skipWhitespace();
 				Expression expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 							"Expected expression as argument of function call");
 				}
 				list.add(expr);

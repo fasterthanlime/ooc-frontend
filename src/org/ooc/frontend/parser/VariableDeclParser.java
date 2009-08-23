@@ -27,26 +27,30 @@ public class VariableDeclParser {
 			return null;
 		}
 		
-		while(reader.peek().type == TokenType.NAME) {
+		Token declStartToken = reader.peek();
+		Token atomStartToken;
+		while((atomStartToken = reader.peek()).type == TokenType.NAME) {
 			String name = reader.read().get(sReader);
 			Expression expr = null;
 			if(reader.peek().type == TokenType.ASSIGN) {
 				reader.skip();
 				expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected expression as an initializer to a variable declaration.");
 				}
 			} else if(reader.peek().type == TokenType.DECL_ASSIGN) {
 				reader.skip();
 				expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected expression as an initializer to a variable declaration.");
 				}
-				return new VariableDeclFromExpr(name, expr);
+				VariableDeclFromExpr vdfe = new VariableDeclFromExpr(name, expr, atomStartToken);
+				return vdfe;
 			}
-			atoms.add(new VariableDeclAtom(name, expr));
+			VariableDeclAtom vda = new VariableDeclAtom(name, expr, atomStartToken);
+			atoms.add(vda);
 			if(reader.peek().type != TokenType.COMMA) break;
 			reader.skip();
 			reader.skipWhitespace();
@@ -87,14 +91,14 @@ public class VariableDeclParser {
 				reader.skip();
 				Expression expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected expression as an initializer to a variable declaration.");
 				}
 				atoms.get(0).setExpression(expr);
 			}
 		}
 		
-		VariableDecl decl = new VariableDecl(type, isConst, isStatic);
+		VariableDecl decl = new VariableDecl(type, isConst, isStatic, declStartToken.cloneEnclosing(reader.prev()));
 		decl.setExternName(externName);
 		decl.getAtoms().addAll(atoms);
 		return decl;

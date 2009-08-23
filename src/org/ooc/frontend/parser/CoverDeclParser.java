@@ -19,9 +19,9 @@ public class CoverDeclParser {
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
-		if(reader.peek().type == TokenType.OOCDOC) {
-			Token t = reader.read();
-			comment = new OocDocComment(t.get(sReader));
+		Token startToken = reader.peek();
+		if(startToken.type == TokenType.OOCDOC) {
+			comment = new OocDocComment(reader.read().get(sReader), startToken);
 		}
 		
 		String name = "";
@@ -44,12 +44,12 @@ public class CoverDeclParser {
 				reader.skip();
 				fromType = TypeParser.parse(sReader, reader);
 				if(fromType == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected cover's base type name after the from keyword.");
 				}
 			}
 			
-			CoverDecl coverDecl = new CoverDecl(name, fromType);
+			CoverDecl coverDecl = new CoverDecl(name, fromType, tName);
 			coverDecl.setExternName(externName);
 			if(comment != null) coverDecl.setComment(comment);
 			
@@ -58,7 +58,7 @@ public class CoverDeclParser {
 				if(t2.type == TokenType.LINESEP) {
 					return coverDecl; // empty cover, acts like a typedef
 				}
-				throw new CompilationFailedError(sReader.getLocation(t2.start),
+				throw new CompilationFailedError(sReader.getLocation(t2),
 						"Expected opening bracket to begin cover declaration, got "+t2.type);
 			}
 			
@@ -71,11 +71,11 @@ public class CoverDeclParser {
 				VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 				if(varDecl != null) {
 					if(reader.read().type != TokenType.LINESEP) {
-						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected semi-colon after variable declaration in cover declaration");
 					}
 					if(fromType != null && !varDecl.isExtern()) {
-						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"You can't add non-extern member variables to a Cover which already has a base type (in this case, "
 								+fromType.getName()+")");
 					}
@@ -89,7 +89,7 @@ public class CoverDeclParser {
 					continue;
 				}
 				
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected variable declaration or function declaration in a cover declaration, but got "
 						+reader.peek().type);
 			

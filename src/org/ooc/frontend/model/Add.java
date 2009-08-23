@@ -6,13 +6,14 @@ import java.util.Stack;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.OpDecl.OpType;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class Add extends BinaryOperation implements MustBeResolved {
 
-	public Add(Expression left, Expression right) {
-		super(left, right);
+	public Add(Expression left, Expression right, Token startToken) {
+		super(left, right, startToken);
 	}
 
 	@Override
@@ -32,14 +33,14 @@ public class Add extends BinaryOperation implements MustBeResolved {
 		for(OpDecl op: res.ops) {
 			if(op.getOpType() == OpType.ADD) {
 				if(op.getFunc().getArguments().size() != 2) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(op, stack,
 							"To overload the add operator, you need exactly two arguments, not "
 							+op.getFunc().getArgsRepr());
 				}
 				NodeList<Argument> args = op.getFunc().getArguments();
 				if(args.get(0).getType().equals(left.getType())
 						&& args.get(1).getType().equals(right.getType())) {
-					FunctionCall call = new FunctionCall(op.getFunc());
+					FunctionCall call = new FunctionCall(op.getFunc(), startToken);
 					call.getArguments().add(left);
 					call.getArguments().add(right);
 					stack.peek().replace(this, call);

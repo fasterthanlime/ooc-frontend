@@ -32,7 +32,7 @@ public class DefaultConstructorGiver implements Hobgoblin {
 				}
 				
 				if(!hasNew) {
-					FunctionDecl con = new FunctionDecl("new", "", false, false, false, false);
+					FunctionDecl con = new FunctionDecl("new", "", false, false, false, false, node.startToken);
 					node.addFunction(con);
 				}
 				

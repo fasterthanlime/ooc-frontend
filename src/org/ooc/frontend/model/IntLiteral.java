@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class IntLiteral extends Literal {
 
@@ -15,13 +16,12 @@ public class IntLiteral extends Literal {
 	
 	protected long value;
 	protected Format format;
-	public static Type type = new Type("Int");
+	public static Type type = new Type("Int", Token.defaultToken);
 	
-	public IntLiteral(long value, Format format) {
-		
+	public IntLiteral(long value, Format format, Token startToken) {
+		super(startToken);
 		this.value = value;
 		this.format = format;
-		
 	}
 	
 	@Override

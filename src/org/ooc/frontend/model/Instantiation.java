@@ -5,22 +5,23 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ubi.CompilationFailedError;
 
 public class Instantiation extends FunctionCall {
 
-	public Instantiation(FunctionCall call) {
-		super(call.name, call.suffix);
+	public Instantiation(FunctionCall call, Token startToken) {
+		super(call.name, call.suffix, startToken);
 		arguments.setAll(call.arguments);
 	}
 
-	public Instantiation(String name, String suffix) {
-		super(name, suffix);
+	public Instantiation(String name, String suffix, Token startToken) {
+		super(name, suffix, startToken);
 	}
 	
-	public Instantiation() {
-		super("", "");
+	public Instantiation(Token startToken) {
+		super("", "", startToken);
 	}
 	
 	@Override

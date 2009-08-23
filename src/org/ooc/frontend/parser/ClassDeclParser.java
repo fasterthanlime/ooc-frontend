@@ -19,8 +19,8 @@ public class ClassDeclParser {
 		
 		OocDocComment comment = null;
 		if(reader.peek().type == TokenType.OOCDOC) {
-			Token t = reader.read();
-			comment = new OocDocComment(t.get(sReader));
+			Token token = reader.read();
+			comment = new OocDocComment(token.get(sReader), token);
 		}
 		
 		String name = "";
@@ -35,9 +35,7 @@ public class ClassDeclParser {
 		}
 		
 		boolean isAbstract = reader.peek().type == TokenType.ABSTRACT_KW;
-		if(isAbstract) {
-			reader.skip();
-		}
+		if(isAbstract) reader.skip();
 		
 		if(reader.readWhiteless().type == TokenType.CLASS_KW) {
 		
@@ -46,7 +44,7 @@ public class ClassDeclParser {
 				reader.skip();
 				Token tSuper = reader.read();
 				if(tSuper.type != TokenType.NAME) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 					"Expected super-class name after the from keyword.");
 				}
 				superName = tSuper.get(sReader);
@@ -55,11 +53,11 @@ public class ClassDeclParser {
 			
 			Token t2 = reader.read();
 			if(t2.type != TokenType.OPEN_BRACK) {
-				throw new CompilationFailedError(sReader.getLocation(t2.start),
+				throw new CompilationFailedError(sReader.getLocation(t2),
 						"Expected opening bracket to begin class declaration.");
 			}
 			
-			ClassDecl classDecl = new ClassDecl(name, isAbstract);
+			ClassDecl classDecl = new ClassDecl(name, isAbstract, tName);
 			classDecl.setSuperName(superName);
 			if(comment != null) classDecl.setComment(comment);
 			
@@ -70,7 +68,7 @@ public class ClassDeclParser {
 				VariableDecl varDecl = VariableDeclParser.parse(sReader, reader);
 				if(varDecl != null) {
 					if(reader.read().type != TokenType.LINESEP) {
-						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected semi-colon after variable declaration in class declaration");
 					}
 					classDecl.addVariable(varDecl);
@@ -88,7 +86,7 @@ public class ClassDeclParser {
 					continue;
 				}
 				
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected variable declaration or function declaration in a class declaration, got "+reader.peek().type);
 			
 			}

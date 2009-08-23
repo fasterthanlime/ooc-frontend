@@ -3,13 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Foreach extends ControlStatement {
 
 	protected VariableDecl variable;
 	protected Expression collection; // must be of type Range or Iterable
 	
-	public Foreach(VariableDecl variable, Expression collection) {
+	public Foreach(VariableDecl variable, Expression collection, Token startToken) {
+		super(startToken);
 		this.variable = variable;
 		this.collection = collection;
 	}

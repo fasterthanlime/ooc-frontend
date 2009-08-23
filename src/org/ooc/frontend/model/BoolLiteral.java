@@ -3,14 +3,16 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 
 public class BoolLiteral extends Literal {
 
-	public static Type type = new Type("Bool");
+	public static Type type = new Type("Bool", Token.defaultToken);
 	protected boolean value;
 	
-	public BoolLiteral(boolean value) {
+	public BoolLiteral(boolean value, Token token) {
+		super(token);
 		this.value = value;
 	}
 	

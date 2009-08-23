@@ -7,10 +7,12 @@ import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.BuildParams;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
@@ -33,6 +35,13 @@ public class CaseEnforcer implements Hobgoblin {
 				
 				if(node instanceof VariableDecl) {
 					VariableDecl varDecl = (VariableDecl) node;
+					Type varDeclType = varDecl.getType();
+					if(varDeclType != null && !varDeclType.getName().isEmpty() && Character.isLowerCase(varDeclType.getName().charAt(0))) {
+						throw new OocCompilationError(varDeclType, stack,
+								"Variable declaration has type '"+varDeclType.getName()+
+								"', which begins with a lowercase letter."+
+								" Types should always begin with an uppercase letter, e.g. CamelCase");
+					}
 					for(VariableDeclAtom atom: varDecl.getAtoms()) {
 						if(atom.getName().isEmpty()) continue;
 						if(Character.isUpperCase(atom.getName().charAt(0)) && !varDecl.isConst()

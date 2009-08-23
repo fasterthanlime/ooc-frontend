@@ -3,12 +3,15 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 
 public class Not extends Expression {
 
+	public static Type type = new Type("Bool", Token.defaultToken);
 	protected Expression expression;
 	
-	public Not(Expression expression) {
+	public Not(Expression expression, Token startToken) {
+		super(startToken);
 		this.expression = expression;
 	}
 
@@ -22,7 +25,7 @@ public class Not extends Expression {
 
 	@Override
 	public Type getType() {
-		return new Type("Bool");
+		return type;
 	}
 	
 	@Override

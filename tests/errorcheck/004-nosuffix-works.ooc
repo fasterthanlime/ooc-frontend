@@ -1,17 +1,12 @@
-include stdio;
-cover String from char*;
-cover Int from int;
-extern func printf(String, ...);
-
-func main {
+main: func {
 	call();
 }
 
-func call {
-	call (42);
-	call ~withValue (42);
+call: func {
+	call(42);
+	call~withValue(42)
 }
 
-func call ~withValue (Int value) {
+call: func ~withValue (value: Int) {
 	printf("The answer is %d\n", value);
 }

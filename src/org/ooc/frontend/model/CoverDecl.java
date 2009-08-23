@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 
 /**
@@ -26,10 +27,10 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	protected Type fromType;
 	protected CoverDecl base;
 	
-	public CoverDecl(String name, Type fromType) {
-		super(name);
+	public CoverDecl(String name, Type fromType, Token startToken) {
+		super(name, startToken);
 		this.fromType = fromType;
-		this.type = new Type(name);
+		this.type = new Type(name, startToken);
 		this.type.setRef(this);
 		this.base = null;
 	}

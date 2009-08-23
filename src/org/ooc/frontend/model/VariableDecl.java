@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
+import org.ooc.frontend.model.tokens.Token;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
@@ -14,7 +15,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		Expression expression;
 		Assignment assign;
 		
-		public VariableDeclAtom(String name, Expression expression) {
+		public VariableDeclAtom(String name, Expression expression, Token startToken) {
+			super(startToken);
 			this.name = name;
 			this.expression = expression;
 		}
@@ -74,12 +76,12 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	protected NodeList<VariableDeclAtom> atoms;
 	
-	public VariableDecl(Type type, boolean isConst, boolean isStatic) {
-		super(null);
+	public VariableDecl(Type type, boolean isConst, boolean isStatic, Token startToken) {
+		super(null, startToken);
 		this.type = type;
 		this.isConst = isConst;
 		this.isStatic = isStatic;
-		this.atoms = new NodeList<VariableDeclAtom>();
+		this.atoms = new NodeList<VariableDeclAtom>(startToken);
 	}
 	
 	@Override
@@ -194,7 +196,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		if(atoms.size() != 1) {
 			throw new Error("Multi-var decls used an expression.. wtf?");
 		}
-		hierarchy.peek().replace(this, new VariableAccess(atoms.get(0).name));
+		hierarchy.peek().replace(this, new VariableAccess(atoms.get(0).name, atoms.get(0).startToken));
 		
 		int lineIndex = find(Line.class, hierarchy);
 		if(lineIndex == -1) {
@@ -207,7 +209,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		
 		NodeList<Line> body = (NodeList<Line>) hierarchy.get(bodyIndex);
-		Block block = new Block();
+		Block block = new Block(body.startToken);
 		block.getBody().add(new Line(this));
 		block.getBody().add(line);
 		body.replace(line, new Line(block));
@@ -222,10 +224,10 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
 			if(atom.getExpression() == null) continue;
 			VariableAccess access = isStatic ?
-					new VariableAccess(typeDecl.getType().getName())
-					: new VariableAccess("this");
+					new VariableAccess(typeDecl.getType().getName(), atom.startToken)
+					: new VariableAccess("this", atom.startToken);
 			Assignment assign = new Assignment(
-				new MemberAccess(access, atom.getName()), atom.getExpression()
+				new MemberAccess(access, atom.getName(), atom.startToken), atom.getExpression(), atom.startToken
 			);
 			atom.assign = assign;
 			Line line = new Line(assign);
@@ -263,6 +265,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	public boolean shouldBeLowerCase() {
+		System.out.println("Should be lower case? externName = "+externName);
 		return externName == null || !externName.isEmpty();
 	}
 	

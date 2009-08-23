@@ -24,9 +24,11 @@ public class FunctionDeclParser {
 		
 		OocDocComment comment = null;
 		if(reader.peek().type == TokenType.OOCDOC) {
-			Token t = reader.read();
-			comment = new OocDocComment(t.get(sReader));
+			Token token = reader.read();
+			comment = new OocDocComment(token.get(sReader), token);
 		}
+		
+		Token startToken= reader.peek();
 		
 		String name = "";
 		Token tName = reader.peek();
@@ -83,7 +85,7 @@ public class FunctionDeclParser {
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(
-				name, suffix, isFinal, isStatic, isAbstract, externName);
+				name, suffix, isFinal, isStatic, isAbstract, externName, startToken);
 		functionDecl.setProto(isProto);
 		if(comment != null) functionDecl.setComment(comment);
 		
@@ -98,14 +100,14 @@ public class FunctionDeclParser {
 				}
 				if(comma) {
 					if(reader.read().type != TokenType.COMMA) {
-						throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 								"Expected comma between arguments of a function definition");
 					}
 				} else {
 					//Argument arg = ArgumentParser.parse(sReader, reader, isExtern);
 					if(!ArgumentParser.fill(sReader, reader, functionDecl.isExtern(), functionDecl.getArguments())) {
 					//if(arg == null) {
-						throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+						throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 								"Expected variable declaration as an argument of a function definition");
 					}
 					//functionDecl.getArguments().add(arg);
@@ -121,7 +123,7 @@ public class FunctionDeclParser {
 		if(t.type == TokenType.ARROW) {
 			Type returnType = TypeParser.parse(sReader, reader);
 			if(returnType == null) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected return type after arrow");
 			}
 			functionDecl.setReturnType(returnType);
@@ -134,7 +136,7 @@ public class FunctionDeclParser {
 			reader.rewind();
 			Line line = LineParser.parse(sReader, reader);
 			if(line == null) {
-				throw new CompilationFailedError(sReader.getLocation(reader.prev().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 						"Expected opening brace after function name.");
 			}
 			functionDecl.getBody().add(line);
@@ -146,7 +148,7 @@ public class FunctionDeclParser {
 		
 			Line line = LineParser.parse(sReader, reader);
 			if(line == null && reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek().start),
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected statement in function body. Found "+reader.peek().type+" instead.");
 			}
 			if(line != null) functionDecl.getBody().add(line);

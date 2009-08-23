@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 import org.ubi.CompilationFailedError;
 
 public class MemberAssignArgument extends MemberArgument {
 
-	public MemberAssignArgument(String name) {
-		super(name);
+	public MemberAssignArgument(String name, Token startToken) {
+		super(name, startToken);
 	}
 	
 	@Override
@@ -43,10 +44,12 @@ public class MemberAssignArgument extends MemberArgument {
 		
 		FunctionDecl funcDecl = (FunctionDecl) hierarchy.get(funcIndex);
 		funcDecl.getBody().add(0, new Line(new Assignment(
-				new MemberAccess(name),
-				new VariableAccess(name))));
+				new MemberAccess(name, startToken),
+				new VariableAccess(name, startToken),
+				startToken
+		)));
 		
-		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name));
+		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name, startToken));
 		
 		return false;
 		

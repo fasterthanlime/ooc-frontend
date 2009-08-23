@@ -6,6 +6,7 @@ import java.util.Stack;
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
@@ -16,11 +17,13 @@ public class VariableAccess extends Access implements MustBeResolved {
 	protected String name;
 	protected Declaration ref;
 	
-	public VariableAccess(String variable) {
+	public VariableAccess(String variable, Token startToken) {
+		super(startToken);
 		this.name = variable;
 	}
 
-	public VariableAccess(VariableDecl varDecl) {
+	public VariableAccess(VariableDecl varDecl, Token startToken) {
+		super(startToken);
 		assert(varDecl.atoms.size() == 1);
 		this.name = varDecl.getName();
 		ref = varDecl;
@@ -84,9 +87,8 @@ public class VariableAccess extends Access implements MustBeResolved {
 					for(VariableDecl var: vars) {
 						if(var.hasAtom(name)) {
 							if(var.isMember()) {
-								VariableAccess thisAccess = new VariableAccess("this");
-								thisAccess.resolve(mainStack, res, fatal);
-								MemberAccess membAcc =  new MemberAccess(thisAccess, name);
+								MemberAccess membAcc =  new MemberAccess(name, startToken);
+								membAcc.resolve(mainStack, res, fatal);
 								membAcc.setRef(var);
 								if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
 									throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
@@ -121,7 +123,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 				}
 				VariableDecl varDecl = typeDecl.getVariable(name);
 				if(varDecl != null) {
-					MemberAccess membAccess = new MemberAccess(name);
+					MemberAccess membAccess = new MemberAccess(name, startToken);
 					membAccess.setRef(varDecl);
 					if(!mainStack.peek().replace(this, membAccess)) {
 						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);

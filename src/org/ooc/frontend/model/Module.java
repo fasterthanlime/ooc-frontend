@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
+import org.ubi.SourceReader;
 
 public class Module extends Node implements Scope {
 
@@ -23,8 +25,12 @@ public class Module extends Node implements Scope {
 	protected String fileName;
 	protected FunctionDecl loadFunc;
 	private boolean isMain;
+	private final SourceReader reader;
 	
-	public Module(String fullName) {
+	public Module(String fullName, SourceReader reader) {
+		
+		super(Token.defaultToken);
+		this.reader = reader;
 		
 		this.fullName = fullName; // just to make sure
 		this.fileName = fullName.replace('.', File.separatorChar);
@@ -33,16 +39,19 @@ public class Module extends Node implements Scope {
 		else name = fullName.substring(index + 1);
 		this.underName = "_"+fullName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
-		this.includes = new NodeList<Include>();
-		this.imports = new NodeList<Import>();
-		this.uses = new NodeList<Use>();
-		this.body = new NodeList<Node>();
+		this.includes = new NodeList<Include>(startToken);
+		this.imports = new NodeList<Import>(startToken);
+		this.uses = new NodeList<Use>(startToken);
+		this.body = new NodeList<Node>(startToken);
 		
 		// set it as extern, so it won't get written implicitly
-		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, true);
+		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, true, Token.defaultToken);
 		
-		if(!fullName.endsWith("ooclib"))
-			imports.add(new Import("ooclib"));
+		if(!fullName.endsWith("ooclib")) {
+			// TODO fixme import everything in lang.*
+			Import imp = new Import("ooclib", Token.defaultToken);
+			imports.add(imp);
+		}
 		
 	}
 	
@@ -193,6 +202,10 @@ public class Module extends Node implements Scope {
 	
 	public void setMain(boolean isMain) {
 		this.isMain = isMain;
+	}
+
+	public SourceReader getReader() {
+		return reader;
 	}
 	
 }

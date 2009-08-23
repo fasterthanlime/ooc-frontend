@@ -1,9 +1,12 @@
 package org.ooc.frontend.model.tokens;
 
+import org.ubi.Locatable;
 import org.ubi.SourceReader;
 
 
-public class Token {
+public class Token implements Locatable {
+
+	public static Token defaultToken = new Token(0, 0, null);
 	
 	public static enum TokenType {
 
@@ -143,6 +146,25 @@ public class Token {
 	
 	public String get(SourceReader sReader) {
 		return sReader.getSlice(start, length);
+	}
+
+	@Override
+	public int getLength() {
+		return length;
+	}
+
+	@Override
+	public int getStart() {
+		return start;
+	}
+	
+	public Token cloneEnclosing(Token end) {
+		Token token = new Token(start, end.getEnd() - start, type);
+		return token;
+	}
+
+	public int getEnd() {
+		return start + length;
 	}
 	
 }
