@@ -1,5 +1,6 @@
-include stdlib
+include stdlib, string
 
+strlen: extern func (String) -> SizeT
 atoi: extern func (String) -> Int
 atol: extern func (String) -> Long
 
@@ -14,12 +15,34 @@ String: cover from Char* {
 		if (this length() != other length()) {
 			return false
 		}
-		/* TODO: Actually compare the strings */
+		for (i : Int in 0..other length()) {
+			if (this[i] != other[i]) {
+				return false
+			}
+		}
 		return true
 	}
 	
-	toInt: func -> Int return atoi(this)
+	toInt: func -> Int atoi(this)
 	
-	toLong: func -> Long return atol(this)
+	toLong: func -> Long atol(this)
+	
+	toLLong: func -> LLong atol(this)
+	
+	/* TODO: toDouble */
+	
+	isEmpty: func -> Bool return ((this == null) || (this[0] == '\0'))
+	
+	func startsWith(String s) -> Bool {
+		if (this length() < s length()) {
+			return false
+		}
+		for (i : Int in 0..s length()) {
+			if(this[i] != s[i]) {
+				return false
+			}
+		}
+		return true
+	}
 	
 }
