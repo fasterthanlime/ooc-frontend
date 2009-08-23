@@ -13,15 +13,14 @@ Char: cover from char {
 	
 }
 
-
 String: cover from Char* {
 	
 	length: func -> Int strlen(this)
 	
 }
 
-Int: cover from int
 Pointer: cover from void*
+Int: cover from int
 UInt: cover from unsigned int
 Float: cover from float
 Double: cover from double
