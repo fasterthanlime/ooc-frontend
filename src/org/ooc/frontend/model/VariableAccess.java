@@ -84,17 +84,19 @@ public class VariableAccess extends Access implements MustBeResolved {
 				public boolean take(Scope node, Stack<Node> stack) throws IOException {
 					
 					Iterable<VariableDecl> vars = res.vars.get((Node) node);
-					for(VariableDecl var: vars) {
-						if(var.hasAtom(name)) {
-							if(var.isMember()) {
-								MemberAccess membAcc =  new MemberAccess(name, startToken);
+					for(VariableDecl varDecl: vars) {
+						if(varDecl.hasAtom(name)) {
+							if(varDecl.isMember()) {
+								VariableAccess thisAccess = new VariableAccess("this", startToken);
+								thisAccess.setRef(varDecl);
+								MemberAccess membAcc =  new MemberAccess(thisAccess, name, startToken);
 								membAcc.resolve(mainStack, res, fatal);
-								membAcc.setRef(var);
+								membAcc.setRef(varDecl);
 								if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
 									throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
 								}
 							}
-							ref = var;
+							ref = varDecl;
 							return false;
 						}
 					}
@@ -123,7 +125,9 @@ public class VariableAccess extends Access implements MustBeResolved {
 				}
 				VariableDecl varDecl = typeDecl.getVariable(name);
 				if(varDecl != null) {
-					MemberAccess membAccess = new MemberAccess(name, startToken);
+					VariableAccess thisAccess = new VariableAccess("this", startToken);
+					thisAccess.setRef(varDecl);
+					MemberAccess membAccess = new MemberAccess(thisAccess, name, startToken);
 					membAccess.setRef(varDecl);
 					if(!mainStack.peek().replace(this, membAccess)) {
 						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);

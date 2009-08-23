@@ -35,8 +35,10 @@ public class Instantiation extends FunctionCall {
 		
 		if(name.isEmpty()) guessName(stack);
 		
-		for(TypeDecl decl: res.types) {			
-			if(!decl.getName().equals(name)) continue;
+		for(TypeDecl decl: res.types) {
+			if(!decl.getName().equals(name)) {
+				continue;
+			}
 			
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
@@ -98,6 +100,13 @@ public class Instantiation extends FunctionCall {
 		}
 		
 		return true;
+		
+	}
+	
+	@Override
+	public Type getType() {
+		
+		return super.getType();
 		
 	}
 	

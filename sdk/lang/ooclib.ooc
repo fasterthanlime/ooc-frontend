@@ -12,9 +12,10 @@ ULong: cover from unsigned long
 LLong: cover from long long
 Void: cover from void
 Bool: cover from bool
-Func: cover from Pointer
 SizeT: cover from size_t
 Octet: cover from uint8_t
+Func: extern cover
+Void: extern cover
 
 sizeof: extern func (...) -> SizeT
 memcpy: extern func (Pointer, Pointer, SizeT)

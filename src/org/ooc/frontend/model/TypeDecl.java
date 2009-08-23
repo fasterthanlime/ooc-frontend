@@ -35,7 +35,6 @@ public abstract class TypeDecl extends Declaration {
 	
 	public void addVariable(VariableDecl decl) {
 		decl.setTypeDecl(this);
-		
 		variables.add(decl);
 	}
 	
@@ -51,14 +50,18 @@ public abstract class TypeDecl extends Declaration {
 				decl.setFinal(true);
 				decl.setReturnType(getInstanceType());
 			}
-			// FIXME this is ugly.
-			if(!decl.isStatic() && (!decl.isConstructor() || !(this instanceof CoverDecl))) {
+			if(shouldAddThis(decl)) {
 				Token tok = decl.getArguments().isEmpty() ? startToken : decl.getArguments().getFirst().startToken;
 				decl.getArguments().add(0, new RegularArgument(getInstanceType(), "this",
 						tok));
 			}
 		}
 		functions.add(decl);
+	}
+
+	private boolean shouldAddThis(FunctionDecl decl) {
+		//fixme this is ugly
+		return !decl.isStatic() && (!decl.isConstructor() || !(this instanceof CoverDecl));
 	}
 	
 	public abstract NodeList<FunctionDecl> getFunctionsRecursive();
@@ -88,6 +91,14 @@ public abstract class TypeDecl extends Declaration {
 	@Override
 	public TypeDecl getTypeDecl() {
 		return this;
+	}
+
+	public String getVariablesRepr() {
+		return variables.nodes.toString();
+	}
+	
+	public String getFunctionsRepr() {
+		return functions.nodes.toString();
 	}
 
 }

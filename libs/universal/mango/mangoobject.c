@@ -4,6 +4,7 @@
 #include <lightning.h>
 #include <gc/gc.h>
 
+/*
 MangoObject *mango_object_new(const MangoClass *class)
 {
     MangoObject *this = malloc(class->size);
@@ -14,6 +15,7 @@ MangoObject *mango_object_new(const MangoClass *class)
 
     return this;
 }
+*/
 
 void (*memb_func_ptr(const MangoObject *this, void (*func)()))()
 {

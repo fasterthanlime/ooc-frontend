@@ -268,12 +268,12 @@ public class CommandLine {
 		try {
 			done.add(module);
 			new Tinkerer().process(module, params);
-			new CGenerator(params.outPath, module).generate();
 			for(Import imp: module.getImports()) {
 				if(!done.contains(imp.getModule())) {
 					translate(imp.getModule(), done);
 				}
 			}
+			new CGenerator(params.outPath, module).generate();
 		} catch(OocCompilationError err) {
 			System.err.println(err);
 			System.exit(1);
@@ -301,7 +301,7 @@ public class CommandLine {
 		command.add("-I");
 		command.add(params.outPath.getPath());
 		// FIXME ooh hardcoded, that is bad.
-		command.add(new File(params.distLocation, "libs/universal/mango/mangoobject.c").getPath());
+		//command.add(new File(params.distLocation, "libs/universal/mango/mangoobject.c").getPath());
 		addDeps(command, module, new HashSet<Module>());
 		for(String dynamicLib: params.dynamicLibs) {
 			command.add("-l");

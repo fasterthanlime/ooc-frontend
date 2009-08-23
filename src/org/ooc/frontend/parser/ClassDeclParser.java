@@ -25,13 +25,16 @@ public class ClassDeclParser {
 		
 		String name = "";
 		Token tName = reader.peek();
-		if(tName.type == TokenType.NAME || tName.type == TokenType.NEW_KW) {
-			name = tName.get(sReader);
-			reader.skip();
-			if(reader.read().type != TokenType.COLON) {
-				reader.reset(mark);
-				return null;
-			}
+		if(tName.type != TokenType.NAME) {
+			reader.reset(mark);
+			return null;
+		}
+			
+		name = tName.get(sReader);
+		reader.skip();
+		if(reader.read().type != TokenType.COLON) {
+			reader.reset(mark);
+			return null;
 		}
 		
 		boolean isAbstract = reader.peek().type == TokenType.ABSTRACT_KW;
@@ -57,8 +60,7 @@ public class ClassDeclParser {
 						"Expected opening bracket to begin class declaration.");
 			}
 			
-			ClassDecl classDecl = new ClassDecl(name, isAbstract, tName);
-			classDecl.setSuperName(superName);
+			ClassDecl classDecl = new ClassDecl(name, superName, isAbstract, tName);
 			if(comment != null) classDecl.setComment(comment);
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {

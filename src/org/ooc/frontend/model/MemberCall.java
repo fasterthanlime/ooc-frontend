@@ -65,7 +65,7 @@ public class MemberCall extends FunctionCall {
 	public boolean resolve(Stack<Node> mainStack, Resolver res, final boolean fatal) throws IOException {
 
 		
-		Type exprType = expression.getType();
+		Type exprType = expression.getType().getFlatType(res);
 		if(exprType == null) {
 			if(fatal) {
 				throw new OocCompilationError(this, mainStack, "Calling member function "
@@ -91,6 +91,15 @@ public class MemberCall extends FunctionCall {
 
 		TypeDecl typeDeclaration = (TypeDecl) decl;
 		impl = typeDeclaration.getFunction(this);
+		
+		if(impl == null) {
+			for(VariableDecl varDecl: typeDeclaration.getVariables()) {
+				if(varDecl.getType() instanceof FuncType && varDecl.getName().equals(name)) {
+					FuncType funcType = (FuncType) varDecl.getType();
+					impl = funcType.getDecl();
+				}
+			}
+		}
 		
 		if(fatal && impl == null) {
 			String message = "Couldn't resolve call to function "

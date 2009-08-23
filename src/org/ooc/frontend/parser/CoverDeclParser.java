@@ -72,7 +72,7 @@ public class CoverDeclParser {
 				if(varDecl != null) {
 					if(reader.read().type != TokenType.LINESEP) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
-							"Expected semi-colon after variable declaration in cover declaration");
+							"Expected newline after variable declaration in cover declaration, but got "+reader.prev());
 					}
 					if(fromType != null && !varDecl.isExtern()) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev()),

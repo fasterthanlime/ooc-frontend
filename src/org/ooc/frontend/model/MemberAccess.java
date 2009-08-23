@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
@@ -72,20 +73,30 @@ public class MemberAccess extends VariableAccess {
 			return true;
 		}
 
-		Declaration decl = exprType.getRef();
-		if(!(decl instanceof TypeDecl)) {
-			throw new Error("Trying to access to a member of not a TypeDecl, but a "
-					+decl.getClass().getSimpleName());
-		}
-		
-		TypeDecl typeDecl = (TypeDecl) decl;
-		ref = typeDecl.getVariable(name);
+		tryResolve(stack, exprType);
+		if(ref == null) tryResolve(stack, exprType.getFlatType(res));
 		
 		if(fatal && ref == null) {
 			throw new OocCompilationError(this, stack, "Can't resolve access to member "
 					+exprType+"."+name);
 		}
 		return ref != null;
+	}
+
+	private void tryResolve(Stack<Node> stack, Type exprType)
+			throws OocCompilationError, EOFException {
+		Declaration decl = exprType.getRef();
+		if(decl != null) {
+			//System.out.println("decl = "+decl+" decl variables = "+decl.getTypeDecl().getVariablesRepr());
+			if(!(decl instanceof TypeDecl)) {
+				throw new OocCompilationError(this, stack, "Trying to access to a member of not a TypeDecl, but a "
+						+decl);
+			}
+			
+			TypeDecl typeDecl = (TypeDecl) decl;
+			//System.out.println("Other type decl variables "+typeDecl.getVariablesRepr());
+			ref = typeDecl.getVariable(name);
+		}
 	}
 
 }

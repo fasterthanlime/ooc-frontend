@@ -29,6 +29,8 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 			@Override
 			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
 				
+				if(node.isFromPointer()) return true;
+				
 				String name = node.getName();
 				if(node.getTypeDecl() != null) {
 					name = node.getTypeDecl().toString() + "." + name;

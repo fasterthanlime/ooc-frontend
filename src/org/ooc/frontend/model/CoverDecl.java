@@ -33,6 +33,10 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 		this.type = new Type(name, startToken);
 		this.type.setRef(this);
 		this.base = null;
+		if(fromType != null) {
+			type.referenceLevel = fromType.referenceLevel;
+			instanceType.referenceLevel = fromType.referenceLevel;
+		}
 	}
 
 	@Override

@@ -89,50 +89,24 @@ public class FunctionDeclParser {
 		functionDecl.setProto(isProto);
 		if(comment != null) functionDecl.setComment(comment);
 		
-		if(reader.peek().type == TokenType.OPEN_PAREN) {
-			reader.skip();
-			boolean comma = false;
-			while(true) {
-				
-				if(reader.peek().type == TokenType.CLOS_PAREN) {
-					reader.skip(); // skip the ')'
-					break;
-				}
-				if(comma) {
-					if(reader.read().type != TokenType.COMMA) {
-						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
-								"Expected comma between arguments of a function definition");
-					}
-				} else {
-					//Argument arg = ArgumentParser.parse(sReader, reader, isExtern);
-					if(!ArgumentParser.fill(sReader, reader, functionDecl.isExtern(), functionDecl.getArguments())) {
-					//if(arg == null) {
-						throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-								"Expected variable declaration as an argument of a function definition");
-					}
-					//functionDecl.getArguments().add(arg);
-				}
-				comma = !comma;
-				
-			}
-		}
+		ArgumentListFiller.fill(sReader, reader, functionDecl.isExtern(), functionDecl.getArguments());
 		
 		if(reader.peek().type == TokenType.LINESEP) return functionDecl;
 		
-		Token t = reader.read();
-		if(t.type == TokenType.ARROW) {
+		Token token = reader.read();
+		if(token.type == TokenType.ARROW) {
 			Type returnType = TypeParser.parse(sReader, reader);
 			if(returnType == null) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected return type after arrow");
 			}
 			functionDecl.setReturnType(returnType);
-			t = reader.read();
+			token = reader.read();
 		}
 		
-		if(t.type == TokenType.LINESEP) return functionDecl;
+		if(token.type == TokenType.LINESEP) return functionDecl; // empty func is actually legal
 
-		if(t.type != TokenType.OPEN_BRACK) {
+		if(token.type != TokenType.OPEN_BRACK) {
 			reader.rewind();
 			Line line = LineParser.parse(sReader, reader);
 			if(line == null) {

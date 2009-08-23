@@ -17,7 +17,9 @@ public class VariableDeclFromExpr extends VariableDecl {
 	public Type getType() {
 		VariableDeclAtom atom = atoms.get(0);
 		Expression expr = atom.getExpression();
-		if(expr == null) return atom.assign.getRvalue().getType();
+		if(expr == null) {
+			return atom.assign.getRvalue().getType();
+		}
 		return expr.getType();
 	}
 	
