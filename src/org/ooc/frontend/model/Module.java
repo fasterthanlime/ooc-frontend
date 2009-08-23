@@ -47,12 +47,6 @@ public class Module extends Node implements Scope {
 		// set it as extern, so it won't get written implicitly
 		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, true, Token.defaultToken);
 		
-		if(!fullName.endsWith("ooclib")) {
-			// TODO fixme import everything in lang.*
-			Import imp = new Import("ooclib", Token.defaultToken);
-			imports.add(imp);
-		}
-		
 	}
 	
 	public String getSimpleName() {
