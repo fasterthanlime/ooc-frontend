@@ -31,12 +31,25 @@ String: cover from Char* {
 	
 	/* TODO: toDouble */
 	
-	isEmpty: func -> Bool ((this == null) || (this[0] == '\0'))
+	isEmpty: func -> Bool ((this == null) || (this[0] == 0))
 	
 	startsWith: func(s: String) -> Bool {
 		if (this length() < s length()) return false
 		for (i : Int in 0..s length()) {
 			if(this[i] != s[i]) return false
+		}
+		return true
+	}
+	
+	endsWith: func(s: String) -> Bool {
+		l1 = this length() : Int
+		l2 = s length() : Int
+		if(l1 < s l2) return false
+		offset = (l1 - l2) : Int
+		for (i: Int in 0..l1) {
+			if(this[i + offset] != s[i]) {
+				return false
+			}
 		}
 		return true
 	}
