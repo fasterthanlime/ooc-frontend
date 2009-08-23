@@ -2,23 +2,6 @@ include stdlib, stdio, stdint, stdbool, memory, gc/gc, string
 
 strlen: extern func (String) -> SizeT
 
-Char: cover from char {
-
-	toInt: func -> Int {
-		if ((this >= 48) && (this <= 57)) {
-			return (this - 48);
-		}
-		return -1;
-	}
-	
-}
-
-String: cover from Char* {
-	
-	length: func -> Int strlen(this)
-	
-}
-
 Pointer: cover from void*
 Int: cover from int
 UInt: cover from unsigned int

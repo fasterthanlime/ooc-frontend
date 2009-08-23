@@ -3,7 +3,7 @@ Int: extern Int
 IntArray: cover from Int* {
 	
 	new: func(size: SizeT) {
-		return GC_calloc(sizeof(Int), size)
+		return gc_calloc(sizeof(Int), size)
 	}
 	
 }
