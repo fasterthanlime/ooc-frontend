@@ -1,5 +1,6 @@
 package org.ooc.middle.hobgoblins;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
@@ -15,9 +16,9 @@ import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.IntLiteral.Format;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 /**
  * The {@link ReturnHandler} spits errors when a void function returns
@@ -38,11 +39,13 @@ public class ReturnHandler implements Hobgoblin {
 		Nosy.get(ValuedReturn.class, new Opportunist<ValuedReturn>() {
 
 			@Override
-			public boolean take(ValuedReturn node, Stack<Node> stack) {
+			public boolean take(ValuedReturn node, Stack<Node> stack) throws OocCompilationError, EOFException {
 				
 				FunctionDecl decl = (FunctionDecl) stack.get(Node.find(FunctionDecl.class, stack));
 				if(decl.getReturnType().isVoid()) {
-					throw new CompilationFailedError(null, "Returning a value in void function "+decl.getProtoRepr());
+					throw new OocCompilationError(node, stack,
+							"Returning a value in function "+decl.getProtoRepr()
+								+" which is declared as returning nothing");
 				}
 				
 				return true;
@@ -65,8 +68,9 @@ public class ReturnHandler implements Hobgoblin {
 						node.getBody().add(new Line(new ValuedReturn(
 								new IntLiteral(0, Format.DEC, node.startToken), node.startToken)));
 					} else {
-						throw new CompilationFailedError(null,
-								"Returning nothing in non-void function "+node.getProtoRepr());
+						throw new OocCompilationError(node, stack,
+								"Returning nothing in function "+node.getProtoRepr()
+									+" that should return a "+node.getReturnType());
 					}
 					
 				}
@@ -80,8 +84,9 @@ public class ReturnHandler implements Hobgoblin {
 						line.setStatement(new ValuedReturn((Expression) line.getStatement(),
 								line.getStatement().startToken));
 					} else {
-						throw new CompilationFailedError(null,
-								"No return at the end of non-void function "+node.getProtoRepr());
+						throw new OocCompilationError(node, stack,
+								"Returning nothing in function "+node.getProtoRepr()
+									+" that should return a "+node.getReturnType());
 					}
 				}
 				return true;

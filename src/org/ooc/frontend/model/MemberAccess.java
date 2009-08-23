@@ -5,8 +5,8 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class MemberAccess extends VariableAccess {
 	
@@ -65,18 +65,13 @@ public class MemberAccess extends VariableAccess {
 		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
-				throw new CompilationFailedError(null, "Accessing member "
+				throw new OocCompilationError(this, stack, "Accessing member "
 						+name+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been resolved yet!");
 			}
 			return true;
 		}
 
-		//System.out.println("==========================");
-		//System.out.println("Should resolve variable access "+expression+"."+variable);
-		//System.out.println("exprType = "+exprType);
-		//System.out.println("exprType ref = "+exprType.getRef());
-		
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
 			throw new Error("Trying to access to a member of not a TypeDecl, but a "
@@ -87,7 +82,7 @@ public class MemberAccess extends VariableAccess {
 		ref = typeDecl.getVariable(name);
 		
 		if(fatal && ref == null) {
-			throw new CompilationFailedError(null, "Can't resolve access to member "
+			throw new OocCompilationError(this, stack, "Can't resolve access to member "
 					+exprType+"."+name);
 		}
 		return ref != null;

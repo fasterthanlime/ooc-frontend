@@ -12,11 +12,10 @@ import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.BuildParams;
-import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 /**
  * Make sure class/cover names are CamelCase and func/vars camelCase
@@ -46,7 +45,7 @@ public class CaseEnforcer implements Hobgoblin {
 						if(atom.getName().isEmpty()) continue;
 						if(Character.isUpperCase(atom.getName().charAt(0)) && !varDecl.isConst()
 								&& varDecl.shouldBeLowerCase()) {
-							throw new CompilationFailedError(null,
+							throw new OocCompilationError(atom, stack,
 									"Upper-case variable name '"+atom.getName()+": "+node.getType()
 									+"'. Variables should always begin with a lowercase letter, e.g. camelCase");
 						}
@@ -58,7 +57,7 @@ public class CaseEnforcer implements Hobgoblin {
 				
 				if(node instanceof FunctionDecl) {
 					if(Character.isUpperCase(node.getName().charAt(0)) && !((FunctionDecl) node).isExtern()) {
-						throw new CompilationFailedError(null,
+						throw new OocCompilationError(node, stack,
 								"Upper-case function name '"+((FunctionDecl) node).getProtoRepr()
 								+"'. Function should always begin with a lowercase letter, e.g. camelCase");
 					}
@@ -66,7 +65,7 @@ public class CaseEnforcer implements Hobgoblin {
 				
 				if(node instanceof TypeDecl) {
 					if(Character.isLowerCase(node.getName().charAt(0))) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(node, stack,
 							"Lower-case type name '"+node.getName()
 							+"'. Types should always begin with a capital letter, e.g. CamelCase (stack = "+stack);
 					

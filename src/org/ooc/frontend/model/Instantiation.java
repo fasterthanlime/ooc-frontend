@@ -1,13 +1,14 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class Instantiation extends FunctionCall {
 
@@ -52,7 +53,7 @@ public class Instantiation extends FunctionCall {
 		}
 		
 		if(fatal && impl == null) {
-			throw new CompilationFailedError(null, "Couldn't find a constructor in "
+			throw new OocCompilationError(this, stack, "Couldn't find a constructor in "
 					+name+" for arguments "+getArgsRepr());
 		}
 		
@@ -72,8 +73,9 @@ public class Instantiation extends FunctionCall {
 	 * 
 	 * accept(new); // guessed: new Blah()
 	 * </code>
+	 * @throws EOFException 
 	 */
-	protected boolean guessName(Stack<Node> stack) throws Error {
+	protected boolean guessName(Stack<Node> stack) throws Error, EOFException {
 		
 		if(stack.peek() instanceof Assignment) {
 			Assignment ass = (Assignment) stack.peek();
@@ -84,7 +86,7 @@ public class Instantiation extends FunctionCall {
 			if(vda.getExpression() == this) {
 				VariableDecl vd = (VariableDecl) stack.get(Node.find(VariableDecl.class, stack));
 				if(vd.getType() == null) {
-					throw new CompilationFailedError(null, "On est dans la merdeuh. Couldn't guess type of 'new'"
+					throw new OocCompilationError(this, stack, "Couldn't guess type of 'new'"
 							+stack.peek().getClass().getSimpleName()+")");
 				}
 				name = vd.getType().getName();
@@ -92,8 +94,7 @@ public class Instantiation extends FunctionCall {
 		} else if(stack.peek() instanceof Cast) {
 			name = ((Cast) stack.peek()).getType().getName();
 		} else {
-			throw new CompilationFailedError(null, "Couldn't guess type of 'new' (btw, we're in a "
-					+stack.peek().getClass().getSimpleName()+")");
+			throw new OocCompilationError(this, stack, "Couldn't guess type of 'new'");
 		}
 		
 		return true;

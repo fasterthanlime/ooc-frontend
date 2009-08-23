@@ -7,10 +7,10 @@ import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 public class VariableAccess extends Access implements MustBeResolved {
 
@@ -147,7 +147,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 			if(guess != null) {
 				message += " Did you mean "+guess+" ?";
 			}
-			throw new CompilationFailedError(null, message+", stack = "+mainStack);
+			throw new OocCompilationError(this, mainStack, message);
 		}
 		
 		return ref == null;

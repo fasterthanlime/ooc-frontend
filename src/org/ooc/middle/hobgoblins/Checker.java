@@ -13,9 +13,9 @@ import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 public class Checker implements Hobgoblin {
 
@@ -26,7 +26,7 @@ public class Checker implements Hobgoblin {
 			@Override
 			public boolean take(VariableAccess node, Stack<Node> stack) throws IOException {
 				if(node.getRef() == null) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(node, stack,
 							node.getClass().getSimpleName()+" to "+node.getName()
 							+" hasn't been resolved :( Stack = "+stack);
 				}
@@ -38,7 +38,7 @@ public class Checker implements Hobgoblin {
 			@Override
 			public boolean take(FunctionCall node, Stack<Node> stack) throws IOException {
 				if(node.getImpl() == null) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(node, stack,
 							node.getClass().getSimpleName()+" to "+node.getName()
 							+" hasn't been resolved :(");
 				}
@@ -50,7 +50,7 @@ public class Checker implements Hobgoblin {
 			@Override
 			public boolean take(Type node, Stack<Node> stack) throws IOException {
 				if(node.getRef() == null) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(node, stack,
 							node.getClass().getSimpleName()+" "+node
 							+" hasn't been resolved :(, stack = "+stack);
 				}
@@ -63,7 +63,8 @@ public class Checker implements Hobgoblin {
 			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
 				if(node.isConstructor()) {
 					if(Node.find(TypeDecl.class, stack) == -1) {
-						throw new CompilationFailedError(null,
+						// TODO forbid functions named load in modules (or __load__?)
+						throw new OocCompilationError(node, stack,
 							"Declaration of a function named 'new' outside a class is forbidden!" +
 							" Functions named 'new' are only used as constructors in classes.");
 					}
@@ -76,7 +77,7 @@ public class Checker implements Hobgoblin {
 			@Override
 			public boolean take(Node node, Stack<Node> stack) throws IOException {
 				if(node.startToken == null && !(node instanceof NodeList<?>)) {
-					throw new CompilationFailedError(null,
+					throw new OocCompilationError(node, stack,
 						"Null startToken for a "+node.getClass().getSimpleName()
 							+" = "+node+", stack = "+stack+"\nStack Trace: "+node.stackTrace);
 				}

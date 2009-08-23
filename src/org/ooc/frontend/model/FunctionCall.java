@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,10 +11,10 @@ import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.walkers.Miner;
 import org.ooc.middle.walkers.Opportunist;
-import org.ubi.CompilationFailedError;
 
 public class FunctionCall extends Access implements MustBeResolved {
 
@@ -113,7 +114,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 			if(guess != null) {
 				message += " Did you mean "+guess+" ?";
 			}
-			throw new CompilationFailedError(null, message);
+			throw new OocCompilationError(this, mainStack, message);
 		}
 		
 		return impl == null;
@@ -141,22 +142,22 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 
-	protected void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) {
+	protected void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) throws OocCompilationError, EOFException {
 		
 		int typeIndex = Node.find(TypeDecl.class, mainStack);
 		if(typeIndex == -1) {
-			throw new CompilationFailedError(null, (isSuper ? "super" : "this")
+			throw new OocCompilationError(this, mainStack, (isSuper ? "super" : "this")
 					+getArgsRepr()+" call outside a class declaration, doesn't make sense.");
 		}
 		TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 		if(isSuper) {
 			if(!(typeDecl instanceof ClassDecl)) {
-				throw new CompilationFailedError(null, "super"+getArgsRepr()+" call in type def "
+				throw new OocCompilationError(this, mainStack, "super"+getArgsRepr()+" call in type def "
 						+typeDecl.getName()+" which is not a class! wtf?");
 			}
 			ClassDecl classDecl = ((ClassDecl) typeDecl);
 			if(classDecl.getSuperRef() == null) {
-				throw new CompilationFailedError(null, "super"+getArgsRepr()+" call in class "
+				throw new OocCompilationError(this, mainStack, "super"+getArgsRepr()+" call in class "
 						+typeDecl.getName()+" which has no super-class!");
 			}
 			typeDecl = classDecl.getSuperRef();
