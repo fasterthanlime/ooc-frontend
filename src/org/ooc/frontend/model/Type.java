@@ -169,4 +169,17 @@ public class Type extends Node implements MustBeResolved {
 		return ref != null;
 	}
 	
+	public Type getGroundType() {
+		if(ref instanceof CoverDecl) {
+			CoverDecl coverDecl = (CoverDecl) ref;
+			if(coverDecl.getFromType() != null) {
+				Type rawType = coverDecl.getFromType().getGroundType();
+				Type groundType = new Type(rawType.name, pointerLevel, referenceLevel, rawType.startToken);
+				groundType.ref = ref;
+				return groundType;
+			}
+		}
+		return this;
+	}
+	
 }

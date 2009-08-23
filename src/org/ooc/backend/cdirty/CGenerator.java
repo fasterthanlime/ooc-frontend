@@ -118,13 +118,6 @@ public class CGenerator extends Generator implements Visitor {
 		for(Include include: module.getIncludes()) {
 			writeInclude(include);
 		}
-		current.newLine();
-		for(Import imp: module.getImports()) {
-			current.append("#include <");
-			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
-			current.append(".h>");
-			current.newLine();
-		}
 		
 		current.newLine();
 		for(Node node: module.getBody()) {
@@ -135,6 +128,14 @@ public class CGenerator extends Generator implements Visitor {
 			} else if(node instanceof CoverDecl) {
 				writeCoverTypedef((CoverDecl) node);
 			}
+		}
+		
+		current.newLine();
+		for(Import imp: module.getImports()) {
+			current.append("#include <");
+			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
+			current.append(".h>");
+			current.newLine();
 		}
 		
 		current = cw;
@@ -511,7 +512,7 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
-		
+
 		int refLevel = variableAccess.getRef().getType().getReferenceLevel();
 		if(refLevel > 0) {
 			current.append('(');
@@ -1155,7 +1156,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.newLine();
 			} else {
 				current.append("typedef ");
-				writeSpacedType(fromType);
+				writeSpacedType(fromType.getGroundType());
 				current.append(cover.getName());
 				current.append(';');
 				current.newLine();
