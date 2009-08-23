@@ -10,7 +10,6 @@ import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class ArrayAccess extends Access implements MustBeResolved {
 
@@ -132,12 +131,12 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	protected boolean tryIndexing(OpDecl op, Stack<Node> stack) {
+	protected boolean tryIndexing(OpDecl op, Stack<Node> stack) throws OocCompilationError, EOFException {
 		
 		if(op.getOpType() != OpType.INDEXING) return false;
 		
 		if(op.getFunc().getArguments().size() != 2) {
-			throw new CompilationFailedError(null,
+			throw new OocCompilationError(op, stack,
 					"To overload the indexing operator, you need exactly two arguments, not "
 					+op.getFunc().getArgsRepr());
 		}

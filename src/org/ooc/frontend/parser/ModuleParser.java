@@ -2,6 +2,7 @@ package org.ooc.frontend.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class ModuleParser {
 		
 		Module module = new Module(fullName, sReader);
 		cache.put(module.getFullName(), module);
+		addLangImports(module, parser);
 		
 		while(reader.hasNext()) {
 
@@ -61,10 +63,10 @@ public class ModuleParser {
 		}
 
 		for(Import imp: module.getImports()) {
-			Module cached = cache.get(imp.getPath());
+			Module cached = cache.get(imp.getName());
 			if(cached == null) {
 				cached = parser.parse(imp.getPath());
-				cache.put(imp.getPath(), cached);
+				cache.put(imp.getName(), cached);
 			}
 			imp.setModule(cached);
 		}
@@ -73,6 +75,19 @@ public class ModuleParser {
 		
 	}
 	
+	private static void addLangImports(Module module, Parser parser) {
+		
+		Collection<String> paths = parser.params.sourcePath.getRelativePaths("lang");
+		for(String path: paths) {
+			String impName = path.replace('/', '.');
+			impName = impName.substring(0, impName.length() - 4); // ditch the '.ooc'
+			if(!impName.equals(module.getFullName())) {
+				module.getImports().add(new Import(impName, Token.defaultToken));
+			}
+		}
+		
+	}
+
 	public static void clearCache() {
 		cache.clear();
 	}

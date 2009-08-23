@@ -6,8 +6,8 @@ import java.util.Stack;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class Type extends Node implements MustBeResolved {
 
@@ -149,7 +149,7 @@ public class Type extends Node implements MustBeResolved {
 		if(ref == null && name.equals("This")) {
 			int index = Node.find(TypeDecl.class, stack);
 			if(index == -1) {
-				throw new CompilationFailedError(null, "Using 'This' outside a type definition. Wtf?");
+				throw new OocCompilationError(this, stack, "Using 'This' outside a type definition. Wtf?");
 			}
 			TypeDecl typeDecl = (TypeDecl) stack.get(index);
 			name = typeDecl.getName();
@@ -157,7 +157,7 @@ public class Type extends Node implements MustBeResolved {
 		}
 		
 		if(ref == null && fatal) {
-			throw new CompilationFailedError(null, "Couldn't resolve type "+getName());
+			throw new OocCompilationError(this, stack, "Couldn't resolve type "+getName());
 		}
 		
 		return ref == null;

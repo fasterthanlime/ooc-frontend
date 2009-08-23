@@ -6,8 +6,8 @@ import java.util.Stack;
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ubi.CompilationFailedError;
 
 public class MemberCall extends FunctionCall {
 
@@ -68,7 +68,7 @@ public class MemberCall extends FunctionCall {
 		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
-				throw new CompilationFailedError(null, "Calling member function "
+				throw new OocCompilationError(this, mainStack, "Calling member function "
 						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been resolved yet!");
 			}
@@ -76,7 +76,7 @@ public class MemberCall extends FunctionCall {
 		}
 		if(exprType.getRef() == null) {
 			if(fatal) {
-				throw new CompilationFailedError(null, "Calling member function "
+				throw new OocCompilationError(this, mainStack, "Calling member function "
 						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
 						+" which type hasn't been ref'd yet, e.g. "+expression);
 			}
@@ -84,7 +84,7 @@ public class MemberCall extends FunctionCall {
 		}
 		Declaration decl = exprType.getRef();
 		if(!(decl instanceof TypeDecl)) {
-			throw new CompilationFailedError(null, 
+			throw new OocCompilationError(this, mainStack, 
 					"Trying to call a member function of not a TypeDecl, but a "
 					+decl.getClass().getSimpleName());
 		}
@@ -101,7 +101,7 @@ public class MemberCall extends FunctionCall {
 			} else {
 				System.out.println("No guess!");
 			}
-			throw new CompilationFailedError(null, message);
+			throw new OocCompilationError(this, mainStack, message);
 		}
 		
 		return impl == null;

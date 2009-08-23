@@ -1,8 +1,10 @@
 package org.ooc.frontend;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Somehow like the 'classpath' in Java. E.g. holds where to find ooc
@@ -85,10 +87,38 @@ public class PathList {
 	}
 	
 	/**
-	 * Find the module described by the specified SourceUnit in the
-	 * source path and return a file to its .ooc source
-	 * @param module
+	 * Return a list of all files found in a directory in the whole sourcepath
+	 * @param path
 	 * @return
+	 */
+	public Collection<String> getRelativePaths(String path) {
+		
+		List<String> files = new ArrayList<String>();
+		
+		for(File element: paths.values()) {
+			File candidate = new File(element, path);
+			if(candidate.exists()) addChildren(path, files, candidate);
+		}
+		
+		return files;
+		
+	}
+
+	private void addChildren(String basePath, List<String> list, File parent) {
+		
+		File[] children = parent.listFiles();
+		for(File child: children) {
+			if(child.isFile()) {
+				list.add(basePath + '/' + child.getName());
+			} else if(child.isDirectory()) {
+				addChildren(basePath + '/' + child.getName(), list, child);
+			}
+		}
+		
+	}
+	
+	/**
+	 * Find the file in the source path and return a File object associated to it
 	 */
 	public File getFile(String path) {
 		

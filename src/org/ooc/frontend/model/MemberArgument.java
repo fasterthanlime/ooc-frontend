@@ -1,11 +1,12 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
-import org.ubi.CompilationFailedError;
+import org.ooc.middle.OocCompilationError;
 
 public class MemberArgument extends Argument {
 
@@ -32,24 +33,38 @@ public class MemberArgument extends Argument {
 	
 	// FIXME too much similar code with MemberAssignArgument. Share it somehow.
 	@Override
-	public boolean unwrap(Stack<Node> hierarchy) {
+	public boolean unwrap(Stack<Node> stack) throws OocCompilationError, EOFException {
 		
-		int typeIndex = Node.find(TypeDecl.class, hierarchy);
+		int typeIndex = Node.find(TypeDecl.class, stack);
 		if(typeIndex == -1) {
-			throw new CompilationFailedError(null, "Member argument outside a class definition!");
+			throw new OocCompilationError(this, stack, getClass().getSimpleName()
+					+" outside a class definition!");
 		}
 		
-		TypeDecl typeDecl = (TypeDecl) hierarchy.get(typeIndex);
-		VariableDecl decl = typeDecl.getVariable(name);
-		if(decl == null) {
-			throw new CompilationFailedError(null, "Member argument named '"+name+"" +
+		TypeDecl typeDecl = (TypeDecl) stack.get(typeIndex);
+		VariableDecl varDecl = typeDecl.getVariable(name);
+		if(varDecl == null) {
+			throw new OocCompilationError(this, stack, getClass().getSimpleName()
+					+" named '"+name+"" +
 					"' doesn't correspond to any real member variable.");
 		}
-
-		hierarchy.peek().replace(this, new RegularArgument(decl.getType(), name, startToken));
 		
+		
+		int funcIndex = Node.find(FunctionDecl.class, stack);
+		if(funcIndex == -1) {
+			throw new OocCompilationError(this, stack, getClass().getSimpleName()
+					+" outside a function definition? What have" +
+					" you been up to?");
+		}		
+		FunctionDecl funcDecl = (FunctionDecl) stack.get(funcIndex);
+
+		doReplace(stack, varDecl, funcDecl);
 		return false;
 		
+	}
+
+	protected void doReplace(Stack<Node> stack, VariableDecl decl, FunctionDecl funcDecl) {
+		stack.peek().replace(this, new RegularArgument(decl.getType(), name, startToken));
 	}
 	
 }

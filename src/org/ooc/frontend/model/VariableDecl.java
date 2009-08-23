@@ -7,6 +7,7 @@ import java.util.Stack;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
 
 public class VariableDecl extends Declaration implements MustBeUnwrapped {
 
@@ -170,25 +171,25 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	@Override
-	public boolean unwrap(Stack<Node> hierarchy) {
+	public boolean unwrap(Stack<Node> stack) throws OocCompilationError, IOException {
 
-		if(hierarchy.get(hierarchy.size() - 2) instanceof ClassDecl) {
-			unwrapToClassInitializers(hierarchy, (ClassDecl) hierarchy.get(hierarchy.size() - 2));
+		if(stack.get(stack.size() - 2) instanceof ClassDecl) {
+			unwrapToClassInitializers(stack, (ClassDecl) stack.get(stack.size() - 2));
 			return false;
 		}
 		
-		return unwrapToVarAcc(hierarchy);
+		return unwrapToVarAcc(stack);
 		
 	}
 
 	@SuppressWarnings("unchecked")
-	protected boolean unwrapToVarAcc(Stack<Node> hierarchy) throws Error {
+	protected boolean unwrapToVarAcc(Stack<Node> stack) throws Error {
 
-		if(hierarchy.peek() instanceof Line
-		|| hierarchy.peek() instanceof Foreach
-		|| hierarchy.get(hierarchy.size() - 2) instanceof Module
-		|| hierarchy.get(hierarchy.size() - 2) instanceof FunctionDecl
-		|| hierarchy.get(hierarchy.size() - 2) instanceof TypeDecl
+		if(stack.peek() instanceof Line
+		|| stack.peek() instanceof Foreach
+		|| stack.get(stack.size() - 2) instanceof Module
+		|| stack.get(stack.size() - 2) instanceof FunctionDecl
+		|| stack.get(stack.size() - 2) instanceof TypeDecl
 		) {
 			return false;
 		}
@@ -196,19 +197,19 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		if(atoms.size() != 1) {
 			throw new Error("Multi-var decls used an expression.. wtf?");
 		}
-		hierarchy.peek().replace(this, new VariableAccess(atoms.get(0).name, atoms.get(0).startToken));
+		stack.peek().replace(this, new VariableAccess(atoms.get(0).name, atoms.get(0).startToken));
 		
-		int lineIndex = find(Line.class, hierarchy);
+		int lineIndex = find(Line.class, stack);
 		if(lineIndex == -1) {
-			throw new Error("Not in a line! How are we supposed to add one? Stack = "+hierarchy);
+			throw new Error("Not in a line! How are we supposed to add one? Stack = "+stack);
 		}
-		Line line = (Line) hierarchy.get(lineIndex);
-		int bodyIndex = find(NodeList.class, hierarchy, lineIndex - 1);
+		Line line = (Line) stack.get(lineIndex);
+		int bodyIndex = find(NodeList.class, stack, lineIndex - 1);
 		if(bodyIndex == -1) {
-			throw new Error("Didn't find a nodelist containing the line! How are we suppoed to add one? Stack = "+hierarchy);
+			throw new Error("Didn't find a nodelist containing the line! How are we suppoed to add one? Stack = "+stack);
 		}
 		
-		NodeList<Line> body = (NodeList<Line>) hierarchy.get(bodyIndex);
+		NodeList<Line> body = (NodeList<Line>) stack.get(bodyIndex);
 		Block block = new Block(body.startToken);
 		block.getBody().add(new Line(this));
 		block.getBody().add(line);
