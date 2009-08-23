@@ -31,13 +31,13 @@ String: cover from Char* {
 	
 	/* TODO: toDouble */
 	
-	isEmpty: func -> Bool return ((this == null) || (this[0] == '\0'))
+	isEmpty: func -> Bool ((this == null) || (this[0] == '\0'))
 	
-	func startsWith(String s) -> Bool {
+	func startsWith(s: String) -> Bool {
 		if (this length() < s length()) {
 			return false
 		}
-		for (i : Int in 0..s length()) {
+		for (i: Int in 0..s length()) {
 			if(this[i] != s[i]) {
 				return false
 			}
