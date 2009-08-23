@@ -268,12 +268,12 @@ public class CommandLine {
 		try {
 			done.add(module);
 			new Tinkerer().process(module, params);
-			new CGenerator(params.outPath, module).generate();
 			for(Import imp: module.getImports()) {
 				if(!done.contains(imp.getModule())) {
 					translate(imp.getModule(), done);
 				}
 			}
+			new CGenerator(params.outPath, module).generate();
 		} catch(OocCompilationError err) {
 			System.err.println(err);
 			System.exit(1);

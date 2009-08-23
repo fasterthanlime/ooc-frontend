@@ -7,10 +7,11 @@ import org.ooc.frontend.model.tokens.Token;
 public abstract class Node implements Visitable {
 
 	public final Token startToken;
-	public final String stackTrace;
+	//public final String stackTrace;
 	
 	public Node(Token startToken) {
 		this.startToken = startToken;
+		/*
 		String trace = "\n";
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 		for(StackTraceElement elem: stack) {
@@ -18,6 +19,7 @@ public abstract class Node implements Visitable {
 				+elem.getLineNumber()+") in "+elem.getMethodName()+"\n";
 		}
 		stackTrace = trace;
+		*/
 	}
 	
 	@Override
