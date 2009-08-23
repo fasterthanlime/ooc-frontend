@@ -581,7 +581,12 @@ public class CGenerator extends Generator implements Visitor {
 			
 		} else {
 		
-			writeSpacedType(variableDecl.getType());
+			Type type = variableDecl.getType();
+			if(!type.isArray()) {
+				writeSpacedType(type);
+			} else {
+				current.append(type.getName()).append(' ');
+			}
 			
 			boolean isStatic = variableDecl.isStatic();
 			TypeDecl typeDecl = variableDecl.getTypeDecl();
@@ -591,6 +596,9 @@ public class CGenerator extends Generator implements Visitor {
 			while(iter.hasNext()) {
 				VariableDeclAtom atom = iter.next();
 				current.append(typePrefix).append(atom.getName());
+				if(type.isArray()) for(int i = 0; i < type.getPointerLevel(); i++) {
+					current.append("[]");
+				}
 				if(atom.getExpression() != null) {
 					current.append(" = ");
 					atom.getExpression().accept(this);
@@ -1238,7 +1246,8 @@ public class CGenerator extends Generator implements Visitor {
 		
 		int level = type.getPointerLevel() + type.getReferenceLevel();
 		for(int i = 0; i < level; i++) {
-			current.append('*');
+			if(type.isArray()) current.append("[]");
+			else current.append('*');
 		}
 	}
 

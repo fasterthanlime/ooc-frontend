@@ -225,7 +225,6 @@ public class FunctionCall extends Access implements MustBeResolved {
 			for(VariableDecl varDecl: typeDeclaration.getVariables()) {
 				if(varDecl.getType() instanceof FuncType && varDecl.getName().equals(name)) {
 					FuncType funcType = (FuncType) varDecl.getType();
-					System.out.println("Reviewing "+varDecl.getName()+" "+funcType.getDecl());
 					if(matchesArgs(funcType.getDecl())) {
 						impl = funcType.getDecl();
 						break;

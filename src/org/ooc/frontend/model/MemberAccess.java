@@ -74,16 +74,14 @@ public class MemberAccess extends VariableAccess {
 			return true;
 		}
 
-		tryResolve(stack, exprType);
-		if(ref == null) tryResolve(stack, exprType.getFlatType(res));
+		if(tryResolve(stack, exprType)) return true;
+		if(tryResolve(stack, exprType.getFlatType(res))) return true;
 		
 		if(fatal && ref == null) {
 			String message = "Can't resolve access to member "+exprType+"."+name;
 			String guess = guessCorrectName((TypeDecl) exprType.getRef());
 			if(guess != null) {
 				message += " Did you mean "+exprType+"."+guess+" ?";
-			} else {
-				System.out.println("No guess!");
 			}
 			throw new OocCompilationError(this, stack, message);
 		}
@@ -108,18 +106,34 @@ public class MemberAccess extends VariableAccess {
 		
 	}
 
-	private void tryResolve(Stack<Node> stack, Type exprType)
+	private boolean tryResolve(Stack<Node> stack, Type exprType)
 			throws OocCompilationError, EOFException {
+		
 		Declaration decl = exprType.getRef();
-		if(decl != null) {
-			if(!(decl instanceof TypeDecl)) {
-				throw new OocCompilationError(this, stack, "Trying to access to a member of not a TypeDecl, but a "
-						+decl);
-			}
-			
-			TypeDecl typeDecl = (TypeDecl) decl;
-			ref = typeDecl.getVariable(name);
+		if(decl == null) return false;
+		
+		if(!(decl instanceof TypeDecl)) {
+			throw new OocCompilationError(this, stack,
+					"Trying to access to a member of not a TypeDecl, but a "+decl);
 		}
+		
+		TypeDecl typeDecl = (TypeDecl) decl;
+		ref = typeDecl.getVariable(name);
+		
+		if(ref == null && name.equals("size") && exprType.isArray) {
+			FunctionCall sizeofArray = new FunctionCall("sizeof", "", startToken);
+			sizeofArray.getArguments().add(expression);
+			FunctionCall sizeofType = new FunctionCall("sizeof", "", startToken);
+			 // FIXME it should probably be type.dereference()
+			sizeofType.getArguments().add(new VariableAccess(expression.getType().getName(), startToken)); 
+			Div div = new Div(sizeofArray, sizeofType, startToken);
+			stack.peek().replace(this, new Parenthesis(div, startToken));
+			return true;
+		}
+		
+		return ref != null;
+		
+		
 	}
 
 }
