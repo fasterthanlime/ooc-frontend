@@ -7,28 +7,30 @@ import org.ooc.frontend.model.tokens.Token;
 
 public class ClassDecl extends TypeDecl implements Scope {
 
-	//protected static Type type = new Type("Class");
-	
 	protected boolean isAbstract;
 	
 	protected OocDocComment comment;
 	protected String superName;
 	protected ClassDecl superRef;
 
-	protected FunctionDecl initializer;
-	protected FunctionDecl staticInitializer;
+	protected FunctionDecl initialize;
+	protected FunctionDecl load;
 	
-	public ClassDecl(String name, boolean isAbstract, Token startToken) {
+	public ClassDecl(String name, String superName, boolean isAbstract, Token startToken) {
 		super(name, startToken);
+		this.superName = (superName.isEmpty() && !isRootClass()) ? "Object" : superName;
 		this.isAbstract = isAbstract;
-		this.superName = "";
-		this.initializer = new FunctionDecl("initialize", "", false, false, false, false, startToken);
-		this.initializer.getArguments().add(new RegularArgument(instanceType, "this", startToken));
-		this.initializer.setTypeDecl(this);
-		this.staticInitializer = new FunctionDecl("static_initialize", "", false, false, false, false, startToken);
-		this.staticInitializer.setStatic(true);
-		this.staticInitializer.setTypeDecl(this);
+		this.initialize = new FunctionDecl("initialize", "", false, false, false, false, startToken);
+		this.initialize.getArguments().add(new RegularArgument(instanceType, "this", startToken));
+		this.initialize.setTypeDecl(this);
+		this.load = new FunctionDecl("load", "", false, false, false, false, startToken);
+		this.load.setStatic(true);
+		this.load.setTypeDecl(this);
 		this.superRef = null;
+	}
+
+	public boolean isRootClass() {
+		return name.equals("Object");
 	}
 	
 	public OocDocComment getComment() {
@@ -47,12 +49,12 @@ public class ClassDecl extends TypeDecl implements Scope {
 		this.superName = superName;
 	}
 	
-	public FunctionDecl getInitializer() {
-		return initializer;
+	public FunctionDecl getInitializeFunc() {
+		return initialize;
 	}
 	
-	public FunctionDecl getStaticInitializer() {
-		return staticInitializer;
+	public FunctionDecl getLoadFunc() {
+		return load;
 	}
 	
 	public boolean isAbstract() {
@@ -96,7 +98,6 @@ public class ClassDecl extends TypeDecl implements Scope {
 
 	@Override
 	public Type getType() {
-		//return type;
 		return getInstanceType();
 	}
 	
@@ -114,8 +115,8 @@ public class ClassDecl extends TypeDecl implements Scope {
 	public void acceptChildren(Visitor visitor) throws IOException {
 		variables.accept(visitor);
 		functions.accept(visitor);
-		initializer.accept(visitor);
-		staticInitializer.accept(visitor);
+		initialize.accept(visitor);
+		load.accept(visitor);
 		instanceType.accept(visitor);
 	}
 	

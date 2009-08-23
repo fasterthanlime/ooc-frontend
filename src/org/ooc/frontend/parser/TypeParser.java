@@ -1,14 +1,18 @@
 package org.ooc.frontend.parser;
 
+import java.io.IOException;
+
+import org.ooc.frontend.model.FuncType;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ooc.frontend.model.tokens.Token.TokenType;
+import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
 public class TypeParser {
 
-	public static Type parse(SourceReader sReader, TokenReader reader) {
+	public static Type parse(SourceReader sReader, TokenReader reader) throws IOException {
 		
 		String name = "";
 		int pointerLevel = 0;
@@ -39,6 +43,20 @@ public class TypeParser {
 			
 		if(reader.peek().type == TokenType.NAME) {
 			name += reader.read().get(sReader);
+		}
+		
+		if(name.equals("Func")) {
+			FuncType funcType = new FuncType(startToken);
+			ArgumentListFiller.fill(sReader, reader, true, funcType.getDecl().getArguments());
+			if(reader.peek().type == TokenType.ARROW) {
+				reader.read();
+				funcType.getDecl().setReturnType(TypeParser.parse(sReader, reader));
+				if(funcType.getDecl().getReturnType() == null) {
+					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
+							"Expected function pointer return type after the arrow '->'");
+				}
+			}
+			return funcType;
 		}
 		
 		while(reader.peek().type == TokenType.STAR) {

@@ -166,5 +166,10 @@ public class Token implements Locatable {
 	public int getEnd() {
 		return start + length;
 	}
+
+	public boolean isNameToken() {
+		return type == TokenType.NAME || type == TokenType.THIS_KW
+			|| type == TokenType.SUPER_KW || type == TokenType.CLASS_KW;
+	}
 	
 }

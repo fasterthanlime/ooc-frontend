@@ -18,9 +18,40 @@ import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
-public class ArgumentParser {
+public class ArgumentListFiller {
 
-	public static boolean fill(SourceReader sReader, TokenReader reader, boolean isExtern, NodeList<Argument> args) throws IOException {
+	public static boolean fill(SourceReader sReader, TokenReader reader, boolean isExtern, NodeList<Argument> args) throws EOFException, IOException, CompilationFailedError {
+		
+		if(reader.peek().type == TokenType.OPEN_PAREN) {
+			reader.skip();
+			boolean comma = false;
+			while(true) {
+				
+				if(reader.peek().type == TokenType.CLOS_PAREN) {
+					reader.skip(); // skip the ')'
+					break;
+				}
+				if(comma) {
+					if(reader.read().type != TokenType.COMMA) {
+						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
+								"Expected comma between arguments of a function definition");
+					}
+				} else {
+					if(!parseInto(sReader, reader, isExtern, args)) {
+						throw new CompilationFailedError(sReader.getLocation(reader.peek()),
+								"Expected argument specification of a function definition");
+					}
+				}
+				comma = !comma;
+				
+			}
+			return true;
+		}
+		return false;
+		
+	}
+	
+	public static boolean parseInto(SourceReader sReader, TokenReader reader, boolean isExtern, NodeList<Argument> args) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -86,9 +117,9 @@ public class ArgumentParser {
 
 	protected static boolean tryRegular(SourceReader sReader, TokenReader reader,
 			NodeList<Argument> args, int mark, Token token)
-			throws CompilationFailedError, EOFException {
+			throws CompilationFailedError, IOException {
 		
-		if(token.type != TokenType.NAME) return false;
+		if(!token.isNameToken()) return false;
 		
 		List<String> names = new ArrayList<String>();
 		List<Token> tokens = new ArrayList<Token>();
@@ -104,9 +135,15 @@ public class ArgumentParser {
 			names.add(subToken.get(sReader));
 			tokens.add(subToken);
 		}
+
+		boolean isConst = false;
 		
 		if(reader.peek().type == TokenType.COLON) {
 			reader.skip();
+			if(reader.peek().type == TokenType.CONST_KW) {
+				isConst = true;
+				reader.skip();
+			}
 			Type type = TypeParser.parse(sReader, reader);
 			if(type == null) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
@@ -114,6 +151,7 @@ public class ArgumentParser {
 			}
 			for(int i = 0; i < names.size(); i++) {
 				RegularArgument regArg = new RegularArgument(type, names.get(i), tokens.get(i));
+				regArg.setConst(isConst);
 				args.add(regArg);
 			}
 			return true;

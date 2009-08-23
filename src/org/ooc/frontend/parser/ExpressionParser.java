@@ -74,7 +74,7 @@ public class ExpressionParser {
 			
 			Token token = reader.peek();
 			
-			if(token.type == TokenType.NAME) {
+			if(token.isNameToken()) {
 				
 				FunctionCall call = FunctionCallParser.parse(sReader, reader);
 				if(call != null) {

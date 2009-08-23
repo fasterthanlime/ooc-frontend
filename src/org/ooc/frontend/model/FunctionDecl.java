@@ -16,6 +16,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	protected boolean isStatic;
 	protected boolean isAbstract;
 	protected boolean isProto = false;
+	protected boolean fromPointer = false;
 	
 	protected TypeDecl typeDecl;
 
@@ -58,6 +59,14 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
+	}
+	
+	public boolean isFromPointer() {
+		return fromPointer;
+	}
+	
+	public void setFromPointer(boolean fromPointer) {
+		this.fromPointer = fromPointer;
 	}
 	
 	public boolean isProto() {

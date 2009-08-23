@@ -79,7 +79,7 @@ public class Type extends Node implements MustBeResolved {
 	@Override
 	public String toString() {
 		
-		if(pointerLevel == 0) {
+		if(pointerLevel == 0 && referenceLevel == 0) {
 			return name;
 		}
 		
@@ -170,16 +170,40 @@ public class Type extends Node implements MustBeResolved {
 	}
 	
 	public Type getGroundType() {
+		return getGroundType(null);
+	}
+	
+	public Type getGroundType(Resolver res) {
 		if(ref instanceof CoverDecl) {
 			CoverDecl coverDecl = (CoverDecl) ref;
 			if(coverDecl.getFromType() != null) {
-				Type rawType = coverDecl.getFromType().getGroundType();
+				Type rawType = coverDecl.getFromType().getGroundType(res);
 				Type groundType = new Type(rawType.name, pointerLevel, referenceLevel, rawType.startToken);
-				groundType.ref = ref;
+				if(res == null) {
+					groundType.ref = ref;
+				} else {
+					res.resolveType(groundType);
+				}
 				return groundType;
 			}
 		}
 		return this;
+	}
+	
+	public Type getFlatType(Resolver res) {
+		Type returnType = this;
+		while(returnType.ref instanceof CoverDecl) {
+			CoverDecl coverDecl = (CoverDecl) returnType.ref;
+			Type fromType = coverDecl.getFromType();
+			if(fromType == null) break;
+			if(fromType.referenceLevel <= 0) break;
+			
+			returnType = new Type(fromType.name, fromType.pointerLevel - 1,
+					returnType.referenceLevel - 1, fromType.startToken);
+			res.resolveType(returnType);
+		}
+		
+		return returnType;
 	}
 	
 }

@@ -22,14 +22,15 @@ public class VariableDeclParser {
 
 		List<VariableDeclAtom> atoms = new ArrayList<VariableDeclAtom>();
 		
-		if(reader.peek().type != TokenType.NAME) {
+		Token tName = reader.peek();
+		if(!tName.isNameToken()) {
 			reader.reset(mark);
 			return null;
 		}
 		
 		Token declStartToken = reader.peek();
 		Token atomStartToken;
-		while((atomStartToken = reader.peek()).type == TokenType.NAME) {
+		while((atomStartToken = reader.peek()).isNameToken()) {
 			String name = reader.read().get(sReader);
 			Expression expr = null;
 			if(reader.peek().type == TokenType.ASSIGN) {

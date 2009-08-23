@@ -1,4 +1,3 @@
-
 #ifndef __MANGO_OBJECT_H__
 #define __MANGO_OBJECT_H__
 

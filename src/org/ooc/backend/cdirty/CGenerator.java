@@ -30,6 +30,7 @@ import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
+import org.ooc.frontend.model.FuncType;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.If;
@@ -114,7 +115,7 @@ public class CGenerator extends Generator implements Visitor {
 
 		// FIXME of course this is a dirty hack because this devbranch
 		// is missing the whole fancy cmdline frontend with sdk search etc.
-		current.append("#include <mango/mangoobject.h>\n");
+		//current.append("#include <mango/mangoobject.h>\n");
 		for(Include include: module.getIncludes()) {
 			writeInclude(include);
 		}
@@ -268,6 +269,8 @@ public class CGenerator extends Generator implements Visitor {
 				current.append('_');
 				current.append(decl.getSuffix());
 			}
+		} else if(decl.isFromPointer()) {
+			current.append(functionCall.getName());
 		} else {
 			decl.writeFullName(current);
 		}
@@ -286,25 +289,39 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	protected void writeExprList(NodeList<Expression> args) throws IOException {
-		boolean isFirst = true;
-
-		for(Expression expr: args) {
-			
-			if(!isFirst) {
-				current.append(", ");
-			}
-			expr.accept(this);
-			
-			isFirst = false;
-
+		Iterator<Expression> iter = args.iterator();
+		while(iter.hasNext()) {
+			iter.next().accept(this);
+			if(iter.hasNext()) current.append(", ");
 		}
+		
 	}
 
 	@Override
 	public void visit(MemberCall memberCall) throws IOException {
 		
 		FunctionDecl impl = memberCall.getImpl();
-		impl.writeFullName(current);
+		if(impl.isFromPointer()) {
+			boolean isArrow = memberCall.getExpression().getType().getRef() instanceof ClassDecl;
+			
+			Expression expression = memberCall.getExpression();
+			if(!isArrow && expression instanceof Dereference) {
+				Dereference deref = (Dereference) expression;
+				expression = deref.getExpression();
+				isArrow = true;
+			}
+			expression.accept(this);
+			
+			if(isArrow) {
+				current.append("->");
+			} else {
+				current.append(".");
+			}
+			current.append(memberCall.getName());
+		} else {
+			impl.writeFullName(current);
+		}
+		
 		current.append('(');
 		
 		TypeDecl typeDecl = impl.getTypeDecl();
@@ -313,7 +330,7 @@ public class CGenerator extends Generator implements Visitor {
 			typeDecl.getInstanceType().accept(this);
 			current.append(") ");
 		}
-		if(!impl.isStatic()) {
+		if(!impl.isStatic() && !impl.isFromPointer()) {
 			memberCall.getExpression().accept(this);
 			if(!memberCall.getArguments().isEmpty()) current.append(", ");
 		}
@@ -489,21 +506,31 @@ public class CGenerator extends Generator implements Visitor {
 			
 		} else {
 		
+			boolean isArrow = (typeDecl instanceof ClassDecl);
+			
+			Expression expression = memberAccess.getExpression();
+			if(!isArrow && expression instanceof Dereference) {
+				Dereference deref = (Dereference) expression;
+				expression = deref.getExpression();
+				isArrow = true;
+			}
+			
 			if(typeDecl.getType().equals(memberAccess.getExpression().getType())) {		
-				memberAccess.getExpression().accept(this);
+				expression.accept(this);
 			} else {
 				current.append("((");
 				typeDecl.getInstanceType().accept(this);
 				current.append(')');
-				memberAccess.getExpression().accept(this);
+				expression.accept(this);
 				current.append(')');
 			}
-			if(typeDecl instanceof ClassDecl) {
+			
+			if(isArrow) {
 				current.append("->");
 			} else {
 				current.append('.');
 			}
-				
+			
 			visit((VariableAccess) memberAccess);
 		
 		}
@@ -514,6 +541,7 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(VariableAccess variableAccess) throws IOException {
 
 		int refLevel = variableAccess.getRef().getType().getReferenceLevel();
+		//System.out.println("writing access to "+variableAccess+" ref level = "+refLevel);
 		if(refLevel > 0) {
 			current.append('(');
 			for(int i = 0; i < refLevel; i++) {
@@ -539,21 +567,40 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(VariableDecl variableDecl) throws IOException {
 
 		if(variableDecl.isExtern()) return;
-		writeSpacedType(variableDecl.getType());
 		
-		boolean isStatic = variableDecl.isStatic();
-		TypeDecl typeDecl = variableDecl.getTypeDecl();
-		String typePrefix = isStatic ? typeDecl.getType().getMangledName() + "_" : "";
+		if(variableDecl.isConst()) current.append("const ");
 		
-		Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
-		while(iter.hasNext()) {
-			VariableDeclAtom atom = iter.next();
-			current.append(typePrefix).append(atom.getName());
-			if(atom.getExpression() != null) {
-				current.append(" = ");
-				atom.getExpression().accept(this);
+		if(variableDecl.getType() instanceof FuncType) {
+			
+			FuncType funcType = (FuncType) variableDecl.getType();
+			FunctionDecl funcDecl = funcType.getDecl();
+			Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
+			while(iter.hasNext()) {
+				VariableDeclAtom atom = iter.next();
+				writeSpacedType(funcDecl.getReturnType());
+				current.append("(*").append(atom.getName()).append(")");
+				writeFuncArgs(funcDecl);
 			}
-			if(iter.hasNext()) current.append(", ");
+			
+		} else {
+		
+			writeSpacedType(variableDecl.getType());
+			
+			boolean isStatic = variableDecl.isStatic();
+			TypeDecl typeDecl = variableDecl.getTypeDecl();
+			String typePrefix = isStatic ? typeDecl.getType().getMangledName() + "_" : "";
+			
+			Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
+			while(iter.hasNext()) {
+				VariableDeclAtom atom = iter.next();
+				current.append(typePrefix).append(atom.getName());
+				if(atom.getExpression() != null) {
+					current.append(" = ");
+					atom.getExpression().accept(this);
+				}
+				if(iter.hasNext()) current.append(", ");
+			}
+			
 		}
 		
 	}
@@ -711,7 +758,7 @@ public class CGenerator extends Generator implements Visitor {
 			openSpacedBlock();
 			
 			if(!decl.getReturnType().isVoid()) current.append("return ");
-			current.append("((").append(className).append("Class *)((MangoObject *)this)->class)->");
+			current.append("((").append(className).append("Class *)((Object *)this)->class)->");
 			decl.writeSuffixedName(current);
 			
 			writeTypelessFuncArgs(decl);
@@ -753,7 +800,7 @@ public class CGenerator extends Generator implements Visitor {
 			if(node instanceof ClassDecl) {
 				ClassDecl classDecl = (ClassDecl) node;
 				current.newLine().append(classDecl.getInstanceType().getMangledName());
-				current.append("_static_initialize();");
+				current.append("_load();");
 			}
 		}
 		for(Node node: module.getLoadFunc().getBody()) {
@@ -777,23 +824,23 @@ public class CGenerator extends Generator implements Visitor {
 		if(!classDecl.getSuperName().isEmpty()) {
 			current.newLine();
 			current.append(classDecl.getSuperName());
-			current.append("_class()->initialize((MangoObject *) this);");
+			current.append("_class()->initialize((Object *) this);");
 		}
 		
-		for(Line line: classDecl.getInitializer().getBody()) {
+		for(Line line: classDecl.getInitializeFunc().getBody()) {
 			line.accept(this);
 		}
 		
 		closeSpacedBlock();
 		
-		current.newLine().append("void ").append(className).append("_static_initialize()");
+		current.newLine().append("void ").append(className).append("_load()");
 		openBlock();
 		
 		current.newLine().append("static bool __done__ = false;").newLine().append("if (!__done__)");
 		openBlock();
 		current.newLine().append("__done__ = true;");
 		
-		for(Line line: classDecl.getStaticInitializer().getBody()) {
+		for(Line line: classDecl.getLoadFunc().getBody()) {
 			line.accept(this);
 		}
 		
@@ -810,16 +857,18 @@ public class CGenerator extends Generator implements Visitor {
 		openBlock();
 		
 		openSpacedBlock();
-		current.append("const MangoClass * super = ((MangoObject *) this)->class->super;");
+		current.append("const Class *super = ((Object *) this)->class->super;");
 		current.newLine();
-		current.append("if(super) super->destroy((MangoObject *) this);");
+		current.append("if(super) super->destroy((Object *) this);");
 		closeSpacedBlock();
 		
+		/*
 		if(!classDecl.getSuperName().isEmpty()) {
 			current.newLine();
 			current.append(classDecl.getSuperName());
 			current.append("_class()->destroy(this);");
 		}
+		*/
 		
 		closeSpacedBlock();
 	}
@@ -853,7 +902,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(className);
 				current.append(" *this = (");
 				current.append(className);
-				current.append(" *) mango_object_new(");
+				current.append(" *) _Object_new(");
 				current.append(className);
 				current.append("_class());");
 				current.newLine();
@@ -895,7 +944,7 @@ public class CGenerator extends Generator implements Visitor {
 
 	protected void writeClassGettingFunction(ClassDecl classDecl) throws IOException {
 		
-		current.append("const MangoClass *");
+		current.append("const Class *");
 		current.append(classDecl.getName());
 		current.append("_class()");
 		openSpacedBlock();
@@ -908,7 +957,7 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(';');
 		
 		current.newLine();
-		current.append("return (const MangoClass *) &class;");
+		current.append("return (const Class *) &class;");
 		closeSpacedBlock();
 	}
 
@@ -940,8 +989,8 @@ public class CGenerator extends Generator implements Visitor {
 			current.append("\",");
 			
 			/* initialize, destroy */
-			writeDesignatedInit("initialize", "(void (*)(MangoObject *))"+coreClass.getName()+"_initialize");
-			writeDesignatedInit("destroy", "(void (*)(MangoObject *))"+coreClass.getName()+"_destroy");
+			writeDesignatedInit("initialize", "(void (*)(Object *))"+coreClass.getName()+"_initialize");
+			writeDesignatedInit("destroy", "(void (*)(Object *))"+coreClass.getName()+"_destroy");
 			
 			closeBlock();
 			current.append(',');
@@ -964,7 +1013,7 @@ public class CGenerator extends Generator implements Visitor {
 	protected void writeMemberFuncPrototypes(ClassDecl classDecl, String className)
 			throws IOException {
 		current.newLine();
-		current.append("const MangoClass *");
+		current.append("const Class *");
 		current.append(className);
 		current.append("_class();");
 		current.newLine();
@@ -1024,11 +1073,9 @@ public class CGenerator extends Generator implements Visitor {
 		openSpacedBlock();
 		
 		if(classDecl.getSuperName().isEmpty()) {
-			// FIXME oooh hardcoded MangoClass, that is baad.
-			current.append("MangoClass super;");
-		} else {
-			current.append(classDecl.getSuperName());
 			current.append("Class super;");
+		} else {
+			current.append(classDecl.getSuperName()).append("Class super;");
 		}
 		
 		/* Now write all virtual functions prototypes in the class struct */
@@ -1053,7 +1100,9 @@ public class CGenerator extends Generator implements Visitor {
 		openSpacedBlock();
 		
 		if(classDecl.getSuperName().isEmpty()) {
-			current.append("MangoObject super;"); // FIXME oooh hardcoded MangoObject, that is baad.
+			if(!classDecl.getName().equals("Object")) {
+				current.append("Object super;");
+			}
 		} else {
 			current.append(classDecl.getSuperName());
 			current.append(" super;");
@@ -1080,12 +1129,12 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	protected void writeStructTypedef(String structName) throws IOException {
+		current.newLine();
 		current.append("typedef struct _");
 		current.append(structName);
 		current.append(" ");
 		current.append(structName);
 		current.append(";");
-		current.newLine();
 	}
 
 	protected void closeBlock() throws IOException {
@@ -1147,19 +1196,18 @@ public class CGenerator extends Generator implements Visitor {
 		if(!cover.isAddon() && !cover.isExtern()) {
 			Type fromType = cover.getFromType();
 			if(fromType == null) {
+				current.newLine();
 				current.append("typedef struct _");
 				current.append(cover.getName());
 				current.append(' ');
 				current.append(cover.getName());
 				current.append(';');
-				current.newLine();
-				current.newLine();
 			} else {
+				current.newLine();
 				current.append("typedef ");
 				writeSpacedType(fromType.getGroundType());
 				current.append(cover.getName());
 				current.append(';');
-				current.newLine();
 			}
 		}
 	}

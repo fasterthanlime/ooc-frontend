@@ -132,6 +132,10 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	
 	public void setTypeDecl(TypeDecl typeDecl) {
 		this.typeDecl = typeDecl;
+		if(type instanceof FuncType) {
+			FuncType funcType = (FuncType) type;
+			funcType.getDecl().setTypeDecl(typeDecl);
+		}
 	}
 	
 	public boolean isMember() {
@@ -233,9 +237,9 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 			atom.assign = assign;
 			Line line = new Line(assign);
 			if(isStatic) {
-				classDecl.getStaticInitializer().getBody().add(line);
+				classDecl.getLoadFunc().getBody().add(line);
 			} else {
-				classDecl.getInitializer().getBody().add(line);
+				classDecl.getInitializeFunc().getBody().add(line);
 			}
 			atom.expression = null;
 		

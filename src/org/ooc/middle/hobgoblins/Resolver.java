@@ -9,6 +9,7 @@ import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.OpDecl;
+import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
@@ -106,6 +107,17 @@ public class Resolver implements Hobgoblin {
 		
 		decls.add(new BuiltinType("size_t"));
 		decls.add(new BuiltinType("time_t"));
+	}
+
+	public void resolveType(Type type) {
+		
+		for(TypeDecl typeDecl: types) {
+			if(typeDecl.getName().equals(type.getName())) {
+				type.setRef(typeDecl);
+				return;
+			}
+		}
+		
 	}
 	
 }
