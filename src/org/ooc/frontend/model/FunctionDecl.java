@@ -114,7 +114,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	 * @return true if it's a member function
 	 */
 	public boolean isMember() {
-		return typeDecl != null;
+		return typeDecl != null && !isFromPointer();
 	}
 	
 	public NodeList<Line> getBody() {

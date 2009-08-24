@@ -18,7 +18,7 @@ public class ClassDecl extends TypeDecl implements Scope {
 	
 	public ClassDecl(String name, String superName, boolean isAbstract, Token startToken) {
 		super(name, startToken);
-		this.superName = (superName.isEmpty() && !isRootClass()) ? "Object" : superName;
+		this.superName = (superName.isEmpty() && !isObjectClass()) ? "Object" : superName;
 		this.isAbstract = isAbstract;
 		this.initialize = new FunctionDecl("initialize", "", false, false, false, false, startToken);
 		this.initialize.getArguments().add(new RegularArgument(instanceType, "this", startToken));
@@ -29,8 +29,16 @@ public class ClassDecl extends TypeDecl implements Scope {
 		this.superRef = null;
 	}
 
-	public boolean isRootClass() {
+	public boolean isObjectClass() {
 		return name.equals("Object");
+	}
+	
+	public boolean isClassClass() {
+		return name.equals("Class");
+	}
+	
+	public boolean isRootClass() {
+		return isObjectClass() || isClassClass();
 	}
 	
 	public OocDocComment getComment() {

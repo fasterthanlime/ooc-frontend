@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
@@ -77,24 +78,46 @@ public class MemberAccess extends VariableAccess {
 		if(ref == null) tryResolve(stack, exprType.getFlatType(res));
 		
 		if(fatal && ref == null) {
-			throw new OocCompilationError(this, stack, "Can't resolve access to member "
-					+exprType+"."+name);
+			String message = "Can't resolve access to member "+exprType+"."+name;
+			String guess = guessCorrectName((TypeDecl) exprType.getRef());
+			if(guess != null) {
+				message += " Did you mean "+exprType+"."+guess+" ?";
+			} else {
+				System.out.println("No guess!");
+			}
+			throw new OocCompilationError(this, stack, message);
 		}
-		return ref != null;
+		
+		return ref == null;
+	}
+
+	private String guessCorrectName(final TypeDecl typeDeclaration) {
+		
+		int bestDistance = Integer.MAX_VALUE;
+		String bestMatch = null;
+		
+		for(VariableDecl decl: typeDeclaration.getVariables()) {
+			int distance = Levenshtein.distance(name, decl.getName());
+			if(distance < bestDistance) {
+				bestDistance = distance;
+				bestMatch = decl.getName();
+			}
+		}
+		
+		return bestMatch;
+		
 	}
 
 	private void tryResolve(Stack<Node> stack, Type exprType)
 			throws OocCompilationError, EOFException {
 		Declaration decl = exprType.getRef();
 		if(decl != null) {
-			//System.out.println("decl = "+decl+" decl variables = "+decl.getTypeDecl().getVariablesRepr());
 			if(!(decl instanceof TypeDecl)) {
 				throw new OocCompilationError(this, stack, "Trying to access to a member of not a TypeDecl, but a "
 						+decl);
 			}
 			
 			TypeDecl typeDecl = (TypeDecl) decl;
-			//System.out.println("Other type decl variables "+typeDecl.getVariablesRepr());
 			ref = typeDecl.getVariable(name);
 		}
 	}

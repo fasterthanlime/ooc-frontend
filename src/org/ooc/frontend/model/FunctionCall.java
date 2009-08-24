@@ -2,9 +2,7 @@ package org.ooc.frontend.model;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
@@ -138,6 +136,20 @@ public class FunctionCall extends Access implements MustBeResolved {
 			}
 		}
 		
+		Module module = (Module) mainStack.get(0);
+		for(Import imp: module.getImports()) {
+			for(Node node: imp.getModule().body) {
+				if(node instanceof FunctionDecl) {
+					FunctionDecl decl = (FunctionDecl) node;
+					int distance = Levenshtein.distance(name, decl.getName());
+					if(distance < bestDistance) {
+						bestDistance = distance;
+						bestMatch = decl.getProtoRepr();
+					}
+				}
+			}
+		}
+		
 		return bestMatch;
 		
 	}
@@ -178,10 +190,12 @@ public class FunctionCall extends Access implements MustBeResolved {
 			final Resolver res, final boolean fatal)
 			throws IOException {
 		
+		TypeDecl typeDeclaration = null;
+		
 		int index = Node.find(TypeDecl.class, mainStack);
 		if(index != -1) {
-			TypeDecl decl = (TypeDecl) mainStack.get(index);
-			impl = decl.getFunction(this);
+			typeDeclaration = (TypeDecl) mainStack.get(index);
+			impl = typeDeclaration.getFunction(this);
 		}
 		
 		if(impl == null) {
@@ -200,14 +214,28 @@ public class FunctionCall extends Access implements MustBeResolved {
 		}
 		
 		if(impl == null) {
-			// Still null? Try top-level funcs in dependencies.
-			Module root = (Module) mainStack.get(0);
-			Set<Module> done = new HashSet<Module>();
-			searchIn(root, done);
+			Module module = (Module) mainStack.get(0);
+			for(Import imp: module.getImports()) {
+				searchIn(imp.getModule());
+				if(impl != null) break;
+			}
+		}
+		
+		if(impl == null && typeDeclaration != null) {
+			for(VariableDecl varDecl: typeDeclaration.getVariables()) {
+				if(varDecl.getType() instanceof FuncType && varDecl.getName().equals(name)) {
+					FuncType funcType = (FuncType) varDecl.getType();
+					System.out.println("Reviewing "+varDecl.getName()+" "+funcType.getDecl());
+					if(matchesArgs(funcType.getDecl())) {
+						impl = funcType.getDecl();
+						break;
+					}
+				}
+			}
 		}
 		
 		if(impl != null) {
-			if(impl.isMember()) {
+			if(impl.isMember() || impl.isFromPointer()) {
 				VariableAccess thisAccess = new VariableAccess("this", startToken);
 				thisAccess.resolve(mainStack, res, fatal);
 				MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this, startToken);
@@ -218,9 +246,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 	
-	// FIXME must simplify
-	protected void searchIn(Module module, Set<Module> done) {
-		done.add(module);
+	protected void searchIn(Module module) {
 		for(Node node: module.getBody()) {
 			if(node instanceof FunctionDecl) {
 				FunctionDecl decl = (FunctionDecl) node;
@@ -228,12 +254,6 @@ public class FunctionCall extends Access implements MustBeResolved {
 					impl = decl;
 					return;
 				}
-			}
-		}
-		
-		for(Import imp: module.getImports()) {
-			if(!done.contains(imp.getModule())) {
-				searchIn(imp.getModule(), done);
 			}
 		}
 	}

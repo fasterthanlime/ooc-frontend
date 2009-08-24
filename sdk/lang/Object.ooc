@@ -1,4 +1,4 @@
-Class: cover {
+Class: abstract class {
 	
 	/// Number of bytes to allocate for a new instance of this class 
 	size: SizeT
@@ -7,7 +7,7 @@ Class: cover {
     name: String
 	
 	/// Pointer to instance of super-class
-	super: const Class*
+	super: const Class
 	
 	/// Initializer: set default values for a new instance of this class
 	initialize: Func (Object)
@@ -15,19 +15,20 @@ Class: cover {
 	/// Finalizer: cleans up any objects belonging to this instance
     destroy: Func (Object)
 	
+	/// Create a new instance of the object of type defined by this class
+	newInstance: final func -> Object {
+		object = gc_malloc(size) : Object
+		if(object) {
+			object class = this
+			initialize(object)
+		}
+		return object
+	}
+	
 }
 
 Object: class {
 
-	class: const Class*
+	class: const Class
 	
-}
-
-_Object_new: func (class: const Class*) -> Object {
-    this = gc_malloc(class@ size) : Object
-    if(this) {
-        this class = class
-        class@ initialize(this)
-    }
-    return this
 }

@@ -113,14 +113,10 @@ public class CGenerator extends Generator implements Visitor {
 		current.newLine();
 		current.newLine();
 
-		// FIXME of course this is a dirty hack because this devbranch
-		// is missing the whole fancy cmdline frontend with sdk search etc.
-		//current.append("#include <mango/mangoobject.h>\n");
 		for(Include include: module.getIncludes()) {
 			writeInclude(include);
 		}
 		
-		current.newLine();
 		for(Node node: module.getBody()) {
 			if(node instanceof ClassDecl) {
 				ClassDecl classDecl = (ClassDecl) node;
@@ -130,6 +126,7 @@ public class CGenerator extends Generator implements Visitor {
 				writeCoverTypedef((CoverDecl) node);
 			}
 		}
+		current.newLine();
 		
 		current.newLine();
 		for(Import imp: module.getImports()) {
@@ -665,7 +662,6 @@ public class CGenerator extends Generator implements Visitor {
 	@Override 
 	public void visit(ClassDecl classDecl) throws IOException {
 		
-		// TODO modularize the heck out of this function: it's a mess.
 		current = hw;
 		
 		String className = classDecl.getName();
@@ -862,14 +858,6 @@ public class CGenerator extends Generator implements Visitor {
 		current.append("if(super) super->destroy((Object *) this);");
 		closeSpacedBlock();
 		
-		/*
-		if(!classDecl.getSuperName().isEmpty()) {
-			current.newLine();
-			current.append(classDecl.getSuperName());
-			current.append("_class()->destroy(this);");
-		}
-		*/
-		
 		closeSpacedBlock();
 	}
 
@@ -902,7 +890,7 @@ public class CGenerator extends Generator implements Visitor {
 				current.append(className);
 				current.append(" *this = (");
 				current.append(className);
-				current.append(" *) _Object_new(");
+				current.append(" *) Class_newInstance((Class *)");
 				current.append(className);
 				current.append("_class());");
 				current.newLine();
@@ -965,7 +953,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		openBlock();
 		
-		if(currentClass.getSuperRef() != null) {
+		if(!currentClass.isRootClass() && currentClass.getSuperRef() != null) {
 			
 			writeFuncPointers(currentClass.getSuperRef(), coreClass);
 			
@@ -1072,10 +1060,10 @@ public class CGenerator extends Generator implements Visitor {
 		current.append("Class");
 		openSpacedBlock();
 		
-		if(classDecl.getSuperName().isEmpty()) {
-			current.append("Class super;");
+		if(classDecl.isRootClass()) {
+			current.append("struct _Class __super__;");
 		} else {
-			current.append(classDecl.getSuperName()).append("Class super;");
+			current.append("struct _").append(classDecl.getSuperName()).append("Class __super__;");
 		}
 		
 		/* Now write all virtual functions prototypes in the class struct */
@@ -1099,13 +1087,8 @@ public class CGenerator extends Generator implements Visitor {
 		current.append(className);
 		openSpacedBlock();
 		
-		if(classDecl.getSuperName().isEmpty()) {
-			if(!classDecl.getName().equals("Object")) {
-				current.append("Object super;");
-			}
-		} else {
-			current.append(classDecl.getSuperName());
-			current.append(" super;");
+		if(!classDecl.isObjectClass()) {
+			current.append("struct _").append(classDecl.getSuperName()).append(" *__super__;");
 		}
 		
 		for(VariableDecl decl: classDecl.getVariables()) {
@@ -1129,12 +1112,9 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	protected void writeStructTypedef(String structName) throws IOException {
-		current.newLine();
-		current.append("typedef struct _");
-		current.append(structName);
-		current.append(" ");
-		current.append(structName);
-		current.append(";");
+		current.newLine().append("struct _").append(structName).append(";");
+		current.newLine().append("typedef struct _").append(structName)
+			.append(" ").append(structName).append(";");
 	}
 
 	protected void closeBlock() throws IOException {
