@@ -23,7 +23,6 @@ import org.ooc.frontend.model.MemberCall;
 import org.ooc.frontend.model.Mod;
 import org.ooc.frontend.model.Mul;
 import org.ooc.frontend.model.Not;
-import org.ooc.frontend.model.Parenthesis;
 import org.ooc.frontend.model.RangeLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
@@ -65,10 +64,19 @@ public class ExpressionParser {
 			return new Sub(new IntLiteral(0, Format.DEC, firstToken), inner, firstToken);
 		}
 		
-		Expression expr = parseFlat(sReader, reader);
-		if(expr == null) {
-			return null;
+		Expression expr = null;
+		if(reader.peek().type == TokenType.OPEN_PAREN) {
+			reader.skip();
+			expr = parse(sReader, reader);
+			if(reader.read().type != TokenType.CLOS_PAREN) {
+				throw new CompilationFailedError(sReader.getLocation(reader.prev())
+						, "Expected closing parenthesis.");
+			}
+		} else {
+			expr = parseFlatNoparen(sReader, reader);
 		}
+		
+		if(expr == null) return null;
 		
 		while(reader.hasNext()) {
 			
@@ -231,6 +239,7 @@ public class ExpressionParser {
 		
 	}
 
+	/*
 	protected static Expression parseFlat(SourceReader sReader, TokenReader reader) throws IOException {
 		
 		int mark = reader.mark();
@@ -272,6 +281,7 @@ public class ExpressionParser {
 		return expression;
 		
 	}
+	*/
 	
 	protected static Expression parseFlatNoparen(SourceReader sReader, TokenReader reader) throws IOException {
 		

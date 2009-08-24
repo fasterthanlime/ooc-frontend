@@ -32,7 +32,7 @@ public class LiteralParser {
 			try {
 				return new CharLiteral(SourceReader.parseCharLiteral(token.get(sReader)), token);
 			} catch (SyntaxError e) {
-				throw new CompilationFailedError(sReader.getLocation(token), "Malformed char literal");
+				throw new CompilationFailedError(sReader.getLocation(token), e.getMessage());
 			}
 		}
 		if(token.type == TokenType.DEC_INT) 
