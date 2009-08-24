@@ -569,7 +569,10 @@ public class CGenerator extends Generator implements Visitor {
 
 		if(variableDecl.isExtern()) return;
 		
-		if(variableDecl.isConst()) current.append("const ");
+		
+		// FIXME add const checking from the ooc side of things. Disabled C's
+		// const keyword because it causes problems with class initializations
+		//if(variableDecl.isConst()) current.append("const ");
 		
 		if(variableDecl.getType() instanceof FuncType) {
 			
