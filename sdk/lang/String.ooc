@@ -70,6 +70,7 @@ String: cover from Char* {
 		if(start > len) {
 			printf("String.substring: out of bounds: length = %d, start = %d\n",
 				len, start);
+			return null
 		}
 		
 		diff = (len - start) : Int
