@@ -11,7 +11,6 @@ import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
 import org.ooc.middle.hobgoblins.Resolver;
 import org.ooc.middle.hobgoblins.ReturnHandler;
 import org.ooc.middle.hobgoblins.SuffixConflictAnnihilator;
-import org.ooc.middle.hobgoblins.SuperResolver;
 import org.ooc.middle.hobgoblins.Unwrapper;
 
 /**
@@ -30,8 +29,6 @@ public class Tinkerer implements Hobgoblin {
 	public void process(Module module, BuildParams params) throws IOException {
 
 		new CaseEnforcer().process(module, params);
-		
-		new SuperResolver().process(module, params);
 		
 		new DefaultConstructorGiver().process(module, params);
 		new Unwrapper().process(module, params);
