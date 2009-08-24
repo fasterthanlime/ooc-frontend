@@ -1,7 +1,5 @@
 include stdlib, stdio, stdint, stdbool, memory, gc/gc, string
 
-strlen: extern func (String) -> SizeT
-
 Pointer: cover from void*
 Int: cover from int
 UInt: cover from unsigned int
