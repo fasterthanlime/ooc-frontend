@@ -32,7 +32,7 @@ public class FunctionDeclParser {
 		
 		String name = "";
 		Token tName = reader.peek();
-		if(tName.type == TokenType.NAME || tName.type == TokenType.NEW_KW) {
+		if(tName.isNameToken()) {
 			name = tName.get(sReader);
 			reader.skip();
 			if(reader.read().type != TokenType.COLON) {

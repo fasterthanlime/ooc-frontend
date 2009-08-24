@@ -120,6 +120,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 			if(typeIndex != -1) {
 				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 				if(name.equals("This")) {
+					name = typeDecl.getName();
 					ref = typeDecl;
 					return true;
 				}

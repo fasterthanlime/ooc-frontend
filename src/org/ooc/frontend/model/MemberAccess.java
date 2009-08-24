@@ -138,6 +138,11 @@ public class MemberAccess extends VariableAccess {
 			return true;
 		}
 		
+		if(ref == null && name.equals("class") && exprType.getRef() instanceof CoverDecl) {
+			stack.peek().replace(this, new MemberCall(expression, "class", "", startToken));
+			return true;
+		}
+		
 		return ref != null;
 		
 		

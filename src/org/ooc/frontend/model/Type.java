@@ -140,7 +140,7 @@ public class Type extends Node implements MustBeResolved {
 	}
 	
 	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
-		
+
 		for(TypeDecl decl: res.types) {
 			if(decl.getName().equals(name)) {
 				ref = decl;

@@ -77,6 +77,8 @@ public class Resolver implements Hobgoblin {
 	}
 	
 	protected void addBuiltins(List<TypeDecl> decls) {
+		decls.add(new BuiltinType("Func"));
+		
 		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(new BuiltinType("void"));
 		decls.add(new BuiltinType("short"));

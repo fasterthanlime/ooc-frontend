@@ -3,7 +3,16 @@ include stdlib, stdio, stdint, stdbool, memory, gc/gc, string
 Char: cover from char
 String: cover from Char*
 Pointer: cover from void*
-Int: cover from int
+Int: cover from int {
+	/*
+	class: func -> Class {
+		c := gc_malloc(sizeof(Class)) as Class
+		c size = sizeof(This)
+		c name = "Int"
+		return c
+	}
+	*/
+}
 UInt: cover from unsigned int
 Float: cover from float
 Double: cover from double
@@ -16,8 +25,6 @@ Void: cover from void
 Bool: cover from bool
 SizeT: cover from size_t
 Octet: cover from uint8_t
-Func: extern cover
-Void: extern cover
 
 sizeof: extern func (...) -> SizeT
 memcpy: extern func (Pointer, Pointer, SizeT)

@@ -568,17 +568,20 @@ public class CGenerator extends Generator implements Visitor {
 			}
 			
 		} else {
-		
+			
+			boolean isStatic = variableDecl.isStatic();
+			TypeDecl typeDecl = variableDecl.getTypeDecl();
+			if(isStatic && (typeDecl == null)) current.append("static ");
+			
 			Type type = variableDecl.getType();
 			if(!type.isArray()) {
 				writeSpacedType(type);
 			} else {
 				current.app(type.getName()).app(' ');
 			}
-			
-			boolean isStatic = variableDecl.isStatic();
-			TypeDecl typeDecl = variableDecl.getTypeDecl();
-			String typePrefix = isStatic ? typeDecl.getType().getMangledName() + "_" : "";
+
+			String typePrefix = isStatic && (typeDecl != null) ?
+					(typeDecl.getType().getMangledName()) + "_" : "";
 			
 			Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
 			while(iter.hasNext()) {
@@ -1080,6 +1083,11 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Type type) throws IOException {
+		if(type.getName().equals("Func")) {
+			current.append("void (*)()");
+			return;
+		}
+		
 		current.app(type.getName());
 		if(!type.isFlat()) {
 			current.app(' ');

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.Compare.CompareType;
+import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.hobgoblins.Resolver;
@@ -26,6 +28,7 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	protected Type type;
 	protected Type fromType;
 	protected CoverDecl base;
+	protected FunctionDecl classGettingFunc;
 	
 	public CoverDecl(String name, Type fromType, Token startToken) {
 		super(name, startToken);
@@ -37,6 +40,48 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 			type.referenceLevel = fromType.referenceLevel;
 			instanceType.referenceLevel = fromType.referenceLevel;
 		}
+		if(fromType == null || !fromType.getName().equals("void")) {
+			addClassDecl();
+		}
+	}
+
+	private void addClassDecl() {
+		classGettingFunc = new FunctionDecl("class", "", false, true, false, false, startToken);
+		classGettingFunc.setReturnType(new Type("Class", startToken));
+		
+		FunctionCall classSizeOf = new FunctionCall("sizeof", "", startToken);
+		classSizeOf.arguments.add(new VariableAccess("Class", startToken));
+		
+		FunctionCall malloc = new FunctionCall("gc_malloc", "", startToken);
+		malloc.arguments.add(classSizeOf);
+		
+		FunctionCall coverSizeOf = new FunctionCall("sizeof", "", startToken);
+		coverSizeOf.arguments.add(new VariableAccess(getName(), startToken));
+		
+		VariableDecl varDecl = new VariableDecl(new Type("Class", startToken), false, true, startToken);
+		NullLiteral nullLiteral = new NullLiteral(startToken);
+		varDecl.atoms.add(new VariableDeclAtom("_class", nullLiteral, startToken));
+		classGettingFunc.body.add(new Line(varDecl));
+		
+		VariableAccess classAccess = new VariableAccess("_class", startToken);
+		
+		If ifNull = new If(new Compare(classAccess, nullLiteral, CompareType.EQUAL, startToken), startToken);
+		classGettingFunc.body.add(new Line(ifNull));
+		
+		ifNull.body.add(new Line(new Assignment(classAccess, malloc, startToken)));
+		ifNull.body.add(new Line(new Assignment(new MemberAccess(classAccess, "size", startToken),
+				coverSizeOf, startToken)));
+		ifNull.body.add(new Line(new Assignment(new MemberAccess(classAccess, "name", startToken),
+				new StringLiteral(name, startToken), startToken)));
+		
+		classGettingFunc.body.add(new Line(new ValuedReturn(classAccess, startToken)));
+
+		addFunction(classGettingFunc);
+	}
+	
+	@Override
+	public void addFunction(FunctionDecl decl) {
+		super.addFunction(decl);
 	}
 
 	@Override
@@ -113,6 +158,7 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	public void absorb(CoverDecl node) {
 		assert(variables.isEmpty());
 		base = node;
+		functions.remove(classGettingFunc);
 	}
 
 	@Override
@@ -130,7 +176,7 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	@Override
 	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
-
+		
 		if(fromType == null) return false;
 
 		for(TypeDecl decl: res.types) {

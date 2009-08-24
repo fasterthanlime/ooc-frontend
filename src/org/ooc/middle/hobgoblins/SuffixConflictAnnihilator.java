@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
@@ -60,6 +61,8 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 
 	void throwError(FunctionDecl node, Stack<Node> stack, String name)
 			throws OocCompilationError, EOFException {
+		
+		if(name.equals("class") && Node.find(CoverDecl.class, stack) != -1) return;
 		
 		throw new OocCompilationError(node, stack,
 				"Two functions have the same name '"+name
