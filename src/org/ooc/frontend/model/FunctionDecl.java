@@ -238,5 +238,13 @@ public class FunctionDecl extends Declaration implements Scope {
 	public boolean isEntryPoint() {
 		return name.equals("main");
 	}
+
+	@Override
+	public boolean hasVariable(String name) {
+		for(Argument argument: arguments) {
+			if(argument.hasAtom(name)) return true;
+		}
+		return false;
+	}
 	
 }

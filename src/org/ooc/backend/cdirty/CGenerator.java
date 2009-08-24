@@ -1211,9 +1211,16 @@ public class CGenerator extends Generator implements Visitor {
 		if(regularArgument.isConst()) {
 			current.append("const ");
 		}
-		regularArgument.getType().accept(this);
-		current.append(' ');
-		current.append(regularArgument.getName());
+		Type type = regularArgument.getType();
+		if(type.isArray()) {
+			current.append(type.getName()).append(' ').append(regularArgument.getName());
+			for(int i = 0; i < type.getPointerLevel(); i++) {
+				current.append("[]");
+			}
+		} else {
+			writeSpacedType(type);
+			current.append(regularArgument.getName());
+		}
 		
 	}
 

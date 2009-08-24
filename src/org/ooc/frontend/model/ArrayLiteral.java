@@ -6,11 +6,12 @@ import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
+import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
 
-public class ArrayLiteral extends Literal implements MustBeResolved {
+public class ArrayLiteral extends Literal implements MustBeUnwrapped, MustBeResolved {
 
 	private static Type defaultType = new Type("Pointer", Token.defaultToken);
 	protected Type type = defaultType;
@@ -60,7 +61,7 @@ public class ArrayLiteral extends Literal implements MustBeResolved {
 	public boolean isResolved() {
 		return type != defaultType;
 	}
-
+	
 	@Override
 	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
@@ -83,6 +84,21 @@ public class ArrayLiteral extends Literal implements MustBeResolved {
 		}
 		
 		return type == defaultType;
+		
+	}
+
+	@Override
+	public boolean unwrap(Stack<Node> stack) throws IOException {
+		
+		int varDeclIndex = Node.find(VariableDecl.class, stack);
+		
+		if(varDeclIndex == -1) {
+			stack.peek().replace(this, new VariableDeclFromExpr(
+					generateTempName("array", stack), this, startToken));
+			return true;
+		}
+		
+		return false;
 		
 	}
 

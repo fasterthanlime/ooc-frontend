@@ -17,6 +17,7 @@ public class TypeParser {
 		String name = "";
 		int pointerLevel = 0;
 		int referenceLevel = 0;
+		boolean isArray = false;
 		
 		Token startToken = reader.peek();
 		
@@ -58,6 +59,16 @@ public class TypeParser {
 			}
 			return funcType;
 		}
+
+		while(reader.peek().type == TokenType.OPEN_SQUAR) {
+			reader.skip();
+			if(reader.read().type != TokenType.CLOS_SQUAR) {
+				throw new CompilationFailedError(sReader.getLocation(reader.prev()),
+						"Expected closing square bracket, e.g. ']' in array type definition");
+			}
+			pointerLevel++;
+			isArray = true;
+		}
 		
 		while(reader.peek().type == TokenType.STAR) {
 			pointerLevel++;
@@ -71,6 +82,7 @@ public class TypeParser {
 		
 		if(!name.isEmpty()) {
 			Type type = new Type(name.trim(), pointerLevel, referenceLevel, startToken);
+			type.setArray(isArray);
 			return type;
 		}
 		return null;

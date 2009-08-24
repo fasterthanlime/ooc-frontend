@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 import java.util.List;
+import java.util.Stack;
 
 import org.ooc.frontend.model.tokens.Token;
 
@@ -48,5 +49,25 @@ public abstract class Node implements Visitable {
 	}
 
 	public abstract boolean replace(Node oldie, Node kiddo);
+	
+	public String generateTempName(String seed, Stack<Node> stack) {
+		String name = seed;
+		int i = 0;
+		while(hasVariable(name, stack)) {
+			name = seed + (i++);
+		}
+		return name;
+	}
+
+	private boolean hasVariable(String name, Stack<Node> stack) {
+		return hasVariable(name, stack, Node.find(Scope.class, stack));
+	}
+
+	private boolean hasVariable(String name, Stack<Node> stack, int index) {
+		if(index == -1) return false;
+		Scope scope = (Scope) stack.get(index);
+		if(scope.hasVariable(name)) return true;
+		return hasVariable(name, stack, Node.find(Scope.class, stack, index - 1));
+	}
 	
 }

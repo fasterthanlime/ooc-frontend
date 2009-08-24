@@ -148,5 +148,14 @@ public class ClassDecl extends TypeDecl implements Scope {
 		if(superRef != null) return superRef.getVariable(name);
 		return null;
 	}
+
+	@Override
+	public boolean hasVariable(String name) {
+		for(VariableDecl variable: variables) {
+			if(variable.getName().equals(name)) return true;
+		}
+		
+		return false;
+	}
 	
 }

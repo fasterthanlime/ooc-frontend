@@ -201,5 +201,16 @@ public class Module extends Node implements Scope {
 	public SourceReader getReader() {
 		return reader;
 	}
+
+	@Override
+	public boolean hasVariable(String name) {
+		for(Node node: body) {
+			if(node instanceof VariableDecl) {
+				VariableDecl vDecl = (VariableDecl) node;
+				if(vDecl.getName().equals(name)) return true;
+			}
+		}
+		return false;
+	}
 	
 }

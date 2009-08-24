@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+
 /**
  * This interface must be implemented by everything which is capable
  * of holding variable declarations, ie. a "scope" in the C meaning of the term.
@@ -10,6 +11,6 @@ package org.ooc.frontend.model;
  */
 public interface Scope {
 
-	
+	boolean hasVariable(String name);
 	
 }
