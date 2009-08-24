@@ -1,11 +1,15 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
+import org.ooc.middle.hobgoblins.Resolver;
 
-public class ClassDecl extends TypeDecl implements Scope {
+public class ClassDecl extends TypeDecl implements Scope, MustBeResolved {
 
 	protected boolean isAbstract;
 	
@@ -156,6 +160,37 @@ public class ClassDecl extends TypeDecl implements Scope {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public boolean isResolved() {
+		return superName.isEmpty() || superRef != null;
+	}
+
+	@Override
+	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+			throws IOException {
+		
+		if(isResolved()) return false;
+		
+		for(TypeDecl candidate: res.types) {
+			if(superName.equals(candidate.getName())) {
+				if(!(candidate instanceof ClassDecl)) {
+					throw new OocCompilationError(this, stack, "Trying to extends a "
+							+candidate.getClass().getSimpleName()+". You can only extend classes.");
+				}
+				superRef = (ClassDecl) candidate;
+				return true;
+			}
+		}
+		
+		if(superRef == null && fatal) {
+			throw new OocCompilationError(this, stack, "Couldn't resolve super-class "
+					+superName+" of class "+name);
+		}
+		
+		return superRef == null;
+		
 	}
 	
 }

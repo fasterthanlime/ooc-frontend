@@ -965,7 +965,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		openBlock();
 		
-		if(!currentClass.isRootClass() && currentClass.getSuperRef() != null) {
+		if(!currentClass.isRootClass() && !currentClass.getSuperName().isEmpty()) {
 			
 			writeFuncPointers(currentClass.getSuperRef(), coreClass);
 			
