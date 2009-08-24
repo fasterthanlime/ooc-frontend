@@ -26,6 +26,7 @@ import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.Else;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
@@ -271,55 +272,46 @@ public class OocGenerator extends Generator implements Visitor {
 		
 		w.append("if (");
 		if1.getCondition().accept(this);
-		w.append(") {");
-		w.tab();
-		w.newLine();
-		for(Line line: if1.getBody()) {
-			line.accept(this);
-		}
-		w.untab();
-		w.newLine();
-		w.append('}');
-		w.newLine();
+		w.append(") ");
+		writeControlStatement(if1);
 		
+	}
+	
+	@Override
+	public void visit(Else else1) throws IOException {
+		w.append("else ");
+		writeControlStatement(else1);
 	}
 
 	@Override
 	public void visit(While while1) throws IOException {
-		
 		w.append("while (");
 		while1.getCondition().accept(this);
-		w.append(") {");
-		w.tab();
-		w.newLine();
-		for(Line line: while1.getBody()) {
-			line.accept(this);
-		}
-		w.untab();
-		w.newLine();
-		w.append('}');
-		w.newLine();
-		
+		w.append(") ");
+		writeControlStatement(while1);
 	}
 
 	@Override
 	public void visit(Foreach foreach) throws IOException {
-
 		w.append("for (");
 		foreach.getVariable().accept(this);
 		w.append(": ");
 		foreach.getCollection().accept(this);
-		w.append(") {");
+		w.append(") ");
+		writeControlStatement(foreach);
+	}
+	
+	private void writeControlStatement(ControlStatement statement) throws IOException {
+		w.append("{");
 		w.tab();
 		w.newLine();
-		for(Line line: foreach.getBody()) {
+		for(Line line: statement.getBody()) {
 			line.accept(this);
 		}
 		w.untab();
 		w.newLine();
 		w.append('}');
 		w.newLine();
-		
 	}
 
 	@Override

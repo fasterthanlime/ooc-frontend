@@ -18,6 +18,7 @@ import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.Else;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
@@ -93,6 +94,7 @@ public interface Visitor {
 	public void visit(Use use) throws IOException;
 
 	public void visit(If if1) throws IOException;
+	public void visit(Else else1) throws IOException;
 	public void visit(While while1) throws IOException;
 	public void visit(Foreach foreach) throws IOException;
 

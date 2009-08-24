@@ -21,6 +21,7 @@ import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.Else;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
 import org.ooc.frontend.model.FunctionCall;
@@ -384,6 +385,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(BinaryCombination binaryCombination) throws IOException {
 		visit((Node) binaryCombination);
+	}
+
+	@Override
+	public void visit(Else else1) throws IOException {
+		visit((Node) else1);
 	}
 	
 }

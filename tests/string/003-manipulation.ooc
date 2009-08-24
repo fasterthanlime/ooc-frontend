@@ -1,10 +1,9 @@
 main: func -> Int {
-	test = "A short list of long stories" : String
-	printf("String startsWith: ")
-	if (test startsWith("A short list")) {
+	test = "A short list of long stories", start = "A short list" : String
+	printf("String '%s' startsWith: '%s'? ", test, start)
+	if (test startsWith(start)) {
 		printf("OK\n")
-	}
-	else {
+	} else {
 		printf("FAIL\n")
 	}
 }

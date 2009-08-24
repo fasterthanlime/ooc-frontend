@@ -44,7 +44,7 @@ String: cover from Char* {
 	endsWith: func(s: String) -> Bool {
 		l1 = this length() : Int
 		l2 = s length() : Int
-		if(l1 < s l2) return false
+		if(l1 < l2) return false
 		offset = (l1 - l2) : Int
 		for (i: Int in 0..l1) {
 			if(this[i + offset] != s[i]) {

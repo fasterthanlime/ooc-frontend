@@ -27,6 +27,7 @@ import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
+import org.ooc.frontend.model.Else;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
@@ -435,14 +436,10 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(Include include) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	public void visit(Include include) throws IOException {}
 
 	@Override
 	public void visit(If if1) throws IOException {
-		
 		current.append("if");
 		if(if1.getCondition() instanceof Parenthesis) {
 			if1.getCondition().accept(this);
@@ -455,7 +452,14 @@ public class CGenerator extends Generator implements Visitor {
 		openBlock();
 		if1.getBody().accept(this);
 		closeBlock();
-		
+	}
+	
+	@Override
+	public void visit(Else else1) throws IOException {
+		current.append("else ");
+		openBlock();
+		else1.getBody().accept(this);
+		closeBlock();
 	}
 
 	@Override
