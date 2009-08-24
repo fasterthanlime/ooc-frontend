@@ -1,19 +1,14 @@
 package org.ooc.frontend.model;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
-import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.frontend.model.tokens.Token;
-import org.ooc.middle.OocCompilationError;
 
-public class Assignment extends Expression implements MustBeUnwrapped {
+public class Assignment extends Expression {
 
 	public static enum Mode {
 		REGULAR,
-		DECLARATION,
 		ADD,
 		SUB,
 		DIV,
@@ -85,31 +80,11 @@ public class Assignment extends Expression implements MustBeUnwrapped {
 		
 	}
 
-	@Override
-	public boolean unwrap(Stack<Node> stack) throws OocCompilationError, EOFException {
-		
-		if(mode == Mode.DECLARATION) {
-			if(lvalue instanceof VariableAccess) {
-				VariableAccess varAcc = (VariableAccess) lvalue;
-				stack.peek().replace(this, new VariableDeclFromExpr(varAcc.getName(), rvalue, startToken));
-			} else {
-				throw new OocCompilationError(lvalue, stack, "Decl-assign to a "
-						+lvalue.getClass().getSimpleName()+" where it should be a VariableAccess");
-			}
-			return true;
-		}
-		
-		return false;
-		
-	}
-
 	public String getSymbol() {
 		
 		switch(mode) {
 			case ADD:
 				return "+=";
-			case DECLARATION:
-				return ":=";
 			case DIV:
 				return "/=";
 			case MUL:

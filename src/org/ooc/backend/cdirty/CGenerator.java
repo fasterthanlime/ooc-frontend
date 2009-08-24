@@ -66,7 +66,6 @@ import org.ooc.frontend.model.VarArg;
 import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.While;
-import org.ooc.frontend.model.Assignment.Mode;
 import org.ooc.frontend.model.Include.Define;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
@@ -358,7 +357,6 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
-		assert(assignment.getMode() != Mode.DECLARATION);
 		assignment.getLvalue().accept(this);
 		current.append(' ');
 		current.append(assignment.getSymbol());

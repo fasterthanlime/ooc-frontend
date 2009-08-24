@@ -9,7 +9,11 @@ import org.ooc.frontend.model.tokens.Token;
 public class VariableDeclFromExpr extends VariableDecl {
 
 	public VariableDeclFromExpr(String name, Expression expression, Token startToken) {
-		super(null, false, false, startToken);
+		this(name, expression, false, false, startToken);
+	}
+	
+	public VariableDeclFromExpr(String name, Expression expression, boolean isConst, boolean isStatic, Token startToken) {
+		super(null, isConst, isStatic, startToken);
 		atoms.add(new VariableDeclAtom(name, expression, startToken));
 	}
 

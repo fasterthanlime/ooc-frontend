@@ -35,19 +35,32 @@ public class VariableDeclParser {
 			Expression expr = null;
 			if(reader.peek().type == TokenType.ASSIGN) {
 				reader.skip();
-				expr = ExpressionParser.parse(sReader, reader);
+				expr = ExpressionParser.parse(sReader, reader, true);
 				if(expr == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected expression as an initializer to a variable declaration.");
 				}
 			} else if(reader.peek().type == TokenType.DECL_ASSIGN) {
 				reader.skip();
+				
+				boolean isConst = false, isStatic = false;
+				while(true) {
+					Token kw = reader.peek();
+					if(kw.type == TokenType.CONST_KW) {
+						reader.skip();
+						isConst = true;
+					} else if(kw.type == TokenType.STATIC_KW) {
+						reader.skip();
+						isStatic = true;
+					} else break;
+				}
+				
 				expr = ExpressionParser.parse(sReader, reader);
 				if(expr == null) {
 					throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected expression as an initializer to a variable declaration.");
 				}
-				VariableDeclFromExpr vdfe = new VariableDeclFromExpr(name, expr, atomStartToken);
+				VariableDeclFromExpr vdfe = new VariableDeclFromExpr(name, expr, isConst, isStatic, atomStartToken);
 				return vdfe;
 			}
 			VariableDeclAtom vda = new VariableDeclAtom(name, expr, atomStartToken);
@@ -86,7 +99,7 @@ public class VariableDeclParser {
 			reader.reset(mark);
 			return null;
 		}
-		
+
 		if(atoms.size() == 1 && atoms.get(0).getExpression() == null) {
 			if(reader.peek().type == TokenType.ASSIGN) {
 				reader.skip();

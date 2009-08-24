@@ -40,6 +40,10 @@ import org.ubi.SourceReader;
 public class ExpressionParser {
 
 	public static Expression parse(SourceReader sReader, TokenReader reader) throws IOException {
+		return parse(sReader, reader, false);
+	}
+	
+	public static Expression parse(SourceReader sReader, TokenReader reader, boolean noDecl) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -73,7 +77,7 @@ public class ExpressionParser {
 						, "Expected closing parenthesis.");
 			}
 		} else {
-			expr = parseFlatNoparen(sReader, reader);
+			expr = parseFlatNoparen(sReader, reader, noDecl);
 		}
 		
 		if(expr == null) return null;
@@ -83,7 +87,6 @@ public class ExpressionParser {
 			Token token = reader.peek();
 			
 			if(token.isNameToken()) {
-				
 				FunctionCall call = FunctionCallParser.parse(sReader, reader);
 				if(call != null) {
 					expr = new MemberCall(expr, call, token);
@@ -95,7 +98,6 @@ public class ExpressionParser {
 					expr = new MemberAccess(expr, varAccess, token);
 					continue;
 				}
-				
 			}
 			
 			if(token.type == TokenType.DOUBLE_DOT) {
@@ -128,7 +130,7 @@ public class ExpressionParser {
 				
 			}
 			
-			if(token.type == TokenType.ASSIGN || token.type == TokenType.DECL_ASSIGN) {
+			if(token.type == TokenType.ASSIGN) {
 				
 				reader.skip();
 				Expression rvalue = ExpressionParser.parse(sReader, reader);
@@ -142,8 +144,6 @@ public class ExpressionParser {
 				}
 				if(token.type == TokenType.ASSIGN) {
 					expr = new Assignment((Access) expr, rvalue, token);
-				} else if(token.type == TokenType.DECL_ASSIGN) {
-					expr = new Assignment(Mode.DECLARATION, (Access) expr, rvalue, token);
 				}
 				continue;
 				
@@ -238,52 +238,8 @@ public class ExpressionParser {
 		}
 		
 	}
-
-	/*
-	protected static Expression parseFlat(SourceReader sReader, TokenReader reader) throws IOException {
-		
-		int mark = reader.mark();
-		
-		int parenNumber = 0;
-		Token t = reader.peek();
-		while(t.type == TokenType.OPEN_PAREN) {
-			reader.skip();
-			parenNumber++;
-			t = reader.peek();
-		}
-		
-		Expression expression;
-		
-		if(parenNumber > 0) {
-			expression = parse(sReader, reader);
-		} else {
-			expression = parseFlatNoparen(sReader, reader);
-		}
-		
-		if(expression == null) {
-			if(parenNumber > 0) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-					"Expected expression in parenthesis");
-			}
-			reader.reset(mark);
-			return null;
-		}
-		
-		while(parenNumber > 0) {
-			if(reader.read().type != TokenType.CLOS_PAREN) {
-				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-					"Missing closing parenthesis.");
-			}
-			expression = new Parenthesis(expression, expression.startToken);
-			parenNumber--;
-		}
-		
-		return expression;
-		
-	}
-	*/
 	
-	protected static Expression parseFlatNoparen(SourceReader sReader, TokenReader reader) throws IOException {
+	protected static Expression parseFlatNoparen(SourceReader sReader, TokenReader reader, boolean noDecl) throws IOException {
 		
 		int mark = reader.mark();
 		
@@ -296,8 +252,10 @@ public class ExpressionParser {
 		FunctionCall funcCall = FunctionCallParser.parse(sReader, reader);
 		if(funcCall != null) return funcCall;
 		
-		Declaration declaration = DeclarationParser.parse(sReader, reader);
-		if(declaration != null) return declaration;
+		if(!noDecl) {
+			Declaration declaration = DeclarationParser.parse(sReader, reader);
+			if(declaration != null) return declaration;
+		}
 				
 		Access access = VariableAccessParser.parse(sReader, reader);
 		if(access != null) return access;
