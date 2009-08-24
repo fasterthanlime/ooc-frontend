@@ -270,7 +270,6 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	public boolean shouldBeLowerCase() {
-		System.out.println("Should be lower case? externName = "+externName);
 		return externName == null || !externName.isEmpty();
 	}
 	

@@ -107,8 +107,6 @@ public class MemberCall extends FunctionCall {
 			String guess = guessCorrectName(typeDeclaration);
 			if(guess != null) {
 				message += " Did you mean "+typeDeclaration.getInstanceType()+"."+guess+" ?";
-			} else {
-				System.out.println("No guess!");
 			}
 			throw new OocCompilationError(this, mainStack, message);
 		}

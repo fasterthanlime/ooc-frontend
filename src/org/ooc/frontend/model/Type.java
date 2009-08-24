@@ -15,6 +15,7 @@ public class Type extends Node implements MustBeResolved {
 	protected int pointerLevel;
 	protected int referenceLevel;
 	protected Declaration ref;
+	protected boolean isArray;
 	
 	public Type(String name, Token startToken) {
 		this(name, 0, startToken);
@@ -86,7 +87,8 @@ public class Type extends Node implements MustBeResolved {
 		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		for(int i = 0; i < pointerLevel; i++) {
-			sb.append('*');
+			if(isArray) sb.append("[]");
+			else sb.append('*');
 		}
 		for(int i = 0; i < referenceLevel; i++) {
 			sb.append('@');
@@ -169,6 +171,14 @@ public class Type extends Node implements MustBeResolved {
 		return ref != null;
 	}
 	
+	public void setArray(boolean isArray) {
+		this.isArray = isArray;
+	}
+	
+	public boolean isArray() {
+		return isArray;
+	}
+	
 	public Type getGroundType() {
 		return getGroundType(null);
 	}
@@ -204,6 +214,10 @@ public class Type extends Node implements MustBeResolved {
 		}
 		
 		return returnType;
+	}
+
+	public boolean fitsIn(Type innerType) {
+		return equals(innerType);
 	}
 	
 }

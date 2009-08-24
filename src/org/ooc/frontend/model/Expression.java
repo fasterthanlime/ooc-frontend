@@ -8,4 +8,8 @@ public abstract class Expression extends Statement implements Typed {
 		super(startToken);
 	}
 
+	public Expression getInner() {
+		return this;
+	}
+
 }

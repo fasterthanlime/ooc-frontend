@@ -6,7 +6,7 @@ IntArray: class {
 	data: Int*
 	
 	new: func(=size) {
-		data = GC_calloc(sizeof(Int), size)
+		data = gc_calloc(sizeof(Int), size)
 	}
 	
 	get: func(index: Int) -> Int {

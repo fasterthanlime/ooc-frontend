@@ -63,5 +63,10 @@ public class Cast extends Expression {
 	public void setType(Type type) {
 		this.type = type;
 	}
+	
+	@Override
+	public Expression getInner() {
+		return getExpression();
+	}
 
 }
