@@ -53,6 +53,10 @@ public class TabbedWriter implements Appendable {
 		return this;
 	}
 	
+	public TabbedWriter nl() throws IOException {
+		return newUntabbedLine().writeTabs();
+	}
+	
 	public TabbedWriter newLine() throws IOException {
 		return newUntabbedLine().writeTabs();
 	}

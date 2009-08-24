@@ -43,8 +43,8 @@ public class MemberAccess extends VariableAccess {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		super.acceptChildren(visitor);
 		expression.accept(visitor);
+		super.acceptChildren(visitor);
 	}
 	
 	@Override
@@ -73,6 +73,8 @@ public class MemberAccess extends VariableAccess {
 			}
 			return true;
 		}
+		
+		if(exprType.getRef() == null) exprType.resolve(stack, res, fatal);
 
 		if(tryResolve(stack, exprType)) return true;
 		if(tryResolve(stack, exprType.getFlatType(res))) return true;
@@ -90,6 +92,11 @@ public class MemberAccess extends VariableAccess {
 	}
 
 	private String guessCorrectName(final TypeDecl typeDeclaration) {
+		
+		if(typeDeclaration == null) {
+			System.out.println("Null TypeDecl for class "+expression.getType());
+			return null;
+		}
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;

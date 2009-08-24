@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.ooc.backend.Generator;
-import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
@@ -69,22 +68,23 @@ import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.Include.Define;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.OocCompilationError;
 import org.ubi.SourceReader;
 
 public class CGenerator extends Generator implements Visitor {
 
-	protected TabbedWriter hw;
-	protected TabbedWriter cw;
-	protected TabbedWriter current;
+	protected AwesomeWriter hw;
+	protected AwesomeWriter cw;
+	protected AwesomeWriter current;
 
 	public CGenerator(File outPath, Module module) throws IOException {
 		super(outPath, module);
 		String basePath = module.getFullName().replace('.', File.separatorChar);
 		File hFile = new File(outPath, basePath + ".h");
 		hFile.getParentFile().mkdirs();
-		this.hw = new TabbedWriter(new FileWriter(hFile));
+		this.hw = new AwesomeWriter(new FileWriter(hFile));
 		File cFile = new File(outPath, basePath + ".c");
-		this.cw = new TabbedWriter(new FileWriter(cFile));
+		this.cw = new AwesomeWriter(new FileWriter(cFile));
 		this.current = hw;
 	}
 
@@ -99,19 +99,19 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(Module module) throws IOException {
 		
 		current = hw;
-		current.append("/* ");
-		current.append(module.getFullName());
-		current.append(" header file, generated with ooc */");
-		current.newLine();
+		current.app("/* ");
+		current.app(module.getFullName());
+		current.app(" header file, generated with ooc */");
+		current.nl();
 		
 		String hName = "__" + module.getUnderName() + "__";
-		current.append("#ifndef ");
-		current.append(hName);
-		current.newLine();
-		current.append("#define ");
-		current.append(hName);
-		current.newLine();
-		current.newLine();
+		current.app("#ifndef ");
+		current.app(hName);
+		current.nl();
+		current.app("#define ");
+		current.app(hName);
+		current.nl();
+		current.nl();
 
 		for(Include include: module.getIncludes()) {
 			writeInclude(include);
@@ -126,26 +126,26 @@ public class CGenerator extends Generator implements Visitor {
 				writeCoverTypedef((CoverDecl) node);
 			}
 		}
-		current.newLine();
+		current.nl();
 		
-		current.newLine();
+		current.nl();
 		for(Import imp: module.getImports()) {
-			current.append("#include <");
-			current.append(imp.getModule().getFullName().replace('.', File.separatorChar));
-			current.append(".h>");
-			current.newLine();
+			current.app("#include <");
+			current.app(imp.getModule().getFullName().replace('.', File.separatorChar));
+			current.app(".h>");
+			current.nl();
 		}
 		
 		current = cw;
-		current.append("/* ");
-		current.append(module.getFullName());
-		current.append(" source file, generated with ooc */");
-		current.newLine();
+		current.app("/* ");
+		current.app(module.getFullName());
+		current.app(" source file, generated with ooc */");
+		current.nl();
 		
-		current.append("#include \"");
-		current.append(module.getSimpleName());
-		current.append(".h\"");
-		current.newLine();
+		current.app("#include \"");
+		current.app(module.getSimpleName());
+		current.app(".h\"");
+		current.nl();
 		
 		current = cw;
 		module.acceptChildren(this);
@@ -154,12 +154,7 @@ public class CGenerator extends Generator implements Visitor {
 		if(module.isMain()) writeDefaultMain();
 		
 		current = hw;
-		current.newLine();
-		current.newLine();
-		current.append("#endif // ");
-		current.append(hName);
-		current.newLine();
-		current.newLine();
+		current.nl().nl().app("#endif // ").app(hName).nl().nl();
 		
 	}
 
@@ -174,64 +169,62 @@ public class CGenerator extends Generator implements Visitor {
 			}
 		}
 		if(!got) {
-			current.newLine().append("int main()");
-			openBlock();
-			current.newLine().append(module.getLoadFuncName()).append("();");
-			closeBlock();
-			current.newLine().newLine();
+			current.nl().app("int main()").openBlock();
+			current.nl().app(module.getLoadFuncName()).app("();");
+			current.closeBlock().nl().nl();
 		}
 		
 	}
 
 	protected void writeInclude(Include include) throws IOException {
 		for(Define define: include.getDefines()) {
-			current.newLine().append("#define ").append(define.name);
-			if(define.value != null) current.append(' ').append(define.value);
+			current.nl().app("#define ").app(define.name);
+			if(define.value != null) current.app(' ').app(define.value);
 		}
-		current.newLine().append("#include <").append(include.getPath()).append(".h>");
+		current.nl().app("#include <").app(include.getPath()).app(".h>");
 		for(Define define: include.getDefines()) {
-			current.newLine().append("#undef ").append(define.name).append(' ');
+			current.nl().app("#undef ").app(define.name).app(' ');
 		}
 	}
 
 	@Override
 	public void visit(Add add) throws IOException {
 		add.getLeft().accept(this);
-		current.append(" + ");
+		current.app(" + ");
 		add.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Mul mul) throws IOException {
 		mul.getLeft().accept(this);
-		current.append(" * ");
+		current.app(" * ");
 		mul.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Sub sub) throws IOException {
 		sub.getLeft().accept(this);
-		current.append(" - ");
+		current.app(" - ");
 		sub.getRight().accept(this);		
 	}
 
 	@Override
 	public void visit(Div div) throws IOException {
 		div.getLeft().accept(this);
-		current.append(" / ");
+		current.app(" / ");
 		div.getRight().accept(this);
 	}
 
 	@Override
 	public void visit(Not not) throws IOException {
-		current.append('!');
+		current.app('!');
 		not.getExpression().accept(this);		
 	}
 	
 	@Override
 	public void visit(Mod mod) throws IOException {
 		mod.getLeft().accept(this);
-		current.append(" % ");
+		current.app(" % ");
 		mod.getRight().accept(this);
 	}
 	
@@ -240,12 +233,12 @@ public class CGenerator extends Generator implements Visitor {
 
 		compare.getLeft().accept(this);
 		switch(compare.getCompareType()) {
-			case GREATER: current.append(" > "); break;
-			case GREATER_OR_EQUAL: current.append(" >= "); break;
-			case LESSER: current.append(" < "); break;
-			case LESSER_OR_EQUAL: current.append(" <= "); break;
-			case EQUAL: current.append(" == "); break;
-			case NOT_EQUAL: current.append(" != "); break;
+			case GREATER: current.app(" > "); break;
+			case GREATER_OR_EQUAL: current.app(" >= "); break;
+			case LESSER: current.app(" < "); break;
+			case LESSER_OR_EQUAL: current.app(" <= "); break;
+			case EQUAL: current.app(" == "); break;
+			case NOT_EQUAL: current.app(" != "); break;
 		}
 		compare.getRight().accept(this);
 		
@@ -256,32 +249,32 @@ public class CGenerator extends Generator implements Visitor {
 
 		FunctionDecl decl = functionCall.getImpl();
 		if(functionCall.isConstructorCall()) {
-			current.append(decl.getTypeDecl().getName());
+			current.app(decl.getTypeDecl().getName());
 			if(functionCall.getImpl().getTypeDecl() instanceof ClassDecl) {
-				current.append("_construct");
+				current.app("_construct");
 			} else{
-				current.append("_new");
+				current.app("_new");
 			}
 			if(!decl.getSuffix().isEmpty()) {
-				current.append('_');
-				current.append(decl.getSuffix());
+				current.app('_');
+				current.app(decl.getSuffix());
 			}
 		} else if(decl.isFromPointer()) {
-			current.append(functionCall.getName());
+			current.app(functionCall.getName());
 		} else {
 			decl.writeFullName(current);
 		}
 		
-		current.append('(');
+		current.app('(');
 		if(functionCall.isConstructorCall() && functionCall.getImpl().getTypeDecl() instanceof ClassDecl) {
-			current.append('(');
+			current.app('(');
 			decl.getTypeDecl().getInstanceType().accept(this);
-			current.append(')');
-			current.append(" this");
-			if(!functionCall.getArguments().isEmpty()) current.append(", ");
+			current.app(')');
+			current.app(" this");
+			if(!functionCall.getArguments().isEmpty()) current.app(", ");
 		}
 		writeExprList(functionCall.getArguments());
-		current.append(')');
+		current.app(')');
 		
 	}
 
@@ -289,7 +282,7 @@ public class CGenerator extends Generator implements Visitor {
 		Iterator<Expression> iter = args.iterator();
 		while(iter.hasNext()) {
 			iter.next().accept(this);
-			if(iter.hasNext()) current.append(", ");
+			if(iter.hasNext()) current.app(", ");
 		}
 		
 	}
@@ -310,30 +303,30 @@ public class CGenerator extends Generator implements Visitor {
 			expression.accept(this);
 			
 			if(isArrow) {
-				current.append("->");
+				current.app("->");
 			} else {
-				current.append(".");
+				current.app(".");
 			}
-			current.append(memberCall.getName());
+			current.app(memberCall.getName());
 		} else {
 			impl.writeFullName(current);
 		}
 		
-		current.append('(');
+		current.app('(');
 		
 		TypeDecl typeDecl = impl.getTypeDecl();
 		if(!typeDecl.getInstanceType().equals(memberCall.getExpression().getType())) {
-			current.append('(');
+			current.app('(');
 			typeDecl.getInstanceType().accept(this);
-			current.append(") ");
+			current.app(") ");
 		}
 		if(!impl.isStatic() && !impl.isFromPointer()) {
 			memberCall.getExpression().accept(this);
-			if(!memberCall.getArguments().isEmpty()) current.append(", ");
+			if(!memberCall.getArguments().isEmpty()) current.app(", ");
 		}
 		writeExprList(memberCall.getArguments());
 		
-		current.append(')');
+		current.app(')');
 		
 	}
 
@@ -342,42 +335,40 @@ public class CGenerator extends Generator implements Visitor {
 
 		FunctionDecl decl = inst.getImpl();
 		decl.writeFullName(current);
-		current.append('(');
+		current.app('(');
 		writeExprList(inst.getArguments());
-		current.append(')');
+		current.app(')');
 		
 	}
 
 	@Override
 	public void visit(Parenthesis parenthesis) throws IOException {
-		current.append('(');
+		current.app('(');
 		parenthesis.getExpression().accept(this);
-		current.append(')');
+		current.app(')');
 	}
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
 		assignment.getLvalue().accept(this);
-		current.append(' ');
-		current.append(assignment.getSymbol());
-		current.append(' ');
+		current.app(' ').app(assignment.getSymbol()).app(' ');
 		assignment.getRvalue().accept(this);
 	}
 
 	@Override
 	public void visit(ValuedReturn return1) throws IOException {
-		current.append("return ");
+		current.app("return ");
 		return1.getExpression().accept(this);
 	}
 	
 	@Override
 	public void visit(Return return1) throws IOException {
-		current.append("return");
+		current.app("return");
 	}
 
 	@Override
 	public void visit(NullLiteral nullLiteral) throws IOException {
-		current.append("NULL");
+		current.app("NULL");
 	}
 
 	@Override
@@ -386,50 +377,46 @@ public class CGenerator extends Generator implements Visitor {
 		switch(numberLiteral.getFormat()) {
 			case HEX:
 			case BIN: // C has no binary literals, write it as hex
-				current.append("0x");
-				current.append(Long.toHexString(numberLiteral.getValue()));
+				current.app("0x");
+				current.app(Long.toHexString(numberLiteral.getValue()));
 				break;
 			case OCT:
-				current.append('0');
-				current.append(Long.toOctalString(numberLiteral.getValue()));
+				current.app('0');
+				current.app(Long.toOctalString(numberLiteral.getValue()));
 				break;
 			default:
-				current.append(String.valueOf(numberLiteral.getValue()));
+				current.app(String.valueOf(numberLiteral.getValue()));
 		}
 	}
 
 	@Override
 	public void visit(StringLiteral stringLiteral) throws IOException {
-		current.append('"');
-		current.append(SourceReader.spelled(stringLiteral.getValue()));
-		current.append('"');
+		current.app('"').app(SourceReader.spelled(stringLiteral.getValue())).app('"');
 	}
 
 	@Override
 	public void visit(RangeLiteral rangeLiteral) throws IOException {
-		// TODO Auto-generated method stub
-		
+		throw new OocCompilationError(rangeLiteral, module,
+				"Using a range literal outside a foreach is not supported yet.");
 	}
 
 	@Override
 	public void visit(BoolLiteral boolLiteral) throws IOException {
-		current.append(boolLiteral.getValue() ? "true" : "false");
+		current.app(boolLiteral.getValue() ? "true" : "false");
 	}
 
 	@Override
 	public void visit(CharLiteral charLiteral) throws IOException {
-		current.append('\'');
-		current.append(SourceReader.spelled(charLiteral.getValue()));
-		current.append('\'');		
+		current.app('\'').app(SourceReader.spelled(charLiteral.getValue())).app('\'');		
 	}
 
 	@Override
 	public void visit(Line line) throws IOException {
-		current.newLine();
+		current.nl();
 		line.getStatement().accept(this);
 		if(!(line.getStatement() instanceof ControlStatement)
 				&& !(line instanceof Comment)) {
-			current.append(';');
+			current.app(';');
 		}
 	}
 
@@ -438,36 +425,34 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(If if1) throws IOException {
-		current.append("if");
+		current.app("if");
 		if(if1.getCondition() instanceof Parenthesis) {
 			if1.getCondition().accept(this);
 		} else {
-			current.append('(');
+			current.app('(');
 			if1.getCondition().accept(this);
-			current.append(')');
+			current.app(')');
 		}
 		
-		openBlock();
+		current.openBlock();
 		if1.getBody().accept(this);
-		closeBlock();
+		current.closeBlock();
 	}
 	
 	@Override
 	public void visit(Else else1) throws IOException {
-		current.append("else ");
-		openBlock();
+		current.app("else ").openBlock();
 		else1.getBody().accept(this);
-		closeBlock();
+		current.closeBlock();
 	}
 
 	@Override
 	public void visit(While while1) throws IOException {
-		current.append("while (");
+		current.app("while (");
 		while1.getCondition().accept(this);
-		current.append(")");
-		openBlock();
+		current.app(")").openBlock();
 		while1.getBody().accept(this);
-		closeBlock();
+		current.closeBlock();
 	}
 
 	@Override
@@ -475,17 +460,15 @@ public class CGenerator extends Generator implements Visitor {
 
 		if(foreach.getCollection() instanceof RangeLiteral) {
 			RangeLiteral range = (RangeLiteral) foreach.getCollection();
-			current.append("for (");
+			current.app("for (");
 			foreach.getVariable().accept(this);
-			current.append(" = ");
+			current.app(" = ");
 			range.getLower().accept(this);
-			current.append("; ").append(foreach.getVariable().getName()).append(" < ");
+			current.app("; ").app(foreach.getVariable().getName()).app(" < ");
 			range.getUpper().accept(this);
-			current.append("; ").append(foreach.getVariable().getName()).append("++");
-			current.append(")");
-			openBlock();
+			current.app("; ").app(foreach.getVariable().getName()).app("++").app(")").openBlock();
 			foreach.getBody().accept(this);
-			closeBlock();
+			current.closeBlock();
 		} else { 
 			throw new UnsupportedOperationException("Iterating over.. not a Range but a "
 					+foreach.getCollection().getType());
@@ -501,7 +484,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		if(isStatic) {
 		
-			current.append(typeDecl.getType().getMangledName()).append('_').append(memberAccess.getName());
+			current.app(typeDecl.getType().getMangledName()).app('_').app(memberAccess.getName());
 			
 		} else {
 		
@@ -517,17 +500,17 @@ public class CGenerator extends Generator implements Visitor {
 			if(typeDecl.getType().equals(memberAccess.getExpression().getType())) {		
 				expression.accept(this);
 			} else {
-				current.append("((");
+				current.app("((");
 				typeDecl.getInstanceType().accept(this);
-				current.append(')');
+				current.app(')');
 				expression.accept(this);
-				current.append(')');
+				current.app(')');
 			}
 			
 			if(isArrow) {
-				current.append("->");
+				current.app("->");
 			} else {
-				current.append('.');
+				current.app('.');
 			}
 			
 			visit((VariableAccess) memberAccess);
@@ -542,14 +525,14 @@ public class CGenerator extends Generator implements Visitor {
 		int refLevel = variableAccess.getRef().getType().getReferenceLevel();
 		//System.out.println("writing access to "+variableAccess+" ref level = "+refLevel);
 		if(refLevel > 0) {
-			current.append('(');
+			current.app('(');
 			for(int i = 0; i < refLevel; i++) {
-				current.append('*');
+				current.app('*');
 			}
 		}
-		current.append(variableAccess.getRef().getExternName(variableAccess));
+		current.app(variableAccess.getRef().getExternName(variableAccess));
 		if(refLevel > 0) {
-			current.append(')');
+			current.app(')');
 		}
 		
 	}
@@ -557,9 +540,9 @@ public class CGenerator extends Generator implements Visitor {
 	@Override
 	public void visit(ArrayAccess arrayAccess) throws IOException {
 		arrayAccess.getVariable().accept(this);
-		current.append('[');
+		current.app('[');
 		arrayAccess.getIndex().accept(this);
-		current.append(']');
+		current.app(']');
 	}
 
 	@Override
@@ -570,7 +553,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		// FIXME add const checking from the ooc side of things. Disabled C's
 		// const keyword because it causes problems with class initializations
-		//if(variableDecl.isConst()) current.append("const ");
+		//if(variableDecl.isConst()) current.app("const ");
 		
 		if(variableDecl.getType() instanceof FuncType) {
 			
@@ -580,7 +563,7 @@ public class CGenerator extends Generator implements Visitor {
 			while(iter.hasNext()) {
 				VariableDeclAtom atom = iter.next();
 				writeSpacedType(funcDecl.getReturnType());
-				current.append("(*").append(atom.getName()).append(")");
+				current.app("(*").app(atom.getName()).app(")");
 				writeFuncArgs(funcDecl);
 			}
 			
@@ -590,7 +573,7 @@ public class CGenerator extends Generator implements Visitor {
 			if(!type.isArray()) {
 				writeSpacedType(type);
 			} else {
-				current.append(type.getName()).append(' ');
+				current.app(type.getName()).app(' ');
 			}
 			
 			boolean isStatic = variableDecl.isStatic();
@@ -600,15 +583,15 @@ public class CGenerator extends Generator implements Visitor {
 			Iterator<VariableDeclAtom> iter = variableDecl.getAtoms().iterator();
 			while(iter.hasNext()) {
 				VariableDeclAtom atom = iter.next();
-				current.append(typePrefix).append(atom.getName());
+				current.app(typePrefix).app(atom.getName());
 				if(type.isArray()) for(int i = 0; i < type.getPointerLevel(); i++) {
-					current.append("[]");
+					current.app("[]");
 				}
 				if(atom.getExpression() != null) {
-					current.append(" = ");
+					current.app(" = ");
 					atom.getExpression().accept(this);
 				}
-				if(iter.hasNext()) current.append(", ");
+				if(iter.hasNext()) current.app(", ");
 			}
 			
 		}
@@ -619,33 +602,26 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(FunctionDecl functionDecl) throws IOException {
 		
 		if(functionDecl.isProto()) {
-			
 			current = hw;
-			current.newLine().append("extern ");
+			current.nl().app("extern ");
 			writeFuncPrototype(functionDecl);
-			current.append(';');
-			
+			current.app(';');
 		} else if(!functionDecl.isExtern() && !functionDecl.isAbstract()) {
-			
 			current = hw;
-			current.newLine();
+			current.nl();
 			writeFuncPrototype(functionDecl);
-			current.append(';');
+			current.app(';');
 		
 			current = cw;
 			writeFuncPrototype(functionDecl);
-			openBlock();
+			current.openBlock();
 			
 			if(functionDecl.isEntryPoint()) {
-				current.newLine().append(module.getLoadFuncName()).append("();");
+				current.nl().app(module.getLoadFuncName()).app("();");
 			}
 			
-			for(Line line: functionDecl.getBody()) {
-				line.accept(this);
-			}
-			
-			closeSpacedBlock();
-			
+			for(Line line: functionDecl.getBody()) line.accept(this);
+			current.closeSpacedBlock();
 		}
 		
 	}
@@ -654,13 +630,13 @@ public class CGenerator extends Generator implements Visitor {
 		
 		writeSpacedType(functionDecl.getReturnType());
 		functionDecl.writeFullName(current);
-		current.append('(');
+		current.app('(');
 		
 		boolean isFirst = true;
 		for(Argument arg: functionDecl.getArguments()) {
 			
 			if(!isFirst) {
-				current.append(", ");
+				current.app(", ");
 			}
 			
 			isFirst = false;
@@ -668,7 +644,7 @@ public class CGenerator extends Generator implements Visitor {
 			
 		}
 		
-		current.append(')');
+		current.app(')');
 		
 	}
 
@@ -685,7 +661,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		/* Now implementations */
 		current = cw;
-		current.newLine();
+		current.nl();
 		
 		writeInitializeClassFunc(classDecl, className);
 		writeDestroyFunc(classDecl, className);
@@ -694,7 +670,7 @@ public class CGenerator extends Generator implements Visitor {
 		writeInstanceVirtualFuncs(classDecl, className);
 		writeStaticFuncs(classDecl, className);
 		
-		current.newLine();
+		current.nl();
 		
 	}
 	
@@ -702,7 +678,7 @@ public class CGenerator extends Generator implements Visitor {
 			FunctionDecl decl) throws IOException {
 		
 		writeSpacedType(decl.getReturnType());
-		current.append(className).append('_').append(decl.getName());
+		current.app(className).app('_').app(decl.getName());
 		writeFuncArgs(decl);
 		
 	}
@@ -713,29 +689,29 @@ public class CGenerator extends Generator implements Visitor {
 	
 	protected void writeFuncArgs(FunctionDecl decl, boolean skipFirst) throws IOException {
 		
-		current.append('(');
+		current.app('(');
 		Iterator<Argument> iter = decl.getArguments().iterator();
 		if(iter.hasNext()) { // of course, no point of doing all this if we have no arguments
 			if(skipFirst) iter.next(); // especially that.
 			while(iter.hasNext()) {
 				iter.next().accept(this);
-				if(iter.hasNext()) current.append(", ");
+				if(iter.hasNext()) current.app(", ");
 			}
 		}
-		current.append(')');
+		current.app(')');
 		
 	}
 	
 	protected void writeTypelessFuncArgs(FunctionDecl decl)
 	throws IOException {
 
-		current.append('(');
+		current.app('(');
 		Iterator<Argument> iter = decl.getArguments().iterator();
 		while(iter.hasNext()) {
-			current.append(iter.next().getName());
-			if(iter.hasNext()) current.append(", ");
+			current.app(iter.next().getName());
+			if(iter.hasNext()) current.app(", ");
 		}
-		current.append(')');
+		current.app(')');
 
 	}
 
@@ -746,11 +722,11 @@ public class CGenerator extends Generator implements Visitor {
 			
 			if(!decl.isStatic()) continue;
 			
-			current.newLine();
+			current.nl();
 			writeMemberFuncPrototype(className, decl);
-			openBlock();
+			current.openBlock();
 			decl.getBody().accept(this);
-			closeSpacedBlock();
+			current.closeSpacedBlock();
 			
 		}
 	}
@@ -762,65 +738,52 @@ public class CGenerator extends Generator implements Visitor {
 			
 			if(decl.isStatic() || decl.isFinal()) continue;
 			
-			current.newLine();
+			current.nl();
 			writeMemberFuncPrototype(className, decl);
-			openSpacedBlock();
+			current.openSpacedBlock();
 			
-			if(!decl.getReturnType().isVoid()) current.append("return ");
-			current.append("((").append(className).append("Class *)((Object *)this)->class)->");
+			if(!decl.getReturnType().isVoid()) current.app("return ");
+			current.app("((").app(className).app("Class *)((Object *)this)->class)->");
 			decl.writeSuffixedName(current);
 			
 			writeTypelessFuncArgs(decl);
-			current.append(";");
-			
-			closeSpacedBlock();
+			current.app(";").closeSpacedBlock();
 			
 		}
 	}
 	
 	protected void writeBuiltinClassFuncName(String className, String returnType, String name)
 		throws IOException {
-		current.newLine();
-		current.append("static ");
-		current.append(returnType);
-		current.append(' ');
-		current.append(className);
-		current.append('_');
-		current.append(name);
-		current.append('(');
-		current.append(className);
-		current.append(" *this)");
+		current.nl().app("static ").app(returnType).app(' ').app(className)
+			.app('_').app(name).app('(').app(className).app(" *this)");
 	}
 	
 	protected void writeInitializeModuleFunc() throws IOException {
 
 		current = hw;
-		current.newLine().append("void ").append(module.getLoadFuncName()).append("();");
+		current.nl().app("void ").app(module.getLoadFuncName()).app("();");
 		
 		current = cw;
-		current.newLine().append("void ").append(module.getLoadFuncName()).append("()");
-		openBlock();
+		current.nl().app("void ").app(module.getLoadFuncName()).app("()").openBlock();
 		
-		current.newLine().append("static bool __done__ = false;").newLine().append("if (!__done__)");
-		openBlock();
-		current.newLine().append("__done__ = true;");
+		current.nl().app("static bool __done__ = false;").nl().app("if (!__done__)").openBlock();
+		current.nl().app("__done__ = true;");
 		
 		for(Node node: module.getBody()) {
 			if(node instanceof ClassDecl) {
 				ClassDecl classDecl = (ClassDecl) node;
-				current.newLine().append(classDecl.getInstanceType().getMangledName());
-				current.append("_load();");
+				current.nl().app(classDecl.getInstanceType().getMangledName());
+				current.app("_load();");
 			}
 		}
 		for(Node node: module.getLoadFunc().getBody()) {
 			node.accept(this);
 		}
 		for(Import imp: module.getImports()) {
-			current.newLine().append(imp.getModule().getLoadFuncName()).append("();");
+			current.nl().app(imp.getModule().getLoadFuncName()).app("();");
 		}
 		
-		closeBlock();
-		closeSpacedBlock();
+		current.closeBlock().closeSpacedBlock();
 		
 	}
 
@@ -828,56 +791,34 @@ public class CGenerator extends Generator implements Visitor {
 			throws IOException {
 		
 		writeBuiltinClassFuncName(className, "void", "initialize");
-		openBlock();
-		
+		current.openBlock();
 		if(!classDecl.getSuperName().isEmpty()) {
-			current.newLine();
-			current.append(classDecl.getSuperName());
-			current.append("_class()->initialize((Object *) this);");
+			current.nl();
+			current.app(classDecl.getSuperName());
+			current.app("_class()->initialize((Object *) this);");
 		}
+		for(Line line: classDecl.getInitializeFunc().getBody()) line.accept(this);
+		current.closeSpacedBlock();
 		
-		for(Line line: classDecl.getInitializeFunc().getBody()) {
-			line.accept(this);
-		}
-		
-		closeSpacedBlock();
-		
-		current.newLine().append("void ").append(className).append("_load()");
-		openBlock();
-		
-		current.newLine().append("static bool __done__ = false;").newLine().append("if (!__done__)");
-		openBlock();
-		current.newLine().append("__done__ = true;");
-		
+		current.nl().app("void ").app(className).app("_load()").openBlock();
+		current.nl().app("static bool __done__ = false;").nl().app("if (!__done__)").openBlock();
+		current.nl().app("__done__ = true;");
 		for(Line line: classDecl.getLoadFunc().getBody()) {
 			line.accept(this);
 		}
-		
-		closeBlock();
-		closeSpacedBlock();
+		current.closeBlock().closeSpacedBlock();
 		
 	}
 
 	protected void writeDestroyFunc(ClassDecl classDecl, String className)
 			throws IOException {
 		
-		current.newLine();
+		current.nl();
 		writeBuiltinClassFuncName(className, "void", "destroy");
-		openBlock();
-		
-		openSpacedBlock();
-		current.append("const Class *super = ((Object *) this)->class->super;");
-		current.newLine();
-		current.append("if(super) super->destroy((Object *) this);");
-		closeSpacedBlock();
-		
-		closeSpacedBlock();
-	}
-
-	protected void closeSpacedBlock() throws IOException {
-		closeBlock();
-		current.newLine();
-		current.newLine();
+		current.openBlock().openSpacedBlock();
+		current.app("const Class *super = ((Object *) this)->class->super;");
+		current.nl().app("if(super) super->destroy((Object *) this);");
+		current.closeSpacedBlock().closeSpacedBlock();
 	}
 
 	protected void writeInstanceImplFuncs(ClassDecl classDecl, String className)
@@ -887,57 +828,37 @@ public class CGenerator extends Generator implements Visitor {
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			if(decl.isStatic()) continue;
 		
-			current.newLine();
-			if(!decl.isFinal()) current.append("static ");
+			current.nl();
+			if(!decl.isFinal()) current.app("static ");
 			writeSpacedType(decl.getReturnType());
 			decl.writeFullName(current);
-			if(!decl.isFinal()) current.append("_impl");
+			if(!decl.isFinal()) current.app("_impl");
 		
 			writeFuncArgs(decl, decl.isConstructor()); // if is constuctor, don't write the first arg
 			
-			openBlock();
+			current.openBlock();
 			
 			/* Special case: constructor */
 			if(decl.isConstructor()) {
-				current.newLine();
-				current.append(className);
-				current.append(" *this = (");
-				current.append(className);
-				current.append(" *) Class_newInstance((Class *)");
-				current.append(className);
-				current.append("_class());");
-				current.newLine();
-				current.append(className);
-				current.append("_construct");
-				if(!decl.getSuffix().isEmpty()) {
-					current.append('_');
-					current.append(decl.getSuffix());
-				}
+				current.nl().app(className).app(" *this = (").app(className)
+					.app(" *) Class_newInstance((Class *)").app(className).app("_class());");
+				current.nl().app(className).app("_construct");
+				if(!decl.getSuffix().isEmpty()) current.app('_').app(decl.getSuffix());
 				writeTypelessFuncArgs(decl);
-				current.append(";");
-				current.newLine();
-				current.append("return this;");
+				current.app(";").nl().app("return this;");
 			} else {
 				decl.getBody().accept(this);
 			}			
-			closeSpacedBlock();
+			current.closeSpacedBlock();
 			
 			/* Special case: constructor, now write the corresponding construct function */
 			if(decl.isConstructor()) {
-				// And now, write the corresponding construct function
-				current.append("void ");
-				current.append(className);
-				current.append("_construct");
-				if(!decl.getSuffix().isEmpty()) {
-					current.append('_');
-					current.append(decl.getSuffix());
-				}
+				current.app("void ").app(className).app("_construct");
+				if(!decl.getSuffix().isEmpty()) current.app('_').app(decl.getSuffix());
 				writeFuncArgs(decl);
-				openBlock();
-				for(Line line: decl.getBody()) {
-					line.accept(this);
-				}
-				closeSpacedBlock();
+				current.openBlock();
+				for(Line line: decl.getBody()) line.accept(this);
+				current.closeSpacedBlock();
 			}
 		}
 		
@@ -945,26 +866,24 @@ public class CGenerator extends Generator implements Visitor {
 
 	protected void writeClassGettingFunction(ClassDecl classDecl) throws IOException {
 		
-		current.append("const Class *");
-		current.append(classDecl.getName());
-		current.append("_class()");
-		openSpacedBlock();
-		
-		current.append("static const ");
-		current.append(classDecl.getName());
-		current.append("Class class = ");
-		
+		current.app("Class *").app(classDecl.getName()).app("_class()").openSpacedBlock();
+		current.app("static bool __done__ = false;").nl();
+		current.app("static ").app(classDecl.getName()).app("Class class = ");
 		writeFuncPointers(classDecl, classDecl);
-		current.append(';');
+		current.app(';');
+		current.nl().app("Class *classPtr = (Class *) &class;");
+		if(!classDecl.getSuperName().isEmpty()) {
+			current.nl().app("if(!__done__)").openBlock().nl().app("__done__ = true;")
+				.nl().app("classPtr->super = ").app(classDecl.getSuperName()).app("_class();")
+			.closeBlock();
+		}
 		
-		current.newLine();
-		current.append("return (const Class *) &class;");
-		closeSpacedBlock();
+		current.nl().app("return classPtr;").closeSpacedBlock();
 	}
 
 	protected void writeFuncPointers(ClassDecl currentClass, ClassDecl coreClass) throws IOException {
 		
-		openBlock();
+		current.openBlock();
 		
 		if(!currentClass.isRootClass() && !currentClass.getSuperName().isEmpty()) {
 			
@@ -972,29 +891,13 @@ public class CGenerator extends Generator implements Visitor {
 			
 		} else {
 		
-			/* class attributes */
-			openBlock();
-			
-			/* size of class */
-			current.newLine();
-			current.append(".size = ");
-			current.append("sizeof(");
-			current.append(coreClass.getName());
-			current.append("),");
-			
-			/* name of class */
-			current.newLine();
-			current.append(".name = ");
-			current.append('"');
-			current.append(coreClass.getName());
-			current.append("\",");
-			
-			/* initialize, destroy */
+			current.openBlock();
+			current.nl().app(".size = ").app("sizeof(").app(coreClass.getName()).app("),");
+			current.nl().app(".name = ").app('"').app(coreClass.getName()).app("\",");
 			writeDesignatedInit("initialize", "(void (*)(Object *))"+coreClass.getName()+"_initialize");
 			writeDesignatedInit("destroy", "(void (*)(Object *))"+coreClass.getName()+"_destroy");
 			
-			closeBlock();
-			current.append(',');
+			current.closeBlock().app(',');
 		
 		}
 		
@@ -1007,154 +910,106 @@ public class CGenerator extends Generator implements Visitor {
 			
 		}
 		
-		closeBlock();
-		if(coreClass != currentClass) current.append(',');
+		current.closeBlock();
+		if(coreClass != currentClass) current.app(',');
 	}
 
 	protected void writeMemberFuncPrototypes(ClassDecl classDecl, String className)
 			throws IOException {
-		current.newLine();
-		current.append("const Class *");
-		current.append(className);
-		current.append("_class();");
-		current.newLine();
-		
-		/* Now all other functions' prototypes */
+
+		current.nl().app("Class *").app(className).app("_class();").nl();
 		for(FunctionDecl decl: classDecl.getFunctions()) {
-			current.newLine();
+			current.nl();
 			writeSpacedType(decl.getReturnType());
 			decl.writeFullName(current);
 			writeFuncArgs(decl, decl.isConstructor());
-			current.append(';');
+			current.app(';');
 			
 			if(decl.getName().equals("new")) {
-				current.newLine();
-				current.append("void ");
-				current.append(className);
-				current.append("_construct");
-				if(!decl.getSuffix().isEmpty()) {
-					current.append('_');
-					current.append(decl.getSuffix());
-				}
+				current.nl().app("void ").app(className).app("_construct");
+				if(!decl.getSuffix().isEmpty()) current.app('_').app(decl.getSuffix());
 				writeFuncArgs(decl);
-				current.append(';');
+				current.app(';');
 			}
 		}
-		
-		current.newLine();
+		current.nl();
 	}
 
 	protected void writeSpacedType(Type type) throws IOException {
 		type.accept(this);
-		if(type.isFlat()) current.append(' ');
+		if(type.isFlat()) current.app(' ');
 	}
 
 	protected Iterator<Argument> writeFuncPointer(FunctionDecl decl)
 			throws IOException {
 		decl.getReturnType().accept(this);
-		current.append(" (*");
-		current.append(decl.getName());
-		current.append(")(");
+		current.app(" (*").app(decl.getName()).app(")(");
 		Iterator<Argument> iter = decl.getArguments().iterator();
 		while(iter.hasNext()) {
 			Argument arg = iter.next();
 			arg.accept(this);
-			if(iter.hasNext()) current.append(", ");
+			if(iter.hasNext()) current.app(", ");
 		}
-		current.append(')');
+		current.app(')');
 		return iter;
 	}
 	
 	protected void writeClassStruct(ClassDecl classDecl, String className)
 		throws IOException {
-		current.newLine();
-		current.append("struct _");
-		current.append(className);
-		current.append("Class");
-		openSpacedBlock();
 		
+		current.nl().app("struct _").app(className).app("Class").openSpacedBlock();
 		if(classDecl.isRootClass()) {
-			current.append("struct _Class __super__;");
+			current.app("struct _Class __super__;");
 		} else {
-			current.append("struct _").append(classDecl.getSuperName()).append("Class __super__;");
+			current.app("struct _").app(classDecl.getSuperName()).app("Class __super__;");
 		}
 		
 		/* Now write all virtual functions prototypes in the class struct */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
 			if(decl.isStatic() || decl.isConstructor()) continue;
-			current.newLine();
+			current.nl();
 			writeFuncPointer(decl);
-			current.append(';');
+			current.app(';');
 		}
-		
-		closeBlock();
-		current.append(';');
-		current.newLine();
-		current.newLine();
+		current.closeBlock().app(';').nl().nl();
 	}
 
 	protected void writeObjectStruct(ClassDecl classDecl, String className)
 			throws IOException {
-		current.newLine();
-		current.append("struct _");
-		current.append(className);
-		openSpacedBlock();
+		current.nl().app("struct _").app(className).openSpacedBlock();
 		
-		if(!classDecl.isObjectClass()) {
-			current.append("struct _").append(classDecl.getSuperName()).append(" *__super__;");
+		if(classDecl.isClassClass()) {
+			current.app("Class *class;");
+		} else if(!classDecl.isObjectClass()) {
+			current.app("struct _").app(classDecl.getSuperName()).app(" __super__;");
 		}
 		
 		for(VariableDecl decl: classDecl.getVariables()) {
 			if(decl.isStatic()) continue;
-			current.newLine();
+			current.nl();
 			decl.accept(this);
-			current.append(';');
+			current.app(';');
 		}
 		
-		closeBlock();
-		current.append(';');
-		current.newLine();
-		current.newLine();
+		current.closeBlock().app(';').nl().nl();
 		
 		for(VariableDecl decl: classDecl.getVariables()) {
 			if(!decl.isStatic()) continue;
-			current.newLine();
+			current.nl();
 			decl.accept(this);
-			current.append(';');
+			current.app(';');
 		}
 	}
 
 	protected void writeStructTypedef(String structName) throws IOException {
-		current.newLine().append("struct _").append(structName).append(";");
-		current.newLine().append("typedef struct _").append(structName)
-			.append(" ").append(structName).append(";");
-	}
-
-	protected void closeBlock() throws IOException {
-		current.untab();
-		current.newLine();
-		current.append("}");
-	}
-
-	protected void openBlock() throws IOException {
-		current.newLine();
-		current.append('{');
-		current.tab();
-	}
-	
-	protected void openSpacedBlock() throws IOException {
-		openBlock();
-		current.newLine();
+		current.nl().app("struct _").app(structName).app(";");
+		current.nl().app("typedef struct _").app(structName)
+			.app(" ").app(structName).app(";");
 	}
 
 	protected void writeDesignatedInit(String contract, String implementation)
 			throws IOException {
-		current.newLine();
-		current.append('.');
-		current.append(contract);
-		current.append(" = ");
-		current.append(implementation);
-		current.append(',');
+		current.nl().app('.').app(contract).app(" = ").app(implementation).app(',');
 	}
 	
 	@Override
@@ -1164,23 +1019,18 @@ public class CGenerator extends Generator implements Visitor {
 		// addons only add functions to an already imported cover, so
 		// we don't need to struct it again, it would confuse the C compiler
 		if(!cover.isAddon() && !cover.isExtern() && cover.getFromType() == null) {
-			current.append("struct _");
-			current.append(cover.getName());
-			current.append(' ');
-			openBlock();
+			current.app("struct _").app(cover.getName()).app(' ').openBlock();
 			for(VariableDecl decl: cover.getVariables()) {
-				current.newLine();
+				current.nl();
 				decl.accept(this);
-				current.append(';');
+				current.app(';');
 			}
-			closeBlock();
-			current.append(';');
-			current.newLine();
+			current.closeBlock().app(';').nl();
 		}
 		
 		for(FunctionDecl decl: cover.getFunctions()) {
 			decl.accept(this);
-			current.newLine();
+			current.nl();
 		}
 	}
 
@@ -1189,18 +1039,11 @@ public class CGenerator extends Generator implements Visitor {
 		if(!cover.isAddon() && !cover.isExtern()) {
 			Type fromType = cover.getFromType();
 			if(fromType == null) {
-				current.newLine();
-				current.append("typedef struct _");
-				current.append(cover.getName());
-				current.append(' ');
-				current.append(cover.getName());
-				current.append(';');
+				current.nl().app("typedef struct _").app(cover.getName()).app(' ').app(cover.getName()).app(';');
 			} else {
-				current.newLine();
-				current.append("typedef ");
+				current.nl().app("typedef ");
 				writeSpacedType(fromType.getGroundType());
-				current.append(cover.getName());
-				current.append(';');
+				current.app(cover.getName()).app(';');
 			}
 		}
 	}
@@ -1214,38 +1057,32 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(RegularArgument regularArgument) throws IOException {
 
 		if(regularArgument.isConst()) {
-			current.append("const ");
+			current.app("const ");
 		}
 		Type type = regularArgument.getType();
 		if(type.isArray()) {
-			current.append(type.getName()).append(' ').append(regularArgument.getName());
+			current.app(type.getName()).app(' ').app(regularArgument.getName());
 			for(int i = 0; i < type.getPointerLevel(); i++) {
-				current.append("[]");
+				current.app("[]");
 			}
 		} else {
 			writeSpacedType(type);
-			current.append(regularArgument.getName());
+			current.app(regularArgument.getName());
 		}
 		
 	}
 
 	@Override
-	public void visit(MemberArgument memberArgument) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	public void visit(MemberArgument memberArgument) throws IOException {}
 
 	@Override
-	public void visit(MemberAssignArgument memberArgument) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	public void visit(MemberAssignArgument memberArgument) throws IOException {}
 
 	@Override
 	public void visit(Type type) throws IOException {
-		current.append(type.getName());
+		current.app(type.getName());
 		if(!type.isFlat()) {
-			current.append(' ');
+			current.app(' ');
 		}
 		
 		if(type.getRef() == null) {
@@ -1253,19 +1090,19 @@ public class CGenerator extends Generator implements Visitor {
 		}
 		
 		if(type.getRef() instanceof ClassDecl) {
-			current.append('*');
+			current.app('*');
 		}
 		
 		int level = type.getPointerLevel() + type.getReferenceLevel();
 		for(int i = 0; i < level; i++) {
-			if(type.isArray()) current.append("[]");
-			else current.append('*');
+			if(type.isArray()) current.app("[]");
+			else current.app('*');
 		}
 	}
 
 	@Override
 	public void visit(VarArg varArg) throws IOException {
-		current.append("...");
+		current.app("...");
 	}
 	
 	@Override
@@ -1275,47 +1112,43 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(Block block) throws IOException {
-		openBlock();
+		current.openBlock();
 		block.acceptChildren(this);
-		closeBlock();
+		current.closeBlock();
 	}
 
 	@Override
-	public void visit(BuiltinType builtinType) throws IOException {
-		// nothing to do.
-	}
+	public void visit(BuiltinType builtinType) throws IOException {}
 
 	@Override
 	public void visit(FloatLiteral floatLiteral) throws IOException {
-		current.append(Double.toString(floatLiteral.getValue()));
+		current.app(Double.toString(floatLiteral.getValue()));
 	}
 
 	@Override
-	public void visit(VariableDeclAtom variableDeclAtom) throws IOException {
-		// do nothing.
-	}
+	public void visit(VariableDeclAtom variableDeclAtom) throws IOException {}
 	
 	@Override
 	public void visit(Cast cast) throws IOException {
-		current.append("((");
+		current.app("((");
 		cast.getType().accept(this);
-		current.append(") ");
+		current.app(") ");
 		cast.getExpression().accept(this);
-		current.append(")");
+		current.app(")");
 	}
 
 	@Override
 	public void visit(AddressOf addressOf) throws IOException {
-		current.append("&(");
+		current.app("&(");
 		addressOf.getExpression().accept(this);
-		current.append(')');
+		current.app(')');
 	}
 
 	@Override
 	public void visit(Dereference dereference) throws IOException {
-		current.append("(*");
+		current.app("(*");
 		dereference.getExpression().accept(this);
-		current.append(')');
+		current.app(')');
 	}
 
 	@Override
@@ -1324,30 +1157,26 @@ public class CGenerator extends Generator implements Visitor {
 	}
 
 	@Override
-	public void visit(Import import1) throws IOException {
-		
-	}
+	public void visit(Import import1) throws IOException {}
 	
 	@Override
 	public void visit(ArrayLiteral arrayLiteral) throws IOException {
-		current.append('{');
+		current.app('{');
 		Iterator<Expression> iter = arrayLiteral.getElements().iterator();
 		while(iter.hasNext()) {
 			iter.next().accept(this);
-			if(iter.hasNext()) current.append(", ");
+			if(iter.hasNext()) current.app(", ");
 		}
-		current.append('}');
+		current.app('}');
 	}
 
 	@Override
-	public void visit(Use use) throws IOException {
-		
-	}
+	public void visit(Use use) throws IOException {}
 
 	@Override
 	public void visit(BinaryCombination binaryCombination) throws IOException {
 		binaryCombination.getLeft().accept(this);
-		current.append(' ').append(binaryCombination.getOpString()).append(' ');
+		current.app(' ').app(binaryCombination.getOpString()).app(' ');
 		binaryCombination.getRight().accept(this);
 	}
 

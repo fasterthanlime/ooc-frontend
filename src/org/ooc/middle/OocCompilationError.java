@@ -18,6 +18,10 @@ public class OocCompilationError extends CompilationFailedError {
 		super(((Module) stack.get(0)).getReader().getLocation(node.startToken), "[ERROR] " + message);
 	}
 	
+	public OocCompilationError(Node node, Module module, String message) throws EOFException {
+		super(module.getReader().getLocation(node.startToken), "[ERROR] " + message);
+	}
+	
 	@Override
 	public void printStackTrace() {
 		System.err.println(toString());
