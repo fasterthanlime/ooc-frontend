@@ -10,11 +10,16 @@ import org.ooc.frontend.model.tokens.Token;
 
 public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
+	protected String name = null;
 	protected final List<T> nodes;
 	
 	public NodeList(Token startToken) {
 		super(startToken);
 		nodes = new ArrayList<T>();
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void add(T element) {
@@ -99,6 +104,7 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	public boolean replace(Node oldie, Node kiddo) {
 		int index = nodes.indexOf(oldie);
 		if(index == -1) {
+			System.out.println("trying to replace "+oldie+" with "+kiddo+" in a list with "+nodes);
 			throw new ArrayIndexOutOfBoundsException("Trying to replace a "
 					+oldie.getClass().getName()+" with a "+kiddo.getClass().getSimpleName()+
 					" in a "+this.getClass().getSimpleName()+", but couldn't find node to replace in NodeList.");
@@ -119,7 +125,9 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		String string = getClass().getSimpleName();
+		if(name != null) string += ": "+name;
+		return string;
 	}
 
 	public void addAll(NodeList<T> list) {

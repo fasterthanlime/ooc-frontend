@@ -6,17 +6,18 @@ Hound: class from Dog {
 }
 
 main: func {
-	printType(new Dog class)
-	printType(new Hound class)
-	printType('c' class)
-	printType(42 class)
-	printType(3.14 class)
-	printType(8.0 as Double class)
-	printType(6.52 as LDouble class)
+	//printType(new Dog)
+	//printType(new Hound)
+	//printType('c')
+	printType(i := 42)
+	//printType(3.14)
+	//printType(8.0)
+	//printType(6.52)
 }
 
-printType: func (c: Class) {
+printType: func <T> (arg: T) {
 	printf("Class hierarchy = ")
+	c := T
 	while (c) {
 		mess := "bytes"
 		if(c size == 1) mess = "byte"
@@ -25,5 +26,7 @@ printType: func (c: Class) {
 		if(c) printf(" -> ")
 	}
 	printf("\n-----------------\n");
+	if(T == Int class) {
+		printf("It's an Int, and it's worth %d!\n", arg as Int)
+	}
 }
-

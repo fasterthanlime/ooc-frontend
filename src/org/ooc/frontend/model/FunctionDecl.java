@@ -1,12 +1,14 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
 
-public class FunctionDecl extends Declaration implements Scope {
+public class FunctionDecl extends Declaration implements Scope, Generic {
 
 	public static Type type = new Type("Func", Token.defaultToken);
 	
@@ -23,6 +25,7 @@ public class FunctionDecl extends Declaration implements Scope {
 	protected String suffix;
 	protected final NodeList<Line> body;
 	protected Type returnType;
+	protected final List<TypeParam> typeParams;
 	protected final NodeList<Argument> arguments;
 	
 	public FunctionDecl(String name, String suffix, boolean isFinal,
@@ -32,17 +35,21 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	public FunctionDecl(String name, String suffix, boolean isFinal,
 			boolean isStatic, boolean isAbstract, String externName, Token startToken) {
-		
 		super(name, externName, startToken);
 		this.suffix = suffix;
 		this.isFinal = isFinal;
-		// TODO check if that's alright
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>(startToken);
+		this.body.setName("body of "+name);
 		this.returnType = name.equals("main") ? IntLiteral.type : new Type("Void", Token.defaultToken);
 		this.arguments = new NodeList<Argument>(startToken);
-		
+		this.arguments.setName("args of "+name);
+		this.typeParams = new ArrayList<TypeParam>();
+	}
+	
+	public List<TypeParam> getTypeParams() {
+		return typeParams;
 	}
 	
 	public void setComment(OocDocComment comment) {
@@ -150,6 +157,9 @@ public class FunctionDecl extends Declaration implements Scope {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
+		for(TypeParam typeParam: typeParams) {
+			typeParam.getType().accept(visitor);
+		}
 		arguments.accept(visitor);
 		returnType.accept(visitor);
 		body.accept(visitor);

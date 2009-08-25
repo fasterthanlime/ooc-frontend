@@ -8,7 +8,7 @@ import org.ooc.frontend.model.tokens.Token;
 
 public class NullLiteral extends Literal {
 
-	public static Type type = new Type("Void", 1, Token.defaultToken);
+	public static Type type = new Type("Pointer", Token.defaultToken);
 	
 	public NullLiteral(Token startToken) {
 		super(startToken);

@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
@@ -144,7 +145,7 @@ public class Type extends Node implements MustBeResolved {
 		for(TypeDecl decl: res.types) {
 			if(decl.getName().equals(name)) {
 				ref = decl;
-				break;
+				return false;
 			}
 		}
 
@@ -156,6 +157,22 @@ public class Type extends Node implements MustBeResolved {
 			TypeDecl typeDecl = (TypeDecl) stack.get(index);
 			name = typeDecl.getName();
 			ref = typeDecl;
+			return false;
+		}
+		
+		if(ref == null) {
+			int genIndex = Node.find(Generic.class, stack);
+			if(genIndex != -1) {
+				Generic gen = (Generic) stack.get(genIndex);
+				List<TypeParam> params = gen.getTypeParams();
+				for(TypeParam param: params) {
+					if(param.name.equals(name)) {
+						ref = param;
+						System.out.println("Found ref in param "+param);
+						return false;
+					}
+				}
+			}
 		}
 		
 		if(ref == null && fatal) {

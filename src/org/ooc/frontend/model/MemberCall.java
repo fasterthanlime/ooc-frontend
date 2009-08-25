@@ -74,11 +74,14 @@ public class MemberCall extends FunctionCall {
 			}
 			return true;
 		}
+		
+		if(exprType.getRef() == null) exprType.resolve(mainStack, res, fatal);
+		
 		if(exprType.getRef() == null) {
 			if(fatal) {
 				throw new OocCompilationError(this, mainStack, "Calling member function "
-						+name+getArgsRepr()+" in an expression "+expression.getClass().getSimpleName()
-						+" which type hasn't been ref'd yet, e.g. "+expression);
+						+name+getArgsRepr()+" in an expression "+expression
+						+" which type hasn't been ref'd yet. Its type = "+exprType);
 			}
 			return true;
 		}

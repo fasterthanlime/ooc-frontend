@@ -1,6 +1,7 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
@@ -78,70 +79,83 @@ public class VariableAccess extends Access implements MustBeResolved {
 
 	@Override
 	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
+
+		if(isResolved()) return false;
 		
-		if(ref == null) {
-			Miner.mine(Scope.class, new Opportunist<Scope>() {
-				public boolean take(Scope node, Stack<Node> stack) throws IOException {
-					
-					Iterable<VariableDecl> vars = res.vars.get((Node) node);
-					for(VariableDecl varDecl: vars) {
-						if(varDecl.hasAtom(name)) {
-							if(varDecl.isMember()) {
-								VariableAccess thisAccess = new VariableAccess("this", startToken);
-								thisAccess.setRef(varDecl);
-								MemberAccess membAcc =  new MemberAccess(thisAccess, name, startToken);
-								membAcc.resolve(mainStack, res, fatal);
-								membAcc.setRef(varDecl);
-								if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
-									throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
-								}
+		Miner.mine(Scope.class, new Opportunist<Scope>() {
+			public boolean take(Scope node, Stack<Node> stack) throws IOException {
+				
+				Iterable<VariableDecl> vars = res.vars.get((Node) node);
+				for(VariableDecl varDecl: vars) {
+					if(varDecl.hasAtom(name)) {
+						if(varDecl.isMember()) {
+							VariableAccess thisAccess = new VariableAccess("this", startToken);
+							thisAccess.setRef(varDecl);
+							MemberAccess membAcc =  new MemberAccess(thisAccess, name, startToken);
+							membAcc.resolve(mainStack, res, fatal);
+							membAcc.setRef(varDecl);
+							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
+								throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
 							}
-							ref = varDecl;
-							return false;
 						}
+						ref = varDecl;
+						return false;
 					}
-					
-					Iterable<FunctionDecl> funcs = res.funcs.get((Node) node);
-					for(FunctionDecl func: funcs) {
-						if(func.getName().equals(name)) {
-							ref = func;
-							return false;
-						}
-					}
-					
-					return true;
-					
 				}
-			}, mainStack);
-		}
+				
+				Iterable<FunctionDecl> funcs = res.funcs.get((Node) node);
+				for(FunctionDecl func: funcs) {
+					if(func.getName().equals(name)) {
+						ref = func;
+						return false;
+					}
+				}
+				
+				return true;
+				
+			}
+		}, mainStack);
+		if(ref != null) return true;
 		
-		if(ref == null) {
-			int typeIndex = Node.find(TypeDecl.class, mainStack);
-			if(typeIndex != -1) {
-				TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
-				if(name.equals("This")) {
-					name = typeDecl.getName();
-					ref = typeDecl;
-					return true;
+		int typeIndex = Node.find(TypeDecl.class, mainStack);
+		if(typeIndex != -1) {
+			TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
+			if(name.equals("This")) {
+				name = typeDecl.getName();
+				ref = typeDecl;
+				return true;
+			}
+			VariableDecl varDecl = typeDecl.getVariable(name);
+			if(varDecl != null) {
+				VariableAccess thisAccess = new VariableAccess("this", startToken);
+				thisAccess.setRef(varDecl);
+				MemberAccess membAccess = new MemberAccess(thisAccess, name, startToken);
+				membAccess.setRef(varDecl);
+				System.out.println("Trying to replace a varAcc "+this
+						+" with a membAcc "+membAccess+". Stack = "+mainStack);
+				if(!mainStack.peek().replace(this, membAccess)) {
+					throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
 				}
-				VariableDecl varDecl = typeDecl.getVariable(name);
-				if(varDecl != null) {
-					VariableAccess thisAccess = new VariableAccess("this", startToken);
-					thisAccess.setRef(varDecl);
-					MemberAccess membAccess = new MemberAccess(thisAccess, name, startToken);
-					membAccess.setRef(varDecl);
-					if(!mainStack.peek().replace(this, membAccess)) {
-						throw new Error("Couldn't replace a VariableAccess with a MemberAccess! Stack = "+mainStack);
-					}
-					return true;
-				}
+				return true;
 			}
 		}
-
-		if(ref == null) {
-			for(TypeDecl decl: res.types) {
-				if(decl.getName().equals(name)) {
-					ref = decl;
+		
+		for(TypeDecl decl: res.types) {
+			if(decl.getName().equals(name)) {
+				ref = decl;
+				return true;
+			}
+		}
+		
+		int genIndex = Node.find(Generic.class, mainStack);
+		if(genIndex != -1) {
+			Generic gen = (Generic) mainStack.get(genIndex);
+			List<TypeParam> params = gen.getTypeParams();
+			for(TypeParam param: params) {
+				if(param.name.equals(name)) {
+					ref = param.getArgument();
+					System.out.println("Found argument ref in param "+param+", "+ref);
+					return false;
 				}
 			}
 		}

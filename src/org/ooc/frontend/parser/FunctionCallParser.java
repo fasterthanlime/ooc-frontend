@@ -16,7 +16,7 @@ public class FunctionCallParser {
 		int mark = reader.mark();
 		
 		Token tName = reader.read();
-		if(tName.type != TokenType.NAME && tName.type != TokenType.THIS_KW && tName.type != TokenType.SUPER_KW) {
+		if(!tName.isNameToken()) {
 			reader.reset(mark);
 			return null;
 		}

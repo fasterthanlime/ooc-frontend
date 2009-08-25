@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import org.ooc.backend.Generator;
 import org.ooc.frontend.Visitor;
@@ -24,6 +25,7 @@ import org.ooc.frontend.model.Comment;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
+import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Dereference;
 import org.ooc.frontend.model.Div;
 import org.ooc.frontend.model.Else;
@@ -59,6 +61,7 @@ import org.ooc.frontend.model.StringLiteral;
 import org.ooc.frontend.model.Sub;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
+import org.ooc.frontend.model.TypeParam;
 import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.VarArg;
@@ -265,24 +268,63 @@ public class CGenerator extends Generator implements Visitor {
 			decl.writeFullName(current);
 		}
 		
+		FunctionDecl impl = functionCall.getImpl();
+		NodeList<Expression> args = functionCall.getArguments();
+		
 		current.app('(');
-		if(functionCall.isConstructorCall() && functionCall.getImpl().getTypeDecl() instanceof ClassDecl) {
+		if(functionCall.isConstructorCall() && impl.getTypeDecl() instanceof ClassDecl) {
 			current.app('(');
 			decl.getTypeDecl().getInstanceType().accept(this);
 			current.app(')');
 			current.app(" this");
-			if(!functionCall.getArguments().isEmpty()) current.app(", ");
+			if(!args.isEmpty()) current.app(", ");
 		}
-		writeExprList(functionCall.getArguments());
+		writeCallArgs(args, impl);
 		current.app(')');
 		
 	}
 
-	protected void writeExprList(NodeList<Expression> args) throws IOException {
-		Iterator<Expression> iter = args.iterator();
+	protected void writeCallArgs(NodeList<Expression> callArgs, FunctionDecl impl) throws IOException {
+		List<TypeParam> typeParams = impl.getTypeParams();
+		if(typeParams.isEmpty()) {
+			Iterator<Expression> iter = callArgs.iterator();
+			NodeList<Argument> implArgs = impl.getArguments();
+			while(iter.hasNext()) {
+				iter.next().accept(this);
+				if(iter.hasNext()) current.app(", ");
+			}
+		} else {
+			writeGenericCallArgs(callArgs, impl, typeParams);
+		}
+		
+	}
+
+	private void writeGenericCallArgs(NodeList<Expression> callArgs,
+			FunctionDecl impl, List<TypeParam> typeParams) throws IOException {
+		
+		int i = 0;
+		// FIXME must write a list of expressions given by FunctionCall instead
+		for(TypeParam param: typeParams) {
+			current.append(callArgs.get(i).getType().getName()+"_class(), ");
+			i++;
+		}
+		
+		i = 0;
+		Iterator<Expression> iter = callArgs.iterator();
+		NodeList<Argument> implArgs = impl.getArguments();
 		while(iter.hasNext()) {
-			iter.next().accept(this);
+			Expression expr = iter.next();
+			Argument arg = implArgs.get(i);
+			for(TypeParam param: typeParams) {
+				System.out.println("arg.getType().getName() = "+arg.getType().getName()
+					+", param.getName() = "+param.getName());
+				if(arg.getType().getName().equals(param.getName())) {
+					current.app("&");
+				}
+			}
+			expr.accept(this);
 			if(iter.hasNext()) current.app(", ");
+			i++;
 		}
 		
 	}
@@ -324,7 +366,7 @@ public class CGenerator extends Generator implements Visitor {
 			memberCall.getExpression().accept(this);
 			if(!memberCall.getArguments().isEmpty()) current.app(", ");
 		}
-		writeExprList(memberCall.getArguments());
+		writeCallArgs(memberCall.getArguments(), impl);
 		
 		current.app(')');
 		
@@ -332,13 +374,11 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Instantiation inst) throws IOException {
-
-		FunctionDecl decl = inst.getImpl();
-		decl.writeFullName(current);
+		FunctionDecl impl = inst.getImpl();
+		impl.writeFullName(current);
 		current.app('(');
-		writeExprList(inst.getArguments());
+		writeCallArgs(inst.getArguments(), impl);
 		current.app(')');
-		
 	}
 
 	@Override
@@ -521,9 +561,19 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(VariableAccess variableAccess) throws IOException {
+		writeVarAccess(variableAccess, true);
+	}
 
+	private void writeVarAccess(VariableAccess variableAccess,
+			boolean doTypeParams) throws IOException {
 		int refLevel = variableAccess.getRef().getType().getReferenceLevel();
 		//System.out.println("writing access to "+variableAccess+" ref level = "+refLevel);
+		
+		if(doTypeParams) {
+			Declaration ref = variableAccess.getRef().getType().getRef();
+			if(ref instanceof TypeParam) refLevel++;
+		}
+		
 		if(refLevel > 0) {
 			current.app('(');
 			for(int i = 0; i < refLevel; i++) {
@@ -534,7 +584,6 @@ public class CGenerator extends Generator implements Visitor {
 		if(refLevel > 0) {
 			current.app(')');
 		}
-		
 	}
 
 	@Override
@@ -636,15 +685,16 @@ public class CGenerator extends Generator implements Visitor {
 		current.app('(');
 		
 		boolean isFirst = true;
+		for(TypeParam param: functionDecl.getTypeParams()) {
+			if(!isFirst) current.app(", ");
+			isFirst = false;
+			param.getArgument().accept(this);
+		}
+		
 		for(Argument arg: functionDecl.getArguments()) {
-			
-			if(!isFirst) {
-				current.app(", ");
-			}
-			
+			if(!isFirst) current.app(", ");
 			isFirst = false;
 			arg.accept(this);
-			
 		}
 		
 		current.app(')');
@@ -1088,6 +1138,11 @@ public class CGenerator extends Generator implements Visitor {
 			return;
 		}
 		
+		if(type.getRef() instanceof TypeParam) {
+			current.append("Pointer");
+			return;
+		}
+		
 		current.app(type.getName());
 		if(!type.isFlat()) {
 			current.app(' ');
@@ -1138,6 +1193,17 @@ public class CGenerator extends Generator implements Visitor {
 	
 	@Override
 	public void visit(Cast cast) throws IOException {
+		if(cast.getExpression().getType().getRef() instanceof TypeParam) {
+			System.out.println("Cast has a typeparam!");
+			VariableAccess access = (VariableAccess) cast.getExpression();
+			current.app("*((");
+			cast.getType().accept(this);
+			current.app("*)");
+			writeVarAccess(access, false);
+			current.app(')');
+			return;
+		}
+		
 		current.app("((");
 		cast.getType().accept(this);
 		current.app(") ");

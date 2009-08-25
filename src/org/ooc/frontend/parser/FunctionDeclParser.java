@@ -1,11 +1,14 @@
 package org.ooc.frontend.parser;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.TypeParam;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ooc.frontend.model.tokens.Token.TokenType;
@@ -75,18 +78,33 @@ public class FunctionDeclParser {
 		}
 		
 		String suffix = "";
-		if(reader.peek().type == TokenType.TILDE) {
-			reader.skip();
-			Token tSuffix = reader.peek();
-			if(tSuffix.type == TokenType.NAME) {
+		List<TypeParam> typeParams = null;
+		while(true) {
+			Token tok = reader.peek();
+			if(tok.type == TokenType.TILDE) {
 				reader.skip();
-				suffix = tSuffix.get(sReader);
-			}
+				Token tSuffix = reader.peek();
+				if(tSuffix.type == TokenType.NAME) {
+					reader.skip();
+					suffix = tSuffix.get(sReader);
+				}
+			} else if(tok.type == TokenType.LESSTHAN) {
+				reader.skip();
+				typeParams = new ArrayList<TypeParam>();
+				while(reader.peek().type != TokenType.GREATERTHAN) {
+					Token nameTok = reader.read();
+					typeParams.add(new TypeParam(nameTok.get(sReader), nameTok));
+					if(reader.peek().type != TokenType.COMMA) break;
+					reader.skip();
+				}
+				reader.skip();
+			} else break;
 		}
 		
 		FunctionDecl functionDecl = new FunctionDecl(
 				name, suffix, isFinal, isStatic, isAbstract, externName, startToken);
 		functionDecl.setProto(isProto);
+		if(typeParams != null) functionDecl.getTypeParams().addAll(typeParams);
 		if(comment != null) functionDecl.setComment(comment);
 		
 		ArgumentListFiller.fill(sReader, reader, functionDecl.isExtern(), functionDecl.getArguments());

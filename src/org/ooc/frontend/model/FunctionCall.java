@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
@@ -26,6 +27,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		this.name = name;
 		this.suffix = suffix;
 		this.arguments = new NodeList<Expression>(startToken);
+		this.arguments.setName("args of call to "+name);
 		this.impl = null;
 	}
 	
@@ -105,6 +107,26 @@ public class FunctionCall extends Access implements MustBeResolved {
 		if (name.equals("this")) resolveConstructorCall(mainStack, false);
 		else if (name.equals("super")) resolveConstructorCall(mainStack, true);
 		else resolveRegular(mainStack, res, fatal);
+	
+		if(impl != null) {
+			List<TypeParam> params = impl.getTypeParams();
+			if(!params.isEmpty()) {
+				for(TypeParam param: params) {
+					NodeList<Argument> args = impl.getArguments();
+					for(int i = 0; i < args.size(); i++) {
+						Argument arg = args.get(i);
+						if(!arg.getType().getName().equals(param.getName())) continue;
+						System.out.println("Argument "+arg+" has generic type "+param);
+						Expression expr = arguments.get(i);
+						if(expr instanceof VariableAccess) {
+							System.out.println("Is a "+expr+"! skipping");
+						} else {
+							System.out.println("Not a variable access, should unwrap");
+						}
+					}
+				}
+			}
+		}
 		
 		if(impl == null && fatal) {
 			String message = "Couldn't resolve call to function "+name+getArgsRepr()+".";
