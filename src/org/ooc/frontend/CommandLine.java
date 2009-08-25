@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -16,6 +17,7 @@ import org.ooc.backends.BackendFactory;
 import org.ooc.compiler.CompilerVersion;
 import org.ooc.compiler.Help;
 import org.ooc.compiler.ProcessUtils;
+import org.ooc.compiler.ReadEnv;
 import org.ooc.compiler.libraries.Target;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
@@ -43,12 +45,13 @@ public class CommandLine {
 	
 	protected BuildParams params = new BuildParams();
 	protected boolean timing = false;
+	List<String> additionals = new ArrayList<String>();
+	List<String> compilerArgs = new ArrayList<String>();
+	List<String> nasms = new ArrayList<String>();
 	
 	public CommandLine(String[] args) throws InterruptedException, IOException {
 		
-		String module = "";
-		List<String> additionals = new ArrayList<String>();
-		List<String> nasms = new ArrayList<String>();
+		String modulePath = "";
 		
 		for(String arg: args) {
 			if(arg.startsWith("-")) {
@@ -57,23 +60,9 @@ public class CommandLine {
         			
         			Locale.setDefault(new Locale(arg.substring(arg.indexOf('=') + 1)));
         		
-        		} else if(option.startsWith("gui")) {
-        			
-        			//gui = true;
-        			
         		} else if(option.startsWith("backend=")) {
         			
         			params.backend = BackendFactory.getBackend(option.substring("backend=".length()).trim());
-        			
-        		} else if(option.startsWith("daemon")) {
-        			
-        			/*
-        			daemon = true;
-        			int index = arg.indexOf(':');
-        			if(index != -1) {
-        				daemonPort = Integer.parseInt(arg.substring(index + 1));
-        			}
-        			*/
         			
         		} else if(option.startsWith("sourcepath")) {
         			
@@ -170,8 +159,10 @@ public class CommandLine {
         			System.err.println("Unrecognized option: '"+arg+"'");
         			
         		}
+        	} else if(arg.startsWith("+")) {
+        		compilerArgs.add(arg.substring(1));
         	} else {
-        		if(!module.isEmpty()) {
+        		if(!modulePath.isEmpty()) {
         			if(arg.toLowerCase().endsWith(".s")) {
         				nasms.add(arg);
         			} else if(!arg.toLowerCase().endsWith(".ooc")) {
@@ -182,27 +173,27 @@ public class CommandLine {
             			return;
             		}
         		} else {
-        			module = arg;
+        			modulePath = arg;
         			if(!arg.toLowerCase().endsWith(".ooc")) {
-        				module += ".ooc";
+        				modulePath += ".ooc";
         			}
         		}
         	}
 		}
 		
-		if(module.isEmpty()) {
+		if(modulePath.isEmpty()) {
 			System.err.println("ooc: no files.");
 			return;
 		}
 		
 		if(!nasms.isEmpty()) {
-			compileNasms(nasms, additionals);
+			compileNasms();
 		}
 		
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
 		params.sourcePath.add(params.distLocation + File.separator + "sdk");
 		
-		parse(module, additionals);
+		parse(modulePath);
 		
 		if(params.clean) {
 			FileUtils.deleteRecursive(params.outPath);
@@ -210,7 +201,7 @@ public class CommandLine {
 		
 	}
 	
-	private void compileNasms(List<String> nasms, Collection<String> additionals) throws IOException, InterruptedException {
+	private void compileNasms() throws IOException, InterruptedException {
 		
 		boolean has = false;
 		
@@ -248,20 +239,22 @@ public class CommandLine {
 		
 	}
 
-	protected void parse(String fileName, List<String> additionals) throws InterruptedException, IOException {
+	protected void parse(String modulePath) throws InterruptedException, IOException {
+		
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
-		Module module = new Parser(params).parse(fileName);
+		Module module = new Parser(params).parse(modulePath);
 		module.setMain(true);
 		translate(module, new HashSet<Module>());
 		long tt2 = System.nanoTime();
-		compile(module, additionals);
+		compile(module);
 		long tt3 = System.nanoTime();
 
 		if(timing)
-			System.out.printf("Took %.2f ms for ooc, and %.2f for gcc\n",
+			System.out.printf("Took %.2f ms for ooc, and %.2f for C compiler\n",
 					Float.valueOf((tt2 - tt1) / 1000000.0f),
 					Float.valueOf((tt3 - tt2) / 1000000.0f));
+		
 	}
 
 	protected void translate(Module module, Set<Module> done) throws IOException {
@@ -280,7 +273,7 @@ public class CommandLine {
 		}
 	}
 
-	protected void compile(Module module, List<String> additionals) throws Error,
+	protected void compile(Module module) throws Error,
 			IOException, InterruptedException {
 		
 		for(Include inc: module.getIncludes()) {
@@ -292,16 +285,18 @@ public class CommandLine {
 		
 		List<String> command = new ArrayList<String>();
 		
-		command.add(findExec("gcc").getPath());
+		Properties env = ReadEnv.getEnvVars();
+		String cc = env.getProperty("CC");
+		String compiler = cc == null ? "gcc" : cc;
+		command.add(findExec(compiler).getPath());
 	
 		if(params.debug) command.add("-g");
-		command.add("-std=c99");
+		if(!compiler.equals("tcc")) command.add("-std=c99");
 		command.add("-I");
 		command.add(new File(params.distLocation, "libs/headers/").getPath());
 		command.add("-I");
 		command.add(params.outPath.getPath());
 		// FIXME ooh hardcoded, that is bad.
-		//command.add(new File(params.distLocation, "libs/universal/mango/mangoobject.c").getPath());
 		addDeps(command, module, new HashSet<Module>());
 		for(String dynamicLib: params.dynamicLibs) {
 			command.add("-l");
@@ -336,7 +331,7 @@ public class CommandLine {
 		ProcessUtils.redirectIO(process);
 		int code = process.waitFor();
 		if(code != 0) {
-			System.err.println("gcc failed, aborting compilation process");
+			System.err.println("C compiler failed, aborting compilation process");
 			System.exit(code);
 		}
 		
@@ -364,7 +359,7 @@ public class CommandLine {
 		done.add(module);
 		
 		for(Use use: module.getUses()) {
-			compileNasms(use.getUseDef().getLibs(), list);
+			compileNasms();
 		}
 		
 		for(Import imp: module.getImports()) {

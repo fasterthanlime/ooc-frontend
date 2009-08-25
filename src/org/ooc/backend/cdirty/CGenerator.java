@@ -503,9 +503,13 @@ public class CGenerator extends Generator implements Visitor {
 			foreach.getVariable().accept(this);
 			current.app(" = ");
 			range.getLower().accept(this);
-			current.app("; ").app(foreach.getVariable().getName()).app(" < ");
+			current.app("; ");
+			foreach.getVariable().accept(this);
+			current.app(" < ");
 			range.getUpper().accept(this);
-			current.app("; ").app(foreach.getVariable().getName()).app("++").app(")").openBlock();
+			current.app("; ");
+			foreach.getVariable().accept(this);
+			current.app("++").app(")").openBlock();
 			foreach.getBody().accept(this);
 			current.closeBlock();
 		} else { 

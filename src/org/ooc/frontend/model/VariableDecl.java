@@ -190,7 +190,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	protected boolean unwrapToVarAcc(Stack<Node> stack) throws Error {
 
 		if(stack.peek() instanceof Line
-		|| stack.peek() instanceof Foreach
+		//|| stack.peek() instanceof Foreach
 		|| stack.get(stack.size() - 2) instanceof Module
 		|| stack.get(stack.size() - 2) instanceof FunctionDecl
 		|| stack.get(stack.size() - 2) instanceof TypeDecl

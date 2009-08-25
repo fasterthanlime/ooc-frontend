@@ -7,7 +7,7 @@ import org.ooc.frontend.model.tokens.Token;
 
 public class Foreach extends ControlStatement {
 
-	protected VariableDecl variable;
+	protected Expression variable;
 	protected Expression collection; // must be of type Range or Iterable
 	
 	public Foreach(VariableDecl variable, Expression collection, Token startToken) {
@@ -16,7 +16,7 @@ public class Foreach extends ControlStatement {
 		this.collection = collection;
 	}
 	
-	public VariableDecl getVariable() {
+	public Expression getVariable() {
 		return variable;
 	}
 	
@@ -53,7 +53,7 @@ public class Foreach extends ControlStatement {
 	public boolean replace(Node oldie, Node kiddo) {
 		
 		if(oldie == variable) {
-			variable = (VariableDecl) kiddo;
+			variable = (Expression) kiddo;
 			return true;
 		}
 		
