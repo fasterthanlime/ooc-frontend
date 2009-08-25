@@ -112,16 +112,20 @@ public class FunctionCall extends Access implements MustBeResolved {
 			List<TypeParam> params = impl.getTypeParams();
 			if(!params.isEmpty()) {
 				for(TypeParam param: params) {
-					NodeList<Argument> args = impl.getArguments();
-					for(int i = 0; i < args.size(); i++) {
-						Argument arg = args.get(i);
+					NodeList<Argument> implArgs = impl.getArguments();
+					for(int i = 0; i < implArgs.size(); i++) {
+						Argument arg = implArgs.get(i);
 						if(!arg.getType().getName().equals(param.getName())) continue;
-						System.out.println("Argument "+arg+" has generic type "+param);
 						Expression expr = arguments.get(i);
 						if(expr instanceof VariableAccess) {
-							System.out.println("Is a "+expr+"! skipping");
 						} else {
-							System.out.println("Not a variable access, should unwrap");
+							VariableDeclFromExpr vdfe = new VariableDeclFromExpr(
+									generateTempName(param.getName()+"param", mainStack), expr, startToken);
+							arguments.replace(expr, vdfe);
+							Stack<Node> stack = new Stack<Node>();
+							stack.addAll(mainStack);
+							stack.add(arguments);
+							vdfe.unwrapToVarAcc(stack);
 						}
 					}
 				}
