@@ -201,7 +201,9 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		if(atoms.size() != 1) {
 			throw new Error("Multi-var decls used an expression.. wtf?");
 		}
-		stack.peek().replace(this, new VariableAccess(atoms.get(0).name, atoms.get(0).startToken));
+		VariableAccess varAcc = new VariableAccess(atoms.get(0).name, atoms.get(0).startToken);
+		varAcc.setRef(this);
+		stack.peek().replace(this, varAcc);
 		
 		int lineIndex = find(Line.class, stack);
 		if(lineIndex == -1) {

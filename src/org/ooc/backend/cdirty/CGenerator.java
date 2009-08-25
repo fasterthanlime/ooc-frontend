@@ -288,7 +288,6 @@ public class CGenerator extends Generator implements Visitor {
 		List<TypeParam> typeParams = impl.getTypeParams();
 		if(typeParams.isEmpty()) {
 			Iterator<Expression> iter = callArgs.iterator();
-			NodeList<Argument> implArgs = impl.getArguments();
 			while(iter.hasNext()) {
 				iter.next().accept(this);
 				if(iter.hasNext()) current.app(", ");
@@ -296,7 +295,6 @@ public class CGenerator extends Generator implements Visitor {
 		} else {
 			writeGenericCallArgs(callArgs, impl, typeParams);
 		}
-		
 	}
 
 	private void writeGenericCallArgs(NodeList<Expression> callArgs,
@@ -465,25 +463,26 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(If if1) throws IOException {
-		current.app("if");
-		if(if1.getCondition() instanceof Parenthesis) {
-			if1.getCondition().accept(this);
-		} else {
-			current.app('(');
-			if1.getCondition().accept(this);
-			current.app(')');
-		}
-		
+		current.app("if (");
+		if1.getCondition().accept(this);
+		current.app(")");
+		NodeList<Line> body = if1.getBody();
 		current.openBlock();
-		if1.getBody().accept(this);
+		body.accept(this);
 		current.closeBlock();
 	}
 	
 	@Override
 	public void visit(Else else1) throws IOException {
-		current.app("else ").openBlock();
-		else1.getBody().accept(this);
-		current.closeBlock();
+		current.app("else ");
+		NodeList<Line> body = else1.getBody();
+		if(body.size() == 1 && (body.get(0).getStatement() instanceof If)) {
+			body.get(0).getStatement().accept(this);
+		} else {
+			current.openBlock();
+			body.accept(this);
+			current.closeBlock();
+		}
 	}
 
 	@Override

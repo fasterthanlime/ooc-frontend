@@ -84,7 +84,7 @@ public class FunctionDeclParser {
 			if(tok.type == TokenType.TILDE) {
 				reader.skip();
 				Token tSuffix = reader.peek();
-				if(tSuffix.type == TokenType.NAME) {
+				if(tSuffix.isNameToken()) {
 					reader.skip();
 					suffix = tSuffix.get(sReader);
 				}

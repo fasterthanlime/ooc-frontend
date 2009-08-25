@@ -6,13 +6,13 @@ Hound: class from Dog {
 }
 
 main: func {
-	//printType(new Dog)
-	//printType(new Hound)
-	//printType('c')
+	printType(d := new Dog)
+	printType(h := new Hound)
+	printType(c := 'c')
 	printType(i := 42)
-	//printType(3.14)
-	//printType(8.0)
-	//printType(6.52)
+	printType(f := 3.14)
+	printType(d := 8.0 as Double)
+	printType(ld := 6.52 as LDouble)
 }
 
 printType: func <T> (arg: T) {
@@ -25,8 +25,17 @@ printType: func <T> (arg: T) {
 		c = c super
 		if(c) printf(" -> ")
 	}
-	printf("\n-----------------\n");
-	if(T == Int class) {
-		printf("It's an Int, and it's worth %d!\n", arg as Int)
+	printf("\n")
+	if(T == Char class) {
+		printf("Value = %c\n", arg as Char)
+	} else if(T == Int class) {
+		printf("Value = %.2d\n", arg as Int)
+	} else if(T == Double class) {
+		printf("Value = %.2f\n", arg as Double)
+	} else if(T == LDouble class) {
+		printf("Value = %.2Lf\n", arg as LDouble)
+	} else if(T == Float class) {
+		printf("Value = %.2f\n", arg as Float)
 	}
+	printf("-----------------\n")
 }
