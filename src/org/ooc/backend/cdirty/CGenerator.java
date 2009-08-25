@@ -882,7 +882,7 @@ public class CGenerator extends Generator implements Visitor {
 		
 		/* Non-static (ie. instance) functions */
 		for(FunctionDecl decl: classDecl.getFunctions()) {
-			if(decl.isStatic()) continue;
+			if(decl.isStatic() || decl.isAbstract()) continue;
 		
 			current.nl();
 			if(!decl.isFinal()) current.app("static ");
@@ -961,7 +961,7 @@ public class CGenerator extends Generator implements Visitor {
 			if(decl.isStatic()) continue;
 			if(decl.isConstructor()) continue;
 			
-			if(decl.isFinal()) writeDesignatedInit(decl.getName(), currentClass.getName() + "_" + decl.getName());
+			if(decl.isFinal() || decl.isAbstract()) writeDesignatedInit(decl.getName(), currentClass.getName() + "_" + decl.getName());
 			else writeDesignatedInit(decl.getName(), currentClass.getName() + "_" + decl.getName() + "_impl");
 			
 		}

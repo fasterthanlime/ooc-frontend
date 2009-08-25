@@ -296,7 +296,6 @@ public class CommandLine {
 		command.add(new File(params.distLocation, "libs/headers/").getPath());
 		command.add("-I");
 		command.add(params.outPath.getPath());
-		// FIXME ooh hardcoded, that is bad.
 		addDeps(command, module, new HashSet<Module>());
 		for(String dynamicLib: params.dynamicLibs) {
 			command.add("-l");
