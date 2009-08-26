@@ -14,30 +14,36 @@ import org.ubi.SourceReader;
 public class Parser {
 	
 	protected BuildParams params;
+	protected Module mainModule;
 	
 	public Parser(BuildParams params) {
 		this.params = params;
 	}
-
-	public Module parse(String path) throws IOException {
-
+	
+	public Module parse(final String path, boolean join) throws IOException {
 		if(params.verbose)
-			System.out.println("Parsing "+path);
+			System.out.println("Parsing "+path+" begun");
 		
-		File file = params.sourcePath.getFile(path);
+		final File file = params.sourcePath.getFile(path);
 		if(file == null) {
 			throw new CompilationFailedError(null, "File "+path+" not found in sourcePath."
 				+" sourcePath = "+params.sourcePath);
 		}
 		
-		SourceReader sReader = SourceReader.getReaderFromFile(file);
-		List<Token> tokens = new Tokenizer().parse(sReader);
+		final SourceReader sReader = SourceReader.getReaderFromFile(file);
+		final List<Token> tokens = new Tokenizer().parse(sReader);
 		
-		String fullName = path.substring(0, path.lastIndexOf('.'))
+		final String fullName = path.substring(0, path.lastIndexOf('.'))
 			.replace(File.separatorChar, '.').replace('/', '.');
 		
-		return ModuleParser.parse(fullName, file, sReader, new TokenReader(tokens), this);
+		final Module module = new Module(fullName, sReader);
+		ModuleParser.parse(module, fullName, file,
+				sReader, new TokenReader(tokens), Parser.this);
 		
+		if(params.verbose)
+			System.out.println("Parsing "+path+" ended!!");
+		
+		return module;
 	}
 		
 }

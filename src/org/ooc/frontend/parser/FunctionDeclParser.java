@@ -17,10 +17,6 @@ import org.ubi.SourceReader;
 
 public class FunctionDeclParser {
 
-	public static FunctionDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
-		return parse(sReader, reader, false);
-	}
-	
 	public static FunctionDecl parse(SourceReader sReader, TokenReader reader, boolean skipFunc) throws IOException {
 
 		int mark = reader.mark();

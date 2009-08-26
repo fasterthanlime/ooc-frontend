@@ -24,6 +24,8 @@ public class Module extends Node implements Scope {
 	private boolean isMain;
 	private final SourceReader reader;
 	
+	public Thread thread;
+	
 	public Module(String fullName, SourceReader reader) {
 		
 		super(Token.defaultToken);
@@ -238,6 +240,11 @@ public class Module extends Node implements Scope {
 				functions.add((FunctionDecl) node);
 			}
 		}
+	}
+	
+	public void join() throws InterruptedException {
+		while(thread == null) Thread.sleep(5L);
+		thread.join();
 	}
 	
 }

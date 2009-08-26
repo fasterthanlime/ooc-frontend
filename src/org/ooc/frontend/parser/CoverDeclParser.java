@@ -83,7 +83,7 @@ public class CoverDeclParser {
 					continue;
 				}
 				
-				FunctionDecl funcDecl = FunctionDeclParser.parse(sReader, reader);
+				FunctionDecl funcDecl = FunctionDeclParser.parse(sReader, reader, false);
 				if(funcDecl != null) {
 					coverDecl.addFunction(funcDecl);
 					continue;

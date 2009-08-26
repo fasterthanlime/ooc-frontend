@@ -22,7 +22,7 @@ public class DeclarationParser {
 		OpDecl opDecl = OpDeclParser.parse(sReader, reader);
 		if(opDecl != null) return opDecl;
 		
-		FunctionDecl funcDecl = FunctionDeclParser.parse(sReader, reader);
+		FunctionDecl funcDecl = FunctionDeclParser.parse(sReader, reader, false);
 		if(funcDecl != null) return funcDecl;
 		
 		ClassDecl classDecl = ClassDeclParser.parse(sReader, reader);

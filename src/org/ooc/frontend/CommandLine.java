@@ -40,12 +40,16 @@ public class CommandLine {
 			System.exit(0);
 		}
 		
-		new CommandLine(argv);
+		try {
+			new CommandLine(argv);
+		} catch(OocCompilationError err) {
+			System.err.println(err);
+			System.exit(1);
+		}
 	
 	}
 	
 	protected BuildParams params = new BuildParams();
-	protected boolean timing = false;
 	List<String> additionals = new ArrayList<String>();
 	List<String> compilerArgs = new ArrayList<String>();
 	private AbstractCompiler compiler = null;
@@ -112,7 +116,7 @@ public class CommandLine {
         			
         		} else if(option.equals("timing") || option.equals("t")) {
         			
-        			timing = true;
+        			params.timing = true;
         			
         		} else if(option.equals("debug") || option.equals("g")) {
         			
@@ -259,33 +263,42 @@ public class CommandLine {
 		
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
-		Module module = new Parser(params).parse(modulePath);
+		Module module = new Parser(params).parse(modulePath, true);
 		module.setMain(true);
-		translate(module, new HashSet<Module>());
 		long tt2 = System.nanoTime();
-		compile(module);
+		tinker(module, new HashSet<Module>());
 		long tt3 = System.nanoTime();
+		output(module, new HashSet<Module>());
+		long tt4 = System.nanoTime();
+		compile(module);
+		long tt5 = System.nanoTime();
 
-		if(timing)
-			System.out.printf("Took %.2f ms for ooc, and %.2f for C compiler\n",
+		if(params.timing)
+			System.out.printf("parse: %.2f ms, tink: %.2f ms, out: %.2f, cc: %.2f ms\n",
 					Float.valueOf((tt2 - tt1) / 1000000.0f),
-					Float.valueOf((tt3 - tt2) / 1000000.0f));
+					Float.valueOf((tt3 - tt2) / 1000000.0f),
+					Float.valueOf((tt4 - tt3) / 1000000.0f),
+					Float.valueOf((tt5 - tt4) / 1000000.0f));
 		
 	}
-
-	protected void translate(Module module, Set<Module> done) throws IOException {
-		try {
-			done.add(module);
-			new Tinkerer().process(module, params);
-			for(Import imp: module.getImports()) {
-				if(!done.contains(imp.getModule())) {
-					translate(imp.getModule(), done);
-				}
+	
+	protected void output(Module module, Set<Module> done) throws IOException {
+		done.add(module);
+		for(Import imp: module.getImports()) {
+			if(!done.contains(imp.getModule())) {
+				output(imp.getModule(), done);
 			}
-			new CGenerator(params.outPath, module).generate();
-		} catch(OocCompilationError err) {
-			System.err.println(err);
-			System.exit(1);
+		}
+		new CGenerator(params.outPath, module).generate();
+	}
+
+	protected void tinker(Module module, Set<Module> done) throws IOException {
+		done.add(module);
+		new Tinkerer().process(module, params);
+		for(Import imp: module.getImports()) {
+			if(!done.contains(imp.getModule())) {
+				tinker(imp.getModule(), done);
+			}
 		}
 	}
 

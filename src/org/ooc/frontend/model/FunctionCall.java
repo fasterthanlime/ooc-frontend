@@ -239,8 +239,10 @@ public class FunctionCall extends Access implements MustBeResolved {
 				}
 			}
 		}
-		
-		if(impl.isMember() || impl.isFromPointer()) transformToMemberCall(stack, res);
+
+		if(impl != null) {
+			if(impl.isMember() || impl.isFromPointer()) transformToMemberCall(stack, res);
+		}
 		
 	}
 

@@ -9,6 +9,8 @@ public class Gcc extends BaseCompiler {
 
 	public Gcc() {
 		super("gcc");
+		command.add("-pipe");
+		command.add("-combine");
 	}
 	
 	protected Gcc(String executableName) {
