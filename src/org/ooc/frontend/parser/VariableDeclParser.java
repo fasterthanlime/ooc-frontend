@@ -1,10 +1,9 @@
 package org.ooc.frontend.parser;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.ooc.frontend.model.Expression;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.VariableDeclFromExpr;
@@ -19,8 +18,6 @@ public class VariableDeclParser {
 
 	public static VariableDecl parse(SourceReader sReader, TokenReader reader) throws IOException {
 		int mark = reader.mark();
-
-		List<VariableDeclAtom> atoms = new ArrayList<VariableDeclAtom>();
 		
 		Token tName = reader.peek();
 		if(!tName.isNameToken()) {
@@ -29,6 +26,7 @@ public class VariableDeclParser {
 		}
 		
 		Token declStartToken = reader.peek();
+		NodeList<VariableDeclAtom> atoms = new NodeList<VariableDeclAtom>(declStartToken);
 		Token atomStartToken;
 		while((atomStartToken = reader.peek()).isNameToken()) {
 			String name = reader.read().get(sReader);

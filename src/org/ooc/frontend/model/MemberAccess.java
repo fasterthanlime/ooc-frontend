@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
@@ -62,7 +61,7 @@ public class MemberAccess extends VariableAccess {
 	}
 	
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		Type exprType = expression.getType();
 		if(exprType == null) {
@@ -113,7 +112,7 @@ public class MemberAccess extends VariableAccess {
 		
 	}
 
-	private boolean tryResolve(Stack<Node> stack, Type exprType)
+	private boolean tryResolve(NodeList<Node> stack, Type exprType)
 			throws OocCompilationError, EOFException {
 		
 		Declaration decl = exprType.getRef();

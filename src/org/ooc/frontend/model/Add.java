@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.OpDecl.OpType;
@@ -27,7 +26,7 @@ public class Add extends BinaryOperation implements MustBeResolved {
 	}
 
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 	
 		for(OpDecl op: res.ops) {

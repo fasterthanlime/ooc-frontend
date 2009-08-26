@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Compare.CompareType;
@@ -174,7 +173,7 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	 * so that it's considered 'resolved' (e.g. it's somewhere in C)
 	 */
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		
 		if(fromType == null) return false;

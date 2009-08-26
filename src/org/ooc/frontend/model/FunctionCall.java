@@ -4,7 +4,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
@@ -27,7 +26,6 @@ public class FunctionCall extends Access implements MustBeResolved {
 		this.name = name;
 		this.suffix = suffix;
 		this.arguments = new NodeList<Expression>(startToken);
-		this.arguments.setName("args of call to "+name);
 		this.impl = null;
 	}
 	
@@ -102,7 +100,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 	}
 
 	@Override
-	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
+	public boolean resolve(final NodeList<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
 
 		if (name.equals("this")) resolveConstructorCall(mainStack, false);
 		else if (name.equals("super")) resolveConstructorCall(mainStack, true);
@@ -122,7 +120,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 							VariableDeclFromExpr vdfe = new VariableDeclFromExpr(
 									generateTempName(param.getName()+"param", mainStack), expr, startToken);
 							arguments.replace(expr, vdfe);
-							Stack<Node> stack = new Stack<Node>();
+							NodeList<Node> stack = new NodeList<Node>();
 							stack.addAll(mainStack);
 							stack.add(arguments);
 							vdfe.unwrapToVarAcc(stack);
@@ -145,7 +143,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 
-	protected String guessCorrectName(final Stack<Node> mainStack, final Resolver res) {
+	protected String guessCorrectName(final NodeList<Node> mainStack, final Resolver res) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
@@ -180,7 +178,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 
-	protected void resolveConstructorCall(final Stack<Node> mainStack, final boolean isSuper) throws OocCompilationError, EOFException {
+	protected void resolveConstructorCall(final NodeList<Node> mainStack, final boolean isSuper) throws OocCompilationError, EOFException {
 		
 		int typeIndex = Node.find(TypeDecl.class, mainStack);
 		if(typeIndex == -1) {
@@ -212,7 +210,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 	
-	protected void resolveRegular(final Stack<Node> mainStack,
+	protected void resolveRegular(final NodeList<Node> mainStack,
 			final Resolver res, final boolean fatal)
 			throws IOException {
 		
@@ -226,8 +224,8 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 		if(impl == null) {
 			Miner.mine(Scope.class, new Opportunist<Scope>() {
-				public boolean take(Scope node, Stack<Node> stack) throws IOException {
-					
+				public boolean take(Scope node, NodeList<Node> stack) throws IOException {
+
 					for(FunctionDecl decl: res.funcs.get((Node) node)) {
 						if(matches(decl)) {
 							impl = decl;

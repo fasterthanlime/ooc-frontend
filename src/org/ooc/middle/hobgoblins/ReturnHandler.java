@@ -2,7 +2,6 @@ package org.ooc.middle.hobgoblins;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.Expression;
@@ -11,6 +10,7 @@ import org.ooc.frontend.model.IntLiteral;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.Return;
 import org.ooc.frontend.model.ValuedReturn;
 import org.ooc.frontend.model.IntLiteral.Format;
@@ -39,7 +39,7 @@ public class ReturnHandler implements Hobgoblin {
 		Nosy.get(ValuedReturn.class, new Opportunist<ValuedReturn>() {
 
 			@Override
-			public boolean take(ValuedReturn node, Stack<Node> stack) throws OocCompilationError, EOFException {
+			public boolean take(ValuedReturn node, NodeList<Node> stack) throws OocCompilationError, EOFException {
 				
 				FunctionDecl decl = (FunctionDecl) stack.get(Node.find(FunctionDecl.class, stack));
 				if(decl.getReturnType().isVoid()) {
@@ -57,7 +57,7 @@ public class ReturnHandler implements Hobgoblin {
 		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 
 			@Override
-			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
+			public boolean take(FunctionDecl node, NodeList<Node> stack) throws IOException {
 				
 				if(node.getReturnType().isVoid()) return true;
 				if(node.isConstructor() && Node.find(ClassDecl.class, stack) != -1) return true;

@@ -1,12 +1,12 @@
 package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.model.ClassDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.walkers.Nosy;
@@ -20,7 +20,7 @@ public class DefaultConstructorGiver implements Hobgoblin {
 		new Nosy<ClassDecl>(ClassDecl.class, new Opportunist<ClassDecl>() {
 
 			@Override
-			public boolean take(ClassDecl node, Stack<Node> stack) {
+			public boolean take(ClassDecl node, NodeList<Node> stack) {
 				
 				boolean hasNew = false;
 				

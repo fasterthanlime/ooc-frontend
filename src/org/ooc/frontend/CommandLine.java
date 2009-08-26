@@ -12,7 +12,6 @@ import java.util.StringTokenizer;
 
 import org.ooc.ShellUtils;
 import org.ooc.backend.cdirty.CGenerator;
-import org.ooc.backends.BackendFactory;
 import org.ooc.compiler.CompilerVersion;
 import org.ooc.compiler.Help;
 import org.ooc.compiler.ProcessUtils;
@@ -63,10 +62,6 @@ public class CommandLine {
         			
         			Locale.setDefault(new Locale(arg.substring(arg.indexOf('=') + 1)));
         		
-        		} else if(option.startsWith("backend=")) {
-        			
-        			params.backend = BackendFactory.getBackend(option.substring("backend=".length()).trim());
-        			
         		} else if(option.startsWith("sourcepath")) {
         			
         			String sourcePathOption = arg.substring(arg.indexOf('=') + 1);

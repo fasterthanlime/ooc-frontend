@@ -4,12 +4,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
 
 import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.TypeDecl;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
@@ -28,7 +28,7 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 		
 		Nosy.get(FunctionDecl.class, new Opportunist<FunctionDecl>() {
 			@Override
-			public boolean take(FunctionDecl node, Stack<Node> stack) throws IOException {
+			public boolean take(FunctionDecl node, NodeList<Node> stack) throws IOException {
 				
 				if(node.isFromPointer()) return true;
 				
@@ -59,7 +59,7 @@ public class SuffixConflictAnnihilator implements Hobgoblin {
 		
 	}
 
-	void throwError(FunctionDecl node, Stack<Node> stack, String name)
+	void throwError(FunctionDecl node, NodeList<Node> stack, String name)
 			throws OocCompilationError, EOFException {
 		
 		if(name.equals("class") && Node.find(CoverDecl.class, stack) != -1) return;

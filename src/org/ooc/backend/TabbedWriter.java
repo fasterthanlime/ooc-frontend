@@ -7,18 +7,10 @@ public class TabbedWriter implements Appendable {
 
 	protected Appendable appendable;
 	protected int tabLevel;
-	protected String tab = "\t";
+	protected String tab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 
 	public TabbedWriter(Appendable appendable) {
 		this.appendable = appendable;
-	}
-	
-	public void setTab(String tab) {
-		this.tab = tab;
-	}
-	
-	public String getTab() {
-		return tab;
 	}
 	
 	public void close() throws IOException {
@@ -42,9 +34,7 @@ public class TabbedWriter implements Appendable {
 	}
 	
 	public TabbedWriter writeTabs() throws IOException {
-		for(int i = 0; i < tabLevel; i++) {
-			appendable.append(tab);
-		}
+		appendable.append(tab, 0, tabLevel);
 		return this;
 	}
 	

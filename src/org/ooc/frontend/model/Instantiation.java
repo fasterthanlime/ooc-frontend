@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
@@ -31,7 +30,7 @@ public class Instantiation extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal) throws IOException {
 		
 		if(name.isEmpty()) guessName(stack);
 		
@@ -77,7 +76,7 @@ public class Instantiation extends FunctionCall {
 	 * </code>
 	 * @throws EOFException 
 	 */
-	protected boolean guessName(Stack<Node> stack) throws Error, EOFException {
+	protected boolean guessName(NodeList<Node> stack) throws Error, EOFException {
 		
 		if(stack.peek() instanceof Assignment) {
 			Assignment ass = (Assignment) stack.peek();

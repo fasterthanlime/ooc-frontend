@@ -1,8 +1,5 @@
 package org.ooc.frontend.model;
 
-import java.util.List;
-import java.util.Stack;
-
 import org.ooc.frontend.model.tokens.Token;
 
 public abstract class Node implements Visitable {
@@ -29,11 +26,11 @@ public abstract class Node implements Visitable {
 	}
 	
 	/** TODO find a better home for this function? Sucks that you can't add function to Stack<? extends Node> */
-	public static <T> int find(Class<T> clazz, List<?> stack) {
+	public static <T> int find(Class<T> clazz, NodeList<?> stack) {
 		return find(clazz, stack, stack.size() - 1);
 	}
 		
-	public static <T> int find(Class<T> clazz, List<?> hierarchy, int offset) {
+	public static <T> int find(Class<T> clazz, NodeList<?> hierarchy, int offset) {
 		
 		int i = offset;
 		while(i >= 0) {
@@ -50,7 +47,7 @@ public abstract class Node implements Visitable {
 
 	public abstract boolean replace(Node oldie, Node kiddo);
 	
-	public String generateTempName(String seed, Stack<Node> stack) {
+	public String generateTempName(String seed, NodeList<Node> stack) {
 		String name = seed;
 		int i = 0;
 		while(hasVariable(name, stack)) {
@@ -59,11 +56,11 @@ public abstract class Node implements Visitable {
 		return name;
 	}
 
-	private boolean hasVariable(String name, Stack<Node> stack) {
+	private boolean hasVariable(String name, NodeList<Node> stack) {
 		return hasVariable(name, stack, Node.find(Scope.class, stack));
 	}
 
-	private boolean hasVariable(String name, Stack<Node> stack, int index) {
+	private boolean hasVariable(String name, NodeList<Node> stack, int index) {
 		if(index == -1) return false;
 		Scope scope = (Scope) stack.get(index);
 		if(scope.hasVariable(name)) return true;

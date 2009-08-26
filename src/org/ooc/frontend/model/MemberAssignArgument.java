@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
@@ -21,7 +20,7 @@ public class MemberAssignArgument extends MemberArgument {
 	public void acceptChildren(Visitor visitor) throws IOException {}
 	
 	@Override
-	protected void doReplace(Stack<Node> stack, VariableDecl decl,
+	protected void doReplace(NodeList<Node> stack, VariableDecl decl,
 			FunctionDecl funcDecl) {
 		
 		funcDecl.getBody().add(0, new Line(new Assignment(

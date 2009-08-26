@@ -1,9 +1,9 @@
 package org.ooc.frontend.model.interfaces;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 
 /**
  * I like to use interfaces as "tags" we can apply to classes.
@@ -33,6 +33,6 @@ public interface MustBeUnwrapped {
 	 * @return true if should run everything once again, false otherwise
 	 * @throws IOException
 	 */
-	public boolean unwrap(Stack<Node> stack) throws IOException;
+	public boolean unwrap(NodeList<Node> stack) throws IOException;
 	
 }

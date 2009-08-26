@@ -2,10 +2,9 @@ package org.ooc.libs;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.ooc.compiler.ReadEnv;
 import org.ooc.outputting.FileUtils;
 
 public class DistLocator {
@@ -16,7 +15,7 @@ public class DistLocator {
 		
 			File location;
 			
-			Properties env = ReadEnv.getEnvVars();
+			Map<String, String> env = System.getenv();
 			Object envDist = env.get("OOC_DIST");
 			if(envDist != null) {
 				return new File(envDist.toString());
@@ -42,7 +41,7 @@ public class DistLocator {
 	 * be set by bash under Gentoo and by MSYS 1.0.11/whatever under MinGW/WinXP
 	 * @throws IOException 
 	 */
-	protected static File tryUnderscore(Properties env) throws IOException {
+	protected static File tryUnderscore(Map<String, String> env) throws IOException {
 		
 		Object underscore = env.get("_");
 		if(underscore != null) {

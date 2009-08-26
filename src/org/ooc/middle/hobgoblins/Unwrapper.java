@@ -1,15 +1,15 @@
 package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
-import java.util.Stack;
 
-import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
-import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
+import org.ooc.middle.walkers.SketchyNosy;
 
 /**
  * The {@link Unwrapper} transforms this kind of statement
@@ -39,18 +39,15 @@ public class Unwrapper implements Hobgoblin {
 	@Override
 	public void process(Module module, BuildParams params) throws IOException {
 
-		Nosy<MustBeUnwrapped> nosy = new Nosy<MustBeUnwrapped>(MustBeUnwrapped.class, new Opportunist<MustBeUnwrapped>() {
-
+		SketchyNosy nosy = new SketchyNosy(new Opportunist<Node>() {
 			@Override
-			public boolean take(MustBeUnwrapped node, Stack<Node> stack) throws IOException {
-				
-				if(node.unwrap(stack)) {
-					running = true;
+			public boolean take(Node node, NodeList<Node> stack) throws IOException {
+				if(node instanceof MustBeUnwrapped) {
+					MustBeUnwrapped must = (MustBeUnwrapped) node;
+					if(must.unwrap(stack)) running = true;
 				}
 				return true;
-				
 			}
-			
 		});
 		
 		int count = 0;

@@ -11,38 +11,51 @@ public class AwesomeWriter extends TabbedWriter {
 	}
 
 	protected AwesomeWriter closeBlock() throws IOException {
-		untab().nl().app("}");
+		tabLevel--;
+		appendable.append('\n');
+		appendable.append(tab, 0, tabLevel);
+		appendable.append('}');
 		return this;
 	}
 
 	protected AwesomeWriter openBlock() throws IOException {
-		nl().app('{').tab();
+		appendable.append("\n{");
+		tabLevel++;
 		return this;
 	}
 	
 	protected AwesomeWriter openSpacedBlock() throws IOException {
-		return openBlock().nl();
+		appendable.append("\n{\n");
+		tabLevel++;
+		appendable.append(tab, 0, tabLevel);
+		return this;
 	}
 	
 	protected AwesomeWriter closeSpacedBlock() throws IOException {
-		return closeBlock().nl().nl();
+		tabLevel--;
+		appendable.append('\n');
+		appendable.append(tab, 0, tabLevel);
+		appendable.append("}\n\n");
+		appendable.append(tab, 0, tabLevel);
+		return this;
 	}
 	
 	@Override
 	public AwesomeWriter tab() {
-		super.tab();
+		tabLevel++;
 		return this;
 	}
 	
 	@Override
 	public AwesomeWriter untab() {
-		super.untab();
+		tabLevel--;
 		return this;
 	}
 	
 	@Override
 	public AwesomeWriter nl() throws IOException {
-		super.nl();
+		appendable.append('\n');
+		appendable.append(tab, 0, tabLevel);
 		return this;
 	}
 	

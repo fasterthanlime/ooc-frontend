@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
@@ -62,7 +61,7 @@ public class MemberCall extends FunctionCall {
 	}
 	
 	@Override
-	public boolean resolve(Stack<Node> mainStack, Resolver res, final boolean fatal) throws IOException {
+	public boolean resolve(NodeList<Node> mainStack, Resolver res, final boolean fatal) throws IOException {
 
 		
 		Type exprType = expression.getType().getFlatType(res);

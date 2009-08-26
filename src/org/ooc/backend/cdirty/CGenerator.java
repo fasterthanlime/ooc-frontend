@@ -429,7 +429,9 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(StringLiteral stringLiteral) throws IOException {
-		current.app('"').app(SourceReader.spelled(stringLiteral.getValue())).app('"');
+		current.app('"');
+		SourceReader.spelled(stringLiteral.getValue(), current);
+		current.app('"');
 	}
 
 	@Override

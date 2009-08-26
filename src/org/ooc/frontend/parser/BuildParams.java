@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ooc.backends.Backend;
-import org.ooc.backends.BackendFactory;
 import org.ooc.frontend.PathList;
 import org.ooc.libs.DistLocator;
 
@@ -26,8 +24,6 @@ public class BuildParams {
 	public boolean link = true;
 	public boolean run = false;
 	public boolean dynGC = false; // Should link dynamically with libgc (Boehm)
-	
-	public Backend backend = BackendFactory.getBackend("gcc");
 	
 	public List<String> dynamicLibs = new ArrayList<String>();
 	

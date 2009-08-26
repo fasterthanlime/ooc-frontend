@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
@@ -33,7 +32,7 @@ public class MemberArgument extends Argument {
 	
 	// FIXME too much similar code with MemberAssignArgument. Share it somehow.
 	@Override
-	public boolean unwrap(Stack<Node> stack) throws OocCompilationError, EOFException {
+	public boolean unwrap(NodeList<Node> stack) throws OocCompilationError, EOFException {
 		
 		int typeIndex = Node.find(TypeDecl.class, stack);
 		if(typeIndex == -1) {
@@ -63,7 +62,7 @@ public class MemberArgument extends Argument {
 		
 	}
 
-	protected void doReplace(Stack<Node> stack, VariableDecl decl, FunctionDecl funcDecl) {
+	protected void doReplace(NodeList<Node> stack, VariableDecl decl, FunctionDecl funcDecl) {
 		stack.peek().replace(this, new RegularArgument(decl.getType(), name, startToken));
 	}
 	

@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
@@ -140,7 +139,7 @@ public class Type extends Node implements MustBeResolved {
 		return super.equals(obj);
 	}
 	
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal) throws IOException {
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal) throws IOException {
 
 		for(TypeDecl decl: res.types) {
 			if(decl.getName().equals(name)) {

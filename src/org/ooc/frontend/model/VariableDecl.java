@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeUnwrapped;
@@ -175,7 +174,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	@Override
-	public boolean unwrap(Stack<Node> stack) throws OocCompilationError, IOException {
+	public boolean unwrap(NodeList<Node> stack) throws OocCompilationError, IOException {
 
 		if(stack.get(stack.size() - 2) instanceof ClassDecl) {
 			unwrapToClassInitializers(stack, (ClassDecl) stack.get(stack.size() - 2));
@@ -187,7 +186,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected boolean unwrapToVarAcc(Stack<Node> stack) throws Error {
+	protected boolean unwrapToVarAcc(NodeList<Node> stack) throws Error {
 
 		if(stack.peek() instanceof Line
 		//|| stack.peek() instanceof Foreach
@@ -225,7 +224,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		
 	}
 
-	protected void unwrapToClassInitializers(Stack<Node> hierarchy, ClassDecl classDecl) {		
+	protected void unwrapToClassInitializers(NodeList<Node> hierarchy, ClassDecl classDecl) {		
 		
 		for(VariableDeclAtom atom: atoms) {
 

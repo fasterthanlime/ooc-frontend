@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.parser.BuildParams;
-import org.ooc.middle.hobgoblins.CaseEnforcer;
 import org.ooc.middle.hobgoblins.Checker;
 import org.ooc.middle.hobgoblins.CoverMerger;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
@@ -28,8 +27,6 @@ public class Tinkerer implements Hobgoblin {
 	@Override
 	public void process(Module module, BuildParams params) throws IOException {
 
-		new CaseEnforcer().process(module, params);
-		
 		new DefaultConstructorGiver().process(module, params);
 		new Unwrapper().process(module, params);
 		new CoverMerger().process(module, params);

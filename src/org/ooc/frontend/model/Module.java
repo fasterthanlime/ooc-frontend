@@ -2,9 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
@@ -121,7 +118,7 @@ public class Module extends Node implements Scope {
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
 			@Override
-			public boolean take(T node, Stack<Node> stack) throws IOException {
+			public boolean take(T node, NodeList<Node> stack) throws IOException {
 				
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {
@@ -137,9 +134,9 @@ public class Module extends Node implements Scope {
 		
 	}
 	
-	public <T extends Declaration> List<T> getDeclarationsList(final Class<T> clazz) throws IOException {
+	public <T extends Declaration> NodeList<T> getDeclarationsList(final Class<T> clazz) throws IOException {
 
-		final List<T> decls = new ArrayList<T>();
+		final NodeList<T> decls = new NodeList<T>();
 		this.getDeclarationsList(clazz, decls);
 		for(Import imp: imports) {
 			imp.getModule().getDeclarationsList(clazz, decls);
@@ -149,11 +146,11 @@ public class Module extends Node implements Scope {
 	}
 
 	protected <T extends Declaration> void getDeclarationsList(final Class<T> clazz,
-			final List<T> decls) throws IOException {
+			final NodeList<T> decls) throws IOException {
 		new Nosy<T> (clazz, new Opportunist<T>() {
 	
 			@Override
-			public boolean take(T node, Stack<Node> stack) throws IOException {
+			public boolean take(T node, NodeList<Node> stack) throws IOException {
 				
 				int index = Node.find(Scope.class, stack);
 				if(index == -1) {

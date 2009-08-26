@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.OpDecl.OpType;
@@ -82,7 +81,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 	}
 
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		
 		int assignIndex = Node.find(Assignment.class, stack);
@@ -99,7 +98,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	protected boolean tryIndexedAssign(OpDecl op, Stack<Node> stack, int assignIndex) throws OocCompilationError, EOFException {
+	protected boolean tryIndexedAssign(OpDecl op, NodeList<Node> stack, int assignIndex) throws OocCompilationError, EOFException {
 		
 		if(op.getOpType() != OpType.INDEXED_ASSIGN) return false;
 		
@@ -131,7 +130,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 	}
 
-	protected boolean tryIndexing(OpDecl op, Stack<Node> stack) throws OocCompilationError, EOFException {
+	protected boolean tryIndexing(OpDecl op, NodeList<Node> stack) throws OocCompilationError, EOFException {
 		
 		if(op.getOpType() != OpType.INDEXING) return false;
 		

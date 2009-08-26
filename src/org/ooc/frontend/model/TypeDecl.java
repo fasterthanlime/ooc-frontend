@@ -94,11 +94,11 @@ public abstract class TypeDecl extends Declaration {
 	}
 
 	public String getVariablesRepr() {
-		return variables.nodes.toString();
+		return variables.getNodes().toString();
 	}
 	
 	public String getFunctionsRepr() {
-		return functions.nodes.toString();
+		return functions.getNodes().toString();
 	}
 
 }

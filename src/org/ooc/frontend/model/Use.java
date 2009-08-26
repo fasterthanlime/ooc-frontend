@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
@@ -56,7 +55,7 @@ public class Use extends Node implements MustBeResolved {
 	}
 
 	@Override
-	public boolean resolve(Stack<Node> stack, Resolver res, boolean fatal)
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		useDef = UseDefParser.parse(identifier, res.params);
 		return useDef == null;

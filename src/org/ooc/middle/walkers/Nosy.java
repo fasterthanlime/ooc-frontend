@@ -1,9 +1,7 @@
 package org.ooc.middle.walkers;
 
 import java.io.IOException;
-import java.util.Stack;
 
-import org.ooc.backend.TabbedWriter;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Add;
 import org.ooc.frontend.model.AddressOf;
@@ -58,42 +56,28 @@ import org.ooc.frontend.model.VariableAccess;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
+import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.parser.TypeArgument;
 
 public class Nosy<T> implements Visitor {
 
-	public final Stack<Node> stack;
+	public final NodeList<Node> stack;
 	protected Class<T> clazz;
 	protected Opportunist<T> oppo;
 	protected boolean running = true;
-	protected boolean debug = false;
-	protected TabbedWriter writer = new TabbedWriter(System.out);
 	
 	public static <T> Nosy<T> get(Class<T> clazz, Opportunist<T> oppo) {
 		return new Nosy<T>(clazz, oppo);
 	}
 	
 	public Nosy(Class<T> clazz, Opportunist<T> oppo) {
-		this.stack = new Stack<Node>();
+		this.stack = new NodeList<Node>(Token.defaultToken);
 		this.clazz = clazz;
 		this.oppo = oppo;
 	}
 
 	public void visit(Node node) throws IOException {
-
 		if(!running) return; // if not running, do nothing
-
-		if(debug) { 
-			writer.newLine();
-			writer.append("<"+node);
-			if(node.hasChildren()) {
-				writer.append(">");
-				writer.tab();
-			} else {
-				writer.append("/>");
-			}
-
-		}
 		
 		if(node.hasChildren()) {
 			stack.push(node);
@@ -108,22 +92,10 @@ public class Nosy<T> implements Visitor {
 				running = false; // aborted. (D-Nied. Denied).
 			}
 		}
-
-		if(debug && node.hasChildren()) {
-			writer.untab();
-			writer.newLine();
-			writer.append("</"+node+">");
-		}
-		
 	}
 	
 	public Nosy<T> start() {
 		running = true;
-		return this;
-	}
-	
-	public Nosy<T> setDebug(boolean debug) {
-		this.debug = debug;
 		return this;
 	}
 	

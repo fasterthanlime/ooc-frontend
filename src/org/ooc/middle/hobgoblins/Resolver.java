@@ -1,13 +1,12 @@
 package org.ooc.middle.hobgoblins;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Stack;
 
 import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
@@ -16,19 +15,20 @@ import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
 import org.ooc.middle.structs.MultiMap;
-import org.ooc.middle.walkers.Nosy;
 import org.ooc.middle.walkers.Opportunist;
+import org.ooc.middle.walkers.SketchyNosy;
+
 
 public class Resolver implements Hobgoblin {
 
-	protected static final int MAX = 5;
+	protected static final int MAX = 1;
 	boolean running;
 	boolean fatal = false;
 	
 	public MultiMap<Node, VariableDecl> vars;
 	public MultiMap<Node, FunctionDecl> funcs;
-	public List<TypeDecl> types;
-	public List<OpDecl> ops;
+	public NodeList<TypeDecl> types;
+	public NodeList<OpDecl> ops;
 	public BuildParams params;
 	
 	@Override
@@ -37,12 +37,13 @@ public class Resolver implements Hobgoblin {
 		this.params = params;
 		getInfos(module);
 		
-		Nosy<MustBeResolved> nosy = Nosy.get(MustBeResolved.class, new Opportunist<MustBeResolved>() {
+		SketchyNosy nosy = SketchyNosy.get(new Opportunist<Node>() {
 			@Override
-			public boolean take(MustBeResolved node, Stack<Node> stack) throws IOException {
+			public boolean take(Node node, NodeList<Node> stack) throws IOException {
 				
-				if(!node.isResolved()) {
-					if(node.resolve(stack, Resolver.this, fatal)) {
+				if(node instanceof MustBeResolved) {
+					MustBeResolved must = (MustBeResolved) node;
+					if(!must.isResolved() && must.resolve(stack, Resolver.this, fatal)) {
 						running = true;
 					}
 				}
@@ -76,10 +77,9 @@ public class Resolver implements Hobgoblin {
 		ops = module.getDeclarationsList(OpDecl.class);
 	}
 	
-	protected void addBuiltins(List<TypeDecl> decls) {
+	protected void addBuiltins(NodeList<TypeDecl> decls) {
 		decls.add(new BuiltinType("Func"));
 		
-		// TODO This should probably not be hardcoded. Or should it? Think of meta.
 		decls.add(new BuiltinType("void"));
 		decls.add(new BuiltinType("short"));
 		decls.add(new BuiltinType("unsigned short"));

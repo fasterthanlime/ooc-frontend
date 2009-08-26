@@ -1,9 +1,9 @@
 package org.ooc.middle.walkers;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.NodeList;
 
 /**
  * A miner takes a list and searches for a node, from the top (end of the list)
@@ -13,9 +13,9 @@ import org.ooc.frontend.model.Node;
  */
 public class Miner {
 	
-	public static <T> void mine(Class<T> clazz, Opportunist<T> oppo, Stack<Node> orig) throws IOException {
+	public static <T> void mine(Class<T> clazz, Opportunist<T> oppo, NodeList<Node> orig) throws IOException {
 		
-		Stack<Node> copy = new Stack<Node>();
+		NodeList<Node> copy = new NodeList<Node>();
 		copy.addAll(orig);
 		
 		int index = orig.size();

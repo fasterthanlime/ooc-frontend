@@ -2,7 +2,6 @@ package org.ooc.frontend.model;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Stack;
 
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
@@ -78,12 +77,12 @@ public class VariableAccess extends Access implements MustBeResolved {
 	}
 
 	@Override
-	public boolean resolve(final Stack<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
+	public boolean resolve(final NodeList<Node> mainStack, final Resolver res, final boolean fatal) throws IOException {
 
 		if(isResolved()) return false;
 		
 		Miner.mine(Scope.class, new Opportunist<Scope>() {
-			public boolean take(Scope node, Stack<Node> stack) throws IOException {
+			public boolean take(Scope node, NodeList<Node> stack) throws IOException {
 				
 				Iterable<VariableDecl> vars = res.vars.get((Node) node);
 				for(VariableDecl varDecl: vars) {
@@ -173,7 +172,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 		
 	}
 
-	private String guessCorrectName(Stack<Node> mainStack, Resolver res) {
+	private String guessCorrectName(NodeList<Node> mainStack, Resolver res) {
 		
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;

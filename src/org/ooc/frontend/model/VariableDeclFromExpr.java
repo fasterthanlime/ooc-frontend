@@ -1,7 +1,6 @@
 package org.ooc.frontend.model;
 
 import java.io.IOException;
-import java.util.Stack;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.tokens.Token;
@@ -39,7 +38,7 @@ public class VariableDeclFromExpr extends VariableDecl {
 	}
 	
 	@Override
-	protected void unwrapToClassInitializers(Stack<Node> hierarchy,
+	protected void unwrapToClassInitializers(NodeList<Node> hierarchy,
 			ClassDecl classDecl) {
 		
 		super.unwrapToClassInitializers(hierarchy, classDecl);

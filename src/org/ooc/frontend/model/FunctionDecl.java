@@ -41,10 +41,8 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>(startToken);
-		this.body.setName("body of "+name);
 		this.returnType = name.equals("main") ? IntLiteral.type : new Type("Void", Token.defaultToken);
 		this.arguments = new NodeList<Argument>(startToken);
-		this.arguments.setName("args of "+name);
 		this.typeParams = new ArrayList<TypeParam>();
 	}
 	
@@ -157,7 +155,7 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		for(TypeParam typeParam: typeParams) {
+		if (typeParams.size() > 0) for (TypeParam typeParam: typeParams) {
 			typeParam.getType().accept(visitor);
 		}
 		arguments.accept(visitor);
