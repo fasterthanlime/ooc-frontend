@@ -180,7 +180,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 
 	protected void resolveConstructorCall(final NodeList<Node> mainStack, final boolean isSuper) throws OocCompilationError, EOFException {
 		
-		int typeIndex = Node.find(TypeDecl.class, mainStack);
+		int typeIndex = mainStack.find(TypeDecl.class);
 		if(typeIndex == -1) {
 			throw new OocCompilationError(this, mainStack, (isSuper ? "super" : "this")
 					+getArgsRepr()+" call outside a class declaration, doesn't make sense.");
@@ -216,7 +216,7 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 		TypeDecl typeDeclaration = null;
 		
-		int index = Node.find(TypeDecl.class, mainStack);
+		int index = mainStack.find(TypeDecl.class);
 		if(index != -1) {
 			typeDeclaration = (TypeDecl) mainStack.get(index);
 			impl = typeDeclaration.getFunction(this);

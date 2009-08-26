@@ -34,7 +34,7 @@ public class MemberArgument extends Argument {
 	@Override
 	public boolean unwrap(NodeList<Node> stack) throws OocCompilationError, EOFException {
 		
-		int typeIndex = Node.find(TypeDecl.class, stack);
+		int typeIndex = stack.find(TypeDecl.class);
 		if(typeIndex == -1) {
 			throw new OocCompilationError(this, stack, getClass().getSimpleName()
 					+" outside a class definition!");
@@ -49,7 +49,7 @@ public class MemberArgument extends Argument {
 		}
 		
 		
-		int funcIndex = Node.find(FunctionDecl.class, stack);
+		int funcIndex = stack.find(FunctionDecl.class);
 		if(funcIndex == -1) {
 			throw new OocCompilationError(this, stack, getClass().getSimpleName()
 					+" outside a function definition? What have" +

@@ -149,7 +149,7 @@ public class Type extends Node implements MustBeResolved {
 		}
 
 		if(ref == null && name.equals("This")) {
-			int index = Node.find(TypeDecl.class, stack);
+			int index = stack.find(TypeDecl.class);
 			if(index == -1) {
 				throw new OocCompilationError(this, stack, "Using 'This' outside a type definition. Wtf?");
 			}
@@ -160,7 +160,7 @@ public class Type extends Node implements MustBeResolved {
 		}
 		
 		if(ref == null) {
-			int genIndex = Node.find(Generic.class, stack);
+			int genIndex = stack.find(Generic.class);
 			if(genIndex != -1) {
 				Generic gen = (Generic) stack.get(genIndex);
 				List<TypeParam> params = gen.getTypeParams();

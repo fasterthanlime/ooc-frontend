@@ -16,11 +16,11 @@ public class Miner {
 	public static <T> void mine(Class<T> clazz, Opportunist<T> oppo, NodeList<Node> orig) throws IOException {
 		
 		NodeList<Node> copy = new NodeList<Node>();
-		copy.addAll(orig);
+		copy.setAll(orig);
 		
 		int index = orig.size();
 		while(index >= 0) {
-			index = Node.find(clazz, orig, index - 1);
+			index = orig.find(clazz, index - 1);
 			if(index == -1) return;
 			while(copy.size() > index) copy.pop();
 			if(!oppo.take(clazz.cast(orig.get(index)), copy)) break;

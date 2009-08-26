@@ -82,7 +82,7 @@ public class Checker implements Hobgoblin {
 			}
 			
 			private void checkFunctionDecl(FunctionDecl node, NodeList<Node> stack) throws IOException {
-				if(node.isConstructor() && Node.find(TypeDecl.class, stack) == -1) {
+				if(node.isConstructor() && stack.find(TypeDecl.class) == -1) {
 					// TODO forbid functions named load in modules (or __load__?)
 					throw new OocCompilationError(node, stack,
 						"Declaration of a function named 'new' outside a class is forbidden!" +
@@ -119,7 +119,7 @@ public class Checker implements Hobgoblin {
 				}
 				
 				if(!node.getReturnType().isVoid() && !node.isExtern() && !node.isAbstract()
-						&& !(node.isConstructor()&& Node.find(ClassDecl.class, stack) != -1)) {
+						&& !(node.isConstructor()&& stack.find(ClassDecl.class) != -1)) {
 					
 					if(node.getBody().isEmpty()) {
 						if(node.getName().equals("main")) {
@@ -151,7 +151,7 @@ public class Checker implements Hobgoblin {
 			
 			void throwError(FunctionDecl node, NodeList<Node> stack, String name)
 			throws OocCompilationError, EOFException {
-				if(name.equals("class") && Node.find(CoverDecl.class, stack) != -1) return;
+				if(name.equals("class") && stack.find(CoverDecl.class) != -1) return;
 				throw new OocCompilationError(node, stack,
 						"Two functions have the same name '"+name
 							+"', add suffix to one of them! e.g. "+name+": func ~suffix "+node.getArgsRepr()+" -> ReturnType");
@@ -192,7 +192,7 @@ public class Checker implements Hobgoblin {
 			private void checkValuedReturn(ValuedReturn node,
 					NodeList<Node> stack) throws EOFException {
 
-				FunctionDecl decl = (FunctionDecl) stack.get(Node.find(FunctionDecl.class, stack));
+				FunctionDecl decl = (FunctionDecl) stack.get(stack.find(FunctionDecl.class));
 				if(decl.getReturnType().isVoid()) {
 					throw new OocCompilationError(node, stack,
 							"Returning a value in function "+decl.getProtoRepr()

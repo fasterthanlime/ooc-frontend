@@ -239,4 +239,21 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	public T peek() {
 		return nodes[size - 1];
 	}
+	
+	public int find(Class<?> clazz) {
+		return find(clazz, size - 1);
+	}
+		
+	public int find(Class<?> clazz, int offset) {
+		int i = offset;
+		while(i >= 0) {
+			T node = nodes[i];
+			if(clazz.isInstance(node)) {
+				return i;
+			}
+			i--;
+		}
+		
+		return -1;
+	}
 }

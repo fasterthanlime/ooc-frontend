@@ -85,7 +85,7 @@ public class Instantiation extends FunctionCall {
 		} else if(stack.peek() instanceof VariableDeclAtom) {
 			VariableDeclAtom vda = (VariableDeclAtom) stack.peek();
 			if(vda.getExpression() == this) {
-				VariableDecl vd = (VariableDecl) stack.get(Node.find(VariableDecl.class, stack));
+				VariableDecl vd = (VariableDecl) stack.get(stack.find(VariableDecl.class));
 				if(vd.getType() == null) {
 					throw new OocCompilationError(this, stack, "Couldn't guess type of 'new'"
 							+stack.peek().getClass().getSimpleName()+")");

@@ -116,7 +116,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 		}, mainStack);
 		if(ref != null) return true;
 		
-		int typeIndex = Node.find(TypeDecl.class, mainStack);
+		int typeIndex = mainStack.find(TypeDecl.class);
 		if(typeIndex != -1) {
 			TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
 			if(name.equals("This")) {
@@ -146,7 +146,7 @@ public class VariableAccess extends Access implements MustBeResolved {
 			}
 		}
 		
-		int genIndex = Node.find(Generic.class, mainStack);
+		int genIndex = mainStack.find(Generic.class);
 		if(genIndex != -1) {
 			Generic gen = (Generic) mainStack.get(genIndex);
 			List<TypeParam> params = gen.getTypeParams();

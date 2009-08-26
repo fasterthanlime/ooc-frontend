@@ -89,7 +89,7 @@ public class ArrayLiteral extends Literal implements MustBeUnwrapped, MustBeReso
 	@Override
 	public boolean unwrap(NodeList<Node> stack) throws IOException {
 		
-		int varDeclIndex = Node.find(VariableDecl.class, stack);
+		int varDeclIndex = stack.find(VariableDecl.class);
 		
 		if(varDeclIndex == -1) {
 			stack.peek().replace(this, new VariableDeclFromExpr(

@@ -84,7 +84,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 		
-		int assignIndex = Node.find(Assignment.class, stack);
+		int assignIndex = stack.find(Assignment.class);
 		
 		for(OpDecl op: res.ops) {
 			if(assignIndex == -1) {

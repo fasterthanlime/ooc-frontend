@@ -204,12 +204,12 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		varAcc.setRef(this);
 		stack.peek().replace(this, varAcc);
 		
-		int lineIndex = find(Line.class, stack);
+		int lineIndex = stack.find(Line.class);
 		if(lineIndex == -1) {
 			throw new Error("Not in a line! How are we supposed to add one? Stack = "+stack);
 		}
 		Line line = (Line) stack.get(lineIndex);
-		int bodyIndex = find(NodeList.class, stack, lineIndex - 1);
+		int bodyIndex = stack.find(NodeList.class, lineIndex - 1);
 		if(bodyIndex == -1) {
 			throw new Error("Didn't find a nodelist containing the line! How are we suppoed to add one? Stack = "+stack);
 		}

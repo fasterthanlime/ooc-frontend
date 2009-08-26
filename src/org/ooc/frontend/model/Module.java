@@ -120,7 +120,7 @@ public class Module extends Node implements Scope {
 			@Override
 			public boolean take(T node, NodeList<Node> stack) throws IOException {
 				
-				int index = Node.find(Scope.class, stack);
+				int index = stack.find(Scope.class);
 				if(index == -1) {
 					throw new Error("Found declaration "+node.getName()+" of type "
 							+node.getType()+" outside of any NodeList!");
@@ -152,7 +152,7 @@ public class Module extends Node implements Scope {
 			@Override
 			public boolean take(T node, NodeList<Node> stack) throws IOException {
 				
-				int index = Node.find(Scope.class, stack);
+				int index = stack.find(Scope.class);
 				if(index == -1) {
 					throw new Error("Found declaration "+node.getName()+" of type "
 							+node.getType()+" outside of any NodeList!");
