@@ -21,7 +21,6 @@ import org.ooc.frontend.model.BuiltinType;
 import org.ooc.frontend.model.Cast;
 import org.ooc.frontend.model.CharLiteral;
 import org.ooc.frontend.model.ClassDecl;
-import org.ooc.frontend.model.Comment;
 import org.ooc.frontend.model.Compare;
 import org.ooc.frontend.model.ControlStatement;
 import org.ooc.frontend.model.CoverDecl;
@@ -454,8 +453,7 @@ public class CGenerator extends Generator implements Visitor {
 	public void visit(Line line) throws IOException {
 		current.nl();
 		line.getStatement().accept(this);
-		if(!(line.getStatement() instanceof ControlStatement)
-				&& !(line instanceof Comment)) {
+		if(!(line.getStatement() instanceof ControlStatement)) {
 			current.app(';');
 		}
 	}
@@ -677,7 +675,11 @@ public class CGenerator extends Generator implements Visitor {
 				current.nl().app(module.getLoadFuncName()).app("();");
 			}
 			
-			for(Line line: functionDecl.getBody()) line.accept(this);
+			for(Line line: functionDecl.getBody()) {
+				current.nl();
+				line.getStatement().accept(this);
+				current.app(';');
+			}
 			current.closeSpacedBlock();
 		}
 		

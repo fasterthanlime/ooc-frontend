@@ -8,8 +8,6 @@ import org.ooc.middle.hobgoblins.Checker;
 import org.ooc.middle.hobgoblins.CoverMerger;
 import org.ooc.middle.hobgoblins.DefaultConstructorGiver;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ooc.middle.hobgoblins.ReturnHandler;
-import org.ooc.middle.hobgoblins.SuffixConflictAnnihilator;
 import org.ooc.middle.hobgoblins.Unwrapper;
 
 /**
@@ -30,12 +28,8 @@ public class Tinkerer implements Hobgoblin {
 		new DefaultConstructorGiver().process(module, params);
 		new Unwrapper().process(module, params);
 		new CoverMerger().process(module, params);
-		
 		new Resolver().process(module, params);
-		
 		new Checker().process(module, params);
-		new SuffixConflictAnnihilator().process(module, params);
-		new ReturnHandler().process(module, params);
 		
 	}
 
