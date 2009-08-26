@@ -7,10 +7,10 @@ import java.io.IOException;
  * 
  * @author Amos Wenger
  */
-public interface Compiler {
+public interface AbstractCompiler {
 
 	/** -o option in gcc */
-	public void addOutputPath(String path);
+	public void setOutputPath(String path);
 	
 	/** -I option in gcc */
 	public void addIncludePath(String path);
@@ -35,5 +35,7 @@ public interface Compiler {
 	
 	/** @return the exit code of the compiler */
 	public int launch() throws IOException, InterruptedException;
+
+	public void printCommandLine();
 	
 }

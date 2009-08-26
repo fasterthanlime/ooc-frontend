@@ -1,6 +1,19 @@
 package org.ooc.frontend.compilers;
 
+/**
+ * Gnu Compilers Collection 
+ * 
+ * @author Amos Wenger
+ */
 public class Gcc extends BaseCompiler {
+
+	public Gcc() {
+		super("gcc");
+	}
+	
+	protected Gcc(String executableName) {
+		super(executableName);
+	}
 
 	@Override
 	public void addDynamicLibrary(String library) {
@@ -31,7 +44,7 @@ public class Gcc extends BaseCompiler {
 	}
 
 	@Override
-	public void addOutputPath(String path) {
+	public void setOutputPath(String path) {
 		command.add("-o");
 		command.add(path);
 	}

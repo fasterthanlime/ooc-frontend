@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -17,8 +16,11 @@ import org.ooc.backends.BackendFactory;
 import org.ooc.compiler.CompilerVersion;
 import org.ooc.compiler.Help;
 import org.ooc.compiler.ProcessUtils;
-import org.ooc.compiler.ReadEnv;
 import org.ooc.compiler.libraries.Target;
+import org.ooc.frontend.compilers.AbstractCompiler;
+import org.ooc.frontend.compilers.Gcc;
+import org.ooc.frontend.compilers.Icc;
+import org.ooc.frontend.compilers.Tcc;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Include;
 import org.ooc.frontend.model.Module;
@@ -47,11 +49,12 @@ public class CommandLine {
 	protected boolean timing = false;
 	List<String> additionals = new ArrayList<String>();
 	List<String> compilerArgs = new ArrayList<String>();
-	List<String> nasms = new ArrayList<String>();
+	private AbstractCompiler compiler = null;
 	
 	public CommandLine(String[] args) throws InterruptedException, IOException {
 		
 		String modulePath = "";
+		List<String> nasms = new ArrayList<String>();
 		
 		for(String arg: args) {
 			if(arg.startsWith("-")) {
@@ -134,6 +137,18 @@ public class CommandLine {
         			Help.printHelp();
         			System.exit(0);
         			
+        		} else if(option.equals("gcc")) {
+        			
+        			compiler = new Gcc();
+        			
+        		} else if(option.equals("icc")) {
+        			
+        			compiler = new Icc();
+        			
+        		} else if(option.equals("tcc")) {
+        			
+        			compiler = new Tcc();
+        			
         		} else if(option.equals("help-backends") || option.equals("-help-backends")) {
         			
         			Help.printHelpBackends();
@@ -186,8 +201,10 @@ public class CommandLine {
 			return;
 		}
 		
+		if(compiler == null) compiler = new Gcc();
+		
 		if(!nasms.isEmpty()) {
-			compileNasms();
+			compileNasms(nasms, additionals);
 		}
 		
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
@@ -201,7 +218,7 @@ public class CommandLine {
 		
 	}
 	
-	private void compileNasms() throws IOException, InterruptedException {
+	private void compileNasms(List<String> nasms, Collection<String> list) throws IOException, InterruptedException {
 		
 		boolean has = false;
 		
@@ -228,13 +245,13 @@ public class CommandLine {
 			
 			for(String nasm: nasms) {
 				if(nasm.endsWith(".s")) {
-					additionals.add(nasm.substring(0, nasm.length() - 1) + "o");
+					list.add(nasm.substring(0, nasm.length() - 1) + "o");
 				} else {
-					additionals.add(nasm);
+					list.add(nasm);
 				}
 			}
 		} else {
-			additionals.addAll(nasms);
+			list.addAll(nasms);
 		}
 		
 	}
@@ -283,60 +300,42 @@ public class CommandLine {
 			}
 		}
 		
-		List<String> command = new ArrayList<String>();
-		
-		Properties env = ReadEnv.getEnvVars();
-		String cc = env.getProperty("CC");
-		String compiler = cc == null ? "gcc" : cc;
-		command.add(findExec(compiler).getPath());
-	
-		if(params.debug) command.add("-g");
-		if(!compiler.equals("tcc")) command.add("-std=c99");
-		command.add("-I");
-		command.add(new File(params.distLocation, "libs/headers/").getPath());
-		command.add("-I");
-		command.add(params.outPath.getPath());
-		addDeps(command, module, new HashSet<Module>());
+		if(params.debug) compiler.setDebugEnabled();
+		compiler.addIncludePath(new File(params.distLocation, "libs/headers/").getPath());
+		compiler.addIncludePath(params.outPath.getPath());
+		addDeps(compiler, module, new HashSet<Module>());
 		for(String dynamicLib: params.dynamicLibs) {
-			command.add("-l");
-			command.add(dynamicLib);
+			compiler.addDynamicLibrary(dynamicLib);
 		}
-		command.addAll(additionals);
+		for(String additional: additionals) {
+			compiler.addObjectFile(additional);
+		}
+		for(String compilerArg: compilerArgs) {
+			compiler.addObjectFile(compilerArg);
+		}
 		
 		if(params.link) {
-			command.add("-o");
-			command.add(module.getSimpleName());
-			command.addAll(getAllLibsFromUses(module));
-			command.add(new File(params.distLocation, "libs/"
+			compiler.setOutputPath(module.getSimpleName());
+			Collection<String> libs = getAllLibsFromUses(module);
+			for(String lib: libs) compiler.addObjectFile(lib);
+			compiler.addObjectFile(new File(params.distLocation, "libs/"
 					+ Target.guessHost().toString() + "/libgc.a").getPath());
 		} else {
-			command.add("-c");
+			compiler.setCompileOnly();
 		}
 		
-		StringBuilder commandLine = new StringBuilder();
-		for(String arg: command) {
-			commandLine.append(arg);
-			commandLine.append(' ');
-		}
+		if(params.verbose) compiler.printCommandLine();
 		
-		if(params.verbose) {
-			System.out.println(commandLine.toString());
-		}
-		
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command(command);
-		
-		Process process = builder.start();
-		ProcessUtils.redirectIO(process);
-		int code = process.waitFor();
+		int code = compiler.launch();
 		if(code != 0) {
 			System.err.println("C compiler failed, aborting compilation process");
 			System.exit(code);
 		}
 		
 		if(params.run) {
+			ProcessBuilder builder = new ProcessBuilder();
 			builder.command("./"+module.getSimpleName());
-			process = builder.start();
+			Process process = builder.start();
 			ProcessUtils.redirectIO(process);
 			process.waitFor();
 		}
@@ -358,7 +357,7 @@ public class CommandLine {
 		done.add(module);
 		
 		for(Use use: module.getUses()) {
-			compileNasms();
+			compileNasms(use.getUseDef().getLibs(), list);
 		}
 		
 		for(Import imp: module.getImports()) {
@@ -380,14 +379,14 @@ public class CommandLine {
 		
 	}
 
-	protected void addDeps(List<String> command, Module module, Set<Module> done) {
+	protected void addDeps(AbstractCompiler compiler, Module module, Set<Module> done) {
 		
 		done.add(module);
-		command.add(new File(params.outPath, module.getPath(".c")).getPath());
+		compiler.addObjectFile(new File(params.outPath, module.getPath(".c")).getPath());
 		
 		for(Import imp: module.getImports()) {
 			if(!done.contains(imp.getModule())) {
-				addDeps(command, imp.getModule(), done);
+				addDeps(compiler, imp.getModule(), done);
 			}
 		}
 		
