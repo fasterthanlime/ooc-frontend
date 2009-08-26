@@ -18,6 +18,7 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 
 	protected FunctionDecl initialize;
 	protected FunctionDecl load;
+	protected FunctionDecl defaultConstructor;
 	
 	public ClassDecl(String name, String superName, boolean isAbstract, Token startToken) {
 		super(name, startToken);
@@ -30,6 +31,9 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 		this.load.setStatic(true);
 		this.load.setTypeDecl(this);
 		this.superRef = null;
+		FunctionDecl constructor = new FunctionDecl("new", "", false, false, false, false, startToken);
+		addFunction(constructor);
+		this.defaultConstructor = constructor;
 	}
 
 	public boolean isObjectClass() {
@@ -82,6 +86,15 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 	
 	public void setSuperRef(ClassDecl superRef) {
 		this.superRef = superRef;
+	}
+	
+	@Override
+	public void addFunction(FunctionDecl decl) {
+		if(defaultConstructor != null && decl.isConstructor()) {
+			functions.remove(defaultConstructor);
+			defaultConstructor = null;
+		}
+		super.addFunction(decl);
 	}
 	
 	@Override

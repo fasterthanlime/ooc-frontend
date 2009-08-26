@@ -40,7 +40,6 @@ public class MemberArgument extends Argument {
 		}
 		
 		TypeDecl typeDecl = (TypeDecl) stack.get(typeIndex);
-		System.out.println("Looking for "+name+" in "+typeDecl+" with vars "+typeDecl.getVariablesRepr());
 		VariableDecl varDecl = typeDecl.getVariable(name);
 		if(varDecl == null) {
 			throw new OocCompilationError(this, stack, getClass().getSimpleName()
