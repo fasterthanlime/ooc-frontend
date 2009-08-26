@@ -103,6 +103,10 @@ public class CommandLine {
         			
         			params.dynamicLibs.add(arg.substring(2));
         			
+        		} else if(option.equals("dyngc")) {
+        			
+        			params.dynGC = true;
+        			
         		} else if(option.equals("noclean")) {
         			
         			params.clean = false;
@@ -300,7 +304,7 @@ public class CommandLine {
 			}
 		}
 		
-		if(params.debug) compiler.setDebugEnabled();
+		if(params.debug) compiler.setDebugEnabled();		
 		compiler.addIncludePath(new File(params.distLocation, "libs/headers/").getPath());
 		compiler.addIncludePath(params.outPath.getPath());
 		addDeps(compiler, module, new HashSet<Module>());
@@ -318,8 +322,13 @@ public class CommandLine {
 			compiler.setOutputPath(module.getSimpleName());
 			Collection<String> libs = getAllLibsFromUses(module);
 			for(String lib: libs) compiler.addObjectFile(lib);
-			compiler.addObjectFile(new File(params.distLocation, "libs/"
-					+ Target.guessHost().toString() + "/libgc.a").getPath());
+			
+			if(params.dynGC) {
+				compiler.addDynamicLibrary("gc");
+			} else {
+				compiler.addObjectFile(new File(params.distLocation, "libs/"
+						+ Target.guessHost().toString() + "/libgc.a").getPath());
+			}
 		} else {
 			compiler.setCompileOnly();
 		}

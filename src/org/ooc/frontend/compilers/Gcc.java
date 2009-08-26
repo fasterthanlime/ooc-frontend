@@ -17,20 +17,17 @@ public class Gcc extends BaseCompiler {
 
 	@Override
 	public void addDynamicLibrary(String library) {
-		command.add("-l");
-		command.add(library);
+		command.add("-l"+library);
 	}
 
 	@Override
 	public void addIncludePath(String path) {
-		command.add("-I");
-		command.add(path);
+		command.add("-I"+path);
 	}
 
 	@Override
 	public void addLibraryPath(String path) {
-		command.add("-L");
-		command.add(path);
+		command.add("-L"+path);
 	}
 
 	@Override
@@ -45,8 +42,7 @@ public class Gcc extends BaseCompiler {
 
 	@Override
 	public void setOutputPath(String path) {
-		command.add("-o");
-		command.add(path);
+		command.add("-o"+path);
 	}
 
 	@Override

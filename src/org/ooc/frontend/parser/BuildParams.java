@@ -25,6 +25,7 @@ public class BuildParams {
 	public boolean shout = false;
 	public boolean link = true;
 	public boolean run = false;
+	public boolean dynGC = false; // Should link dynamically with libgc (Boehm)
 	
 	public Backend backend = BackendFactory.getBackend("gcc");
 	
