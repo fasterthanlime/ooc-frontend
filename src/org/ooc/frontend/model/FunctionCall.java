@@ -11,8 +11,6 @@ import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ooc.middle.walkers.Miner;
-import org.ooc.middle.walkers.Opportunist;
 
 public class FunctionCall extends Access implements MustBeResolved {
 
@@ -148,15 +146,19 @@ public class FunctionCall extends Access implements MustBeResolved {
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
 		
+		NodeList<FunctionDecl> funcs = new NodeList<FunctionDecl>();
+		
 		for(int i = mainStack.size() - 1; i >= 0; i--) {
-			if(!(mainStack.get(i) instanceof Scope)) continue;
-			
-			for(FunctionDecl decl: res.funcs.get(mainStack.get(i))) {
-				int distance = Levenshtein.distance(name, decl.getName());
-				if(distance < bestDistance) {
-					bestDistance = distance;
-					bestMatch = decl.getProtoRepr();
-				}
+			Node node = mainStack.get(i);
+			if(!(node instanceof Scope)) continue;
+			((Scope) node).getFunctions(funcs);
+		}
+		
+		for(FunctionDecl decl: funcs) {
+			int distance = Levenshtein.distance(name, decl.getName());
+			if(distance < bestDistance) {
+				bestDistance = distance;
+				bestMatch = decl.getProtoRepr();
 			}
 		}
 		
@@ -210,63 +212,45 @@ public class FunctionCall extends Access implements MustBeResolved {
 		
 	}
 	
-	protected void resolveRegular(final NodeList<Node> mainStack,
-			final Resolver res, final boolean fatal)
-			throws IOException {
+	protected void resolveRegular(NodeList<Node> stack, Resolver res, boolean fatal) throws IOException {
 		
-		TypeDecl typeDeclaration = null;
-		
-		int index = mainStack.find(TypeDecl.class);
-		if(index != -1) {
-			typeDeclaration = (TypeDecl) mainStack.get(index);
-			impl = typeDeclaration.getFunction(this);
-		}
-		
-		if(impl == null) {
-			Miner.mine(Scope.class, new Opportunist<Scope>() {
-				public boolean take(Scope node, NodeList<Node> stack) throws IOException {
+		impl = getFunction(name, this, stack);
 
-					for(FunctionDecl decl: res.funcs.get((Node) node)) {
-						if(matches(decl)) {
-							impl = decl;
-							return false;
-						}
-					}
-					return true;
-				}
-			}, mainStack);
-		}
-		
 		if(impl == null) {
-			Module module = (Module) mainStack.get(0);
+			Module module = (Module) stack.get(0);
 			for(Import imp: module.getImports()) {
 				searchIn(imp.getModule());
 				if(impl != null) break;
 			}
 		}
 		
-		if(impl == null && typeDeclaration != null) {
-			for(VariableDecl varDecl: typeDeclaration.getVariables()) {
-				if(varDecl.getType() instanceof FuncType && varDecl.getName().equals(name)) {
-					FuncType funcType = (FuncType) varDecl.getType();
-					if(matchesArgs(funcType.getDecl())) {
-						impl = funcType.getDecl();
-						break;
+		if(impl == null) {
+			int typeIndex = stack.find(TypeDecl.class);
+			if(typeIndex != -1) {
+				TypeDecl typeDeclaration = (TypeDecl) stack.get(typeIndex);
+				for(VariableDecl varDecl: typeDeclaration.getVariables()) {
+					if(varDecl.getType() instanceof FuncType && varDecl.getName().equals(name)) {
+						FuncType funcType = (FuncType) varDecl.getType();
+						if(matchesArgs(funcType.getDecl())) {
+							impl = funcType.getDecl();
+							break;
+						}
 					}
 				}
 			}
 		}
 		
-		if(impl != null) {
-			if(impl.isMember() || impl.isFromPointer()) {
-				VariableAccess thisAccess = new VariableAccess("this", startToken);
-				thisAccess.resolve(mainStack, res, fatal);
-				MemberCall memberCall = new MemberCall(thisAccess, FunctionCall.this, startToken);
-				memberCall.setImpl(impl);
-				mainStack.peek().replace(FunctionCall.this, memberCall);
-			}
-		}
+		if(impl.isMember() || impl.isFromPointer()) transformToMemberCall(stack, res);
 		
+	}
+
+	private void transformToMemberCall(final NodeList<Node> stack,
+			final Resolver res) throws IOException {
+		VariableAccess thisAccess = new VariableAccess("this", startToken);
+		thisAccess.resolve(stack, res, true);
+		MemberCall memberCall = new MemberCall(new VariableAccess("this", startToken), this, startToken);
+		memberCall.setImpl(impl);
+		stack.peek().replace(this, memberCall);
 	}
 	
 	protected void searchIn(Module module) {

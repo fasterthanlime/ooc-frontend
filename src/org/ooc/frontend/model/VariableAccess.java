@@ -9,8 +9,6 @@ import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
-import org.ooc.middle.walkers.Miner;
-import org.ooc.middle.walkers.Opportunist;
 
 public class VariableAccess extends Access implements MustBeResolved {
 
@@ -81,41 +79,33 @@ public class VariableAccess extends Access implements MustBeResolved {
 
 		if(isResolved()) return false;
 		
-		Miner.mine(Scope.class, new Opportunist<Scope>() {
-			public boolean take(Scope node, NodeList<Node> stack) throws IOException {
-				
-				Iterable<VariableDecl> vars = res.vars.get((Node) node);
-				for(VariableDecl varDecl: vars) {
-					if(varDecl.hasAtom(name)) {
-						if(varDecl.isMember()) {
-							VariableAccess thisAccess = new VariableAccess("this", startToken);
-							thisAccess.setRef(varDecl);
-							MemberAccess membAcc =  new MemberAccess(thisAccess, name, startToken);
-							membAcc.resolve(mainStack, res, fatal);
-							membAcc.setRef(varDecl);
-							if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
-								throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
-							}
-						}
-						ref = varDecl;
-						return false;
+		{
+			VariableDecl varDecl = getVariable(name, mainStack);
+			if(varDecl != null) {
+				if(varDecl.isMember()) {
+					VariableAccess thisAccess = new VariableAccess("this", startToken);
+					thisAccess.setRef(varDecl);
+					MemberAccess membAcc =  new MemberAccess(thisAccess, name, startToken);
+					membAcc.resolve(mainStack, res, fatal);
+					membAcc.setRef(varDecl);
+					if(!mainStack.peek().replace(VariableAccess.this, membAcc)) {
+						throw new Error("Couldn't replace a VariableAccess with a MemberAccess!");
 					}
 				}
-				
-				Iterable<FunctionDecl> funcs = res.funcs.get((Node) node);
-				for(FunctionDecl func: funcs) {
-					if(func.getName().equals(name)) {
-						ref = func;
-						return false;
-					}
-				}
-				
-				return true;
-				
+				ref = varDecl;
+				return false;
 			}
-		}, mainStack);
-		if(ref != null) return true;
+		}
 		
+		{
+			FunctionDecl func = getFunction(name, null, mainStack);
+			if(func != null) {
+				ref = func;
+				return false;
+			}
+		}
+		
+		if(ref != null) return false;
 		int typeIndex = mainStack.find(TypeDecl.class);
 		if(typeIndex != -1) {
 			TypeDecl typeDecl = (TypeDecl) mainStack.get(typeIndex);
@@ -177,15 +167,20 @@ public class VariableAccess extends Access implements MustBeResolved {
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
 		
+		NodeList<VariableDecl> variables = new NodeList<VariableDecl>();
+		
 		for(int i = mainStack.size() - 1; i >= 0; i--) {
-			if(!(mainStack.get(i) instanceof Scope)) continue;
-			
-			for(VariableDecl decl: res.vars.get(mainStack.get(i))) {
-				int distance = Levenshtein.distance(name, decl.getName());
-				if(distance < bestDistance) {
-					bestDistance = distance;
-					bestMatch = decl.getName();
-				}
+			Node node = mainStack.get(i);
+			if(!(node instanceof Scope)) continue;
+			Scope scope = (Scope) node;
+			scope.getVariables(variables);
+		}
+		
+		for(VariableDecl decl: variables) {
+			int distance = Levenshtein.distance(name, decl.getName());
+			if(distance < bestDistance) {
+				bestDistance = distance;
+				bestMatch = decl.getName();
 			}
 		}
 		

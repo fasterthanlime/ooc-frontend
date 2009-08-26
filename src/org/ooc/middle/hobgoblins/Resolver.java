@@ -3,18 +3,15 @@ package org.ooc.middle.hobgoblins;
 import java.io.IOException;
 
 import org.ooc.frontend.model.BuiltinType;
-import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
 import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeDecl;
-import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.middle.Hobgoblin;
-import org.ooc.middle.structs.MultiMap;
 import org.ooc.middle.walkers.Opportunist;
 import org.ooc.middle.walkers.SketchyNosy;
 
@@ -25,10 +22,8 @@ public class Resolver implements Hobgoblin {
 	boolean running;
 	boolean fatal = false;
 	
-	public MultiMap<Node, VariableDecl> vars;
-	public MultiMap<Node, FunctionDecl> funcs;
-	public NodeList<TypeDecl> types;
-	public NodeList<OpDecl> ops;
+	public NodeList<TypeDecl> types = new NodeList<TypeDecl>();
+	public NodeList<OpDecl> ops =  new NodeList<OpDecl>();
 	public BuildParams params;
 	
 	@Override
@@ -70,11 +65,11 @@ public class Resolver implements Hobgoblin {
 	}
 
 	protected void getInfos(Module module) throws IOException {
-		vars = module.getDeclarationsMap(VariableDecl.class);
-		funcs = module.getDeclarationsMap(FunctionDecl.class);
+		
 		types = module.getDeclarationsList(TypeDecl.class);
 		addBuiltins(types);
 		ops = module.getDeclarationsList(OpDecl.class);
+		
 	}
 	
 	protected void addBuiltins(NodeList<TypeDecl> decls) {

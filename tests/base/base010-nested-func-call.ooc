@@ -4,7 +4,7 @@ srand: extern func (Int)
 rand: extern func -> Int
 time: extern func (TimeT)
 
-random: func (max : Int) -> Int {
+number: func (max : Int) -> Int {
 	
 	srand(time(null))
 	return (rand() + 1) % max
@@ -13,6 +13,6 @@ random: func (max : Int) -> Int {
 
 main: func {
 
-	printf("The answer is %d\n", random(random(random(random(random(random(2500)))))))
+	printf("The answer is %d\n", number(number(number(number(number((2500)))))))
 
 }

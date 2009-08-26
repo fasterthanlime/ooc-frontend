@@ -188,11 +188,13 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	@SuppressWarnings("unchecked")
 	protected boolean unwrapToVarAcc(NodeList<Node> stack) throws Error {
 
-		if(stack.peek() instanceof Line
-		//|| stack.peek() instanceof Foreach
-		|| stack.get(stack.size() - 2) instanceof Module
-		|| stack.get(stack.size() - 2) instanceof FunctionDecl
-		|| stack.get(stack.size() - 2) instanceof TypeDecl
+		Node parent = stack.peek();
+		Node grandpa = stack.get(stack.size() - 2);
+		
+		if(parent instanceof Line
+		|| grandpa instanceof Module
+		|| grandpa instanceof FunctionDecl
+		|| grandpa instanceof TypeDecl
 		) {
 			return false;
 		}
@@ -200,9 +202,22 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		if(atoms.size() != 1) {
 			throw new Error("Multi-var decls used an expression.. wtf?");
 		}
-		VariableAccess varAcc = new VariableAccess(atoms.get(0).name, atoms.get(0).startToken);
+		VariableDeclAtom atom = atoms.get(0);
+		VariableAccess varAcc = new VariableAccess(atom.name, atom.startToken);
 		varAcc.setRef(this);
-		stack.peek().replace(this, varAcc);
+		parent.replace(this, varAcc);
+		
+		if(parent instanceof NodeList<?>) {
+			NodeList<Node> list = (NodeList<Node>) parent;
+			for(Node node: list) {
+				if(node instanceof VariableAccess) {
+					VariableAccess brother = (VariableAccess) node;
+					if(brother.name.equals(atom.name)) {
+						brother.setRef(this);
+					}
+				}
+			}
+		}
 		
 		int lineIndex = stack.find(Line.class);
 		if(lineIndex == -1) {
@@ -216,8 +231,8 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		
 		NodeList<Line> body = (NodeList<Line>) stack.get(bodyIndex);
 		Block block = new Block(body.startToken);
-		block.getBody().add(new Line(this));
-		block.getBody().add(line);
+		block.body.add(new Line(this));
+		block.body.add(line);
 		body.replace(line, new Line(block));
 		
 		return true;

@@ -51,7 +51,6 @@ public class Foreach extends ControlStatement {
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
 		if(oldie == variable) {
 			variable = (Expression) kiddo;
 			return true;
@@ -63,7 +62,30 @@ public class Foreach extends ControlStatement {
 		}
 		
 		return false;
-		
+	}
+	
+	@Override
+	public VariableDecl getVariable(String name) {
+		if(variable instanceof VariableDecl) {
+			VariableDecl varDecl = (VariableDecl) variable;
+			if(varDecl.getName().equals(name)) return varDecl;
+		} else if(variable instanceof VariableAccess) {
+			VariableAccess varAcc = (VariableAccess) variable;
+			if(varAcc.getName().equals(name)) return (VariableDecl) varAcc.getRef();
+		}
+		return super.getVariable(name);
+	}
+	
+	@Override
+	public void getVariables(NodeList<VariableDecl> variables) {
+		if(variable instanceof VariableDecl) {
+			VariableDecl varDecl = (VariableDecl) variable;
+			variables.add(varDecl);
+		} else if(variable instanceof VariableAccess) {
+			VariableAccess varAcc = (VariableAccess) variable;
+			variables.add((VariableDecl) varAcc.getRef());
+		}
+		super.getVariables(variables);
 	}
 	
 }

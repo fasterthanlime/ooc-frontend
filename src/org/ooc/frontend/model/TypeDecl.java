@@ -3,7 +3,7 @@ package org.ooc.frontend.model;
 import org.ooc.frontend.model.tokens.Token;
 
 
-public abstract class TypeDecl extends Declaration {
+public abstract class TypeDecl extends Declaration implements Scope {
 
 	protected NodeList<VariableDecl> variables;
 	protected NodeList<FunctionDecl> functions;
@@ -33,6 +33,11 @@ public abstract class TypeDecl extends Declaration {
 		return variables;
 	}
 	
+	@Override
+	public void getVariables(NodeList<VariableDecl> variables) {
+		variables.addAll(this.variables);
+	}
+	
 	public void addVariable(VariableDecl decl) {
 		decl.setTypeDecl(this);
 		variables.add(decl);
@@ -40,6 +45,20 @@ public abstract class TypeDecl extends Declaration {
 	
 	public Iterable<FunctionDecl> getFunctions() {
 		return functions;
+	}
+	
+	@Override
+	public FunctionDecl getFunction(String name, FunctionCall call) {
+		for(FunctionDecl func : functions) {
+			if(func.getName().equals(name)
+					&& (call == null || call.matches(func))) return func;
+		}
+		return null;
+	}
+	
+	@Override
+	public void getFunctions(NodeList<FunctionDecl> functions) {
+		functions.addAll(this.functions);
 	}
 	
 	public void addFunction(FunctionDecl decl) {
@@ -94,11 +113,11 @@ public abstract class TypeDecl extends Declaration {
 	}
 
 	public String getVariablesRepr() {
-		return variables.getNodes().toString();
+		return variables.toString();
 	}
 	
 	public String getFunctionsRepr() {
-		return functions.getNodes().toString();
+		return functions.toString();
 	}
 
 }

@@ -200,14 +200,44 @@ public class Module extends Node implements Scope {
 	}
 
 	@Override
-	public boolean hasVariable(String name) {
+	public VariableDecl getVariable(String name) {
 		for(Node node: body) {
 			if(node instanceof VariableDecl) {
-				VariableDecl vDecl = (VariableDecl) node;
-				if(vDecl.getName().equals(name)) return true;
+				VariableDecl varDecl = (VariableDecl) node;
+				if(varDecl.getName().equals(name)) return varDecl;
 			}
 		}
-		return false;
+		return null;
+	}
+
+	@Override
+	public void getVariables(NodeList<VariableDecl> variables) {
+		for(Node node: body) {
+			if(node instanceof VariableDecl) {
+				variables.add((VariableDecl) node);
+			}
+		}
+	}
+
+	@Override
+	public FunctionDecl getFunction(String name, FunctionCall call) {
+		for(Node node: body) {
+			if(node instanceof FunctionDecl) {
+				FunctionDecl func = (FunctionDecl) node;
+				if(func.getName().equals(name)
+						&& (call == null || call.matches(func))) return func;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void getFunctions(NodeList<FunctionDecl> functions) {
+		for(Node node: body) {
+			if(node instanceof FunctionDecl) {
+				functions.add((FunctionDecl) node);
+			}
+		}
 	}
 	
 }

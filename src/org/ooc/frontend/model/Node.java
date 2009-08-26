@@ -26,15 +26,30 @@ public abstract class Node implements Visitable {
 		return name;
 	}
 
-	private boolean hasVariable(String name, NodeList<Node> stack) {
-		return hasVariable(name, stack, stack.find(Scope.class));
+	public boolean hasVariable(String name, NodeList<Node> stack) {
+		return getVariable(name, stack) != null;
 	}
 
-	private boolean hasVariable(String name, NodeList<Node> stack, int index) {
-		if(index == -1) return false;
-		Scope scope = (Scope) stack.get(index);
-		if(scope.hasVariable(name)) return true;
-		return hasVariable(name, stack, stack.find(Scope.class, index - 1));
+	public VariableDecl getVariable(String name, NodeList<Node> stack) {
+		return getVariable(name, stack, stack.find(Scope.class));
+	}
+
+	public VariableDecl getVariable(String name, NodeList<Node> stack, int index) {
+		if(index == -1) return null;
+		VariableDecl varDecl = ((Scope) stack.get(index)).getVariable(name);
+		if(varDecl != null) return varDecl;
+		return getVariable(name, stack, stack.find(Scope.class, index - 1));
+	}
+	
+	public FunctionDecl getFunction(String name, FunctionCall call, NodeList<Node> stack) {
+		return getFunction(name, call, stack, stack.find(Scope.class));
+	}
+
+	public FunctionDecl getFunction(String name, FunctionCall call, NodeList<Node> stack, int index) {
+		if(index == -1) return null;
+		FunctionDecl func = ((Scope) stack.get(index)).getFunction(name, call);
+		if(func != null) return func;
+		return getFunction(name, call, stack, stack.find(Scope.class, index - 1));
 	}
 	
 }

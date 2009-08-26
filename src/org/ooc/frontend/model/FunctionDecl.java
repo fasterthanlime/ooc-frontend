@@ -201,7 +201,9 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 	@Override
 	public String toString() {
 		
-		return getClass().getSimpleName()+" : "+name+getArgsRepr();
+		String repr = getClass().getSimpleName()+" : "+name+getArgsRepr();
+		if(isMember()) repr = "[member] " + repr;
+		return repr;
 		
 	}
 
@@ -248,11 +250,40 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 	}
 
 	@Override
-	public boolean hasVariable(String name) {
-		for(Argument argument: arguments) {
-			if(argument.hasAtom(name)) return true;
+	public VariableDecl getVariable(String name) {
+		if(arguments.size > 0) for(Argument argument: arguments) {
+			if(argument.hasAtom(name)) return argument;
 		}
-		return false;
+		if(body.size > 0) for(Line line: body) {
+			Node node = line.getStatement();
+			if(node instanceof VariableDecl) {
+				VariableDecl varDecl = (VariableDecl) node;
+				if(varDecl.hasAtom(name)) return varDecl;
+			}
+		}
+		return null;
 	}
+
+	@Override
+	public void getVariables(NodeList<VariableDecl> variables) {
+		if(arguments.size > 0) for(Argument argument: arguments) {
+			if(argument.hasAtom(name)) variables.add(argument);
+		}
+		if(body.size > 0) for(Line line: body) {
+			Node node = line.getStatement();
+			if(node instanceof VariableDecl) {
+				VariableDecl varDecl = (VariableDecl) node;
+				if(varDecl.hasAtom(name)) variables.add(varDecl);
+			}
+		}
+	}
+
+	@Override
+	public FunctionDecl getFunction(String name, FunctionCall call) {
+		return null;
+	}
+
+	@Override
+	public void getFunctions(NodeList<FunctionDecl> functions) {}
 	
 }

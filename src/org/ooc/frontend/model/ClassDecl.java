@@ -8,7 +8,7 @@ import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
 
-public class ClassDecl extends TypeDecl implements Scope, MustBeResolved {
+public class ClassDecl extends TypeDecl implements MustBeResolved {
 
 	protected boolean isAbstract;
 	
@@ -151,14 +151,11 @@ public class ClassDecl extends TypeDecl implements Scope, MustBeResolved {
 		if(superRef != null) return superRef.getVariable(name);
 		return null;
 	}
-
+	
 	@Override
-	public boolean hasVariable(String name) {
-		for(VariableDecl variable: variables) {
-			if(variable.getName().equals(name)) return true;
-		}
-		
-		return false;
+	public void getVariables(NodeList<VariableDecl> variables) {
+		super.getVariables(variables);
+		if(superRef != null) superRef.getVariables(variables);
 	}
 
 	@Override
