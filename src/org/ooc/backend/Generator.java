@@ -7,12 +7,10 @@ import org.ooc.frontend.model.Module;
 
 public abstract class Generator {
 
-	protected Module module;
+	public final Module module;
 
 	public Generator(File outPath, Module module) {
-		
 		this.module = module;
-		
 	}
 	
 	public abstract void generate() throws IOException;
