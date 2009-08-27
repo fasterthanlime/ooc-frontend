@@ -11,4 +11,10 @@ public class Tcc extends Gcc {
 		super("tcc");
 	}
 	
+	@Override
+	public void reset() {
+		command.clear();
+		command.add(executablePath);
+	}
+	
 }

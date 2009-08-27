@@ -34,19 +34,12 @@ import org.ooc.outputting.FileUtils;
 public class CommandLine {
 	
 	public static void main(String[] argv) throws InterruptedException, IOException {
-		
-		if(argv.length == 0) {
-			System.out.println("Usage: ooc [OPTIONS] file.ooc");
-			System.exit(0);
-		}
-		
 		try {
 			new CommandLine(argv);
 		} catch(OocCompilationError err) {
 			System.err.println(err);
 			System.exit(1);
 		}
-	
 	}
 	
 	protected BuildParams params = new BuildParams();
@@ -56,7 +49,7 @@ public class CommandLine {
 	
 	public CommandLine(String[] args) throws InterruptedException, IOException {
 		
-		String modulePath = "";
+		List<String> modulePaths = new ArrayList<String>();
 		List<String> nasms = new ArrayList<String>();
 		
 		for(String arg: args) {
@@ -172,6 +165,12 @@ public class CommandLine {
         			Help.printHelpNone();
         			System.exit(0);
         			
+        		} else if(option.equals("daemon")) {
+        			
+        			new CompilerDaemon();
+
+        			System.exit(0);
+        			
         		} else {
         			
         			System.err.println("Unrecognized option: '"+arg+"'");
@@ -180,26 +179,18 @@ public class CommandLine {
         	} else if(arg.startsWith("+")) {
         		compilerArgs.add(arg.substring(1));
         	} else {
-        		if(!modulePath.isEmpty()) {
-        			if(arg.toLowerCase().endsWith(".s")) {
+        			String lowerArg = arg.toLowerCase();
+					if(lowerArg.endsWith(".s")) {
         				nasms.add(arg);
-        			} else if(!arg.toLowerCase().endsWith(".ooc")) {
+        			} else if(lowerArg.endsWith(".o") || lowerArg.endsWith(".c") || lowerArg.endsWith(".cpp")) {
             			additionals.add(arg);
             		} else {
-            			System.err.println("You can't specify multiple .ooc files at command line."
-        					+"\nDependencies are resolved automatically, so just specify your main file");
-            			return;
+        				modulePaths.add(arg);
             		}
-        		} else {
-        			modulePath = arg;
-        			if(!arg.toLowerCase().endsWith(".ooc")) {
-        				modulePath += ".ooc";
-        			}
-        		}
         	}
 		}
 		
-		if(modulePath.isEmpty()) {
+		if(modulePaths.isEmpty()) {
 			System.err.println("ooc: no files.");
 			return;
 		}
@@ -212,11 +203,12 @@ public class CommandLine {
 		
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
 		params.sourcePath.add(params.distLocation + File.separator + "sdk");
-		
-		parse(modulePath);
-		
-		if(params.clean) {
-			FileUtils.deleteRecursive(params.outPath);
+	
+		for(String modulePath: modulePaths) {
+			parse(modulePath);
+			if(params.clean) {
+				FileUtils.deleteRecursive(params.outPath);
+			}
 		}
 		
 	}
@@ -273,12 +265,22 @@ public class CommandLine {
 		compile(module);
 		long tt5 = System.nanoTime();
 
-		if(params.timing)
-			System.out.printf("parse: %.2f ms, tink: %.2f ms, out: %.2f, cc: %.2f ms\n",
+		if(params.timing) {
+			System.out.printf("parse: %.2f ms, tink: %.2f ms, out: %.2f, cc: %.2f ms, TOTAL %.2f ms\n",
 					Float.valueOf((tt2 - tt1) / 1000000.0f),
 					Float.valueOf((tt3 - tt2) / 1000000.0f),
 					Float.valueOf((tt4 - tt3) / 1000000.0f),
-					Float.valueOf((tt5 - tt4) / 1000000.0f));
+					Float.valueOf((tt5 - tt4) / 1000000.0f),
+					Float.valueOf((tt5 - tt1) / 1000000.0f));
+		}
+		
+		if(params.run) {
+			ProcessBuilder builder = new ProcessBuilder();
+			builder.command("./"+module.getSimpleName());
+			Process process = builder.start();
+			ProcessUtils.redirectIO(process);
+			process.waitFor();
+		}
 		
 	}
 	
@@ -304,6 +306,8 @@ public class CommandLine {
 
 	protected void compile(Module module) throws Error,
 			IOException, InterruptedException {
+		
+		compiler.reset();
 		
 		for(Include inc: module.getIncludes()) {
 			if(inc.getMode() == Mode.LOCAL) {
@@ -347,14 +351,6 @@ public class CommandLine {
 		if(code != 0) {
 			System.err.println("C compiler failed, aborting compilation process");
 			System.exit(code);
-		}
-		
-		if(params.run) {
-			ProcessBuilder builder = new ProcessBuilder();
-			builder.command("./"+module.getSimpleName());
-			Process process = builder.start();
-			ProcessUtils.redirectIO(process);
-			process.waitFor();
 		}
 		
 	}

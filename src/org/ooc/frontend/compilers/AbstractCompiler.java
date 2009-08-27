@@ -37,5 +37,7 @@ public interface AbstractCompiler {
 	public int launch() throws IOException, InterruptedException;
 
 	public void printCommandLine();
+
+	public void reset();
 	
 }

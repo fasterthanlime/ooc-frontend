@@ -10,9 +10,11 @@ import org.ooc.compiler.ProcessUtils;
 public abstract class BaseCompiler implements AbstractCompiler {
 	
 	protected List<String> command = new ArrayList<String>();
+	protected String executablePath;
 	
 	public BaseCompiler(String executableName) {
-		command.add(ShellUtils.findExecutable(executableName).getName());
+		executablePath = ShellUtils.findExecutable(executableName).getName();
+		reset();
 	}
 	
 	@Override
@@ -32,6 +34,12 @@ public abstract class BaseCompiler implements AbstractCompiler {
 			commandLine.append(' ');
 		}
 		System.out.println(commandLine.toString());
+	}
+	
+	@Override
+	public void reset() {
+		command.clear();
+		command.add(executablePath);
 	}
 
 }

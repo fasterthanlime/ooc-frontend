@@ -63,8 +63,7 @@ public class MemberCall extends FunctionCall {
 	@Override
 	public boolean resolve(NodeList<Node> mainStack, Resolver res, final boolean fatal) throws IOException {
 
-		
-		Type exprType = expression.getType().getFlatType(res);
+		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
 				throw new OocCompilationError(this, mainStack, "Calling member function "
@@ -73,6 +72,7 @@ public class MemberCall extends FunctionCall {
 			}
 			return true;
 		}
+		exprType = exprType.getFlatType(res);
 		
 		if(exprType.getRef() == null) exprType.resolve(mainStack, res, fatal);
 		

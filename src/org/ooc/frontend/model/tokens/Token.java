@@ -91,39 +91,39 @@ public final class Token implements Locatable {
 		public static final byte LESSTHAN = 64; // <
 		public static final byte GREATERTHAN_EQUALS = 65; // >=
 		public static final byte LESSTHAN_EQUALS = 66; // <=
-		public static final byte ASSIGN = 66; // =
-		public static final byte DECL_ASSIGN = 67; // :=
-		public static final byte EQUALS = 68; // ==
+		public static final byte ASSIGN = 67; // =
+		public static final byte DECL_ASSIGN = 68; // :=
+		public static final byte EQUALS = 69; // ==
 		
-		public static final byte DOUBLE_AMPERSAND = 69; // && (logical and)
-		public static final byte DOUBLE_PIPE = 70; // || (et non pas double pipe..)
+		public static final byte DOUBLE_AMPERSAND = 70; // && (logical and)
+		public static final byte DOUBLE_PIPE = 71; // || (et non pas double pipe..)
 		
-		public static final byte AMPERSAND = 71; // & (binary and)
-		public static final byte PIPE = 72; // | (binary or)
+		public static final byte AMPERSAND = 72; // & (binary and)
+		public static final byte PIPE = 73; // | (binary or)
 		
-		public static final byte CHAR_LIT = 73; // 'c'
-		public static final byte STRING_LIT = 74; // "blah\n"
+		public static final byte CHAR_LIT = 74; // 'c'
+		public static final byte STRING_LIT = 75; // "blah\n"
 		
-		public static final byte DEC_INT = 75; // 234
-		public static final byte HEX_INT = 76; // 0xdeadbeef007
-		public static final byte OCT_INT = 77; // 0c777
-		public static final byte BIN_INT = 78; // 0b1011
-		public static final byte DEC_FLOAT = 79; // 3.14
+		public static final byte DEC_INT = 76; // 234
+		public static final byte HEX_INT = 77; // 0xdeadbeef007
+		public static final byte OCT_INT = 78; // 0c777
+		public static final byte BIN_INT = 79; // 0b1011
+		public static final byte DEC_FLOAT = 80; // 3.14
 		
-		public static final byte OPEN_PAREN = 80; // (
-		public static final byte CLOS_PAREN = 81; // )
+		public static final byte OPEN_PAREN = 81; // (
+		public static final byte CLOS_PAREN = 82; // )
 		
-		public static final byte OPEN_BRACK = 82; // {
-		public static final byte CLOS_BRACK = 83; // }
+		public static final byte OPEN_BRACK = 83; // {
+		public static final byte CLOS_BRACK = 84; // }
 		
-		public static final byte OPEN_SQUAR = 84; // [
-		public static final byte CLOS_SQUAR = 85; // ]
+		public static final byte OPEN_SQUAR = 85; // [
+		public static final byte CLOS_SQUAR = 86; // ]
 		
-		public static final byte UNSIGNED = 86;
-		public static final byte SIGNED = 87;
-		public static final byte LONG = 88;
-		public static final byte STRUCT = 89;
-		public static final byte UNION = 90;
+		public static final byte UNSIGNED = 87;
+		public static final byte SIGNED = 88;
+		public static final byte LONG = 89;
+		public static final byte STRUCT = 90;
+		public static final byte UNION = 91;
 	}
 	
 	public final int start;

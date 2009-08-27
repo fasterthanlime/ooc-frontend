@@ -22,7 +22,7 @@ public class Parser {
 	
 	public Module parse(final String path, boolean join) throws IOException {
 		if(params.verbose)
-			System.out.println("Parsing "+path+" begun");
+			System.out.println("Parsing "+path);
 		
 		final File file = params.sourcePath.getFile(path);
 		if(file == null) {
@@ -39,9 +39,6 @@ public class Parser {
 		final Module module = new Module(fullName, sReader);
 		ModuleParser.parse(module, fullName, file,
 				sReader, new TokenReader(tokens), Parser.this);
-		
-		if(params.verbose)
-			System.out.println("Parsing "+path+" ended!!");
 		
 		return module;
 	}

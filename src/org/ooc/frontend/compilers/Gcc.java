@@ -9,8 +9,6 @@ public class Gcc extends BaseCompiler {
 
 	public Gcc() {
 		super("gcc");
-		command.add("-pipe");
-		command.add("-combine");
 	}
 	
 	protected Gcc(String executableName) {
@@ -55,6 +53,13 @@ public class Gcc extends BaseCompiler {
 	@Override
 	public void setDebugEnabled() {
 		command.add("-g");
+	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		command.add("-pipe");
+		command.add("-combine");
 	}
 
 }
