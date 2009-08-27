@@ -33,15 +33,10 @@ public class Dereference extends Access {
 				Declaration ref = exprType.getRef();
 				if(ref instanceof CoverDecl) {
 					Type fromType = ((CoverDecl) ref).getFromType();
-					if(fromType != null) {
-						//System.out.println("Twitched to fromType "+fromType);
-						exprType = fromType;
-					}
+					if(fromType != null) exprType = fromType;
 				}
-				//System.out.println("Pointer level - 1, was "+exprType+", ref = "+ref);
 				type = new Type(exprType.getName(), exprType.getPointerLevel() - 1, exprType.startToken);
 				type.setRef(exprType.getRef());
-				//System.out.println("New type ref = "+type.getRef());
 			}
 		}
 		return type;

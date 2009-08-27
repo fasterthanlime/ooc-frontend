@@ -80,8 +80,8 @@ public class Instantiation extends FunctionCall {
 		
 		if(stack.peek() instanceof Assignment) {
 			Assignment ass = (Assignment) stack.peek();
-			if (ass.getLvalue().getType() == null) return false;
-			name = ass.getLvalue().getType().getName();
+			if (ass.getLeft().getType() == null) return false;
+			name = ass.getLeft().getType().getName();
 		} else if(stack.peek() instanceof VariableDeclAtom) {
 			VariableDeclAtom vda = (VariableDeclAtom) stack.peek();
 			if(vda.getExpression() == this) {

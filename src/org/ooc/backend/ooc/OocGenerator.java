@@ -177,11 +177,11 @@ public class OocGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
-		assignment.getLvalue().accept(this);
+		assignment.getLeft().accept(this);
 		w.append(' ');
 		w.append(assignment.getSymbol());
 		w.append(' ');
-		assignment.getRvalue().accept(this);
+		assignment.getRight().accept(this);
 	}
 
 	@Override

@@ -23,6 +23,56 @@ operator == (first, second: Test) -> Bool {
     return true;
 }
 
+operator != (first, second: Test) -> Bool {
+    println("!= works")
+    return true;
+}
+
+operator < (first, second: Test) -> Bool {
+    println("< works")
+    return true;
+}
+
+operator <= (first, second: Test) -> Bool {
+    println("<= works")
+    return true;
+}
+
+operator >= (first, second: Test) -> Bool {
+    println(">= works")
+    return true;
+}
+
+operator > (first, second: Test) -> Bool {
+    println("> works")
+    return true;
+}
+
+operator = (first, second: Test) -> Bool {
+    println("= works")
+    return true;
+}
+
+operator += (first, second: Test) -> Bool {
+    println("+= works")
+    return true;
+}
+
+operator -= (first, second: Test) -> Bool {
+    println("-= works")
+    return true;
+}
+
+operator *= (first, second: Test) -> Bool {
+    println("*= works")
+    return true;
+}
+
+operator /= (first, second: Test) -> Bool {
+    println("/= works")
+    return true;
+}
+
 operator []= (first: Test, second: Int, third: Test) {
     println("[]= works")
 }
@@ -34,10 +84,19 @@ operator [] (first: Test, second: Int) {
 main: func {
     one, two: Test
     one + two
-//    one - two
-//    one * two
-//    one / two
-//    one == two
+    one - two
+    one * two
+    one / two
+    one == two
+	one != two
+	one > two
+	one >= two
+	one < two
+	one <= two
+	one += two
+	one -= two
+	one *= two
+	one /= two
     one[123] = two
     one[123]
 }

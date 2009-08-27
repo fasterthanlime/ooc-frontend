@@ -10,12 +10,27 @@ public class OpDecl extends Declaration {
 
 	public enum OpType {
 		ADD,
+		ADD_ASS,
 		SUB,
+		SUB_ASS,
 		MUL,
+		MUL_ASS,
 		DIV,
-		EQUALS,
-		INDEXING,
-		INDEXED_ASSIGN,
+		DIV_ASS,
+		ASS,
+		MOD,
+		L_OR,
+		L_AND,
+		B_OR,
+		B_AND,
+		IDX,
+		IDX_ASS,
+		GT,
+		GTE,
+		LT,
+		LTE,
+		EQ,
+		NE,
 	}
 	
 	protected OpType opType;
@@ -25,7 +40,7 @@ public class OpDecl extends Declaration {
 		super("Operator "+opType, startToken);
 		this.opType = opType;
 		this.func = func;
-		String name = "__OP_"+opType;
+		String name = "__OP_"+opType.toString();
 		Iterator<Argument> iter = func.getArguments().iterator();
 		while(iter.hasNext()) {
 			name += "_" + iter.next().getType().getMangledName();
@@ -77,19 +92,48 @@ public class OpDecl extends Declaration {
 			return "+";
 		case DIV:
 			return "/";
-		case EQUALS:
-			return "==";
-		case INDEXED_ASSIGN:
+		case IDX_ASS:
 			return "[]=";
-		case INDEXING:
+		case IDX:
 			return "[]";
 		case MUL:
 			return "*";
 		case SUB:
 			return "-";
-		default:
-			return "?operator?"; // bah
+		case B_AND:
+			return "&";
+		case B_OR:
+			return "&&";
+		case L_AND:
+			return "|";
+		case L_OR:
+			return "||";
+		case MOD:
+			return "%";
+		case EQ:
+			return "++";
+		case GT:
+			return ">";
+		case GTE:
+			return ">=";
+		case LT:
+			return "<";
+		case LTE:
+			return "<=";
+		case NE:
+			return "!=";
+		case ASS:
+			return "=";
+		case ADD_ASS:
+			return "+=";
+		case DIV_ASS:
+			return "/=";
+		case MUL_ASS:
+			return "*=";
+		case SUB_ASS:
+			return "-=";
 		}
+		return null;
 	}
 	
 	@Override

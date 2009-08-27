@@ -12,6 +12,7 @@ import org.ooc.middle.hobgoblins.Resolver;
 
 public class ArrayAccess extends Access implements MustBeResolved {
 
+	Type type;
 	protected Expression variable;
 	protected Expression index;
 
@@ -39,7 +40,19 @@ public class ArrayAccess extends Access implements MustBeResolved {
 	
 	@Override
 	public Type getType() {
-		throw new UnsupportedOperationException("ArrayAccess doesn't resolve types just yet ;)");
+		if(type == null) {
+			Type exprType = variable.getType();
+			if(exprType != null) {
+				Declaration ref = exprType.getRef();
+				if(ref instanceof CoverDecl) {
+					Type fromType = ((CoverDecl) ref).getFromType();
+					if(fromType != null) exprType = fromType;
+				}
+				type = new Type(exprType.getName(), exprType.getPointerLevel() - 1, exprType.startToken);
+				type.setRef(exprType.getRef());
+			}
+		}
+		return type;
 	}
 	
 	@Override
@@ -100,10 +113,10 @@ public class ArrayAccess extends Access implements MustBeResolved {
 
 	protected boolean tryIndexedAssign(OpDecl op, NodeList<Node> stack, int assignIndex) throws OocCompilationError, EOFException {
 		
-		if(op.getOpType() != OpType.INDEXED_ASSIGN) return false;
+		if(op.getOpType() != OpType.IDX_ASS) return false;
 		
 		Assignment ass = (Assignment) stack.get(assignIndex);
-		if(ass.getLvalue() != this) {
+		if(ass.getLeft() != this) {
 			System.out.println(getClass().getSimpleName()+" not the lvalue, not replacing.");
 			return false;
 		}
@@ -119,7 +132,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 			FunctionCall call = new FunctionCall(op.getFunc(), startToken);
 			call.getArguments().add(variable);
 			call.getArguments().add(index);
-			call.getArguments().add(ass.getRvalue());
+			call.getArguments().add(ass.getRight());
 			if(!stack.get(assignIndex - 1).replace(ass, call)) {
 				throw new OocCompilationError(this, stack, "Couldn't replace array-access-assign with a function call");
 			}
@@ -132,7 +145,7 @@ public class ArrayAccess extends Access implements MustBeResolved {
 
 	protected boolean tryIndexing(OpDecl op, NodeList<Node> stack) throws OocCompilationError, EOFException {
 		
-		if(op.getOpType() != OpType.INDEXING) return false;
+		if(op.getOpType() != OpType.IDX) return false;
 		
 		if(op.getFunc().getArguments().size() != 2) {
 			throw new OocCompilationError(op, stack,

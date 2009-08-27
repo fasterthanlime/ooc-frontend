@@ -24,14 +24,42 @@ public class OpDeclParser {
 		Token token = reader.read();
 		if(token.type == TokenType.PLUS) {
 			type = OpType.ADD;
+		} else if(token.type == TokenType.MINUS) {
+			type = OpType.SUB;
+		} else if(token.type == TokenType.STAR) {
+			type = OpType.MUL;
+		} else if(token.type == TokenType.SLASH) {
+			type = OpType.DIV;
+		} else if(token.type == TokenType.PLUS_ASSIGN) {
+			type = OpType.ADD_ASS;
+		} else if(token.type == TokenType.MINUS_ASSIGN) {
+			type = OpType.SUB_ASS;
+		} else if(token.type == TokenType.STAR_ASSIGN) {
+			type = OpType.MUL_ASS;
+		} else if(token.type == TokenType.SLASH_ASSIGN) {
+			type = OpType.DIV_ASS;
+		} else if(token.type == TokenType.ASSIGN) {
+			type = OpType.ASS;
+		} else if(token.type == TokenType.EQUALS) {
+			type = OpType.EQ;
+		} else if(token.type == TokenType.NOT_EQUALS) {
+			type = OpType.NE;
+		} else if(token.type == TokenType.GREATERTHAN) {
+			type = OpType.GT;
+		} else if(token.type == TokenType.GREATERTHAN_EQUALS) {
+			type = OpType.GTE;
+		} else if(token.type == TokenType.LESSTHAN) {
+			type = OpType.LT;
+		} else if(token.type == TokenType.LESSTHAN_EQUALS) {
+			type = OpType.LTE;
 		} else if(token.type == TokenType.OPEN_SQUAR) {
 			if(reader.peek().type == TokenType.CLOS_SQUAR) {
 				reader.skip();
 				if(reader.peek().type == TokenType.ASSIGN) {
 					reader.skip();
-					type = OpType.INDEXED_ASSIGN;
+					type = OpType.IDX_ASS;
 				} else {
-					type = OpType.INDEXING;
+					type = OpType.IDX;
 				}
 			} else {
 				throw new CompilationFailedError(null, "Unexpected token "+reader.peek().type

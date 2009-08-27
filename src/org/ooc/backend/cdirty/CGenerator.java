@@ -388,9 +388,9 @@ public class CGenerator extends Generator implements Visitor {
 
 	@Override
 	public void visit(Assignment assignment) throws IOException {
-		assignment.getLvalue().accept(this);
+		assignment.getLeft().accept(this);
 		current.app(' ').app(assignment.getSymbol()).app(' ');
-		assignment.getRvalue().accept(this);
+		assignment.getRight().accept(this);
 	}
 
 	@Override

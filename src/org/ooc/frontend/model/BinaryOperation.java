@@ -3,13 +3,17 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.OpDecl.OpType;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
+import org.ooc.middle.OocCompilationError;
+import org.ooc.middle.hobgoblins.Resolver;
 
 /**
  * Binary in the sense that it has a left and a right operand (e.g. binary op,
  * as opposed to unary op or ternary op)
  */
-public abstract class BinaryOperation extends Expression {
+public abstract class BinaryOperation extends Expression implements MustBeResolved {
 
 	protected Expression left;
 	protected Expression right;
@@ -53,6 +57,40 @@ public abstract class BinaryOperation extends Expression {
 		right.accept(visitor);
 	}
 	
+
+
+	@Override
+	public boolean isResolved() {
+		return false;
+	}
+
+	@Override
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
+			throws IOException {
+	
+		for(OpDecl op: res.ops) {
+			OpType opType = getOpType();
+			if(op.getOpType() == opType) {
+				if(op.getFunc().getArguments().size() != 2) {
+					throw new OocCompilationError(op, stack,
+							"To overload the add operator, you need exactly two arguments, not "
+							+op.getFunc().getArgsRepr());
+				}
+				NodeList<Argument> args = op.getFunc().getArguments();
+				if(args.get(0).getType().equals(left.getType())
+						&& args.get(1).getType().equals(right.getType())) {
+					FunctionCall call = new FunctionCall(op.getFunc(), startToken);
+					call.getArguments().add(left);
+					call.getArguments().add(right);
+					stack.peek().replace(this, call);
+				}
+			}
+		}
+		
+		return false;
+		
+	}
+	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		
@@ -69,5 +107,7 @@ public abstract class BinaryOperation extends Expression {
 		return false;
 		
 	}
+	
+	public abstract OpType getOpType();
 	
 }

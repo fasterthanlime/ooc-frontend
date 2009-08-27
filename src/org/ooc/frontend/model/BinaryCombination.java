@@ -3,6 +3,7 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.OpDecl.OpType;
 import org.ooc.frontend.model.tokens.Token;
 
 public class BinaryCombination extends BinaryOperation {
@@ -49,6 +50,18 @@ public class BinaryCombination extends BinaryOperation {
 		case BINARY_OR: return "|";
 		case BINARY_AND: default: return "&";
 		}
+	}
+	
+
+	@Override
+	public OpType getOpType() {
+		switch(comp) {
+		case LOGICAL_OR: return OpType.L_OR;
+		case LOGICAL_AND: return OpType.L_AND;
+		case BINARY_OR: return OpType.B_OR;
+		case BINARY_AND: return OpType.B_AND;
+		}
+		return null;
 	}
 
 }

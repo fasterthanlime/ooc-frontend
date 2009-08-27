@@ -3,9 +3,10 @@ package org.ooc.frontend.model;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.OpDecl.OpType;
 import org.ooc.frontend.model.tokens.Token;
 
-public class Assignment extends Expression {
+public class Assignment extends BinaryOperation {
 
 	public static enum Mode {
 		REGULAR,
@@ -16,26 +17,16 @@ public class Assignment extends Expression {
 	}
 	
 	protected Mode mode;
-	protected Access lvalue;
-	protected Expression rvalue;	
 	
-	public Assignment(Access lvalue, Expression rvalue, Token startToken) {
-		this(Mode.REGULAR, lvalue, rvalue, startToken);
+	public Assignment(Access left, Expression right, Token startToken) {
+		this(Mode.REGULAR, left, right, startToken);
 	}
 	
 	public Assignment(Mode mode, Access lvalue, Expression rvalue, Token startToken) {
-		super(startToken);
+		super(lvalue, rvalue, startToken);
 		this.mode = mode;
-		this.lvalue = lvalue;
-		this.rvalue = rvalue;
-	}
-	
-	public Access getLvalue() {
-		return lvalue;
-	}
-	
-	public Expression getRvalue() {
-		return rvalue;
+		this.left = lvalue;
+		this.right = rvalue;
 	}
 	
 	public Mode getMode() {
@@ -44,7 +35,7 @@ public class Assignment extends Expression {
 
 	@Override
 	public Type getType() {
-		return lvalue.getType();
+		return left.getType();
 	}
 	
 	@Override
@@ -59,29 +50,24 @@ public class Assignment extends Expression {
 	
 	@Override
 	public void acceptChildren(Visitor visitor) throws IOException {
-		lvalue.accept(visitor);
-		rvalue.accept(visitor);
+		left.accept(visitor);
+		right.accept(visitor);
 	}
 
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
-		if(oldie == lvalue) {
-			lvalue = (Access) kiddo;
+		if(oldie == left) {
+			left = (Access) kiddo;
 			return true;
 		}
-		
-		if(oldie == rvalue) {
-			rvalue = (Expression) kiddo;
+		if(oldie == right) {
+			right = (Expression) kiddo;
 			return true;
 		}
-		
 		return false;
-		
 	}
 
 	public String getSymbol() {
-		
 		switch(mode) {
 			case ADD:
 				return "+=";
@@ -94,7 +80,23 @@ public class Assignment extends Expression {
 			default:
 				return "=";
 		}
-		
+	}
+
+	@Override
+	public OpType getOpType() {
+		switch(mode) {
+		case ADD:
+			return OpType.ADD_ASS;
+		case DIV:
+			return OpType.DIV_ASS;
+		case MUL:
+			return OpType.MUL_ASS;
+		case SUB:
+			return OpType.SUB_ASS;
+		case REGULAR:
+			return OpType.ASS;
+		}
+		return null;
 	}
 	
 }
