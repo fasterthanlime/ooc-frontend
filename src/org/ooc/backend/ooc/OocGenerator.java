@@ -66,6 +66,7 @@ import org.ooc.frontend.model.Visitable;
 import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.structs.MultiMap;
 import org.ubi.SourceReader;
 
 public class OocGenerator extends Generator implements Visitor {
@@ -581,5 +582,8 @@ public class OocGenerator extends Generator implements Visitor {
 		w.append(' ').append(binaryCombination.getOpString()).append(' ');
 		binaryCombination.getRight().accept(this);
 	}
+
+	@Override
+	public void visit(MultiMap<?, ?> list) throws IOException {}
 	
 }

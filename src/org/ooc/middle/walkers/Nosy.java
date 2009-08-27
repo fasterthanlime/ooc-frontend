@@ -58,6 +58,7 @@ import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.structs.MultiMap;
 
 public class Nosy<T> implements Visitor {
 
@@ -362,6 +363,11 @@ public class Nosy<T> implements Visitor {
 	@Override
 	public void visit(Else else1) throws IOException {
 		visit((Node) else1);
+	}
+
+	@Override
+	public void visit(MultiMap<?, ?> list) throws IOException {
+		visit((Node) list);
 	}
 	
 }

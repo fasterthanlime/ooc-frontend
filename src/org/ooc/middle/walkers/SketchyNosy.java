@@ -58,6 +58,7 @@ import org.ooc.frontend.model.While;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.parser.TypeArgument;
+import org.ooc.middle.structs.MultiMap;
 
 /**
  * Whereas Nosy<T> shows where Java abstractions win, SketchyNosy demonstrates
@@ -413,6 +414,12 @@ public class SketchyNosy implements Visitor {
 	public void visit(Else node) throws IOException {
 		if(node.hasChildren()) visitAll(node);
 		else if(!oppo.take(node, stack)) running = false;
+	}
+
+	@Override
+	public void visit(MultiMap<?, ?> node) throws IOException {
+		if(node.hasChildren()) visitAll(node);
+		else if(!oppo.take(node, stack)) running = false;		
 	}
 	
 }

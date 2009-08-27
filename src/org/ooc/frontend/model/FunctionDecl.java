@@ -41,7 +41,7 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 		this.isStatic = isStatic;
 		this.isAbstract = isAbstract;
 		this.body = new NodeList<Line>(startToken);
-		this.returnType = name.equals("main") ? IntLiteral.type : new Type("Void", Token.defaultToken);
+		this.returnType = name.equals("main") ? IntLiteral.type : new Type("void", Token.defaultToken);
 		this.arguments = new NodeList<Argument>(startToken);
 		this.typeParams = new ArrayList<TypeParam>();
 	}

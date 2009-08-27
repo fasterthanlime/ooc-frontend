@@ -18,6 +18,8 @@ public class Module extends Node implements Scope {
 	protected NodeList<Include> includes;
 	protected NodeList<Import> imports;
 	protected NodeList<Use> uses;
+	protected MultiMap<String, TypeDecl> types;
+	protected MultiMap<String, FunctionDecl> functions;
 	protected NodeList<Node> body;
 	protected String fileName;
 	protected FunctionDecl loadFunc;
@@ -42,6 +44,8 @@ public class Module extends Node implements Scope {
 		this.imports = new NodeList<Import>(startToken);
 		this.uses = new NodeList<Use>(startToken);
 		this.body = new NodeList<Node>(startToken);
+		this.types = new MultiMap<String, TypeDecl>();
+		this.functions = new MultiMap<String, FunctionDecl>();
 		
 		// set it as extern, so it won't get written implicitly
 		this.loadFunc = new FunctionDecl(underName + "_load", "", false, false, false, true, Token.defaultToken);

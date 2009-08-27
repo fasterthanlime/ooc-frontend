@@ -1,11 +1,16 @@
 package org.ooc.middle.structs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.ooc.frontend.Visitor;
+import org.ooc.frontend.model.Node;
+import org.ooc.frontend.model.tokens.Token;
 
 /**
  * A MultiMap allows you to store several values for the same
@@ -15,14 +20,13 @@ import java.util.Map;
  * @param <K> the keys type
  * @param <V> the values type
  */
-public class MultiMap<K, V> {
+public class MultiMap<K, V> extends Node {
 
 	final Map<K, Object> map;
 	
 	public MultiMap() {
-		
+		super(Token.defaultToken);
 		map = new HashMap<K, Object>();
-		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -90,6 +94,38 @@ public class MultiMap<K, V> {
 	@Override
 	public String toString() {
 		return map.toString();
+	}
+
+	@Override
+	public boolean replace(Node oldie, Node kiddo) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void accept(Visitor visitor) throws IOException {
+		visitor.visit(this);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void acceptChildren(Visitor visitor) throws IOException {
+		for(Object key: map.keySet()) {
+			final Object o = map.get(key);
+			if(o instanceof List<?>) {
+				List<V> list = (List<V>) o;
+				for(V value: list) {
+					((Node) value).accept(visitor);
+				}
+			} else if(o != null) {
+				((Node) o).accept(visitor);
+			}
+		}
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return map.size() > 0;
 	}
 	
 }

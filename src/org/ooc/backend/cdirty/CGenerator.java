@@ -71,6 +71,7 @@ import org.ooc.frontend.model.Include.Define;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
 import org.ooc.frontend.parser.TypeArgument;
 import org.ooc.middle.OocCompilationError;
+import org.ooc.middle.structs.MultiMap;
 import org.ubi.SourceReader;
 
 public class CGenerator extends Generator implements Visitor {
@@ -646,7 +647,10 @@ public class CGenerator extends Generator implements Visitor {
 					current.app(" = ");
 					atom.getExpression().accept(this);
 				}
-				if(iter.hasNext()) current.app(", ");
+				if(iter.hasNext()) {
+					current.app(", ");
+					writeStars(type);
+				}
 			}
 			
 		}
@@ -1159,6 +1163,10 @@ public class CGenerator extends Generator implements Visitor {
 			throw new Error("Unresolved Type "+type.getName()+" !!");
 		}
 		
+		writeStars(type);
+	}
+
+	private void writeStars(Type type) throws IOException {
 		if(type.getRef() instanceof ClassDecl) {
 			current.app('*');
 		}
@@ -1260,5 +1268,8 @@ public class CGenerator extends Generator implements Visitor {
 		current.app(' ').app(binaryCombination.getOpString()).app(' ');
 		binaryCombination.getRight().accept(this);
 	}
+
+	@Override
+	public void visit(MultiMap<?, ?> list) throws IOException {}
 
 }
