@@ -38,7 +38,7 @@ public class OpDeclParser {
 						+". You're probably trying to override [] (indexing) or []= (indexed assign)");
 			}
 		} else {
-			throw new CompilationFailedError(null, "Trying to overload unknown operator "+token.type);
+			throw new CompilationFailedError(null, "Trying to overload unknown operator "+token);
 		}
 		
 		FunctionDecl decl = FunctionDeclParser.parse(sReader, reader, true);
