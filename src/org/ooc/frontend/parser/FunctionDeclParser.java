@@ -47,22 +47,15 @@ public class FunctionDeclParser {
 		String externName = null;
 		
 		Token kw = reader.peek();
-		while(kw.type == TokenType.ABSTRACT_KW
-		   || kw.type == TokenType.STATIC_KW
-		   || kw.type == TokenType.FINAL_KW
-		   || kw.type == TokenType.EXTERN_KW
-		   || kw.type == TokenType.PROTO_KW
-		   ) {
-			
+		keywordRead: while(true) {
 			switch(kw.type) {
-			case ABSTRACT_KW: reader.skip(); isAbstract = true; break;
-			case STATIC_KW: reader.skip(); isStatic = true; break;
-			case FINAL_KW: reader.skip(); isFinal = true; break;
-			case PROTO_KW: reader.skip(); isProto = true; break;
-			case EXTERN_KW: externName = ExternParser.parse(sReader, reader); break;
-			default:
+			case TokenType.ABSTRACT_KW: reader.skip(); isAbstract = true; break;
+			case TokenType.STATIC_KW: reader.skip(); isStatic = true; break;
+			case TokenType.FINAL_KW: reader.skip(); isFinal = true; break;
+			case TokenType.PROTO_KW: reader.skip(); isProto = true; break;
+			case TokenType.EXTERN_KW: externName = ExternParser.parse(sReader, reader); break;
+			default: break keywordRead;
 			}
-			
 			kw = reader.peek();
 		}
 		

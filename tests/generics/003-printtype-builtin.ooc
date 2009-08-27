@@ -1,7 +1,7 @@
 Dog: class {
 	bloh: func
 }
-Hound: class from Dog {
+Hound: class extends Dog {
 	i := 42
 }
 

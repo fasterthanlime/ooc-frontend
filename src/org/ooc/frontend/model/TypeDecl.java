@@ -7,10 +7,15 @@ public abstract class TypeDecl extends Declaration implements Scope {
 
 	protected NodeList<VariableDecl> variables;
 	protected NodeList<FunctionDecl> functions;
+	
+	protected String superName;
+	protected ClassDecl superRef;
+	
 	protected Type instanceType;
 	
-	public TypeDecl(String name, Token startToken) {
+	public TypeDecl(String name, String superName, Token startToken) {
 		super(name, startToken);
+		this.superName = superName;
 		this.variables = new NodeList<VariableDecl>(startToken);
 		this.functions = new NodeList<FunctionDecl>(startToken);
 		this.instanceType = new Type(name, startToken);

@@ -11,7 +11,7 @@ Animal: class {
 
 }
 
-Dog: class from Animal {
+Dog: class extends Animal {
 
 	new: func(.name) {
 		super(name)

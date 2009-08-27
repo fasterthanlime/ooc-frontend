@@ -1,5 +1,5 @@
 Dog: class {}
-Hound: class from Dog {}
+Hound: class extends Dog {}
 
 main: func {
 	printType(new Dog as Object)

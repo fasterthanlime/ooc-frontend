@@ -26,7 +26,7 @@ public class CoverDeclParser {
 		
 		String name = "";
 		Token tName = reader.peek();
-		if(tName.type == TokenType.NAME || tName.type == TokenType.NEW_KW) {
+		if(tName.isNameToken()) {
 			name = tName.get(sReader);
 			reader.skip();
 			if(reader.read().type != TokenType.COLON) {
@@ -38,18 +38,26 @@ public class CoverDeclParser {
 		String externName = ExternParser.parse(sReader, reader);
 		
 		if(reader.read().type == TokenType.COVER_KW) {
-			
-			Type fromType = null;
-			if(reader.peek().type == TokenType.FROM_KW) {
-				reader.skip();
-				fromType = TypeParser.parse(sReader, reader);
-				if(fromType == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-					"Expected cover's base type name after the from keyword.");
+
+			Type overType = null;
+			String superName = "";
+			while(true) {
+				Token token = reader.peek();
+				if(token.type == TokenType.FROM_KW) {
+					reader.skip();
+					overType = TypeParser.parse(sReader, reader);
+					if(overType == null) {
+						throw new CompilationFailedError(sReader.getLocation(reader.peek()),
+						"Expected cover's base type name after the from keyword.");
+					}
+				} else if(token.type == TokenType.EXTENDS_KW) {
+					reader.skip();
+					superName = reader.read().get(sReader);
 				}
+				break;
 			}
 			
-			CoverDecl coverDecl = new CoverDecl(name, fromType, tName);
+			CoverDecl coverDecl = new CoverDecl(name, superName, overType, tName);
 			coverDecl.setExternName(externName);
 			if(comment != null) coverDecl.setComment(comment);
 			
@@ -74,10 +82,10 @@ public class CoverDeclParser {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"Expected newline after variable declaration in cover declaration, but got "+reader.prev());
 					}
-					if(fromType != null && !varDecl.isExtern()) {
+					if(overType != null && !varDecl.isExtern()) {
 						throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 							"You can't add non-extern member variables to a Cover which already has a base type (in this case, "
-								+fromType.getName()+")");
+								+overType.getName()+")");
 					}
 					coverDecl.addVariable(varDecl);
 					continue;

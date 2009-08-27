@@ -3,13 +3,11 @@ package org.ooc.frontend.model;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.Token.TokenType;
 import org.ubi.CompilationFailedError;
-import org.ubi.FileLocation;
 import org.ubi.SourceReader;
 import org.ubi.SyntaxError;
 
@@ -17,46 +15,47 @@ public class Tokenizer {
 
 	protected static class Name {
 		String name;
-		TokenType tokenType;
+		byte tokenType;
 		
-		public Name(String name, TokenType tokenType) {
+		public Name(String name, byte tokenType) {
 			this.name = name;
 			this.tokenType = tokenType;
 		}
 	}
 	
 	protected static Name[] names = new Name[] {
+		new Name("func", TokenType.FUNC_KW),
+		new Name("new", TokenType.NEW_KW),
 		new Name("class", TokenType.CLASS_KW),
 		new Name("cover", TokenType.COVER_KW),
-		new Name("func", TokenType.FUNC_KW),
-		new Name("abstract", TokenType.ABSTRACT_KW),
+		new Name("extern", TokenType.EXTERN_KW),
 		new Name("from", TokenType.FROM_KW),
 		new Name("this", TokenType.THIS_KW),
 		new Name("super", TokenType.SUPER_KW),
-		new Name("new", TokenType.NEW_KW),
-		new Name("const", TokenType.CONST_KW),
-		new Name("final", TokenType.FINAL_KW),
-		new Name("static", TokenType.STATIC_KW),
-		new Name("include", TokenType.INCLUDE_KW),
-		new Name("import", TokenType.IMPORT_KW),
-		new Name("use", TokenType.USE_KW),
-		new Name("break", TokenType.BREAK_KW),
-		new Name("continue", TokenType.CONTINUE_KW),
-		new Name("fallthrough", TokenType.FALLTHR_KW),
 		new Name("if", TokenType.IF_KW),
 		new Name("else", TokenType.ELSE_KW),
 		new Name("for", TokenType.FOR_KW),
 		new Name("while", TokenType.WHILE_KW),
+		new Name("true", TokenType.TRUE),
+		new Name("false", TokenType.FALSE),
+		new Name("null", TokenType.NULL),
 		new Name("do", TokenType.DO_KW),
 		new Name("switch", TokenType.SWITCH_KW),
 		new Name("return", TokenType.RETURN_KW),
 		new Name("as", TokenType.AS_KW),
+		new Name("const", TokenType.CONST_KW),
+		new Name("static", TokenType.STATIC_KW),
+		new Name("abstract", TokenType.ABSTRACT_KW),
+		new Name("import", TokenType.IMPORT_KW),
+		new Name("final", TokenType.FINAL_KW),
+		new Name("include", TokenType.INCLUDE_KW),
+		new Name("use", TokenType.USE_KW),
+		new Name("break", TokenType.BREAK_KW),
+		new Name("continue", TokenType.CONTINUE_KW),
+		new Name("fallthrough", TokenType.FALLTHR_KW),
+		new Name("extends", TokenType.EXTENDS_KW),
 		new Name("in", TokenType.IN_KW),
 		new Name("version", TokenType.VERSION_KW),
-		new Name("true", TokenType.TRUE),
-		new Name("false", TokenType.FALSE),
-		new Name("null", TokenType.NULL),
-		new Name("extern", TokenType.EXTERN_KW),
 		new Name("proto", TokenType.PROTO_KW),
 		new Name("operator", TokenType.OPERATOR_KW),
 		//TODO I'm not sure if those three should be keywords.
@@ -69,25 +68,25 @@ public class Tokenizer {
 	};
 	
 	protected static class CharTuple {
-		protected char first;
-		protected TokenType firstType;
+		char first;
+		byte firstType;
 		
-		protected char second;
-		protected TokenType secondType;
+		char second;
+		byte secondType;
 		
-		protected char third;
-		protected TokenType thirdType;
+		char third;
+		byte thirdType;
 		
-		public CharTuple(char first, TokenType firstType) {
-			this(first, firstType, '\0', null);
+		public CharTuple(char first, byte firstType) {
+			this(first, firstType, '\0', (byte) 0);
 		}
 		
-		public CharTuple(char first, TokenType firstType, char second, TokenType secondType) {
-			this(first, firstType, second, secondType, '\0', null);
+		public CharTuple(char first, byte firstType, char second, byte secondType) {
+			this(first, firstType, second, secondType, '\0', (byte) 0);
 		}
 		
-		public CharTuple(char first, TokenType firstType, char second, TokenType secondType,
-				char third, TokenType thirdType) {
+		public CharTuple(char first, byte firstType, char second, byte secondType,
+				char third, byte thirdType) {
 			this.first = first;
 			this.firstType = firstType;
 			this.second = second;
@@ -96,31 +95,31 @@ public class Tokenizer {
 			this.thirdType = thirdType;
 		}
 
-		public Token handle(FileLocation location, char c, SourceReader reader) throws EOFException {
+		public Token handle(int index, char c, SourceReader reader) throws EOFException {
 			if(c != first) return null;
 			reader.read();
 			if(second == '\0' || second != reader.peek()) {
-				return new Token(location.getIndex(), 1, firstType);
+				return new Token(index, 1, firstType);
 			}
 			reader.read();
 			if(third == '\0' || third != reader.peek()) {
-				return new Token(location.getIndex(), 2, secondType);
+				return new Token(index, 2, secondType);
 			}
 			reader.read();
-			return new Token(location.getIndex(), 3, thirdType);
+			return new Token(index, 3, thirdType);
 		}
 	}
 	
-	protected CharTuple[] chars = new CharTuple[] {
-		new CharTuple('{', TokenType.OPEN_BRACK),
-		new CharTuple('}', TokenType.CLOS_BRACK),
+	protected static CharTuple[] chars = new CharTuple[] {
 		new CharTuple('(', TokenType.OPEN_PAREN),
 		new CharTuple(')', TokenType.CLOS_PAREN),
+		new CharTuple('{', TokenType.OPEN_BRACK),
+		new CharTuple('}', TokenType.CLOS_BRACK),
 		new CharTuple('[', TokenType.OPEN_SQUAR),
 		new CharTuple(']', TokenType.CLOS_SQUAR),
+		new CharTuple('=', TokenType.ASSIGN, '=', TokenType.EQUALS),
 		new CharTuple('.', TokenType.DOT, '.', TokenType.DOUBLE_DOT, '.', TokenType.TRIPLE_DOT),
 		new CharTuple(',', TokenType.COMMA),
-		new CharTuple('=', TokenType.ASSIGN, '=', TokenType.EQUALS),
 		new CharTuple('%', TokenType.PERCENT),
 		new CharTuple('~', TokenType.TILDE),
 		new CharTuple(':', TokenType.COLON, '=', TokenType.DECL_ASSIGN),
@@ -147,7 +146,7 @@ public class Tokenizer {
 				break;
 			}
 			
-			FileLocation location = reader.getLocation();
+			int index = reader.mark();
 			
 			char c = reader.peek();
 			if(c == ';' || c == '\n') {
@@ -155,7 +154,7 @@ public class Tokenizer {
 				while(reader.peek() == '\n' && reader.hasNext()) {
 					reader.read();
 				}
-				tokens.add(new Token(location.getIndex(), 1, TokenType.LINESEP));
+				tokens.add(new Token(index, 1, TokenType.LINESEP));
 				continue;
 			}
 			
@@ -164,17 +163,17 @@ public class Tokenizer {
 				char c2 = reader.peek();
 				if(c2 == '\\') {
 					reader.read();
-					tokens.add(new Token(location.getIndex(), 2, TokenType.DOUBLE_BACKSLASH));
+					tokens.add(new Token(index, 2, TokenType.DOUBLE_BACKSLASH));
 				} else if(c2 == '\n') {
 					reader.read(); // Just skip both of'em (line continuation)
 				} else {
-					tokens.add(new Token(location.getIndex(), 1, TokenType.BACKSLASH));
+					tokens.add(new Token(index, 1, TokenType.BACKSLASH));
 				}
 				continue;
 			}
 			
 			for(CharTuple candidate: chars) {
-				Token token = candidate.handle(location, c, reader);
+				Token token = candidate.handle(index, c, reader);
 				if(token != null) {
 					tokens.add(token);
 					continue reading;
@@ -188,10 +187,10 @@ public class Tokenizer {
 				try {
 					reader.readStringLiteral();
 				} catch(EOFException eof) {
-					throw new CompilationFailedError(location, "Never-ending string literal (reached end of file)");
+					throw new CompilationFailedError(reader.getLocation(index, 0), "Never-ending string literal (reached end of file)");
 				}
-				tokens.add(new Token(location.getIndex() + 1,
-						reader.mark() - location.getIndex() - 2,
+				tokens.add(new Token(index + 1,
+						reader.mark() - index - 2,
 						TokenType.STRING_LIT));
 				continue;
 			}
@@ -200,12 +199,12 @@ public class Tokenizer {
 				reader.read();
 				try {
 					reader.readCharLiteral();
-					tokens.add(new Token(location.getIndex() + 1, 
-							reader.mark() - location.getIndex() - 2,
+					tokens.add(new Token(index + 1, 
+							reader.mark() - index - 2,
 							TokenType.CHAR_LIT));
 					continue;
 				} catch(SyntaxError e) {
-					throw new CompilationFailedError(location, e.getMessage());
+					throw new CompilationFailedError(reader.getLocation(index, 0), e.getMessage());
 				}
 			}
 			
@@ -214,22 +213,22 @@ public class Tokenizer {
 				char c2 = reader.peek();
 				if(c2 == '=') {
 					reader.read();
-					tokens.add(new Token(location.getIndex(), 2, TokenType.SLASH_ASSIGN));
+					tokens.add(new Token(index, 2, TokenType.SLASH_ASSIGN));
 				} else if(c2 == '/') {
 					reader.readLine();
-					tokens.add(new Token(location.getIndex(), 1, TokenType.LINESEP));
+					tokens.add(new Token(index, 1, TokenType.LINESEP));
 				} else if(c2 == '*') {
 					reader.read();
 					char c3 = reader.peek();
 					if(c3 == '*') {
 						reader.read();
 						reader.readUntil(new String[] {"*/"}, true);
-						tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(), TokenType.OOCDOC));
+						tokens.add(new Token(index, reader.mark() - index, TokenType.OOCDOC));
 					} else {
 						reader.readUntil(new String[] {"*/"}, true);
 					}
 				} else {
-					tokens.add(new Token(location.getIndex(), 1, TokenType.SLASH));
+					tokens.add(new Token(index, 1, TokenType.SLASH));
 				}
 				continue;
 			}
@@ -239,12 +238,12 @@ public class Tokenizer {
 				char c2 = reader.peek();
 				if(c2 == '>') {
 					reader.read();
-					tokens.add(new Token(location.getIndex(), 2, TokenType.ARROW));
+					tokens.add(new Token(index, 2, TokenType.ARROW));
 				} else if(c2 == '=') {
 					reader.read();
-					tokens.add(new Token(location.getIndex(), 2, TokenType.MINUS_ASSIGN));
+					tokens.add(new Token(index, 2, TokenType.MINUS_ASSIGN));
 				} else {
-					tokens.add(new Token(location.getIndex(), 1, TokenType.MINUS));
+					tokens.add(new Token(index, 1, TokenType.MINUS));
 				}
 				continue;
 			}
@@ -256,28 +255,28 @@ public class Tokenizer {
 					reader.read();
 					String lit = reader.readMany("0123456789abcdefABCDEF", "_", true);
 					if(lit.isEmpty()) {
-						throw new CompilationFailedError(location, "Empty hexadecimal number literal");
+						throw new CompilationFailedError(reader.getLocation(index, 0), "Empty hexadecimal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark()
-							- location.getIndex() - 2, TokenType.HEX_INT));
+					tokens.add(new Token(index + 2, reader.mark()
+							- index - 2, TokenType.HEX_INT));
 					continue;
 				} else if(c2 == 'c') {
 					reader.read();
 					String lit = reader.readMany("01234567", "_", true);
 					if(lit.isEmpty()) {
-						throw new CompilationFailedError(location, "Empty octal number literal");
+						throw new CompilationFailedError(reader.getLocation(index, 0), "Empty octal number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark()
-							- location.getIndex() - 2, TokenType.OCT_INT));
+					tokens.add(new Token(index + 2, reader.mark()
+							- index - 2, TokenType.OCT_INT));
 					continue;
 				} else if(c2 == 'b') {
 					reader.read();
 					String lit = reader.readMany("01", "_", true);
 					if(lit.isEmpty()) {
-						throw new CompilationFailedError(location, "Empty binary number literal");
+						throw new CompilationFailedError(reader.getLocation(index, 0), "Empty binary number literal");
 					}
-					tokens.add(new Token(location.getIndex() + 2, reader.mark()
-							- location.getIndex() - 2, TokenType.BIN_INT));
+					tokens.add(new Token(index + 2, reader.mark()
+							- index - 2, TokenType.BIN_INT));
 					continue;
 				}
 			}
@@ -288,53 +287,35 @@ public class Tokenizer {
 					reader.read();
 					if(reader.peek() != '.') {
 						reader.readMany("0123456789", "_", true);
-						tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+						tokens.add(new Token(index, reader.mark() - index,
 								TokenType.DEC_FLOAT));
 						continue;
 					}
 					reader.rewind(1);
 				}
-				tokens.add(new Token(location.getIndex(), reader.mark() - location.getIndex(),
+				tokens.add(new Token(index, reader.mark() - index,
 					TokenType.DEC_INT));
 				continue;
 			}
 			
 			if(reader.skipName()) {
-				String name = reader.getSlice(location.getIndex(), reader.mark() - location.getIndex());
+				String name = reader.getSlice(index, reader.mark() - index);
 				for(Name candidate: names) {
 					if(candidate.name.equals(name)) {
-						tokens.add(new Token(location.getIndex(), name.length(), candidate.tokenType));
+						tokens.add(new Token(index, name.length(), candidate.tokenType));
 						continue reading;
 					}
 				}
-				tokens.add(new Token(location.getIndex(), name.length(), TokenType.NAME));
+				tokens.add(new Token(index, name.length(), TokenType.NAME));
 				continue reading;
 			}
-			
-			throw new CompilationFailedError(location, "Unexpected input. Token list is: "+tokens);
+			throw new CompilationFailedError(reader.getLocation(index, 0), "Unexpected input. Token list is: "+tokens);
 			
 		}
 		
 		tokens.add(new Token(reader.mark(), 0, TokenType.LINESEP));
 		
 		return tokens;
-	}
-	
-	public static void main(String[] args) throws IOException {
-		
-		if(args.length < 1) {
-			System.out.println("Usage: ooft file.ooc");
-			System.exit(0);
-		}
-		
-		SourceReader reader = SourceReader.getReaderFromPath(args[0]);
-		List<Token> tokens = new Tokenizer().parse(reader);
-		Iterator<Token> iter = tokens.iterator();
-		while(iter.hasNext()) {
-			Token t = iter.next();
-			System.out.printf("%s \t[%s]\n", reader.getSlice(t.start, t.length), t.type);
-		}
-		
 	}
 	
 }

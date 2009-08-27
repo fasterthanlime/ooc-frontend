@@ -11,7 +11,7 @@ public class TypeParam extends TypeDecl {
 	private Argument argument;
 	
 	public TypeParam(String name, Token startToken) {
-		super(name, startToken);
+		super(name, "", startToken);
 		type = new Type("Class", Token.defaultToken);
 		argument = new RegularArgument(type, name, startToken);
 	}

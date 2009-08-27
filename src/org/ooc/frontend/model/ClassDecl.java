@@ -13,16 +13,13 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 	protected boolean isAbstract;
 	
 	protected OocDocComment comment;
-	protected String superName;
-	protected ClassDecl superRef;
 
 	protected FunctionDecl initialize;
 	protected FunctionDecl load;
 	protected FunctionDecl defaultConstructor;
 	
 	public ClassDecl(String name, String superName, boolean isAbstract, Token startToken) {
-		super(name, startToken);
-		this.superName = (superName.isEmpty() && !isObjectClass()) ? "Object" : superName;
+		super(name, (superName.isEmpty() && !name.equals("Object")) ? "Object" : superName, startToken);
 		this.isAbstract = isAbstract;
 		this.initialize = new FunctionDecl("initialize", "", false, false, false, false, startToken);
 		this.initialize.getArguments().add(new RegularArgument(instanceType, "this", startToken));

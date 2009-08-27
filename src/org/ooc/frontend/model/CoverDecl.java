@@ -29,8 +29,8 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	protected CoverDecl base;
 	protected FunctionDecl classGettingFunc;
 	
-	public CoverDecl(String name, Type fromType, Token startToken) {
-		super(name, startToken);
+	public CoverDecl(String name, String superName, Type fromType, Token startToken) {
+		super(name, superName, startToken);
 		this.fromType = fromType;
 		this.type = new Type(name, startToken);
 		this.type.setRef(this);

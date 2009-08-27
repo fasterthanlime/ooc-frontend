@@ -17,7 +17,7 @@ public class ExpressionListFiller {
 	}
 
 	public static boolean fill(SourceReader sReader, TokenReader reader,
-			NodeList<Expression> list, TokenType opening, TokenType closing) throws IOException {
+			NodeList<Expression> list, byte opening, byte closing) throws IOException {
 
 		int mark = reader.mark();
 		

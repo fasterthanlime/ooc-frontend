@@ -43,7 +43,7 @@ public class ClassDeclParser {
 		if(reader.readWhiteless().type == TokenType.CLASS_KW) {
 		
 			String superName = "";
-			if(reader.peek().type == TokenType.FROM_KW) {
+			if(reader.peek().type == TokenType.EXTENDS_KW) {
 				reader.skip();
 				Token tSuper = reader.read();
 				if(tSuper.type != TokenType.NAME) {
