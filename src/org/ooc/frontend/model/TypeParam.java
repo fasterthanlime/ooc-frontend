@@ -47,10 +47,5 @@ public class TypeParam extends TypeDecl {
 	public boolean hasChildren() {
 		return true;
 	}
-
-	@Override
-	public NodeList<FunctionDecl> getFunctionsRecursive() {
-		return functions;
-	}
 	
 }

@@ -129,12 +129,8 @@ public class VariableAccess extends Access implements MustBeResolved {
 			}
 		}
 		
-		for(TypeDecl decl: res.types) {
-			if(decl.getName().equals(name)) {
-				ref = decl;
-				return true;
-			}
-		}
+		ref = res.module.getType(name);
+		if(ref != null) return true;
 		
 		int genIndex = mainStack.find(Generic.class);
 		if(genIndex != -1) {

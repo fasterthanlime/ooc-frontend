@@ -180,7 +180,7 @@ public class Checker implements Hobgoblin {
 			
 			private void checkTypeDecl(TypeDecl node, NodeList<Node> stack)
 				throws OocCompilationError, EOFException {
-				if(node.getName().isEmpty()) return;
+				if(node.isExtern() || node.getName().isEmpty()) return;
 				if(Character.isLowerCase(node.getName().charAt(0))) {
 					throw new OocCompilationError(node, stack,
 						"Lower-case type name '"+node.getName()

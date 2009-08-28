@@ -3,7 +3,7 @@ main: func {
 	// demonstrate compiler error messages, e.g. a Float won't
 	// fit in an Int array. Then again, maybe it should guess they
 	// are all Floats?
-	array := [1, 2, 3.14, 4]
+	array := [3.14, 2, 3, 4]
 	for(i: Int in 0..4) {
 		printf("array[%d] = %d\n", i, array[i])
 	}

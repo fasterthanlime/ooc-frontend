@@ -28,13 +28,15 @@ public class ModuleWriter {
 			IncludeWriter.write(include, cgen);
 		}
 		
-		for(Node node: module.getBody()) {
-			if(node instanceof ClassDecl) {
-				ClassDecl classDecl = (ClassDecl) node;
-				ClassDeclWriter.writeStructTypedef(classDecl.getName(), cgen);
-				ClassDeclWriter.writeStructTypedef(classDecl.getName()+"Class", cgen);
-			} else if(node instanceof CoverDecl) {
-				CoverDeclWriter.writeTypedef((CoverDecl) node, cgen);
+		for(String key: module.getTypes().keySet()) {
+			for(TypeDecl node : module.getTypes().getAll(key)) {
+				if(node instanceof ClassDecl) {
+					ClassDecl classDecl = (ClassDecl) node;
+					ClassDeclWriter.writeStructTypedef(classDecl.getName(), cgen);
+					ClassDeclWriter.writeStructTypedef(classDecl.getName()+"Class", cgen);
+				} else if(node instanceof CoverDecl) {
+					CoverDeclWriter.writeTypedef((CoverDecl) node, cgen);
+				}
 			}
 		}
 		cgen.current.nl();
@@ -58,7 +60,11 @@ public class ModuleWriter {
 		cgen.current.app(".h\"");
 		cgen.current.nl();
 		
-		cgen.current = cgen.cw;
+		for(String key: module.getTypes().keySet()) {
+			for(TypeDecl node : module.getTypes().getAll(key)) {
+				node.accept(cgen);
+			}
+		}
 		module.acceptChildren(cgen);
 		
 		ModuleWriter.writeInitFunc(cgen);
@@ -102,9 +108,7 @@ public class ModuleWriter {
 		for (Node node : cgen.module.getBody()) {
 			if (node instanceof ClassDecl) {
 				ClassDecl classDecl = (ClassDecl) node;
-				cgen.current.nl().app(
-						classDecl.getInstanceType().getMangledName());
-				cgen.current.app("_load();");
+				cgen.current.nl().app(classDecl.getName()).app("_").app(classDecl.getLoadFunc().getName()).app("();");
 			}
 		}
 		for (Node node : cgen.module.getLoadFunc().getBody()) {

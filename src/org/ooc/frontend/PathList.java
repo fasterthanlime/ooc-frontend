@@ -33,10 +33,10 @@ public class PathList {
 		
 		File file = new File(path);
 		if(!file.exists()) {
-			System.err.println("Classpath element cannot be found: "+file.getPath());
+			System.err.println("Classpath element cannot be found: "+path);
 			return;
 		} else if(!file.isDirectory()) {
-			System.err.println("Classpath element is not a directory: "+file.getPath());
+			System.err.println("Classpath element is not a directory: "+path);
 			return;
 		}
 		

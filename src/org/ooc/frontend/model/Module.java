@@ -20,6 +20,7 @@ public class Module extends Node implements Scope {
 	protected NodeList<Use> uses;
 	protected MultiMap<String, TypeDecl> types;
 	protected MultiMap<String, FunctionDecl> functions;
+	protected NodeList<OpDecl> ops;
 	protected NodeList<Node> body;
 	protected String fileName;
 	protected FunctionDecl loadFunc;
@@ -44,6 +45,7 @@ public class Module extends Node implements Scope {
 		this.imports = new NodeList<Import>(startToken);
 		this.uses = new NodeList<Use>(startToken);
 		this.body = new NodeList<Node>(startToken);
+		this.ops = new NodeList<OpDecl>();
 		this.types = new MultiMap<String, TypeDecl>();
 		this.functions = new MultiMap<String, FunctionDecl>();
 		
@@ -104,6 +106,8 @@ public class Module extends Node implements Scope {
 		imports.accept(visitor);
 		uses.accept(visitor);
 		body.accept(visitor);
+		types.accept(visitor);
+		ops.accept(visitor);
 		loadFunc.accept(visitor);
 	}
 	
@@ -249,6 +253,24 @@ public class Module extends Node implements Scope {
 	public void join() throws InterruptedException {
 		while(thread == null) Thread.sleep(5L);
 		thread.join();
+	}
+	
+	public MultiMap<String, TypeDecl> getTypes() {
+		return types;
+	}
+	
+	public NodeList<OpDecl> getOps() {
+		return ops;
+	}
+
+	public TypeDecl getType(String typeName) {
+		TypeDecl typeDecl = getTypes().get(typeName);
+		if(typeDecl != null) return typeDecl;
+		for(Import imp: imports) {
+			typeDecl = imp.getModule().getTypes().get(typeName);
+			if(typeDecl != null) return typeDecl;
+		}
+		return null;
 	}
 	
 }

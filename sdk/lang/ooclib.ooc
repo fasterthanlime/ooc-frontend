@@ -1,5 +1,7 @@
 include stdlib, stdio, stdint, stdbool, memory, gc/gc, string
 
+void: extern cover
+
 Char: cover from char
 String: cover from Char*
 Pointer: cover from void*

@@ -9,7 +9,7 @@ public abstract class TypeDecl extends Declaration implements Scope {
 	protected NodeList<FunctionDecl> functions;
 	
 	protected String superName;
-	protected ClassDecl superRef;
+	protected TypeDecl superRef;
 	
 	protected Type instanceType;
 	
@@ -20,6 +20,22 @@ public abstract class TypeDecl extends Declaration implements Scope {
 		this.functions = new NodeList<FunctionDecl>(startToken);
 		this.instanceType = new Type(name, startToken);
 		instanceType.setRef(this);
+	}
+	
+	public String getSuperName() {
+		return superName;
+	}
+	
+	public void setSuperName(String superName) {
+		this.superName = superName;
+	}
+	
+	public TypeDecl getSuperRef() {
+		return superRef;
+	}
+	
+	public void setSuperRef(TypeDecl superRef) {
+		this.superRef = superRef;
 	}
 	
 	public Type getInstanceType() {
@@ -84,11 +100,24 @@ public abstract class TypeDecl extends Declaration implements Scope {
 	}
 
 	private boolean shouldAddThis(FunctionDecl decl) {
-		//fixme this is ugly
-		return !decl.isStatic() && (!decl.isConstructor() || !(this instanceof CoverDecl));
+		if(decl.isStatic()) return false;
+		if(decl.isConstructor() && (this instanceof CoverDecl)) return false;
+		return true;
 	}
 	
-	public abstract NodeList<FunctionDecl> getFunctionsRecursive();
+	public void getFunctionsRecursive(NodeList<FunctionDecl> functions) {
+		for(FunctionDecl decl: functions) {
+			boolean already = false;
+			for(FunctionDecl decl2: functions) {
+				if(decl.sameProto(decl2)) {
+					already = true;
+					break;
+				}
+			}
+			if(!already) functions.add(decl);
+		}
+		if(superRef != null) superRef.getFunctionsRecursive(functions);
+	}
 
 	public FunctionDecl getFunction(FunctionCall call) {
 		for(FunctionDecl decl: functions) {

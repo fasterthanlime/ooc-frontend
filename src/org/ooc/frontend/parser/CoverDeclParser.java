@@ -19,16 +19,16 @@ public class CoverDeclParser {
 		int mark = reader.mark();
 		
 		OocDocComment comment = null;
-		Token startToken = reader.peek();
-		if(startToken.type == TokenType.OOCDOC) {
-			comment = new OocDocComment(reader.read().get(sReader), startToken);
+		Token commentToken = reader.peek();
+		if(commentToken.type == TokenType.OOCDOC) {
+			comment = new OocDocComment(reader.read().get(sReader), commentToken);
 		}
 		
+		Token startToken = reader.peek();
 		String name = "";
-		Token tName = reader.peek();
-		if(tName.isNameToken()) {
-			name = tName.get(sReader);
-			reader.skip();
+		Type tName = TypeParser.parse(sReader, reader);
+		if(tName != null) {
+			name = tName.toString();
 			if(reader.read().type != TokenType.COLON) {
 				reader.reset(mark);
 				return null;
@@ -57,7 +57,7 @@ public class CoverDeclParser {
 				break;
 			}
 			
-			CoverDecl coverDecl = new CoverDecl(name, superName, overType, tName);
+			CoverDecl coverDecl = new CoverDecl(name, superName, overType, startToken);
 			coverDecl.setExternName(externName);
 			if(comment != null) coverDecl.setComment(comment);
 			
@@ -67,7 +67,7 @@ public class CoverDeclParser {
 					return coverDecl; // empty cover, acts like a typedef
 				}
 				throw new CompilationFailedError(sReader.getLocation(t2),
-						"Expected opening bracket to begin cover declaration, got "+t2.type);
+						"Expected opening bracket to begin cover declaration, got "+t2);
 			}
 			
 			while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {

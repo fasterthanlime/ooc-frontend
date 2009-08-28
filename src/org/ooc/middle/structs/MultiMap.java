@@ -3,10 +3,11 @@ package org.ooc.middle.structs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.Node;
@@ -26,7 +27,7 @@ public class MultiMap<K, V> extends Node {
 	
 	public MultiMap() {
 		super(Token.defaultToken);
-		map = new HashMap<K, Object>();
+		map = new LinkedHashMap<K, Object>();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -34,15 +35,12 @@ public class MultiMap<K, V> extends Node {
 		
 		Object o = map.get(key);
 		if(o == null) {
-			//System.out.println("Null, adding");
 			map.put(key, value);
 		} else {
 			if(o instanceof List<?>) {
-				//System.out.println("Already a list, adding");
 				List<V> list = (List<V>) o;
 				list.add(value);
 			} else {
-				//System.out.println("Replacing with a list and adding both");
 				List<V> list = new ArrayList<V>();
 				list.add((V) o);
 				list.add(value);
@@ -53,7 +51,7 @@ public class MultiMap<K, V> extends Node {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Iterable<V> get(final K key) {
+	public Iterable<V> getAll(final K key) {
 		
 		final Object o = map.get(key);
 		if(o instanceof List<?>) {
@@ -91,14 +89,42 @@ public class MultiMap<K, V> extends Node {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	public V get(final K key) {
+		
+		final Object o = map.get(key);
+		if(o instanceof List<?>) {
+			List<V> list = (List<V>) o;
+			return list.get(0);
+		}
+		return (V) o;
+		
+	}
+	
 	@Override
 	public String toString() {
 		return map.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		// TODO Auto-generated method stub
+		for(Object key: map.keySet()) {
+			final Object o = map.get(key);
+			if(o instanceof List<?>) {
+				List<V> list = (List<V>) o;
+				for(int index = 0; index < list.size(); index++) {
+					V value = list.get(index);
+					if(oldie == value) {
+						list.set(index, (V) kiddo);
+						return true;
+					}
+				}
+			} else if(o != null && o == oldie) {
+				map.put((K) oldie, kiddo);
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -126,6 +152,10 @@ public class MultiMap<K, V> extends Node {
 	@Override
 	public boolean hasChildren() {
 		return map.size() > 0;
+	}
+
+	public Set<K> keySet() {
+		return map.keySet();
 	}
 	
 }

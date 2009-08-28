@@ -6,10 +6,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.CoverDecl;
 import org.ooc.frontend.model.Declaration;
 import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.Module;
+import org.ooc.frontend.model.OpDecl;
 import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
@@ -35,6 +38,30 @@ public class ModuleParser {
 				if(reader.peek().type == TokenType.LINESEP) {
 					reader.skip();
 					continue;
+				}
+				
+				{
+					ClassDecl classDecl = ClassDeclParser.parse(sReader, reader);
+					if(classDecl != null) {
+						module.getTypes().add(classDecl.getName(), classDecl);
+						continue;
+					}
+				}
+				
+				{
+					CoverDecl coverDecl = CoverDeclParser.parse(sReader, reader);
+					if(coverDecl != null) {
+						module.getTypes().add(coverDecl.getName(), coverDecl);
+						continue;
+					}
+				}
+				
+				{
+					OpDecl opDecl = OpDeclParser.parse(sReader, reader);
+					if(opDecl != null) {
+						module.getOps().add(opDecl);
+						continue;
+					}
 				}
 				
 				Declaration declaration = DeclarationParser.parse(sReader, reader);

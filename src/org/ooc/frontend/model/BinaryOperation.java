@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.ooc.frontend.Visitor;
@@ -68,27 +69,40 @@ public abstract class BinaryOperation extends Expression implements MustBeResolv
 	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
 	
-		for(OpDecl op: res.ops) {
-			OpType opType = getOpType();
-			if(op.getOpType() == opType) {
-				if(op.getFunc().getArguments().size() != 2) {
-					throw new OocCompilationError(op, stack,
-							"To overload the add operator, you need exactly two arguments, not "
-							+op.getFunc().getArgsRepr());
-				}
-				NodeList<Argument> args = op.getFunc().getArguments();
-				if(args.get(0).getType().equals(left.getType())
-						&& args.get(1).getType().equals(right.getType())) {
-					FunctionCall call = new FunctionCall(op.getFunc(), startToken);
-					call.getArguments().add(left);
-					call.getArguments().add(right);
-					stack.peek().replace(this, call);
-				}
+		OpType opType = getOpType();		
+		for(OpDecl op: res.module.getOps()) {
+			if(tryOp(stack, opType, op)) break;
+		}
+		for(Import imp: res.module.getImports()) {
+			for(OpDecl op: imp.getModule().getOps()) {
+				if(tryOp(stack, opType, op)) break;
 			}
 		}
 		
 		return false;
 		
+	}
+
+	private boolean tryOp(NodeList<Node> stack, OpType opType, OpDecl op)
+			throws OocCompilationError, EOFException {
+		boolean end = false;
+		if(op.getOpType() == opType) {
+			if(op.getFunc().getArguments().size() != 2) {
+				throw new OocCompilationError(op, stack,
+						"To overload the add operator, you need exactly two arguments, not "
+						+op.getFunc().getArgsRepr());
+			}
+			NodeList<Argument> args = op.getFunc().getArguments();
+			if(args.get(0).getType().equals(left.getType())
+					&& args.get(1).getType().equals(right.getType())) {
+				FunctionCall call = new FunctionCall(op.getFunc(), startToken);
+				call.getArguments().add(left);
+				call.getArguments().add(right);
+				stack.peek().replace(this, call);
+				end = true;
+			}
+		}
+		return end;
 	}
 	
 	@Override

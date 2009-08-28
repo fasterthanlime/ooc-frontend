@@ -167,7 +167,7 @@ public class ClassDeclWriter {
 	public static void writeInstanceImplFuncs(ClassDecl classDecl,
 			String className, CGenerator cgen) throws IOException {
 
-		/* Non-static (ie. instance) functions */
+		// Non-static (ie. instance) functions
 		for (FunctionDecl decl : classDecl.getFunctions()) {
 			if (decl.isStatic() || decl.isAbstract())
 				continue;
@@ -180,10 +180,8 @@ public class ClassDeclWriter {
 			if (!decl.isFinal())
 				cgen.current.app("_impl");
 
-			writeFuncArgs(decl, decl.isConstructor(), cgen); // if is
-																// constuctor,
-																// don't write
-																// the first arg
+			// if is constuctor, don't write the first arg
+			writeFuncArgs(decl, decl.isConstructor(), cgen);
 
 			cgen.current.openBlock();
 
@@ -202,10 +200,7 @@ public class ClassDeclWriter {
 			}
 			cgen.current.closeSpacedBlock();
 
-			/*
-			 * Special case: constructor, now write the corresponding construct
-			 * function
-			 */
+			// Special case: constructor, now write the corresponding construct
 			if (decl.isConstructor()) {
 				cgen.current.app("void ").app(className).app("_construct");
 				if (!decl.getSuffix().isEmpty())
@@ -266,9 +261,7 @@ public class ClassDeclWriter {
 		}
 
 		for (FunctionDecl decl : writerClass.getFunctions()) {
-			if (decl.isStatic())
-				continue;
-			if (decl.isConstructor())
+			if (decl.isStatic() || decl.isConstructor())
 				continue;
 
 			if (decl.isFinal() || decl.isAbstract()) {
@@ -308,19 +301,18 @@ public class ClassDeclWriter {
 		cgen.current.nl();
 	}
 
-	public static Iterator<Argument> writeFuncPointer(FunctionDecl decl, CGenerator cgen)
+	public static void writeFuncPointer(FunctionDecl decl, CGenerator cgen)
 			throws IOException {
 		decl.getReturnType().accept(cgen);
 		cgen.current.app(" (*").app(decl.getName()).app(")(");
-		Iterator<Argument> iter = decl.getArguments().iterator();
-		while (iter.hasNext()) {
-			Argument arg = iter.next();
-			arg.accept(cgen);
-			if (iter.hasNext())
+		int numArgs = decl.getArguments().size() - 1;
+		Node[] args = decl.getArguments().getNodes();
+		for (int i = 0; i <= numArgs; i++) {
+			args[i].accept(cgen);
+			if (i < numArgs)
 				cgen.current.app(", ");
 		}
 		cgen.current.app(')');
-		return iter;
 	}
 
 	public static void writeClassStruct(ClassDecl classDecl, String className, CGenerator cgen)

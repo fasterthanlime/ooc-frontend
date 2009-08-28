@@ -99,14 +99,26 @@ public class ArrayAccess extends Access implements MustBeResolved {
 		
 		int assignIndex = stack.find(Assignment.class);
 		
-		for(OpDecl op: res.ops) {
-			if(assignIndex == -1) {
-				if(tryIndexing(op, stack)) break;
-			} else {
-				if(tryIndexedAssign(op, stack, assignIndex)) break;
+		for(OpDecl op: res.module.getOps()) {
+			if(tryOp(stack, assignIndex, op)) break;
+		}
+		for(Import imp: res.module.getImports()) {
+			for(OpDecl op: imp.getModule().getOps()) {
+				if(tryOp(stack, assignIndex, op)) break;
 			}
 		}
+		return false;
 		
+	}
+
+	private boolean tryOp(NodeList<Node> stack, int assignIndex, OpDecl op)
+		throws OocCompilationError, EOFException {
+		
+		if(assignIndex == -1) {
+			if(tryIndexing(op, stack)) return true;
+		} else {
+			if(tryIndexedAssign(op, stack, assignIndex)) return true;
+		}
 		return false;
 		
 	}

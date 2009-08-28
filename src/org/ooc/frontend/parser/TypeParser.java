@@ -21,7 +21,7 @@ public class TypeParser {
 		
 		Token startToken = reader.peek();
 		
-		//TODO add more type checking
+		//TODO add more checks
 		while(reader.hasNext()) {
 			Token t = reader.peek();
 			if(t.type == TokenType.UNSIGNED) {
@@ -63,8 +63,7 @@ public class TypeParser {
 		while(reader.peek().type == TokenType.OPEN_SQUAR) {
 			reader.skip();
 			if(reader.read().type != TokenType.CLOS_SQUAR) {
-				throw new CompilationFailedError(sReader.getLocation(reader.prev()),
-						"Expected closing square bracket, e.g. ']' in array type definition");
+				return null;
 			}
 			pointerLevel++;
 			isArray = true;

@@ -1,26 +1,19 @@
-include stdio;
-
-cover String from char*;
-extern func printf(String, ...);
-
-func main {
-	new Dog.sayName;
+main: func {
+	new Dog sayName();
 }
 
-class Animal {
+Animal: class {
 
-	String name;
-
-	func sayName printf("Hi, my name is %s\n", name);
+	name: String;
+	sayName: func printf("Hi, my name is %s\n", name);
 
 }
 
-class Dog from Animal {
+Dog: class extends Animal {
 
-	func new {
+	new: func {
 		this("Fido");
 	}
-
-	func new~withName(=name);
+	new: func ~withName (=name)
 
 }

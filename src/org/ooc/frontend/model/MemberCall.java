@@ -73,8 +73,7 @@ public class MemberCall extends FunctionCall {
 			return true;
 		}
 		exprType = exprType.getFlatType(res);
-		
-		if(exprType.getRef() == null) exprType.resolve(mainStack, res, fatal);
+		if(exprType.getRef() == null) exprType.resolve(res);
 		
 		if(exprType.getRef() == null) {
 			if(fatal) {
@@ -122,7 +121,9 @@ public class MemberCall extends FunctionCall {
 		int bestDistance = Integer.MAX_VALUE;
 		String bestMatch = null;
 		
-		for(FunctionDecl decl: typeDeclaration.getFunctionsRecursive()) {
+		NodeList<FunctionDecl> functions = new NodeList<FunctionDecl>();
+		typeDeclaration.getFunctionsRecursive(functions);
+		for(FunctionDecl decl: functions) {
 			int distance = Levenshtein.distance(name, decl.getName());
 			if(distance < bestDistance) {
 				bestDistance = distance;

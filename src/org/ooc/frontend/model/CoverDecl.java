@@ -94,12 +94,6 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 	}
 	
 	@Override
-	public NodeList<FunctionDecl> getFunctionsRecursive() {
-		System.out.println("Should get functions recursively from "+name+", got "+functions);
-		return functions;
-	}
-	
-	@Override
 	public FunctionDecl getFunction(FunctionCall call) {
 		for(FunctionDecl decl: functions) {
 			if(call.matches(decl)) return decl;
@@ -177,18 +171,13 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 			throws IOException {
 		
 		if(fromType == null) return false;
-
-		for(TypeDecl decl: res.types) {
-			if(decl.getName().equals(fromType.getName())) {
-				fromType.setRef(decl);
-			}
+		fromType.resolve(res);
+		
+		if(fromType.ref == null) {
+			fromType.ref = new BuiltinType(fromType);
 		}
 		
-		if(fromType.getRef() == null) {
-			fromType.setRef(new BuiltinType(fromType));
-		}
-		
-		return fromType.getRef() == null;
+		return fromType.ref == null;
 		
 	}
 

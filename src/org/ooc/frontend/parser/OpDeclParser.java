@@ -62,7 +62,7 @@ public class OpDeclParser {
 					type = OpType.IDX;
 				}
 			} else {
-				throw new CompilationFailedError(null, "Unexpected token "+reader.peek().type
+				throw new CompilationFailedError(null, "Unexpected token "+reader.peek()
 						+". You're probably trying to override [] (indexing) or []= (indexed assign)");
 			}
 		} else {

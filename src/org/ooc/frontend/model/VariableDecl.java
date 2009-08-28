@@ -1,5 +1,6 @@
 package org.ooc.frontend.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -186,7 +187,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected boolean unwrapToVarAcc(NodeList<Node> stack) throws Error {
+	protected boolean unwrapToVarAcc(NodeList<Node> stack) throws EOFException {
 
 		Node parent = stack.peek();
 		Node grandpa = stack.get(stack.size() - 2);
@@ -200,7 +201,7 @@ public class VariableDecl extends Declaration implements MustBeUnwrapped {
 		}
 		
 		if(atoms.size() != 1) {
-			throw new Error("Multi-var decls used an expression.. wtf?");
+			throw new OocCompilationError(this, stack, "Multi-var decls used an expression.. wtf?");
 		}
 		VariableDeclAtom atom = atoms.get(0);
 		VariableAccess varAcc = new VariableAccess(atom.name, atom.startToken);

@@ -141,17 +141,12 @@ public class Type extends Node implements MustBeResolved {
 	
 	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal) throws IOException {
 
-		for(TypeDecl decl: res.types) {
-			if(decl.getName().equals(name)) {
-				ref = decl;
-				return false;
-			}
-		}
+		ref = stack.getModule().getType(name);
 
 		if(ref == null && name.equals("This")) {
 			int index = stack.find(TypeDecl.class);
 			if(index == -1) {
-				throw new OocCompilationError(this, stack, "Using 'This' outside a type definition. Wtf?");
+				throw new OocCompilationError(this, stack, "Using 'This' outside a type definition. Wtf? stack = "+stack);
 			}
 			TypeDecl typeDecl = (TypeDecl) stack.get(index);
 			name = typeDecl.getName();
@@ -208,7 +203,7 @@ public class Type extends Node implements MustBeResolved {
 				if(res == null) {
 					groundType.ref = ref;
 				} else {
-					res.resolveType(groundType);
+					groundType.resolve(res);
 				}
 				return groundType;
 			}
@@ -226,7 +221,7 @@ public class Type extends Node implements MustBeResolved {
 			
 			returnType = new Type(fromType.name, fromType.pointerLevel - 1,
 					returnType.referenceLevel - 1, fromType.startToken);
-			res.resolveType(returnType);
+			returnType.resolve(res);
 		}
 		
 		return returnType;
@@ -234,6 +229,10 @@ public class Type extends Node implements MustBeResolved {
 
 	public boolean fitsIn(Type innerType) {
 		return equals(innerType);
+	}
+
+	public void resolve(Resolver res) {
+		ref = res.module.getType(name);
 	}
 	
 }

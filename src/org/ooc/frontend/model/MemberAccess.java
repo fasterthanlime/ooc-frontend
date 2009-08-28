@@ -61,8 +61,8 @@ public class MemberAccess extends VariableAccess {
 	}
 	
 	@Override
-	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
-			throws IOException {
+	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal) throws IOException {
+		
 		Type exprType = expression.getType();
 		if(exprType == null) {
 			if(fatal) {
@@ -72,8 +72,8 @@ public class MemberAccess extends VariableAccess {
 			}
 			return true;
 		}
-		
-		if(exprType.getRef() == null) exprType.resolve(stack, res, fatal);
+		exprType = exprType.getFlatType(res);
+		if(exprType.getRef() == null) exprType.resolve(res);
 
 		if(tryResolve(stack, exprType)) return true;
 		if(tryResolve(stack, exprType.getFlatType(res))) return true;
@@ -93,7 +93,7 @@ public class MemberAccess extends VariableAccess {
 	private String guessCorrectName(final TypeDecl typeDeclaration) {
 		
 		if(typeDeclaration == null) {
-			System.out.println("Null TypeDecl for class "+expression.getType());
+			System.out.println("Null TypeDecl for class "+expression.getType()+", returning null");
 			return null;
 		}
 		
@@ -136,9 +136,11 @@ public class MemberAccess extends VariableAccess {
 			stack.peek().replace(this, new Parenthesis(div, startToken));
 			return true;
 		}
-		
+
 		if(ref == null && name.equals("class") && exprType.getRef() instanceof CoverDecl) {
-			stack.peek().replace(this, new MemberCall(expression, "class", "", startToken));
+			if(!stack.peek().replace(this, new MemberCall(expression, "class", "", startToken))) {
+				throw new OocCompilationError(this, stack, "Couldn't replace class access with member call");
+			}
 			return true;
 		}
 		

@@ -43,7 +43,7 @@ public class IncludeParser {
 				readDefines(sReader, reader, defines);
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(token),
-						"Unexpected token "+token.type+" while reading an include");
+						"Unexpected token "+token+" while reading an include");
 			}
 			
 		}

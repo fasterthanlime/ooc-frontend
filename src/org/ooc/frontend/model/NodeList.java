@@ -256,4 +256,8 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 		
 		return -1;
 	}
+
+	public Module getModule() {
+		return (Module) nodes[0];
+	}
 }

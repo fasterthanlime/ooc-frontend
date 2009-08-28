@@ -27,19 +27,14 @@ import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
-import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.Tinkerer;
 import org.ooc.outputting.FileUtils;
+import org.ubi.CompilationFailedError;
 
 public class CommandLine {
 	
 	public static void main(String[] argv) throws InterruptedException, IOException {
-		try {
-			new CommandLine(argv);
-		} catch(OocCompilationError err) {
-			System.err.println(err);
-			System.exit(1);
-		}
+		new CommandLine(argv);
 	}
 	
 	protected BuildParams params = new BuildParams();
@@ -204,11 +199,20 @@ public class CommandLine {
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
 		params.sourcePath.add(params.distLocation + File.separator + "sdk");
 	
+		int successCount = 0;
 		for(String modulePath: modulePaths) {
-			parse(modulePath);
-			if(params.clean) {
-				FileUtils.deleteRecursive(params.outPath);
+			try {
+				int code = parse(modulePath);
+				if(code == 0) successCount++;
+			} catch(CompilationFailedError err) {
+				System.err.println(err);
 			}
+			if(params.clean) FileUtils.deleteRecursive(params.outPath);
+		}
+		
+		if(modulePaths.size() > 1) {
+			System.out.println(modulePaths.size()+" compiled ("+successCount
+					+" success, "+(modulePaths.size() - successCount)+" failed)");
 		}
 		
 	}
@@ -251,7 +255,7 @@ public class CommandLine {
 		
 	}
 
-	protected void parse(String modulePath) throws InterruptedException, IOException {
+	protected int parse(String modulePath) throws InterruptedException, IOException {
 		
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
@@ -262,11 +266,11 @@ public class CommandLine {
 		long tt3 = System.nanoTime();
 		output(module, new HashSet<Module>());
 		long tt4 = System.nanoTime();
-		compile(module);
+		int code = compile(module);
 		long tt5 = System.nanoTime();
 
 		if(params.timing) {
-			System.out.printf("parse: %.2f ms, tink: %.2f ms, out: %.2f, cc: %.2f ms, TOTAL %.2f ms\n",
+			System.out.printf("parse: %.2f ms\ttink: %.2f ms\tout: %.2f\tcc: %.2f ms\tTOTAL %.2f ms\n",
 					Float.valueOf((tt2 - tt1) / 1000000.0f),
 					Float.valueOf((tt3 - tt2) / 1000000.0f),
 					Float.valueOf((tt4 - tt3) / 1000000.0f),
@@ -274,13 +278,14 @@ public class CommandLine {
 					Float.valueOf((tt5 - tt1) / 1000000.0f));
 		}
 		
-		if(params.run) {
+		if(code == 0 && params.run) {
 			ProcessBuilder builder = new ProcessBuilder();
 			builder.command("./"+module.getSimpleName());
 			Process process = builder.start();
 			ProcessUtils.redirectIO(process);
 			process.waitFor();
 		}
+		return code;
 		
 	}
 	
@@ -304,15 +309,17 @@ public class CommandLine {
 		}
 	}
 
-	protected void compile(Module module) throws Error,
+	protected int compile(Module module) throws Error,
 			IOException, InterruptedException {
 		
 		compiler.reset();
 		
 		for(Include inc: module.getIncludes()) {
 			if(inc.getMode() == Mode.LOCAL) {
-				FileUtils.copy(new File(inc.getPath() + ".h"),
+				try {
+					FileUtils.copy(new File(inc.getPath() + ".h"),
 						new File(params.outPath, inc.getPath() + ".h"));
+				} catch(Exception e) { e.printStackTrace(); }
 			}
 		}
 		
@@ -350,8 +357,8 @@ public class CommandLine {
 		int code = compiler.launch();
 		if(code != 0) {
 			System.err.println("C compiler failed, aborting compilation process");
-			System.exit(code);
 		}
+		return code;
 		
 	}
 

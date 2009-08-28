@@ -10,33 +10,28 @@ public class FunctionCallWriter {
 
 	public static void write(FunctionCall functionCall, CGenerator cgen) throws IOException {
 
-		FunctionDecl decl = functionCall.getImpl();
+		FunctionDecl impl = functionCall.getImpl();
 		if(functionCall.isConstructorCall()) {
-			cgen.current.app(decl.getTypeDecl().getName());
-			if(functionCall.getImpl().getTypeDecl() instanceof ClassDecl) {
+			cgen.current.app(impl.getTypeDecl().getName());
+			if(impl.getTypeDecl() instanceof ClassDecl) {
 				cgen.current.app("_construct");
 			} else{
 				cgen.current.app("_new");
 			}
-			if(!decl.getSuffix().isEmpty()) {
-				cgen.current.app('_');
-				cgen.current.app(decl.getSuffix());
-			}
-		} else if(decl.isFromPointer()) {
+			if(!impl.getSuffix().isEmpty()) cgen.current.app('_').app(impl.getSuffix());
+		} else if(impl.isFromPointer()) {
 			cgen.current.app(functionCall.getName());
 		} else {
-			decl.writeFullName(cgen.current);
+			impl.writeFullName(cgen.current);
 		}
 		
-		FunctionDecl impl = functionCall.getImpl();
 		NodeList<Expression> args = functionCall.getArguments();
-		
 		cgen.current.app('(');
 		if(functionCall.isConstructorCall() && impl.getTypeDecl() instanceof ClassDecl) {
 			cgen.current.app('(');
-			decl.getTypeDecl().getInstanceType().accept(cgen);
+			impl.getTypeDecl().getInstanceType().accept(cgen);
 			cgen.current.app(')');
-			cgen.current.app(" cgen");
+			cgen.current.app(" this");
 			if(!args.isEmpty()) cgen.current.app(", ");
 		}
 		writeCallArgs(args, impl, cgen);

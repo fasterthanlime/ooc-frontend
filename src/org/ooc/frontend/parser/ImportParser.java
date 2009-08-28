@@ -45,7 +45,7 @@ public class ImportParser {
 				sb.append('.');
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(token),
-						"Unexpected token "+token.type+" while reading an import");
+						"Unexpected token "+token+" while reading an import");
 			}
 			
 		}

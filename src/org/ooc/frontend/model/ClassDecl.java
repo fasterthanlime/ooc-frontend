@@ -32,6 +32,11 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 		addFunction(constructor);
 		this.defaultConstructor = constructor;
 	}
+	
+	@Override
+	public ClassDecl getSuperRef() {
+		return (ClassDecl) superRef;
+	}
 
 	public boolean isObjectClass() {
 		return name.equals("Object");
@@ -53,14 +58,6 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 		this.comment = comment;
 	}
 	
-	public String getSuperName() {
-		return superName;
-	}
-	
-	public void setSuperName(String superName) {
-		this.superName = superName;
-	}
-	
 	public FunctionDecl getInitializeFunc() {
 		return initialize;
 	}
@@ -77,14 +74,6 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 		this.isAbstract = isAbstract;
 	}
 	
-	public ClassDecl getSuperRef() {
-		return superRef;
-	}
-	
-	public void setSuperRef(ClassDecl superRef) {
-		this.superRef = superRef;
-	}
-	
 	@Override
 	public void addFunction(FunctionDecl decl) {
 		if(defaultConstructor != null && decl.isConstructor()) {
@@ -92,29 +81,6 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 			defaultConstructor = null;
 		}
 		super.addFunction(decl);
-	}
-	
-	@Override
-	public NodeList<FunctionDecl> getFunctionsRecursive() {
-		NodeList<FunctionDecl> allFuncs = new NodeList<FunctionDecl>(startToken);
-		getFunctionsRecursive(allFuncs);
-		return allFuncs;
-	}
-	
-	protected void getFunctionsRecursive(NodeList<FunctionDecl> allFuncs) {
-		for(FunctionDecl decl: functions) {
-			boolean already = false;
-			for(FunctionDecl decl2: allFuncs) {
-				if(decl.sameProto(decl2)) {
-					already = true;
-					break;
-				}
-			}
-			if(!already) {
-				allFuncs.add(decl);
-			}
-		}
-		if(superRef != null) superRef.getFunctionsRecursive(allFuncs);
 	}
 
 	@Override
@@ -178,23 +144,10 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 			throws IOException {
 		
 		if(isResolved()) return false;
-		
-		for(TypeDecl candidate: res.types) {
-			if(superName.equals(candidate.getName())) {
-				if(!(candidate instanceof ClassDecl)) {
-					throw new OocCompilationError(this, stack, "Trying to extends a "
-							+candidate.getClass().getSimpleName()+". You can only extend classes.");
-				}
-				superRef = (ClassDecl) candidate;
-				return true;
-			}
+		if(!(superRef instanceof ClassDecl)) {
+			throw new OocCompilationError(this, stack, "Trying to extends a "
+					+superRef.getClass().getSimpleName()+". You can only extend classes.");
 		}
-		
-		if(superRef == null && fatal) {
-			throw new OocCompilationError(this, stack, "Couldn't resolve super-class "
-					+superName+" of class "+name);
-		}
-		
 		return superRef == null;
 		
 	}

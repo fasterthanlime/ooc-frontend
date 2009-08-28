@@ -8,7 +8,6 @@ import org.ooc.frontend.model.tokens.Token;
 public class BuiltinType extends TypeDecl {
 
 	protected Type type;
-	static NodeList<FunctionDecl> EMPTY = new NodeList<FunctionDecl>(Token.defaultToken);
 	
 	public BuiltinType(String name) {
 		this(name, Token.defaultToken);
@@ -45,11 +44,6 @@ public class BuiltinType extends TypeDecl {
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
 		return false;
-	}
-
-	@Override
-	public NodeList<FunctionDecl> getFunctionsRecursive() {
-		return EMPTY;
 	}
 	
 }

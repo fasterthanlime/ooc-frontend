@@ -34,11 +34,8 @@ public class Instantiation extends FunctionCall {
 		
 		if(name.isEmpty()) guessName(stack);
 		
-		for(TypeDecl decl: res.types) {
-			if(!decl.getName().equals(name)) {
-				continue;
-			}
-			
+		TypeDecl decl = res.module.getType(name);
+		if(decl != null) {
 			for(FunctionDecl func: decl.getFunctions()) {
 				if(!func.isConstructor()) continue;
 				if(!suffix.isEmpty() && !func.getSuffix().equals(suffix)) continue;
@@ -47,7 +44,7 @@ public class Instantiation extends FunctionCall {
 				if(numArgs == arguments.size()
 					|| ((!func.getArguments().isEmpty() && func.getArguments().getLast() instanceof VarArg)
 					&& (numArgs <= arguments.size()))) {
-					setImpl(func);
+					impl = func;
 					return false;
 				}
 			}
@@ -99,13 +96,6 @@ public class Instantiation extends FunctionCall {
 		}
 		
 		return true;
-		
-	}
-	
-	@Override
-	public Type getType() {
-		
-		return super.getType();
 		
 	}
 	

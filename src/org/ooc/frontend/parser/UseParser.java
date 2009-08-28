@@ -36,7 +36,7 @@ public class UseParser {
 				sb.append(token.get(sReader));
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(token),
-						"Unexpected token "+token.type+" while reading use");
+						"Unexpected token "+token+" while reading use");
 			}
 			
 		}

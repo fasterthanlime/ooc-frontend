@@ -2,4 +2,5 @@
 *.gen
 bin/*
 build/
+utils/test-suite
 ooc_tmp
