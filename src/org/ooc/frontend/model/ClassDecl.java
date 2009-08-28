@@ -113,14 +113,6 @@ public class ClassDecl extends TypeDecl implements MustBeResolved {
 	}
 	
 	@Override
-	public FunctionDecl getFunction(FunctionCall call) {
-		FunctionDecl function = super.getFunction(call);
-		if(function != null) return function;
-		if(superRef != null) return superRef.getFunction(call);
-		return null;
-	}
-	
-	@Override
 	public VariableDecl getVariable(String name) {
 		VariableDecl variable = super.getVariable(name);
 		if(variable != null) return variable;

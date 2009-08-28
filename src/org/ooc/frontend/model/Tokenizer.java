@@ -133,6 +133,7 @@ public class Tokenizer {
 		new CharTuple('*', TokenType.STAR, '=', TokenType.STAR_ASSIGN),
 		new CharTuple('<', TokenType.LESSTHAN, '=', TokenType.LESSTHAN_EQUALS),
 		new CharTuple('>', TokenType.GREATERTHAN, '=', TokenType.GREATERTHAN_EQUALS),
+		new CharTuple('^', TokenType.SOMBRERO),
 	};
 	
 	public List<Token> parse(SourceReader reader) throws IOException {

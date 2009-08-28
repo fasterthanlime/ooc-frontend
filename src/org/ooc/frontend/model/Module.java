@@ -27,7 +27,7 @@ public class Module extends Node implements Scope {
 	private boolean isMain;
 	private final SourceReader reader;
 	
-	public Thread thread;
+	public long lastModified;
 	
 	public Module(String fullName, SourceReader reader) {
 		
@@ -212,6 +212,9 @@ public class Module extends Node implements Scope {
 	@Override
 	public VariableDecl getVariable(String name) {
 		for(Node node: body) {
+			if(node instanceof Line) {
+				node = ((Line) node).getStatement();
+			}
 			if(node instanceof VariableDecl) {
 				VariableDecl varDecl = (VariableDecl) node;
 				if(varDecl.getName().equals(name)) return varDecl;
@@ -248,11 +251,6 @@ public class Module extends Node implements Scope {
 				functions.add((FunctionDecl) node);
 			}
 		}
-	}
-	
-	public void join() throws InterruptedException {
-		while(thread == null) Thread.sleep(5L);
-		thread.join();
 	}
 	
 	public MultiMap<String, TypeDecl> getTypes() {

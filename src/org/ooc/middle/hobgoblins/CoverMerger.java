@@ -35,7 +35,6 @@ public class CoverMerger implements Hobgoblin {
 	boolean searchFor(final Module module, final CoverDecl child) throws IOException {
 		
 		Nosy.get(CoverDecl.class, new Opportunist<CoverDecl> () {
-
 			@Override
 			public boolean take(CoverDecl node, NodeList<Node> stack) throws IOException {
 				if(!node.getName().equals(child.getName())) return true;

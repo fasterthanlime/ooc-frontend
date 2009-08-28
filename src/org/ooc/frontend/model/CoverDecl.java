@@ -93,16 +93,6 @@ public class CoverDecl extends TypeDecl implements MustBeResolved {
 		return fromType;
 	}
 	
-	@Override
-	public FunctionDecl getFunction(FunctionCall call) {
-		for(FunctionDecl decl: functions) {
-			if(call.matches(decl)) return decl;
-		}
-		
-		if(base != null) return base.getFunction(call);
-		return null;
-	}
-	
 	public OocDocComment getComment() {
 		return comment;
 	}

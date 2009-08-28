@@ -1,6 +1,5 @@
 package org.ooc.frontend.parser;
 
-import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import org.ubi.SourceReader;
 
 public class IncludeParser {
 
-	public static boolean parse(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws EOFException, CompilationFailedError {
+	public static boolean parse(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws CompilationFailedError {
 
 		Token startToken = reader.peek();
 		if(startToken.type != TokenType.INCLUDE_KW) return false;
@@ -36,14 +35,10 @@ public class IncludeParser {
 				addInclude(includes, sb.toString(), defines, startToken);
 				sb.setLength(0);
 				defines.clear();
-			} else if(token.type == TokenType.NAME || token.type == TokenType.SLASH
-					|| token.type == TokenType.DOT || token.type == TokenType.DOUBLE_DOT) {
-				sb.append(token.get(sReader));
 			} else if(token.type == TokenType.PIPE) {
 				readDefines(sReader, reader, defines);
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(token),
-						"Unexpected token "+token+" while reading an include");
+				sb.append(token.get(sReader));
 			}
 			
 		}

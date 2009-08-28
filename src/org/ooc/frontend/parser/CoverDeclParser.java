@@ -50,9 +50,11 @@ public class CoverDeclParser {
 						throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected cover's base type name after the from keyword.");
 					}
+					continue;
 				} else if(token.type == TokenType.EXTENDS_KW) {
 					reader.skip();
 					superName = reader.read().get(sReader);
+					continue;
 				}
 				break;
 			}
@@ -97,9 +99,14 @@ public class CoverDeclParser {
 					continue;
 				}
 				
+				if(reader.peek().type == TokenType.OOCDOC) {
+					reader.skip();
+					continue;
+				}
+				
 				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected variable declaration or function declaration in a cover declaration, but got "
-						+reader.peek().type);
+						+reader.peek());
 			
 			}
 			reader.skip();

@@ -28,6 +28,7 @@ import org.ooc.frontend.model.Else;
 import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FloatLiteral;
 import org.ooc.frontend.model.Foreach;
+import org.ooc.frontend.model.FuncType;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.FunctionDecl;
 import org.ooc.frontend.model.If;
@@ -312,8 +313,12 @@ public class CGenerator extends Generator implements Visitor {
 				current.app("[]");
 			}
 		} else {
-			TypeWriter.writeSpaced(type, this);
-			current.app(regularArgument.getName());
+			if(type instanceof FuncType) {
+				TypeWriter.writeFuncPointer((FuncType) type, regularArgument.getName(), this);
+			} else {
+				TypeWriter.writeSpaced(type, this);
+				current.app(regularArgument.getName());
+			}
 		}
 	}
 

@@ -79,7 +79,7 @@ public class Nosy<T> implements Visitor {
 
 	public void visit(Node node) throws IOException {
 		if(!running) return; // if not running, do nothing
-		
+
 		if(node.hasChildren()) {
 			stack.push(node);
 			node.acceptChildren(this);

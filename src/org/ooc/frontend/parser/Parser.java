@@ -20,7 +20,7 @@ public class Parser {
 		this.params = params;
 	}
 	
-	public Module parse(final String path, boolean join) throws IOException {
+	public Module parse(final String path) throws IOException {
 		if(params.verbose)
 			System.out.println("Parsing "+path);
 		
@@ -29,7 +29,10 @@ public class Parser {
 			throw new CompilationFailedError(null, "File "+path+" not found in sourcePath."
 				+" sourcePath = "+params.sourcePath);
 		}
-		
+		return parse(path, file);
+	}
+
+	public Module parse(final String path, final File file) throws IOException {
 		final SourceReader sReader = SourceReader.getReaderFromFile(file);
 		final List<Token> tokens = new Tokenizer().parse(sReader);
 		
@@ -39,7 +42,6 @@ public class Parser {
 		final Module module = new Module(fullName, sReader);
 		ModuleParser.parse(module, fullName, file,
 				sReader, new TokenReader(tokens), Parser.this);
-		
 		return module;
 	}
 		

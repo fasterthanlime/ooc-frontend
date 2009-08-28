@@ -1,7 +1,9 @@
 package org.ooc.frontend;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,6 +18,8 @@ import org.ooc.compiler.CompilerVersion;
 import org.ooc.compiler.Help;
 import org.ooc.compiler.ProcessUtils;
 import org.ooc.compiler.libraries.Target;
+import org.ooc.compiler.pkgconfig.PkgConfigFrontend;
+import org.ooc.compiler.pkgconfig.PkgInfo;
 import org.ooc.frontend.compilers.AbstractCompiler;
 import org.ooc.frontend.compilers.Gcc;
 import org.ooc.frontend.compilers.Icc;
@@ -28,6 +32,7 @@ import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
 import org.ooc.frontend.parser.Parser;
 import org.ooc.middle.Tinkerer;
+import org.ooc.middle.UseDef;
 import org.ooc.outputting.FileUtils;
 import org.ubi.CompilationFailedError;
 
@@ -160,11 +165,9 @@ public class CommandLine {
         			Help.printHelpNone();
         			System.exit(0);
         			
-        		} else if(option.equals("daemon")) {
+        		} else if(option.equals("slave")) {
         			
-        			new CompilerDaemon();
-
-        			System.exit(0);
+        			params.slave = true;
         			
         		} else {
         			
@@ -199,21 +202,28 @@ public class CommandLine {
 		if(params.sourcePath.isEmpty()) params.sourcePath.add(".");
 		params.sourcePath.add(params.distLocation + File.separator + "sdk");
 	
-		int successCount = 0;
-		for(String modulePath: modulePaths) {
-			try {
-				int code = parse(modulePath);
-				if(code == 0) successCount++;
-			} catch(CompilationFailedError err) {
-				System.err.println(err);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		do {
+			int successCount = 0;
+			for(String modulePath: modulePaths) {
+				try {
+					int code = parse(modulePath);
+					if(code == 0) successCount++;
+				} catch(CompilationFailedError err) {
+					System.err.println(err);
+				}
+				if(params.clean) FileUtils.deleteRecursive(params.outPath);
 			}
-			if(params.clean) FileUtils.deleteRecursive(params.outPath);
-		}
-		
-		if(modulePaths.size() > 1) {
-			System.out.println(modulePaths.size()+" compiled ("+successCount
-					+" success, "+(modulePaths.size() - successCount)+" failed)");
-		}
+			
+			if(modulePaths.size() > 1) {
+				System.out.println(modulePaths.size()+" compiled ("+successCount
+						+" success, "+(modulePaths.size() - successCount)+" failed)");
+			}
+			if(params.slave) {
+				System.out.println("------------- ready -------------\n");
+				reader.readLine();
+			}
+		} while(params.slave);
 		
 	}
 	
@@ -259,7 +269,7 @@ public class CommandLine {
 		
 		params.outPath.mkdirs();
 		long tt1 = System.nanoTime();
-		Module module = new Parser(params).parse(modulePath, true);
+		Module module = new Parser(params).parse(modulePath);
 		module.setMain(true);
 		long tt2 = System.nanoTime();
 		tinker(module, new HashSet<Module>());
@@ -339,7 +349,7 @@ public class CommandLine {
 		
 		if(params.link) {
 			compiler.setOutputPath(module.getSimpleName());
-			Collection<String> libs = getAllLibsFromUses(module);
+			Collection<String> libs = getFlagsFromUse(module);
 			for(String lib: libs) compiler.addObjectFile(lib);
 			
 			if(params.dynGC) {
@@ -362,26 +372,40 @@ public class CommandLine {
 		
 	}
 
-	protected Collection<String> getAllLibsFromUses(Module module) throws IOException, InterruptedException {
+	protected Collection<String> getFlagsFromUse(Module module) throws IOException, InterruptedException {
 
 		Set<String> list = new HashSet<String>();
 		Set<Module> done = new HashSet<Module>();
-		getAllLibsFromUses(module, list, done);
+		getFlagsFromUse(module, list, done);
 		return list;
 		
 	}
 
-	protected void getAllLibsFromUses(Module module, Set<String> list, Set<Module> done) throws IOException, InterruptedException {
+	protected void getFlagsFromUse(Module module, Set<String> list, Set<Module> done) throws IOException, InterruptedException {
 
 		if(done.contains(module)) return;
 		done.add(module);
 		
 		for(Use use: module.getUses()) {
-			compileNasms(use.getUseDef().getLibs(), list);
+			UseDef useDef = use.getUseDef();
+			compileNasms(useDef.getLibs(), list);
+			for(String pkg: useDef.getPkgs()) {
+				PkgInfo info = PkgConfigFrontend.getInfo(pkg);
+				for(String cflag: info.cflags) {
+					if(!list.contains(cflag)) {
+						list.add(cflag);
+					}
+				}
+				for(String library: info.libraries) {
+					if(!list.contains(library)) {
+						list.add("-l"+library); // FIXME lazy
+					}
+				}
+			}
 		}
 		
 		for(Import imp: module.getImports()) {
-			getAllLibsFromUses(imp.getModule(), list, done);
+			getFlagsFromUse(imp.getModule(), list, done);
 		}
 		
 	}

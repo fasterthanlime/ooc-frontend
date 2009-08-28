@@ -68,12 +68,17 @@ public abstract class TypeDecl extends Declaration implements Scope {
 		return functions;
 	}
 	
+	public FunctionDecl getFunction(FunctionCall call) {
+		return getFunction(call.getName(), call);
+	}
+	
 	@Override
 	public FunctionDecl getFunction(String name, FunctionCall call) {
 		for(FunctionDecl func : functions) {
 			if(func.getName().equals(name)
 					&& (call == null || call.matches(func))) return func;
 		}
+		if(superRef != null) return superRef.getFunction(name, call);
 		return null;
 	}
 	
@@ -118,14 +123,7 @@ public abstract class TypeDecl extends Declaration implements Scope {
 		}
 		if(superRef != null) superRef.getFunctionsRecursive(functions);
 	}
-
-	public FunctionDecl getFunction(FunctionCall call) {
-		for(FunctionDecl decl: functions) {
-			if(call.matches(decl)) return decl;
-		}
-		return null;
-	}
-
+	
 	public VariableDecl getVariable(String name) {
 		for(VariableDecl decl: variables) {
 			if(decl.hasAtom(name)) return decl;

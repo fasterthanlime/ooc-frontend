@@ -90,7 +90,7 @@ public class ExpressionParser {
 				FunctionCall call = FunctionCallParser.parse(sReader, reader);
 				if(call != null) {
 					expr = new MemberCall(expr, call, token);
-					continue;
+					continue ;
 				}
 				
 				VariableAccess varAccess = VariableAccessParser.parse(sReader, reader);

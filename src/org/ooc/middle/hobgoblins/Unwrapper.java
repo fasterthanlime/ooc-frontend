@@ -2,7 +2,9 @@ package org.ooc.middle.hobgoblins;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.HashSet;
 
+import org.ooc.frontend.model.Import;
 import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Node;
 import org.ooc.frontend.model.NodeList;
@@ -40,7 +42,7 @@ public class Unwrapper implements Hobgoblin {
 	@Override
 	public void process(Module module, BuildParams params) throws IOException {
 
-		resolveSuper(module);
+		resolveSuper(module, new HashSet<Module>());
 
 		SketchyNosy nosy = new SketchyNosy(new Opportunist<Node>() {
 			@Override
@@ -98,13 +100,16 @@ public class Unwrapper implements Hobgoblin {
 		decls.add(new BuiltinType("uint16_t"));
 		decls.add(new BuiltinType("uint32_t"));
 		
-		decls.add(new BuiltinType("size_t"));
+		decls.add(new BuiltinType("size_t"));		
 		decls.add(new BuiltinType("time_t"));
 	}
 	*/
 
-	private void resolveSuper(Module module) throws OocCompilationError,
+	private void resolveSuper(Module module, HashSet<Module> hashSet) throws OocCompilationError,
 			EOFException {
+		
+		hashSet.add(module);
+		
 		MultiMap<String, TypeDecl> types = module.getTypes();
 		for (String key : types.keySet()) {
 			for (TypeDecl decl : types.getAll(key)) {
@@ -118,6 +123,12 @@ public class Unwrapper implements Hobgoblin {
 							"Couldn't resolve parent type " + superName
 									+ " of type " + decl.getName());
 				}
+			}
+		}
+		
+		for(Import imp: module.getImports()) {
+			if(!hashSet.contains(imp.getModule())) {
+				resolveSuper(imp.getModule(), hashSet);
 			}
 		}
 	}

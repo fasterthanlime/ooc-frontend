@@ -28,6 +28,7 @@ public class ModuleParser {
 	public static void parse(final Module module, final String fullName, final File file, final SourceReader sReader,
 			final TokenReader reader, final Parser parser) {
 		
+		module.lastModified = file.lastModified();
 		cache.put(module.getFullName(), module);
 		
 		try {
@@ -91,14 +92,16 @@ public class ModuleParser {
 			}
 	
 			for(Import imp: module.getImports()) {
-				synchronized (cache) {
-					Module cached = cache.get(imp.getName());
-					if(cached == null) {
-						cached = parser.parse(imp.getPath(), false);
-						cache.put(imp.getName(), cached);
+				Module cached = cache.get(imp.getName());
+				File impFile = parser.params.sourcePath.getFile(imp.getPath());
+				if(cached == null || impFile.lastModified() > cached.lastModified) {
+					if(cached != null) {
+						System.out.println(imp.getPath()+" has been changed, recompiling...");
 					}
-					imp.setModule(cached);
+					cached = parser.parse(imp.getPath(), impFile);
+					cache.put(imp.getName(), cached);
 				}
+				imp.setModule(cached);
 			}
 		
 		} catch(IOException e) {

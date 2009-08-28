@@ -2,13 +2,16 @@ package org.ooc.backend.cdirty;
 
 import java.io.IOException;
 
-import org.ooc.frontend.model.*;
+import org.ooc.frontend.model.ClassDecl;
+import org.ooc.frontend.model.FuncType;
+import org.ooc.frontend.model.Type;
+import org.ooc.frontend.model.TypeParam;
 
 public class TypeWriter {
 
 	public static void write(Type type, CGenerator cgen) throws IOException {
 		if(type.getName().equals("Func")) {
-			cgen.current.append("void (*)()");
+			writeFuncPointer((FuncType) type, "", cgen);
 			return;
 		}
 		
@@ -44,6 +47,10 @@ public class TypeWriter {
 	public static void writeSpaced(Type type, CGenerator cgen) throws IOException {
 		type.accept(cgen);
 		if(type.isFlat()) cgen.current.app(' ');
+	}
+
+	public static void writeFuncPointer(FuncType type, String name, CGenerator cgen) throws IOException {
+		cgen.current.app("void (*").app(name).app(")()");		
 	}
 	
 }
