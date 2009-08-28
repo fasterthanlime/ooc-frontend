@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ooc.frontend.model.FunctionDecl;
-import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.OocDocComment;
 import org.ooc.frontend.model.Type;
 import org.ooc.frontend.model.TypeParam;
@@ -115,24 +114,21 @@ public class FunctionDeclParser {
 
 		if(token.type != TokenType.OPEN_BRACK) {
 			reader.rewind();
-			Line line = LineParser.parse(sReader, reader);
-			if(line == null) {
+			if(!LineParser.fill(sReader, reader, functionDecl.getBody())) {
 				throw new CompilationFailedError(sReader.getLocation(reader.prev()),
 						"Expected opening brace after function name.");
 			}
-			functionDecl.getBody().add(line);
 			return functionDecl;
 		}
 	
 		while(reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
 			reader.skipWhitespace();
 		
-			Line line = LineParser.parse(sReader, reader);
-			if(line == null && reader.hasNext() && reader.peek().type != TokenType.CLOS_BRACK) {
+			if(!LineParser.fill(sReader, reader, functionDecl.getBody()) && reader.hasNext()
+					&& reader.peek().type != TokenType.CLOS_BRACK) {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
 						"Expected statement in function body. Found "+reader.peek().type+" instead.");
 			}
-			if(line != null) functionDecl.getBody().add(line);
 		}
 		reader.skip();
 		

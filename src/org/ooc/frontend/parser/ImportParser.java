@@ -12,7 +12,7 @@ import org.ubi.SourceReader;
 
 public class ImportParser {
 
-	public static boolean parse(SourceReader sReader, 
+	public static boolean fill(SourceReader sReader, 
 			TokenReader reader, NodeList<Import> imports) throws EOFException {
 
 		Token startToken = reader.peek();

@@ -75,15 +75,11 @@ public class ModuleParser {
 					continue;
 				}
 				
-				if(IncludeParser.parse(sReader, reader, module.getIncludes())) continue;
-				if(ImportParser.parse(sReader, reader, module.getImports())) continue;
-				if(UseParser.parse(sReader, reader, module.getUses())) continue;
+				if(LineParser.fill(sReader, reader, module.getLoadFunc().getBody())) continue;
+				if(IncludeParser.fill(sReader, reader, module.getIncludes())) continue;
+				if(ImportParser.fill(sReader, reader, module.getImports())) continue;
+				if(UseParser.fill(sReader, reader, module.getUses())) continue;
 				if(CommentParser.parse(sReader, reader) != null) continue;
-				Line line = LineParser.parse(sReader, reader);
-				if(line != null) {
-					module.getLoadFunc().getBody().add(line);
-					continue;
-				}
 				
 				Token errToken = reader.peek();
 				throw new CompilationFailedError(sReader.getLocation(errToken),

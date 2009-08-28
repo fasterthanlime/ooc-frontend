@@ -17,6 +17,8 @@ public class BuildParams {
 	
 	public File outPath = new File("ooc_tmp");
 	
+	public String editor = "";
+	
 	public boolean clean = true;
 	public boolean debug = false;
 	public boolean verbose = false;

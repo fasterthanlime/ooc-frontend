@@ -30,11 +30,13 @@ import org.ooc.frontend.model.Module;
 import org.ooc.frontend.model.Use;
 import org.ooc.frontend.model.Include.Mode;
 import org.ooc.frontend.parser.BuildParams;
+import org.ooc.frontend.parser.ModuleParser;
 import org.ooc.frontend.parser.Parser;
 import org.ooc.middle.Tinkerer;
 import org.ooc.middle.UseDef;
 import org.ooc.outputting.FileUtils;
 import org.ubi.CompilationFailedError;
+import org.ubi.FileLocation;
 
 public class CommandLine {
 	
@@ -82,6 +84,10 @@ public class CommandLine {
         		} else if(option.startsWith("libpath")) {
         			
         			params.libPath.add(arg.substring(arg.indexOf('=') + 1));
+        			
+        		} else if(option.startsWith("editor")) {
+        			
+        			params.editor = arg.substring(arg.indexOf('=') + 1);
         			
         		} else if(option.startsWith("c")) {
         			
@@ -204,6 +210,7 @@ public class CommandLine {
 	
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		do {
+			ModuleParser.clearCache();
 			int successCount = 0;
 			for(String modulePath: modulePaths) {
 				try {
@@ -211,6 +218,9 @@ public class CommandLine {
 					if(code == 0) successCount++;
 				} catch(CompilationFailedError err) {
 					System.err.println(err);
+					if(!params.editor.isEmpty()) {
+						launchEditor(params.editor, err);
+					}
 				}
 				if(params.clean) FileUtils.deleteRecursive(params.outPath);
 			}
@@ -220,13 +230,24 @@ public class CommandLine {
 						+" success, "+(modulePaths.size() - successCount)+" failed)");
 			}
 			if(params.slave) {
-				System.out.println("------------- ready -------------\n");
+				System.out.println(".-------------( ready )-------------.\n");
 				reader.readLine();
 			}
 		} while(params.slave);
 		
 	}
 	
+	private void launchEditor(String editor, CompilationFailedError err) throws IOException, InterruptedException {
+		
+		ProcessBuilder builder = new ProcessBuilder();
+		FileLocation location = err.getLocation();
+		String absolutePath = new File(location.getFileName()).getAbsolutePath();
+		builder.command(editor, absolutePath+":"+location.getLineNumber()+":"+location.getLinePos());
+		Process process = builder.start();
+		ProcessUtils.redirectIO(process);
+		process.waitFor();
+	}
+
 	private void compileNasms(List<String> nasms, Collection<String> list) throws IOException, InterruptedException {
 		
 		boolean has = false;

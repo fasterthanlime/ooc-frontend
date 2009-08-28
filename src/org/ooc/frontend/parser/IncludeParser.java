@@ -15,7 +15,7 @@ import org.ubi.SourceReader;
 
 public class IncludeParser {
 
-	public static boolean parse(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws CompilationFailedError {
+	public static boolean fill(SourceReader sReader, TokenReader reader, NodeList<Include> includes) throws CompilationFailedError {
 
 		Token startToken = reader.peek();
 		if(startToken.type != TokenType.INCLUDE_KW) return false;
