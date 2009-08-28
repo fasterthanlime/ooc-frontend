@@ -131,9 +131,7 @@ public class Tokenizer {
 		new CharTuple('@', TokenType.AT),
 		new CharTuple('+', TokenType.PLUS, '=', TokenType.PLUS_ASSIGN),
 		new CharTuple('*', TokenType.STAR, '=', TokenType.STAR_ASSIGN),
-		new CharTuple('<', TokenType.LESSTHAN, '=', TokenType.LESSTHAN_EQUALS),
 		new CharTuple('>', TokenType.GREATERTHAN, '=', TokenType.GREATERTHAN_EQUALS),
-		new CharTuple('^', TokenType.SOMBRERO),
 	};
 	
 	public List<Token> parse(SourceReader reader) throws IOException {
@@ -245,6 +243,21 @@ public class Tokenizer {
 					tokens.add(new Token(index, 2, TokenType.MINUS_ASSIGN));
 				} else {
 					tokens.add(new Token(index, 1, TokenType.MINUS));
+				}
+				continue;
+			}
+			
+			if(c == '<') {
+				reader.read();
+				char c2 = reader.peek();
+				if(c2 == '-') {
+					reader.read();
+					tokens.add(new Token(index, 2, TokenType.L_ARROW));
+				} else if(c2 == '=') {
+					reader.read();
+					tokens.add(new Token(index, 2, TokenType.LESSTHAN_EQUALS));
+				} else {
+					tokens.add(new Token(index, 1, TokenType.LESSTHAN));
 				}
 				continue;
 			}

@@ -242,7 +242,7 @@ public class CommandLine {
 		ProcessBuilder builder = new ProcessBuilder();
 		FileLocation location = err.getLocation();
 		String absolutePath = new File(location.getFileName()).getAbsolutePath();
-		builder.command(editor, absolutePath+":"+location.getLineNumber()+":"+location.getLinePos());
+		builder.command(editor, absolutePath+":"+location.getLineNumber()+":"+(location.getLinePos() - 1));
 		Process process = builder.start();
 		ProcessUtils.redirectIO(process);
 		process.waitFor();

@@ -3,6 +3,7 @@ package org.ooc.frontend.parser;
 import java.io.IOException;
 
 import org.ooc.frontend.model.ControlStatement;
+import org.ooc.frontend.model.Expression;
 import org.ooc.frontend.model.FunctionCall;
 import org.ooc.frontend.model.Line;
 import org.ooc.frontend.model.MemberCall;
@@ -36,22 +37,26 @@ public class LineParser {
 		}
 		body.add(new Line(statement));
 		
-		while(reader.peek().type == TokenType.SOMBRERO) {
+		while(reader.peek().type == TokenType.L_ARROW) {
+			Expression expr = null;
 			if(statement instanceof MemberCall) {
 				MemberCall memberCall = (MemberCall) statement;
-				reader.skip();
-				Token startToken = reader.peek();
-				FunctionCall otherCall = FunctionCallParser.parse(sReader, reader);
-				if(otherCall == null) {
-					throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-						"Expected function call after a sombrero '^'");
-				}
-				statement = new MemberCall(memberCall.getExpression(), otherCall, startToken);
-				body.add(new Line(statement));
+				expr = memberCall.getExpression();
+			} else if(statement instanceof Expression) {
+				expr = (Expression) statement;
 			} else {
 				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
-						"Sombreros '^' for chain-calls should be used after member function calls only");
+						"Arrows '<-' for chain-calls should be used after member function calls only");
 			}
+			reader.skip();
+			Token startToken = reader.peek();
+			FunctionCall otherCall = FunctionCallParser.parse(sReader, reader);
+			if(otherCall == null) {
+				throw new CompilationFailedError(sReader.getLocation(reader.peek()),
+					"Expected function call after an arrow '<-'");
+			}
+			statement = new MemberCall(expr, otherCall, startToken);
+			body.add(new Line(statement));
 		}
 		
 		if(!(statement instanceof ControlStatement)) {
