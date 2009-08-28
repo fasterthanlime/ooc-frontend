@@ -221,10 +221,14 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 
 	public void writeFullName(Appendable dst) throws IOException {
 		
-		if(isMember()) {
-			dst.append(typeDecl.getExternName()).append('_');
+		if(externName != null && externName.length() > 0) {
+			dst.append(externName);
+		} else {
+			if(isMember()) {
+				dst.append(typeDecl.getExternName()).append('_');
+			}
+			writeSuffixedName(dst);
 		}
-		writeSuffixedName(dst);
 		
 	}
 

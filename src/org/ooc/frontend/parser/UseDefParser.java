@@ -50,10 +50,13 @@ public class UseDefParser {
 				def.setDescription(value);
 			} else if(id.equals("Pkgs")) {
 				StringTokenizer st = new StringTokenizer(value, ",");
-				while(st.hasMoreTokens()) def.getPkgs().add(st.nextToken());
+				while(st.hasMoreTokens()) def.getPkgs().add(st.nextToken().trim());
 			} else if(id.equals("Libs")) {
 				StringTokenizer st = new StringTokenizer(value, ",");
-				while(st.hasMoreTokens()) def.getLibs().add(st.nextToken()); 
+				while(st.hasMoreTokens()) def.getLibs().add(st.nextToken().trim()); 
+			}else if(id.equals("Includes")) {
+				StringTokenizer st = new StringTokenizer(value, ",");
+				while(st.hasMoreTokens()) def.getIncludes().add(st.nextToken().trim()); 
 			}
 			
 			reader.skipWhitespace();

@@ -97,4 +97,10 @@ String: cover from Char* {
 		return result
 	}
 	
+	println: func {
+		
+		printf("%s\n", this)
+		
+	}
+	
 }

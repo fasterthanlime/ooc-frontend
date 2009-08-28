@@ -100,8 +100,6 @@ public class FunctionCallWriter {
 				cgen.current.app(".");
 			}
 			cgen.current.app(memberCall.getName());
-		} else if(impl.isStatic() && impl.isExtern()) {
-			cgen.current.app(impl.getExternName());
 		} else {
 			impl.writeFullName(cgen.current);
 		}

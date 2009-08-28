@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.ooc.frontend.model.*;
+import org.ooc.middle.UseDef;
 
 public class ModuleWriter {
 	
@@ -27,6 +28,12 @@ public class ModuleWriter {
 		for(Include include: module.getIncludes()) {
 			IncludeWriter.write(include, cgen);
 		}
+		for(Use use: module.getUses()) {
+			UseDef useDef = use.getUseDef();
+			for(String include: useDef.getIncludes()) {
+				cgen.current.app("#include <").app(include).app(">").nl();
+			}
+		}
 		
 		for(String key: module.getTypes().keySet()) {
 			for(TypeDecl node : module.getTypes().getAll(key)) {
@@ -43,10 +50,8 @@ public class ModuleWriter {
 		
 		cgen.current.nl();
 		for(Import imp: module.getImports()) {
-			cgen.current.app("#include <");
-			cgen.current.app(imp.getModule().getFullName().replace('.', File.separatorChar));
-			cgen.current.app(".h>");
-			cgen.current.nl();
+			String include = imp.getModule().getFullName().replace('.', File.separatorChar);
+			cgen.current.app("#include <").app(include).app(".h>").nl();
 		}
 		
 		cgen.current = cgen.cw;

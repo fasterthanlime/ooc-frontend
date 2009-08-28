@@ -17,6 +17,7 @@ import org.ooc.frontend.model.VariableDecl;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.frontend.model.tokens.TokenReader;
 import org.ooc.frontend.model.tokens.Token.TokenType;
+import org.ooc.middle.OocCompilationError;
 import org.ubi.CompilationFailedError;
 import org.ubi.SourceReader;
 
@@ -90,6 +91,9 @@ public class ModuleParser {
 			for(Import imp: module.getImports()) {
 				Module cached = cache.get(imp.getName());
 				File impFile = parser.params.sourcePath.getFile(imp.getPath());
+				if(impFile == null) {
+					throw new OocCompilationError(imp, module, "Module not found in sourcepath: "+imp.getPath());
+				}
 				if(cached == null || impFile.lastModified() > cached.lastModified) {
 					if(cached != null) {
 						System.out.println(imp.getPath()+" has been changed, recompiling...");

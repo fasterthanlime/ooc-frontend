@@ -16,12 +16,14 @@ public class UseDef {
 	final protected List<Requirement> requirements;
 	final protected List<String> pkgs;
 	final protected List<String> libs;
+	final protected List<String> includes;
 	
 	public UseDef(String identifier) {
 		this.identifier = identifier;
 		this.requirements = new ArrayList<Requirement>();
 		this.pkgs = new ArrayList<String>();
 		this.libs = new ArrayList<String>();
+		this.includes = new ArrayList<String>();
 	}
 	
 	public String getIdentifier() {
@@ -58,6 +60,10 @@ public class UseDef {
 	
 	public List<String> getLibs() {
 		return libs;
+	}
+	
+	public List<String> getIncludes() {
+		return includes;
 	}
 	
 	@Override

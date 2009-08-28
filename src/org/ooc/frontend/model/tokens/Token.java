@@ -188,7 +188,7 @@ public final class Token implements Locatable {
 			"...",
 			"->",
 			":",
-			";",
+			"line separator",
 			
 			"+",
 			"+=",
