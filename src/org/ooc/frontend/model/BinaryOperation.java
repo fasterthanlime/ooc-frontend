@@ -58,8 +58,6 @@ public abstract class BinaryOperation extends Expression implements MustBeResolv
 		right.accept(visitor);
 	}
 	
-
-
 	@Override
 	public boolean isResolved() {
 		return false;
@@ -68,7 +66,15 @@ public abstract class BinaryOperation extends Expression implements MustBeResolv
 	@Override
 	public boolean resolve(NodeList<Node> stack, Resolver res, boolean fatal)
 			throws IOException {
-	
+		
+		if(left.getType() == null || right.getType() == null) {
+			if(fatal) {
+				throw new OocCompilationError(this, stack, "Can't resolve type of left "+
+						left+" or right "+right+" operand. Wtf?");
+			}
+			return true;
+		}
+		
 		OpType opType = getOpType();		
 		for(OpDecl op: res.module.getOps()) {
 			if(tryOp(stack, opType, op)) break;
@@ -107,7 +113,6 @@ public abstract class BinaryOperation extends Expression implements MustBeResolv
 	
 	@Override
 	public boolean replace(Node oldie, Node kiddo) {
-		
 		if(oldie == left) {
 			left = (Expression) kiddo;
 			return true;
@@ -119,7 +124,6 @@ public abstract class BinaryOperation extends Expression implements MustBeResolv
 		}
 		
 		return false;
-		
 	}
 	
 	public abstract OpType getOpType();

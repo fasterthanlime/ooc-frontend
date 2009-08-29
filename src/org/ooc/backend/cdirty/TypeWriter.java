@@ -50,7 +50,19 @@ public class TypeWriter {
 	}
 
 	public static void writeFuncPointer(FuncType type, String name, CGenerator cgen) throws IOException {
-		cgen.current.app("void (*").app(name).app(")()");		
+		writeFuncPointerStart(type, cgen);
+		cgen.current.app(name);
+		writeFuncPointerEnd(type, cgen);		
+	}
+
+	public static AwesomeWriter writeFuncPointerEnd(FuncType type, CGenerator cgen)
+			throws IOException {
+		return cgen.current.app(")()");
+	}
+
+	public static AwesomeWriter writeFuncPointerStart(FuncType type, CGenerator cgen)
+			throws IOException {
+		return cgen.current.app("void (*");
 	}
 	
 }

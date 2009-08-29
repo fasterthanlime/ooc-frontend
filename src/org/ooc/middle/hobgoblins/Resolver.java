@@ -47,6 +47,7 @@ public class Resolver implements Hobgoblin {
 			if(count > MAX) {
 				fatal = true;
 				nosy.start().visit(module);
+				System.exit(0);
 			}
 			running = false;
 			nosy.start().visit(module);

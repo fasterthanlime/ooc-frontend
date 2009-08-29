@@ -39,7 +39,12 @@ public class FunctionDeclWriter {
 
 	public static void writeFuncPrototype(FunctionDecl functionDecl, CGenerator cgen) throws IOException {
 		
-		TypeWriter.writeSpaced(functionDecl.getReturnType(), cgen);
+		Type returnType = functionDecl.getReturnType();
+		if(returnType instanceof FuncType) {
+			TypeWriter.writeFuncPointerStart((FuncType) returnType, cgen);
+		} else {
+			TypeWriter.writeSpaced(returnType, cgen);
+		}
 		functionDecl.writeFullName(cgen.current);
 		
 		cgen.current.app('(');
@@ -56,6 +61,10 @@ public class FunctionDeclWriter {
 			arg.accept(cgen);
 		}
 		cgen.current.app(')');
+		
+		if(returnType instanceof FuncType) {
+			TypeWriter.writeFuncPointerEnd((FuncType) returnType, cgen);
+		}
 		
 	}
 	

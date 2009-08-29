@@ -110,10 +110,12 @@ public class ModuleWriter {
 		cgen.current.nl().app("static bool __done__ = false;").nl().app("if (!__done__)").openBlock();
 		cgen.current.nl().app("__done__ = true;");
 
-		for (Node node : cgen.module.getBody()) {
-			if (node instanceof ClassDecl) {
-				ClassDecl classDecl = (ClassDecl) node;
-				cgen.current.nl().app(classDecl.getName()).app("_").app(classDecl.getLoadFunc().getName()).app("();");
+		for (String key : cgen.module.getTypes().keySet()) {
+			for (TypeDecl typeDecl: cgen.module.getTypes().getAll(key)) {
+				if (typeDecl instanceof ClassDecl) {
+					ClassDecl classDecl = (ClassDecl) typeDecl;
+					cgen.current.nl().app(classDecl.getName()).app("_").app(classDecl.getLoadFunc().getName()).app("();");
+				}
 			}
 		}
 		for (Node node : cgen.module.getLoadFunc().getBody()) {

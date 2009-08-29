@@ -228,7 +228,17 @@ public class Type extends Node implements MustBeResolved {
 	}
 
 	public boolean fitsIn(Type innerType) {
-		return equals(innerType);
+		if (equals(innerType)) return true;
+		if (getClassification() == innerType.getClassification()) return true;
+		return false;
+	}
+	
+	public int getClassification() {
+		if(!isFlat()) return 0; // 0 = pointer
+		if(name.equals("Int")  || name.equals("Short")
+		|| name.equals("Char") || name.equals("Long")
+		|| name.equals("Octet")) return 1; // 1 = integers
+		return 2; // 2 = others
 	}
 
 	public void resolve(Resolver res) {

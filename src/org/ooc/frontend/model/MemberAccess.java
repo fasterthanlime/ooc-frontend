@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.ooc.frontend.Levenshtein;
 import org.ooc.frontend.Visitor;
 import org.ooc.frontend.model.VariableDecl.VariableDeclAtom;
+import org.ooc.frontend.model.interfaces.MustBeResolved;
 import org.ooc.frontend.model.tokens.Token;
 import org.ooc.middle.OocCompilationError;
 import org.ooc.middle.hobgoblins.Resolver;
@@ -76,8 +77,14 @@ public class MemberAccess extends VariableAccess {
 		exprType = exprType.getFlatType(res);
 		if(exprType.getRef() == null) exprType.resolve(res);
 
-		if(tryResolve(stack, exprType)) return true;
-		if(tryResolve(stack, exprType.getFlatType(res))) return true;
+		if(!tryResolve(stack, exprType)) {
+			tryResolve(stack, exprType.getFlatType(res));
+		}
+		
+		if(ref != null && ref.getType() == null && ref instanceof MustBeResolved) {
+			MustBeResolved must = (MustBeResolved) ref;
+			must.resolve(stack, res, fatal);
+		}
 		
 		if(fatal && ref == null) {
 			String message = "Can't resolve access to member "+exprType+"."+name;

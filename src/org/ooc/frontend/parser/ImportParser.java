@@ -36,14 +36,11 @@ public class ImportParser {
 				imports.add(imp);
 				sb.setLength(0);
 				startToken = reader.peek();
-			} else if(token.type == TokenType.NAME || token.type == TokenType.MINUS) {
-				sb.append(token.get(sReader));
 			} else if(token.type == TokenType.DOT) {
 				sb.append('.');
 				if(readMulti(sReader, reader, imports, sb, token)) break;
 			} else {
-				throw new CompilationFailedError(sReader.getLocation(token),
-						"Unexpected token "+token+" while reading an import");
+				sb.append(token.get(sReader));
 			}
 			
 		}
