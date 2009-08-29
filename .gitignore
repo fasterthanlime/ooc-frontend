@@ -1,6 +1,8 @@
+*.[oa]
 *.class
 *.gen
+*~
 bin/*
-build/
+build/*
 utils/test-suite
 ooc_tmp
