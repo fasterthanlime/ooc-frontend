@@ -119,7 +119,7 @@ public class FunctionDecl extends Declaration implements Scope, Generic {
 	 * @return true if it's a member function
 	 */
 	public boolean isMember() {
-		return typeDecl != null && !isFromPointer();
+		return typeDecl != null;
 	}
 	
 	public NodeList<Line> getBody() {

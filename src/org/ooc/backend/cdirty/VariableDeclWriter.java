@@ -20,7 +20,8 @@ public class VariableDeclWriter {
 		// const keyword because it causes problems with class initializations
 		//if(variableDecl.isConst()) cgen.current.app("const ");
 		
-		if(variableDecl.getType() instanceof FuncType) {
+		Type type = variableDecl.getType();
+		if(type instanceof FuncType) {
 			
 			FuncType funcType = (FuncType) variableDecl.getType();
 			FunctionDecl funcDecl = funcType.getDecl();
@@ -30,6 +31,7 @@ public class VariableDeclWriter {
 				TypeWriter.writeSpaced(funcDecl.getReturnType(), cgen);
 				cgen.current.app("(*").app(atom.getName()).app(")");
 				ClassDeclWriter.writeFuncArgs(funcDecl, cgen);
+				writeInitAndComma(cgen, type, iter, atom);
 			}
 			
 		} else {
@@ -38,7 +40,6 @@ public class VariableDeclWriter {
 			TypeDecl typeDecl = variableDecl.getTypeDecl();
 			if(isStatic && (typeDecl == null)) cgen.current.append("static ");
 			
-			Type type = variableDecl.getType();
 			if(!type.isArray()) {
 				TypeWriter.writeSpaced(type, cgen);
 			} else {
@@ -55,18 +56,24 @@ public class VariableDeclWriter {
 				if(type.isArray()) for(int i = 0; i < type.getPointerLevel(); i++) {
 					cgen.current.app("[]");
 				}
-				if(atom.getExpression() != null) {
-					cgen.current.app(" = ");
-					atom.getExpression().accept(cgen);
-				}
-				if(iter.hasNext()) {
-					cgen.current.app(", ");
-					TypeWriter.writeStars(type, cgen);
-				}
+				writeInitAndComma(cgen, type, iter, atom);
 			}
 			
 		}
 		
+	}
+
+	private static void writeInitAndComma(CGenerator cgen, Type type,
+			Iterator<VariableDeclAtom> iter, VariableDeclAtom atom)
+			throws IOException {
+		if(atom.getExpression() != null) {
+			cgen.current.app(" = ");
+			atom.getExpression().accept(cgen);
+		}
+		if(iter.hasNext()) {
+			cgen.current.app(", ");
+			TypeWriter.writeStars(type, cgen);
+		}
 	}
 	
 }

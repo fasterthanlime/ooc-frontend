@@ -227,7 +227,7 @@ public class NodeList<T extends Node> extends Node implements Iterable<T> {
 	}
 
 	public void push(T node) {
-		if(size > nodes.length) realloc();
+		if(size + 1 > nodes.length) realloc();
 		nodes[size++] = node;
 	}
 

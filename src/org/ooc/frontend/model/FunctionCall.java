@@ -239,9 +239,24 @@ public class FunctionCall extends Access implements MustBeResolved {
 				}
 			}
 		}
+		
+		if(impl == null) {
+			VariableDecl varDecl = getVariable(name, stack);
+			if(varDecl != null) {
+				if(varDecl.getName().equals(name)) {
+					if(varDecl.getType() instanceof FuncType) {
+						FuncType funcType = (FuncType) varDecl.getType();
+						impl = funcType.getDecl();
+					} else {
+						throw new OocCompilationError(this, stack, "Trying to call "
+								+name+", which isn't a function pointer (Func), but a "+varDecl.getType());
+					}
+				}
+			}
+		}
 
 		if(impl != null) {
-			if(impl.isMember() || impl.isFromPointer()) transformToMemberCall(stack, res);
+			if(impl.isMember()) transformToMemberCall(stack, res);
 		}
 		
 	}
